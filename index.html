@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Network Builder v8.0 Omni-Core</title>
+    <title>Network Builder v8.1 Omni-Core</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
@@ -152,7 +152,7 @@
 <body>
     <div class="container">
         <h2>
-            ⚡ Network Builder v8.0 Omni-Core
+            ⚡ Network Builder v8.1 Omni-Core
             <div class="header-actions">
                 <button class="icon-btn primary" onclick="pingAll()">⚡ Ping All</button>
                 <button class="icon-btn" onclick="sortProxies()">📶 Сортировка</button>
@@ -162,13 +162,9 @@
             </div>
         </h2>
         
-        <p>Поддержка: VLESS, VMess, Trojan, Hysteria2, SS, SSR, WireGuard, Socks5, HTTP, SSH, Naive, TUIC. <br><b>Перетащите .txt файл прямо в поле ниже или вставьте ссылки.</b></p>
+        <p>Поддержка: JSON Configs (Xray/Nekobox), VLESS, VMess, Trojan, Hysteria2, SS, SSR, WireGuard, Socks5, HTTP, SSH, Naive, TUIC.</p>
         
-        <textarea id="input" placeholder="Drop .txt file here or paste links:
-vless://...
-wireguard://...
-ssh://...
-socks5://..."></textarea>
+        <textarea id="input" placeholder="Drop .txt/.json file here or paste links / raw JSON config"></textarea>
         
         <div class="btn-group">
             <button class="action-btn btn-convert" onclick="startProcess()">► PROCESS NODES</button>
@@ -207,7 +203,6 @@ socks5://..."></textarea>
             catch(e) { try { return atob(str.replace(/-/g, '+').replace(/_/g, '/')); } catch(e2) { return ""; } }
         }
 
-        // === DRAG AND DROP ===
         const dropZone = document.getElementById('input');
         dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
         dropZone.addEventListener('dragleave', (e) => { e.preventDefault(); dropZone.classList.remove('dragover'); });
@@ -259,7 +254,7 @@ socks5://..."></textarea>
             const out = document.getElementById('output');
             if (!input) { showToast("Пустое поле!", "#f85149"); return; }
 
-            if (input.startsWith('http') && !input.includes('://') && !input.includes('@')) {
+            if (input.startsWith('http') && !input.includes('://') && !input.includes('@') && !input.includes('{')) {
                 out.textContent = "⏳ Fetching...";
                 try {
                     const res = await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(input));
@@ -268,16 +263,77 @@ socks5://..."></textarea>
             } else { parseData(input); }
         }
 
-        // РАСШИРЕННЫЙ ПАРСЕР ПРОТОКОЛОВ
+        // =========================================================================
+        // ПАРСЕР (ВКЛЮЧАЯ ДЕСЕРИАЛИЗАЦИЮ XRAY JSON)
+        // =========================================================================
         function parseData(rawText) {
             let text = rawText.trim();
             let newProxiesCount = 0;
 
+            // 1. Пытаемся распарсить как Xray/Sing-box JSON
             try {
                 let json = JSON.parse(text);
-                if (json.outbounds) { showToast("Конвертация из JSON пока не поддерживается, используйте ссылки.", "#d29922"); return; }
-            } catch(e){}
+                if (json.outbounds && Array.isArray(json.outbounds)) {
+                    json.outbounds.forEach(ob => {
+                        if (ob.protocol === 'freedom' || ob.protocol === 'blackhole' || ob.protocol === 'dns') return;
+                        
+                        let proxyObj = null;
+                        let tag = ob.tag || "Node_" + Math.floor(Math.random()*1000);
 
+                        // Парсинг Xray VLESS (как в твоем примере)
+                        if (ob.protocol === 'vless' && ob.settings && ob.settings.vnext && ob.settings.vnext.length > 0) {
+                            let vnext = ob.settings.vnext[0];
+                            let user = (vnext.users && vnext.users.length > 0) ? vnext.users[0] : {};
+                            let stream = ob.streamSettings || {};
+                            let reality = stream.realitySettings || {};
+                            let tls = stream.tlsSettings || {};
+                            
+                            proxyObj = {
+                                name: tag,
+                                type: "vless",
+                                server: vnext.address,
+                                port: vnext.port,
+                                uuid: user.id,
+                                tls: stream.security === 'reality' || stream.security === 'tls',
+                                "reality-opts": stream.security === 'reality' ? { "public-key": reality.publicKey, "short-id": reality.shortId || "" } : undefined,
+                                sni: reality.serverName || tls.serverName || vnext.address,
+                                network: stream.network || "tcp",
+                                flow: user.flow || "",
+                                fp: reality.fingerprint || tls.fingerprint || "chrome"
+                            };
+                        }
+                        
+                        if (proxyObj) {
+                            // Собираем обратно стандартную ссылку
+                            let link = `vless://${proxyObj.uuid}@${proxyObj.server}:${proxyObj.port}?type=${proxyObj.network}&security=${proxyObj.tls ? (proxyObj["reality-opts"] ? 'reality' : 'tls') : 'none'}&sni=${proxyObj.sni}&fp=${proxyObj.fp}`;
+                            if (proxyObj.flow) link += `&flow=${proxyObj.flow}`;
+                            if (proxyObj["reality-opts"]) link += `&pbk=${proxyObj["reality-opts"]["public-key"]}&sid=${proxyObj["reality-opts"]["short-id"]}`;
+                            link += `#${encodeURIComponent(proxyObj.name)}`;
+                            proxyObj.rawLink = link;
+
+                            if (!currentProxies.some(p => p.server === proxyObj.server && p.port === proxyObj.port)) {
+                                currentProxies.push(proxyObj); newProxiesCount++;
+                            }
+                        }
+                    });
+                    
+                    if (newProxiesCount > 0) {
+                        document.getElementById('input').value = '';
+                        showToast(`+${newProxiesCount} узлов из JSON добавлено!`);
+                        saveState(); renderCards();
+                        return; // Завершаем функцию, так как JSON успешно прочитан
+                    }
+                }
+            } catch(e) {
+                // Если это не JSON, идем дальше к построчному парсингу
+            }
+
+            // 2. Декодинг Base64 подписок (если это сплошной текст)
+            if (newProxiesCount === 0 && !text.includes('://') && !text.includes('"outbounds"')) {
+                try { text = atob(text.replace(/\s/g, '')); } catch (e) {}
+            }
+
+            // 3. Построчный парсинг ссылок (VLESS, Trojan, SSR и т.д.)
             text.split('\n').forEach(line => {
                 line = line.trim(); let proxyObj = null;
                 try {
@@ -436,7 +492,7 @@ socks5://..."></textarea>
                 document.getElementById('copyBtn').style.display = "inline-block";
             } else {
                 container.style.display = 'none'; document.getElementById('nodeCount').style.display = "none";
-                document.getElementById('output').textContent = "Waiting for data...";
+                document.getElementById('output').textContent = "Вставьте ссылки или JSON конфиг...";
                 document.getElementById('downloadBtn').style.display = "none"; document.getElementById('copyBtn').style.display = "none";
             }
         }
@@ -464,9 +520,7 @@ socks5://..."></textarea>
         // =========================================================================
         function generateSingboxJSON() {
             if (currentProxies.length === 0) return;
-            
-            let outbounds = [];
-            let proxyTags = [];
+            let outbounds = []; let proxyTags = [];
 
             currentProxies.forEach((p, index) => {
                 let tag = p.name || `proxy-${index}`;
@@ -506,7 +560,6 @@ socks5://..."></textarea>
             outbounds.push({ type: "direct", tag: "direct" });
             outbounds.push({ type: "block", tag: "block" });
             outbounds.push({ type: "dns", tag: "dns-out" });
-
             outbounds.unshift({ type: "selector", tag: "🚀 Proxy Select", outbounds: proxyTags });
 
             document.getElementById('output').textContent = JSON.stringify({ outbounds: outbounds }, null, 2);
@@ -1656,9 +1709,10 @@ rules:
 
         function downloadFile() {
             const content = document.getElementById('output').textContent;
+            
             const format = document.getElementById('exportFormat').value;
             const ext = (format === 'xray' || format === 'singbox') ? 'json' : 'yaml';
-            const filename = `Network_Config_v8.${ext}`;
+            const filename = `Network_Config_v8.1.${ext}`;
             const mimeType = (format === 'xray' || format === 'singbox') ? 'application/json' : 'text/yaml';
 
             const a = document.createElement('a');
