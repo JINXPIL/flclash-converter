@@ -60,7 +60,7 @@
 
         textarea { 
             width: 100%; 
-            height: 100px;
+            height: 120px;
             background: #010409; 
             color: #3fb950; 
             border: 1px solid #30363d; 
@@ -131,7 +131,7 @@
         .proxy-name { 
             font-weight: bold; color: #58a6ff; font-size: 13px; 
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
-            padding-right: 50px; outline: none; border-bottom: 1px dashed transparent; cursor: text;
+            padding-right: 30px; outline: none; border-bottom: 1px dashed transparent; cursor: text;
         }
         .proxy-name:focus { border-bottom: 1px dashed #58a6ff; }
         
@@ -170,14 +170,14 @@
         <h2>
             ⚡ Network Builder v77
             <div class="header-actions">
-                <button class="icon-btn" onclick="shuffleProxies()" title="Перемешать список для балансировки нагрузки">🔀 Shuffle</button>
+                <button class="icon-btn" onclick="shuffleProxies()" title="Shuffle nodes">🔀 Shuffle</button>
                 <button class="icon-btn danger" onclick="clearAll()">🗑 Clear</button>
             </div>
         </h2>
         
-        <p>Утилита для генерации профилей маршрутизации. Вставьте список узлов (vless://), и скрипт интегрирует их в базовый сетевой профиль.</p>
+        <p>Утилита для генерации профилей маршрутизации. Поддерживает vless/vmess/trojan ссылки, подписки в Base64 и формат Sing-box JSON (Happ/2RayTun).</p>
         
-        <textarea id="input" placeholder="Paste nodes here..."></textarea>
+        <textarea id="input" placeholder="Paste nodes or Sing-box JSON here..."></textarea>
         
         <div class="btn-group">
             <button class="btn-convert" onclick="startProcess()">► BUILD CONFIG</button>
@@ -221,7 +221,6 @@
             }
         }
 
-        // Функция перемешивания серверов (алгоритм Фишера-Йетса)
         function shuffleProxies() {
             if (currentProxies.length < 2) return;
             for (let i = currentProxies.length - 1; i > 0; i--) {
@@ -239,7 +238,7 @@
 
             if (!input) { showToast("Input is empty!", "#f85149"); return; }
 
-            if (input.startsWith('http')) {
+            if (input.startsWith('http://') || input.startsWith('https://')) {
                 out.textContent = "⏳ Fetching...";
                 try {
                     const res = await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(input));
@@ -252,41 +251,120 @@
 
         function parseData(rawText) {
             let text = rawText.trim();
-            if (!text.includes('vless://') && !text.includes('"outbounds"')) {
+            let newProxiesCount = 0;
+
+            // Попытка декодировать Base64, если это не JSON и не ссылки
+            if (!text.includes('://') && !text.includes('"outbounds"') && !text.startsWith('{') && !text.startsWith('[')) {
                 try { text = atob(text.replace(/\s/g, '')); } catch (e) {}
             }
 
-            let newProxiesCount = 0;
-            if (text.includes('vless://')) {
-                const lines = text.split('\n');
-                lines.forEach(line => {
-                    line = line.trim();
-                    if (line.startsWith('vless://')) {
-                        try {
-                            const url = new URL(line);
-                            const params = new URLSearchParams(url.search);
-                            const isDuplicate = currentProxies.some(p => p.server === url.hostname && p.port === parseInt(url.port));
-                            
+            // 1. ПАРСЕР SING-BOX JSON
+            if (text.includes('"outbounds"') || text.startsWith('{') || text.startsWith('[')) {
+                try {
+                    const data = JSON.parse(text);
+                    const outbounds = data.outbounds || (Array.isArray(data) ? data : [data]);
+                    
+                    outbounds.forEach(ob => {
+                        if (!ob || !ob.server) return;
+                        
+                        const isSupported = ['vless', 'vmess', 'trojan', 'hysteria2'].includes(ob.type);
+                        if (isSupported) {
+                            const isDuplicate = currentProxies.some(p => p.server === ob.server && p.port === ob.server_port);
                             if (!isDuplicate) {
-                                currentProxies.push({
-                                    name: decodeURIComponent(url.hash.slice(1)) || "Node_" + Math.floor(Math.random()*100),
-                                    type: "vless",
-                                    server: url.hostname,
-                                    port: parseInt(url.port),
-                                    uuid: url.username,
-                                    tls: params.get('security') === 'reality' || params.get('security') === 'tls',
-                                    "reality-opts": params.get('pbk') ? { "public-key": params.get('pbk'), "short-id": params.get('sid') || "" } : undefined,
-                                    sni: params.get('sni') || url.hostname,
-                                    network: params.get('type') || "tcp",
-                                    flow: params.get('flow') || "",
-                                    fp: params.get('fp') || "chrome"
-                                });
+                                let proxy = {
+                                    name: ob.tag || `${ob.type}_${ob.server}`,
+                                    type: ob.type,
+                                    server: ob.server,
+                                    port: ob.server_port,
+                                    udp: true
+                                };
+
+                                if (ob.type === 'vless' || ob.type === 'vmess') proxy.uuid = ob.uuid;
+                                if (ob.type === 'trojan' || ob.type === 'hysteria2') proxy.password = ob.password;
+                                if (ob.type === 'vless' && ob.flow) proxy.flow = ob.flow;
+                                
+                                if (ob.type === 'vmess') {
+                                    proxy.alterId = ob.alter_id || 0;
+                                    proxy.cipher = ob.security || "auto";
+                                }
+
+                                if (ob.type === 'hysteria2') {
+                                    proxy.sni = ob.tls?.server_name || ob.server;
+                                    proxy['skip-cert-verify'] = ob.tls?.insecure || false;
+                                    if (ob.obfs) {
+                                        proxy.obfs = ob.obfs.type;
+                                        proxy['obfs-password'] = ob.obfs.password;
+                                    }
+                                }
+
+                                // Парсинг TLS & Reality
+                                if (ob.tls && ob.tls.enabled !== false && ob.type !== 'hysteria2') {
+                                    proxy.tls = true;
+                                    proxy.sni = ob.tls.server_name || ob.server;
+                                    proxy['skip-cert-verify'] = ob.tls.insecure || false;
+                                    proxy.fp = ob.tls.utls?.fingerprint || "chrome";
+                                    
+                                    if (ob.tls.reality && ob.tls.reality.enabled) {
+                                        proxy['reality-opts'] = {
+                                            'public-key': ob.tls.reality.public_key || "",
+                                            'short-id': ob.tls.reality.short_id || ""
+                                        };
+                                    }
+                                }
+
+                                // Парсинг Transport
+                                if (ob.transport) {
+                                    proxy.network = ob.transport.type;
+                                    if (proxy.network === 'ws') {
+                                        proxy['ws-opts'] = { path: ob.transport.path || "/" };
+                                        if (ob.transport.headers) proxy['ws-opts'].headers = { Host: ob.transport.headers.Host || ob.transport.headers.host || ob.server };
+                                    } else if (proxy.network === 'grpc') {
+                                        proxy['grpc-opts'] = { 'grpc-service-name': ob.transport.service_name || "" };
+                                    } else if (['httpupgrade', 'xhttp', 'splithttp'].includes(proxy.network)) {
+                                        proxy.network = 'xhttp';
+                                        proxy['xhttp-opts'] = { path: ob.transport.path || "/" };
+                                    }
+                                } else if (!proxy.network && ob.type !== 'hysteria2') {
+                                    proxy.network = "tcp";
+                                }
+
+                                currentProxies.push(proxy);
                                 newProxiesCount++;
                             }
-                        } catch (e) {}
-                    }
-                });
+                        }
+                    });
+                } catch (e) { console.error("JSON Error:", e); }
             }
+
+            // 2. ПАРСЕР ССЫЛОК (vless://)
+            const lines = text.split('\n');
+            lines.forEach(line => {
+                line = line.trim();
+                if (line.startsWith('vless://')) {
+                    try {
+                        const url = new URL(line);
+                        const params = new URLSearchParams(url.search);
+                        const isDuplicate = currentProxies.some(p => p.server === url.hostname && p.port === parseInt(url.port));
+                        
+                        if (!isDuplicate) {
+                            currentProxies.push({
+                                name: decodeURIComponent(url.hash.slice(1)) || "Node_" + Math.floor(Math.random()*100),
+                                type: "vless",
+                                server: url.hostname,
+                                port: parseInt(url.port),
+                                uuid: url.username,
+                                tls: params.get('security') === 'reality' || params.get('security') === 'tls',
+                                "reality-opts": params.get('pbk') ? { "public-key": params.get('pbk'), "short-id": params.get('sid') || "" } : undefined,
+                                sni: params.get('sni') || url.hostname,
+                                network: params.get('type') || "tcp",
+                                flow: params.get('flow') || "",
+                                fp: params.get('fp') || "chrome"
+                            });
+                            newProxiesCount++;
+                        }
+                    } catch (e) {}
+                }
+            });
 
             if (newProxiesCount > 0) {
                 document.getElementById('input').value = '';
@@ -315,7 +393,6 @@
                     card.className = 'proxy-card';
                     card.innerHTML = `
                         <div class="card-actions">
-                            <button class="btn-card" onclick="copyVless(${index})" title="Copy link">🔗</button>
                             <button class="btn-card remove" onclick="removeProxy(${index})" title="Remove">✖</button>
                         </div>
                         <div class="proxy-name" contenteditable="true" spellcheck="false" 
@@ -346,26 +423,33 @@
             saveState(); generateYAML();
         }
 
-        function copyVless(index) {
-            const p = currentProxies[index];
-            let url = `vless://${p.uuid}@${p.server}:${p.port}?type=${p.network}&security=${p.tls?'reality':'none'}&sni=${p.sni}&fp=${p.fp}`;
-            if (p.flow) url += `&flow=${p.flow}`;
-            if (p["reality-opts"]) url += `&pbk=${p["reality-opts"]["public-key"]}&sid=${p["reality-opts"]["short-id"]}`;
-            url += `#${encodeURIComponent(p.name)}`;
-            navigator.clipboard.writeText(url);
-            showToast("🔗 Link copied!");
-        }
-
-        // === СТЕЛС-ИНТЕГРАЦИЯ УНИВЕРСАЛЬНОГО КОНФИГА ===
+        // === ГЕНЕРАТОР YAML С ПОДДЕРЖКОЙ РАЗНЫХ ТИПОВ ===
         function generateYAML() {
             if (currentProxies.length === 0) return;
 
             let proxiesYAML = "proxies:\n";
             currentProxies.forEach(p => {
-                proxiesYAML += `  - name: "${p.name}"\n    type: ${p.type}\n    server: ${p.server}\n    port: ${p.port}\n    uuid: ${p.uuid}\n    network: ${p.network}\n    udp: true\n`;
+                proxiesYAML += `  - name: "${p.name}"\n    type: ${p.type}\n    server: ${p.server}\n    port: ${p.port}\n`;
+                if (p.type === 'vless' || p.type === 'vmess') proxiesYAML += `    uuid: ${p.uuid}\n`;
+                if (p.type === 'trojan' || p.type === 'hysteria2') proxiesYAML += `    password: ${p.password}\n`;
+                if (p.type === 'vmess') proxiesYAML += `    alterId: ${p.alterId}\n    cipher: ${p.cipher}\n`;
+                if (p.network) proxiesYAML += `    network: ${p.network}\n`;
+                proxiesYAML += `    udp: true\n`;
                 if (p.flow) proxiesYAML += `    flow: ${p.flow}\n`;
-                if (p.tls) proxiesYAML += `    tls: true\n    sni: ${p.sni}\n    client-fingerprint: ${p.fp}\n`;
-                if (p["reality-opts"]) proxiesYAML += `    reality-opts:\n      public-key: ${p["reality-opts"]["public-key"]}\n      short-id: ${p["reality-opts"]["short-id"]}\n`;
+                
+                if (p.tls) proxiesYAML += `    tls: true\n    sni: ${p.sni}\n    client-fingerprint: ${p.fp || 'chrome'}\n`;
+                
+                if (p.type === 'hysteria2') {
+                    proxiesYAML += `    sni: ${p.sni}\n    skip-cert-verify: ${p['skip-cert-verify']}\n`;
+                    if (p.obfs) proxiesYAML += `    obfs: ${p.obfs}\n    obfs-password: ${p['obfs-password']}\n`;
+                } else if (p['skip-cert-verify']) {
+                    proxiesYAML += `    skip-cert-verify: true\n`;
+                }
+
+                if (p['reality-opts']) proxiesYAML += `    reality-opts:\n      public-key: ${p['reality-opts']['public-key']}\n      short-id: ${p['reality-opts']['short-id']}\n`;
+                if (p['ws-opts']) proxiesYAML += `    ws-opts:\n      path: ${p['ws-opts'].path}\n` + (p['ws-opts'].headers ? `      headers:\n        Host: ${p['ws-opts'].headers.Host}\n` : "");
+                if (p['grpc-opts']) proxiesYAML += `    grpc-opts:\n      grpc-service-name: "${p['grpc-opts']['grpc-service-name']}"\n`;
+                if (p['xhttp-opts']) proxiesYAML += `    xhttp-opts:\n      path: ${p['xhttp-opts'].path}\n`;
             });
 
             const proxyNames = currentProxies.map(p => `      - "${p.name}"`).join('\n');
