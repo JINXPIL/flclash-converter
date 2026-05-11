@@ -22,7 +22,7 @@
             border: 1px solid #30363d;
             border-radius: 12px;
             padding: 30px;
-            max-width: 700px;
+            max-width: 750px;
             width: 100%;
             box-shadow: 0 8px 24px rgba(0,0,0,0.5);
         }
@@ -50,36 +50,34 @@
             font-family: inherit;
             resize: vertical;
             outline: none;
-            transition: border-color 0.2s;
         }
 
-        textarea:focus { border-color: #58a6ff; }
+        .btn-group { display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap; align-items: center; }
 
-        .btn-group { display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; }
-
-        button { 
+        button, select { 
             border: none; 
-            padding: 12px 24px; 
+            padding: 12px 20px; 
             border-radius: 6px; 
             font-weight: bold; 
             font-family: inherit;
             cursor: pointer; 
             transition: all 0.2s ease;
-            font-size: 14px;
+            font-size: 13px;
         }
 
-        .btn-convert { 
-            background: #238636; 
-            color: #ffffff; 
-        }
-        .btn-convert:hover { background: #2ea043; transform: translateY(-1px); }
-
-        .btn-copy { 
-            background: #21262d; 
-            color: #c9d1d9; 
+        select {
+            background: #21262d;
+            color: #c9d1d9;
             border: 1px solid #30363d;
+            outline: none;
         }
-        .btn-copy:hover { background: #30363d; }
+
+        .btn-convert { background: #238636; color: #ffffff; }
+        .btn-convert:hover { background: #2ea043; }
+
+        .btn-copy { background: #21262d; color: #c9d1d9; border: 1px solid #30363d; }
+        .btn-download { background: #58a6ff; color: #ffffff; display: none; }
+        .btn-download:hover { background: #79c0ff; }
 
         pre { 
             background: #0d1117; 
@@ -101,27 +99,33 @@
             padding: 15px; 
             border-left: 4px solid #58a6ff; 
             border-radius: 0 6px 6px 0;
-            line-height: 1.6;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h2>⚡ FlClash Конвертер</h2>
-        <p>Вставь ссылку на подписку (https://...), Base64 или набор vless:// серверов:</p>
+        <p>Вставьте подписку или vless:// ссылки:</p>
         
         <textarea id="input" placeholder="vless://..."></textarea>
         
         <div class="btn-group">
             <button class="btn-convert" onclick="startProcess()">► КОНВЕРТИРОВАТЬ</button>
-            <button class="btn-copy" onclick="copyResult()">⎘ КОПИРОВАТЬ YAML</button>
+            <button class="btn-copy" onclick="copyResult()">⎘ КОПИРОВАТЬ</button>
+            
+            <select id="extension">
+                <option value="yaml">.yaml</option>
+                <option value="yml">.yml</option>
+                <option value="txt">.txt</option>
+            </select>
+            
+            <button id="downloadBtn" class="btn-download" onclick="downloadFile()">⬇ СКАЧАТЬ ФАЙЛ</button>
         </div>
         
-        <pre id="output">Здесь появится готовый конфиг для FlClash...</pre>
+        <pre id="output">Здесь появится готовый конфиг...</pre>
 
         <div class="hint">
-            <strong>💡 Подсказка:</strong><br>
-            Если ссылка не скачивается автоматически (блок прокси), открой её в браузере, скопируй весь зашифрованный текст и вставь его сюда.
+            <strong>Совет:</strong> После появления результата выберите формат и нажмите «Скачать», чтобы сохранить файл для импорта во FlClash.
         </div>
     </div>
 
@@ -129,17 +133,16 @@
         async function startProcess() {
             const input = document.getElementById('input').value.trim();
             const out = document.getElementById('output');
+            const dlBtn = document.getElementById('downloadBtn');
+
             if (!input) { out.textContent = "Пустое поле!"; return; }
 
-            if (input.startsWith('http://') || input.startsWith('https://')) {
-                out.textContent = "⏳ Скачиваю данные с сервера...";
+            if (input.startsWith('http')) {
+                out.textContent = "⏳ Загрузка...";
                 try {
                     const res = await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(input));
-                    if (!res.ok) throw new Error("Ошибка");
                     parseData(await res.text());
-                } catch (e) {
-                    out.textContent = "❌ Сервер заблокировал запрос.\n\nСкопируй текст по ссылке вручную и вставь сюда.";
-                }
+                } catch (e) { out.textContent = "❌ Ошибка загрузки."; }
             } else {
                 parseData(input);
             }
@@ -148,6 +151,7 @@
         function parseData(rawText) {
             let text = rawText.trim();
             const out = document.getElementById('output');
+            const dlBtn = document.getElementById('downloadBtn');
             let proxies = [];
 
             if (!text.includes('vless://') && !text.includes('"outbounds"')) {
@@ -173,41 +177,54 @@
                                 sni: params.get('sni') || url.hostname,
                                 network: params.get('type') || "tcp",
                                 flow: params.get('flow') || "",
-                                fp: params.get('fp') || "chrome",
-                                udp: true
+                                fp: params.get('fp') || "chrome"
                             });
                         } catch (e) {}
                     }
                 });
-            } 
+            }
 
             if (proxies.length > 0) {
                 let yaml = "proxies:\n";
                 proxies.forEach(p => {
                     yaml += `  - name: "${p.name}"\n    type: ${p.type}\n    server: ${p.server}\n    port: ${p.port}\n    uuid: ${p.uuid}\n    network: ${p.network}\n    udp: true\n`;
                     if (p.flow) yaml += `    flow: ${p.flow}\n`;
-                    if (p.tls) {
-                        yaml += `    tls: true\n    sni: ${p.sni}\n    client-fingerprint: ${p.fp}\n`;
-                    }
+                    if (p.tls) yaml += `    tls: true\n    sni: ${p.sni}\n    client-fingerprint: ${p.fp}\n`;
                     if (p["reality-opts"]) yaml += `    reality-opts:\n      public-key: ${p["reality-opts"]["public-key"]}\n      short-id: ${p["reality-opts"]["short-id"]}\n`;
                 });
                 out.textContent = yaml;
+                dlBtn.style.display = "inline-block"; // Показываем кнопку скачивания
             } else {
-                out.textContent = "❌ Не нашел рабочих серверов VLESS в тексте.";
+                out.textContent = "❌ Серверы не найдены.";
+                dlBtn.style.display = "none";
             }
+        }
+
+        function downloadFile() {
+            const content = document.getElementById('output').textContent;
+            const ext = document.getElementById('extension').value;
+            const filename = `config_${new Date().getTime()}.${ext}`;
+            
+            const blob = new Blob([content], { type: 'text/yaml' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
         }
 
         function copyResult() {
             const text = document.getElementById('output').textContent;
-            const btn = document.querySelector('.btn-copy');
             if (text.includes('proxies:')) {
                 navigator.clipboard.writeText(text);
+                const btn = document.querySelector('.btn-copy');
                 btn.textContent = "✓ СКОПИРОВАНО";
-                btn.style.color = "#3fb950";
-                setTimeout(() => {
-                    btn.textContent = "⎘ КОПИРОВАТЬ YAML";
-                    btn.style.color = "#c9d1d9";
-                }, 2000);
+                setTimeout(() => btn.textContent = "⎘ КОПИРОВАТЬ", 2000);
             }
         }
     </script>
