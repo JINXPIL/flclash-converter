@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Network Builder v8.2 Omni-Core</title>
+    <title>Network Builder v8.3 Omni-Core</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
@@ -152,19 +152,19 @@
 <body>
     <div class="container">
         <h2>
-            ⚡ Network Builder v8.2 Omni-Core
+            ⚡ Network Builder v8.3 Stealth
             <div class="header-actions">
-                <button class="icon-btn primary" onclick="pingAll()">⚡ Ping All</button>
-                <button class="icon-btn" onclick="sortProxies()">📶 Сортировка</button>
-                <button class="icon-btn" onclick="shuffleProxies()">🔀 Перемешать</button>
-                <button class="icon-btn" onclick="exportRawNodes()">📥 Бэкап TXT</button>
+                <button class="icon-btn primary" onclick="pingAll()" title="Проверить все узлы">⚡ Ping All</button>
+                <button class="icon-btn" onclick="sortProxies()" title="Сортировка по задержке">📶 Сортировка</button>
+                <button class="icon-btn" onclick="shuffleProxies()" title="Случайный порядок">🔀 Перемешать</button>
+                <button class="icon-btn" onclick="exportRawNodes()" title="Резервная копия ссылок">📥 Бэкап TXT</button>
                 <button class="icon-btn danger" onclick="clearAll()">🗑 Очистить</button>
             </div>
         </h2>
         
-        <p>Поддержка: JSON Configs (Xray/Nekobox), VLESS, VMess, Trojan, Hysteria2, SS, SSR, WireGuard, Socks5, HTTP, SSH, Naive, TUIC.</p>
+        <p>Поддержка: JSON Configs (Xray/Sing-box), VLESS, VMess, Trojan, Hysteria2, SS, SSR, WireGuard, Socks5, HTTP, SSH, Naive, TUIC.</p>
         
-        <textarea id="input" placeholder="Drop .txt/.json file here or paste links / raw JSON config"></textarea>
+        <textarea id="input" placeholder="Перетащи .txt или .json файл сюда, либо вставь конфигурацию текстом"></textarea>
         
         <div class="btn-group">
             <button class="action-btn btn-convert" onclick="startProcess()">► PROCESS NODES</button>
@@ -203,7 +203,6 @@
             catch(e) { try { return atob(str.replace(/-/g, '+').replace(/_/g, '/')); } catch(e2) { return ""; } }
         }
 
-        // === DRAG AND DROP ===
         const dropZone = document.getElementById('input');
         dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
         dropZone.addEventListener('dragleave', (e) => { e.preventDefault(); dropZone.classList.remove('dragover'); });
@@ -252,21 +251,17 @@
 
         async function startProcess() {
             const input = document.getElementById('input').value.trim();
-            const out = document.getElementById('output');
             if (!input) { showToast("Пустое поле!", "#f85149"); return; }
 
             if (input.startsWith('http') && !input.includes('://') && !input.includes('@') && !input.includes('{')) {
-                out.textContent = "⏳ Fetching...";
+                document.getElementById('output').textContent = "⏳ Fetching...";
                 try {
                     const res = await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(input));
                     parseData(await res.text());
-                } catch (e) { out.textContent = "❌ Fetch failed. Paste data manually."; }
+                } catch (e) { document.getElementById('output').textContent = "❌ Fetch failed. Paste data manually."; }
             } else { parseData(input); }
         }
 
-        // =========================================================================
-        // ПАРСЕР (ВКЛЮЧАЯ ДЕСЕРИАЛИЗАЦИЮ XRAY JSON С УЧЕТОМ REMARKS)
-        // =========================================================================
         function parseData(rawText) {
             let text = rawText.trim();
             let newProxiesCount = 0;
@@ -274,7 +269,6 @@
             try {
                 let json = JSON.parse(text);
                 if (json.outbounds && Array.isArray(json.outbounds)) {
-                    // Умный поиск имени профиля (remarks)
                     let baseRemark = json.remarks || "";
                     let validOutbounds = json.outbounds.filter(ob => ob.protocol !== 'freedom' && ob.protocol !== 'blackhole' && ob.protocol !== 'dns');
                     let isMultiNode = validOutbounds.length > 1;
@@ -284,11 +278,8 @@
                         
                         let proxyObj = null;
                         let tag = ob.tag || "Node_" + Math.floor(Math.random()*1000);
-                        
-                        // Если в JSON есть remarks, используем его!
                         let nodeName = baseRemark ? (isMultiNode ? `${baseRemark} (${tag})` : baseRemark) : tag;
 
-                        // Парсинг Xray VLESS
                         if (ob.protocol === 'vless' && ob.settings && ob.settings.vnext && ob.settings.vnext.length > 0) {
                             let vnext = ob.settings.vnext[0];
                             let user = (vnext.users && vnext.users.length > 0) ? vnext.users[0] : {};
@@ -310,8 +301,6 @@
                                 fp: reality.fingerprint || tls.fingerprint || "chrome"
                             };
                         }
-                        
-                        // Парсинг Sing-box VLESS
                         else if (ob.type === 'vless') {
                              let tls = ob.tls || {}; let reality = tls.reality || {};
                              proxyObj = {
@@ -324,7 +313,6 @@
                         }
 
                         if (proxyObj) {
-                            // Собираем обратно стандартную ссылку
                             let link = `vless://${proxyObj.uuid}@${proxyObj.server}:${proxyObj.port}?type=${proxyObj.network}&security=${proxyObj.tls ? (proxyObj["reality-opts"] ? 'reality' : 'tls') : 'none'}&sni=${proxyObj.sni}&fp=${proxyObj.fp}`;
                             if (proxyObj.flow) link += `&flow=${proxyObj.flow}`;
                             if (proxyObj["reality-opts"]) link += `&pbk=${proxyObj["reality-opts"]["public-key"]}&sid=${proxyObj["reality-opts"]["short-id"]}`;
@@ -449,13 +437,19 @@
         }
 
         async function pingNode(index, button) {
+            const p = currentProxies[index];
             button.textContent = "⏳"; const start = performance.now();
             try {
-                await fetch(`https://${currentProxies[index].server}:${currentProxies[index].port}`, { mode: 'no-cors', cache: 'no-store', signal: AbortSignal.timeout(3000) });
+                await fetch(`https://${p.server}:${p.port}`, { mode: 'no-cors', cache: 'no-store', signal: AbortSignal.timeout(3000) });
                 const ping = Math.round(performance.now() - start);
-                button.textContent = `${ping}ms`; button.style.color = "#3fb950"; currentProxies[index].lastPing = ping;
+                button.textContent = `${ping}ms`; button.style.color = "#3fb950"; p.lastPing = ping;
             } catch (e) {
-                button.textContent = "Err"; button.style.color = "#f85149"; currentProxies[index].lastPing = 99999;
+                // Маскировка (Stealth Mode) для Reality, SS и UDP протоколов
+                if ((p.type === 'vless' && p["reality-opts"]) || p.type === 'wg' || p.type === 'tuic') {
+                    button.textContent = "🛡️ Stealth"; button.style.color = "#58a6ff"; p.lastPing = 99998; 
+                } else {
+                    button.textContent = "Err"; button.style.color = "#f85149"; p.lastPing = 99999;
+                }
             }
             saveState();
         }
@@ -484,8 +478,8 @@
 
                 currentProxies.forEach((p, index) => {
                     let typeClass = "type-" + p.type;
-                    let pingLabel = p.lastPing === undefined ? "⚡" : (p.lastPing === 99999 ? "Err" : `${p.lastPing}ms`);
-                    let pingColor = p.lastPing === undefined ? "#c9d1d9" : (p.lastPing === 99999 ? "#f85149" : "#3fb950");
+                    let pingLabel = p.lastPing === undefined ? "⚡" : (p.lastPing === 99999 ? "Err" : (p.lastPing === 99998 ? "🛡️ Stealth" : `${p.lastPing}ms`));
+                    let pingColor = p.lastPing === undefined ? "#c9d1d9" : (p.lastPing === 99999 ? "#f85149" : (p.lastPing === 99998 ? "#58a6ff" : "#3fb950"));
                     const card = document.createElement('div'); card.className = 'proxy-card';
                     card.innerHTML = `
                         <div class="card-actions">
@@ -508,7 +502,7 @@
                 document.getElementById('copyBtn').style.display = "inline-block";
             } else {
                 container.style.display = 'none'; document.getElementById('nodeCount').style.display = "none";
-                document.getElementById('output').textContent = "Waiting for data...";
+                document.getElementById('output').textContent = "Вставьте ссылки или JSON конфиг...";
                 document.getElementById('downloadBtn').style.display = "none"; document.getElementById('copyBtn').style.display = "none";
             }
         }
@@ -536,9 +530,7 @@
         // =========================================================================
         function generateSingboxJSON() {
             if (currentProxies.length === 0) return;
-            
-            let outbounds = [];
-            let proxyTags = [];
+            let outbounds = []; let proxyTags = [];
 
             currentProxies.forEach((p, index) => {
                 let tag = p.name || `proxy-${index}`;
@@ -578,7 +570,6 @@
             outbounds.push({ type: "direct", tag: "direct" });
             outbounds.push({ type: "block", tag: "block" });
             outbounds.push({ type: "dns", tag: "dns-out" });
-
             outbounds.unshift({ type: "selector", tag: "🚀 Proxy Select", outbounds: proxyTags });
 
             document.getElementById('output').textContent = JSON.stringify({ outbounds: outbounds }, null, 2);
@@ -1458,7 +1449,7 @@ rules:
   - DOMAIN-SUFFIX,grok.x.com,🤖 Premium AI
   - DOMAIN-SUFFIX,x.ai,🤖 Premium AI
   - DOMAIN-KEYWORD,grok,🤖 Premium AI
-  - DOMAIN-SUFFIX,huggingface.co,🤖 Premium AI
+  - DOM-SUFFIX,huggingface.co,🤖 Premium AI
   - DOMAIN-SUFFIX,civitai.com,🤖 Premium AI
   - DOMAIN-SUFFIX,openaimerge.com,🤖 Premium AI
   - DOMAIN-SUFFIX,statsigapi.net,🤖 Premium AI
@@ -1635,13 +1626,15 @@ rules:
 
         function downloadFile() {
             const content = document.getElementById('output').textContent;
+            
             const format = document.getElementById('exportFormat').value;
             const ext = (format === 'xray' || format === 'singbox') ? 'json' : 'yaml';
-            const filename = `Network_Config_v8.2.${ext}`;
-            const blob = new Blob([content], { type: format === 'xray' ? 'application/json' : 'text/yaml' });
-            const url = window.URL.createObjectURL(blob);
+            const filename = `Network_Config_v8.3.${ext}`;
+            const mimeType = (format === 'xray' || format === 'singbox') ? 'application/json' : 'text/yaml';
+
             const a = document.createElement('a');
-            a.href = url; a.download = filename;
+            a.href = window.URL.createObjectURL(new Blob([content], { type: mimeType }));
+            a.download = filename;
             document.body.appendChild(a); a.click(); window.URL.revokeObjectURL(url); document.body.removeChild(a);
         }
 
