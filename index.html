@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#0d1117">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Network Builder v13.0 Zenith</title>
+    <title>Network Builder v13.1 Fixed</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
@@ -70,7 +70,7 @@
 <body>
     <div class="container">
         <h2>
-            <div>⚡ Network Builder <span style="color:#8b949e; font-size:16px;">v13.0 Zenith</span></div>
+            <div>⚡ Network Builder <span style="color:#8b949e; font-size:16px;">v13.1 Fixed</span></div>
             <div class="version-badge" id="mihomoVersion">⏳ Ядро...</div>
             <div class="header-actions">
                 <button class="icon-btn primary" onclick="pingAll()">⚡ Ping All</button>
@@ -400,7 +400,9 @@ sniffer:
             if (n.includes('GB') || n.includes('UK') || n.includes('ВЕЛИКОБРИТАНИЯ')) return '🇬🇧 ' + name.replace(/🇬🇧\s*/g, '');
             if (n.includes('FR') || n.includes('FRANCE') || n.includes('ФРАНЦИЯ')) return '🇫🇷 ' + name.replace(/🇫🇷\s*/g, '');
             if (n.includes('TR') || n.includes('TURKEY') || n.includes('ТУРЦИЯ')) return '🇹🇷 ' + name.replace(/🇹🇷\s*/g, '');
+            if (n.includes('PL') || n.includes('POLAND') || n.includes('ПОЛЬША')) return '🇵🇱 ' + name.replace(/🇵🇱\s*/g, '');
             if (n.includes('SE') || n.includes('SWEDEN') || n.includes('ШВЕЦИЯ')) return '🇸🇪 ' + name.replace(/🇸🇪\s*/g, '');
+            if (n.includes('IT') || n.includes('ITALY') || n.includes('ИТАЛИЯ')) return '🇮🇹 ' + name.replace(/🇮🇹\s*/g, '');
             return name;
         }
 
@@ -526,7 +528,7 @@ sniffer:
             showToast("🔗 Base64 Подписка скопирована!");
         }
 
-        // === PARSER CORE ===
+        // === ЧИСТЫЙ И СТАБИЛЬНЫЙ ПАРСЕР ИЗ v12 ===
         async function startProcess() {
             const inp = document.getElementById('input').value.trim();
             if (!inp) return showToast("Пусто!", "#f85149");
@@ -545,7 +547,7 @@ sniffer:
             // 1. Пытаемся как JSON
             try {
                 let json = JSON.parse(text);
-                if (json.outbounds) {
+                if (json.outbounds && Array.isArray(json.outbounds)) {
                     let baseRem = json.remarks || "";
                     json.outbounds.forEach(ob => {
                         let pt = ob.protocol || ob.type;
@@ -555,12 +557,41 @@ sniffer:
                         let nn = addGeoFlag(baseRem ? `${baseRem} (${tag})` : tag);
                         let p = null;
 
-                        if (ob.protocol === 'vless' && ob.settings?.vnext?.length) {
-                            let vn = ob.settings.vnext[0]; let st = ob.streamSettings || {}; let re = st.realitySettings || {}; let tl = st.tlsSettings || {};
-                            p = { name: nn, type: "vless", server: vn.address, port: vn.port, uuid: vn.users?.[0]?.id, tls: st.security==='reality'||st.security==='tls', "reality-opts": st.security==='reality'?{"public-key":re.publicKey,"short-id":re.shortId||""}:null, sni: re.serverName||tl.serverName||vn.address, network: st.network||"tcp", flow: vn.users?.[0]?.flow||"", fp: re.fingerprint||tl.fingerprint||"chrome" };
+                        if (ob.protocol === 'vless' && ob.settings && ob.settings.vnext && ob.settings.vnext.length > 0) {
+                            let vn = ob.settings.vnext[0];
+                            let st = ob.streamSettings || {};
+                            let re = st.realitySettings || {};
+                            let tl = st.tlsSettings || {};
+                            
+                            p = {
+                                name: nn,
+                                type: "vless",
+                                server: vn.address,
+                                port: vn.port,
+                                uuid: vn.users?.[0]?.id,
+                                tls: st.security === 'reality' || st.security === 'tls',
+                                "reality-opts": st.security === 'reality' ? { "public-key": re.publicKey, "short-id": re.shortId || "" } : null,
+                                sni: re.serverName || tl.serverName || vn.address,
+                                network: st.network || "tcp",
+                                flow: vn.users?.[0]?.flow || "",
+                                fp: re.fingerprint || tl.fingerprint || "chrome"
+                            };
                         } else if (ob.type === 'vless') {
-                             let tl = ob.tls||{}; let re = tl.reality||{};
-                             p = { name: nn, type: "vless", server: ob.server, port: ob.server_port, uuid: ob.uuid, tls: tl.enabled, "reality-opts": re.enabled?{"public-key":re.public_key,"short-id":re.short_id||""}:null, sni: tl.server_name||ob.server, network: ob.transport?.type||"tcp", flow: ob.flow||"", fp: tl.utls?.fingerprint||"chrome" };
+                             let tl = ob.tls || {};
+                             let re = tl.reality || {};
+                             p = {
+                                 name: nn,
+                                 type: "vless",
+                                 server: ob.server,
+                                 port: ob.server_port,
+                                 uuid: ob.uuid,
+                                 tls: tl.enabled === true,
+                                 "reality-opts": re.enabled ? { "public-key": re.public_key, "short-id": re.short_id || "" } : null,
+                                 sni: tl.server_name || ob.server,
+                                 network: ob.transport?.type || "tcp",
+                                 flow: ob.flow || "",
+                                 fp: tl.utls?.fingerprint || "chrome"
+                             };
                         }
 
                         if(p) {
@@ -568,23 +599,33 @@ sniffer:
                             if(p.flow) l += `&flow=${p.flow}`;
                             if(p["reality-opts"]) l += `&pbk=${p["reality-opts"]["public-key"]}&sid=${p["reality-opts"]["short-id"]}`;
                             p.rawLink = l + `#${encodeURIComponent(p.name)}`;
-                            if (!currentProxies.some(x => x.server===p.server && x.port===p.port)) { currentProxies.push(p); added++; }
+                            if (!currentProxies.some(x => x.server === p.server && x.port === p.port)) { currentProxies.push(p); added++; }
                         }
                     });
                     if (added > 0) { document.getElementById('input').value=''; showToast(`+${added} узлов из JSON`); saveState(); renderCards(); return; }
                 }
             } catch(e) {}
 
-            // 2. Base64
-            if (added === 0 && !text.includes('://') && !text.includes('{')) { try { text = safeB64Decode(text); } catch(e){} }
+            // 2. Расшифровка Base64
+            if (added === 0 && !text.includes('://') && !text.includes('{')) {
+                try { text = safeB64Decode(text); } catch(e){}
+            }
 
-            // 3. Строки
+            // 3. Построчный парсинг ссылок (Здесь была опечатка, теперь чисто и надежно)
             text.split('\n').forEach(line => {
-                line = line.trim(); let p = null;
+                line = line.trim();
+                let p = null;
                 try {
                     if (line.startsWith('vless://')) {
-                        let u = new URL(line); let sp = new URLSearchParams(url.search);
-                        p = { name: addGeoFlag(decodeURIComponent(u.hash.slice(1))||"VLESS"), type: "vless", server: u.hostname, port: parseInt(u.port), uuid: u.username, tls: sp.get('security')==='reality'||sp.get('security')==='tls', "reality-opts": sp.get('pbk')?{"public-key":sp.get('pbk'),"short-id":sp.get('sid')||""}:null, sni: sp.get('sni')||u.hostname, network: sp.get('type')||"tcp", flow: sp.get('flow')||"", fp: sp.get('fp')||"chrome", rawLink: line };
+                        const url = new URL(line); 
+                        const sp = new URLSearchParams(url.search);
+                        p = {
+                            name: addGeoFlag(decodeURIComponent(url.hash.slice(1)) || "VLESS_" + Math.floor(Math.random()*100)),
+                            type: "vless", server: url.hostname, port: parseInt(url.port), uuid: url.username,
+                            tls: sp.get('security') === 'reality' || sp.get('security') === 'tls',
+                            "reality-opts": sp.get('pbk') ? { "public-key": sp.get('pbk'), "short-id": sp.get('sid') || "" } : null,
+                            sni: sp.get('sni') || url.hostname, network: sp.get('type') || "tcp", flow: sp.get('flow') || "", fp: sp.get('fp') || "chrome", rawLink: line
+                        };
                     } else if (line.startsWith('vmess://')) {
                         let v = JSON.parse(safeB64Decode(line.slice(8)));
                         p = { name: addGeoFlag(v.ps||"VMess"), type: "vmess", server: v.add, port: parseInt(v.port), uuid: v.id, aid: v.aid||0, network: v.net||"tcp", tls: v.tls==="tls", sni: v.sni||v.host||v.add, rawLink: line };
@@ -609,16 +650,16 @@ sniffer:
                             p = { name: addGeoFlag(nn), type: "ssr", server: ps[0], port: parseInt(ps[1]), protocol: ps[2], cipher: ps[3], obfs: ps[4], password: safeB64Decode(rem[0]), rawLink: line };
                         }
                     } else if (line.startsWith('hy2://') || line.startsWith('hysteria2://')) {
-                        let u = new URL(line); let sp = new URLSearchParams(u.search);
-                        p = { name: addGeoFlag(decodeURIComponent(u.hash.slice(1))||"HY2"), type: "hysteria2", server: u.hostname, port: parseInt(u.port), password: u.username, sni: sp.get('sni')||u.hostname, "skip-cert-verify": sp.get('insecure')==='1', obfs: sp.get('obfs')||"", "obfs-password": sp.get('obfs-password')||"", rawLink: line };
+                        let url = new URL(line); let sp = new URLSearchParams(url.search);
+                        p = { name: addGeoFlag(decodeURIComponent(url.hash.slice(1))||"HY2"), type: "hysteria2", server: url.hostname, port: parseInt(url.port), password: url.username, sni: sp.get('sni')||url.hostname, "skip-cert-verify": sp.get('insecure')==='1', obfs: sp.get('obfs')||"", "obfs-password": sp.get('obfs-password')||"", rawLink: line };
                     } else if (line.startsWith('trojan://')) {
-                        let u = new URL(line); let sp = new URLSearchParams(u.search);
-                        p = { name: addGeoFlag(decodeURIComponent(u.hash.slice(1))||"Trojan"), type: "trojan", server: u.hostname, port: parseInt(u.port), password: u.username, tls: true, sni: sp.get('sni')||u.hostname, network: sp.get('type')||"tcp", fp: sp.get('fp')||"chrome", rawLink: line };
+                        let url = new URL(line); let sp = new URLSearchParams(url.search);
+                        p = { name: addGeoFlag(decodeURIComponent(url.hash.slice(1))||"Trojan"), type: "trojan", server: url.hostname, port: parseInt(url.port), password: url.username, tls: true, sni: sp.get('sni')||url.hostname, network: sp.get('type')||"tcp", fp: sp.get('fp')||"chrome", rawLink: line };
                     } else if (line.startsWith('wg://') || line.startsWith('wireguard://')) {
-                        let u = new URL(line.replace(/^(wg|wireguard):\/\//,'http://')); let sp = new URLSearchParams(u.search);
-                        p = { name: addGeoFlag(decodeURIComponent(u.hash.slice(1))||"WG"), type: "wg", server: u.hostname, port: parseInt(u.port), "private-key": u.username||sp.get('privateKey'), "public-key": sp.get('publicKey')||sp.get('peerPublicKey'), ip: sp.get('ip')||"10.0.0.2/32", reserved: sp.get('reserved'), rawLink: line };
+                        let url = new URL(line.replace(/^(wg|wireguard):\/\//,'http://')); let sp = new URLSearchParams(url.search);
+                        p = { name: addGeoFlag(decodeURIComponent(url.hash.slice(1))||"WG"), type: "wg", server: url.hostname, port: parseInt(url.port), "private-key": url.username||sp.get('privateKey'), "public-key": sp.get('publicKey')||sp.get('peerPublicKey'), ip: sp.get('ip')||"10.0.0.2/32", reserved: sp.get('reserved'), rawLink: line };
                     } else if (line.startsWith('tuic://')) {
-                        let u = new URL(line); p = { name: addGeoFlag(decodeURIComponent(u.hash.slice(1))||"TUIC"), type: "tuic", server: u.hostname, port: parseInt(u.port), uuid: u.username, password: u.password, sni: new URLSearchParams(u.search).get('sni')||u.hostname, rawLink: line };
+                        let url = new URL(line); p = { name: addGeoFlag(decodeURIComponent(url.hash.slice(1))||"TUIC"), type: "tuic", server: url.hostname, port: parseInt(url.port), uuid: url.username, password: url.password, sni: new URLSearchParams(url.search).get('sni')||url.hostname, rawLink: line };
                     }
 
                     if (p && p.server && !currentProxies.some(x => x.server === p.server && x.port === p.port)) { currentProxies.push(p); added++; }
@@ -667,7 +708,6 @@ sniffer:
                 document.getElementById('cardsToolbar').style.display = "flex";
                 document.getElementById('nodeCount').textContent = `${currentProxies.length} Nodes`;
                 
-                // РЕНДЕР ЧЕРЕЗ ФРАГМЕНТ (УСКОРЕНИЕ x10)
                 const frag = document.createDocumentFragment();
                 currentProxies.forEach((p, i) => {
                     let tc = "type-" + p.type;
@@ -680,6 +720,7 @@ sniffer:
                         <div class="card-actions">
                             <button class="btn-card btn-ping" style="color:${pc}" onclick="pingNode(${i},this)">${pl}</button>
                             <button class="btn-card" onclick="showQR(${i})">📱</button>
+                            <button class="btn-card" onclick="copyLink(${i})">🔗</button>
                             <button class="btn-card remove" onclick="removeProxy(${i})">✖</button>
                         </div>
                         <div class="proxy-name" contenteditable="true" spellcheck="false" onblur="renameProxy(${i},this.innerText)">${p.name}</div>
@@ -792,7 +833,7 @@ sniffer:
             if(c.includes("ОШИБКА:")) return showToast("Исправьте ошибку!", "#f85149");
             const f = document.getElementById('exportFormat').value;
             const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([c], { type: f.includes('clash')?'text/yaml':'application/json' }));
-            a.download = `Config_v13.${f.includes('clash')?'yaml':'json'}`; a.click();
+            a.download = `Config_v13.1.${f.includes('clash')?'yaml':'json'}`; a.click();
         }
 
         function copyResult() {
