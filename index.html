@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Network Builder v9.1 Studio</title>
+    <title>Network Builder v9.2 Studio</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
@@ -23,10 +23,18 @@
         h2 { 
             margin-top: 0; color: #58a6ff; font-size: 24px;
             border-bottom: 1px solid #30363d; padding-bottom: 15px;
-            display: flex; justify-content: space-between; align-items: center;
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
         }
 
-        .header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .version-badge {
+            font-size: 12px; font-weight: normal; background: #21262d; 
+            padding: 6px 10px; border-radius: 6px; border: 1px solid #30363d;
+            transition: 0.2s; display: flex; align-items: center;
+        }
+        .version-badge:hover { border-color: #58a6ff; background: #30363d; }
+        .version-badge a { color: #a5d6ff; text-decoration: none; }
+
+        .header-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; width: 100%; }
 
         .icon-btn {
             background: #21262d; border: 1px solid #30363d; color: #c9d1d9;
@@ -131,12 +139,18 @@
         .btn-card:hover { background: #58a6ff; color: white; }
         .btn-card.remove:hover { background: #f85149; color: white; }
 
-        pre { 
+        /* Стили для редактора итогового кода */
+        #outputEditor { 
             background: #010409; padding: 20px; border: 1px solid #30363d; 
-            border-radius: 8px; color: #a5d6ff; overflow-x: auto; 
-            max-height: 400px; font-size: 12px; line-height: 1.5;
-            white-space: pre-wrap; word-wrap: break-word;
+            border-radius: 8px; color: #a5d6ff; overflow-y: auto; 
+            height: 400px; font-size: 12px; line-height: 1.5;
+            width: 100%; box-sizing: border-box; font-family: 'JetBrains Mono', monospace;
+            resize: vertical; white-space: pre; outline: none; margin-bottom: 20px;
         }
+        #outputEditor:focus { border-color: #58a6ff; box-shadow: 0 0 8px rgba(88,166,255,0.2); }
+
+        .editor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .editor-header span { font-size: 12px; color: #8b949e; font-weight: bold; text-transform: uppercase; }
 
         #toast {
             visibility: hidden; min-width: 200px; background-color: #238636; color: #fff;
@@ -163,7 +177,11 @@
 <body>
     <div class="container">
         <h2>
-            ⚡ Network Builder v9.1 Studio
+            <div>⚡ Network Builder <span style="color:#8b949e; font-size: 16px;">v9.2 Studio</span></div>
+            <div class="version-badge" id="mihomoVersion">
+                ⏳ Загрузка версии ядра...
+            </div>
+            
             <div class="header-actions">
                 <button class="icon-btn primary" onclick="pingAll()">⚡ Ping All</button>
                 <button class="icon-btn" onclick="sortProxies()">📶 Sort</button>
@@ -211,11 +229,15 @@
         
         <div id="cardsContainer" class="cards-grid"></div>
 
+        <div class="editor-header">
+            <span>📝 Встроенный редактор кода (Изменения сохранятся при скачивании)</span>
+        </div>
+        <textarea id="outputEditor" spellcheck="false" placeholder="Здесь появится готовый код..."></textarea>
+
         <div style="display: flex; gap: 10px; margin-bottom: 10px; justify-content: flex-end;" id="outputActions">
             <button id="copyBtn" class="action-btn btn-copy" onclick="copyResult()">⎘ СКОПИРОВАТЬ КОД</button>
             <button id="downloadBtn" class="action-btn btn-download" onclick="downloadFile()">⬇ СКАЧАТЬ ФАЙЛ</button>
         </div>
-        <pre id="output">Ожидание серверов...</pre>
     </div>
 
     <div id="toast">✅ Done!</div>
@@ -230,6 +252,33 @@
 
     <script>
         let currentProxies = []; 
+
+        // === ИНТЕГРАЦИЯ GITHUB API ДЛЯ ПРОВЕРКИ ВЕРСИИ MIHOMO ===
+        async function fetchMihomoVersion() {
+            try {
+                const res = await fetch('https://api.github.com/repos/MetaCubeX/mihomo/releases?per_page=5');
+                const data = await res.json();
+                
+                // Ищем самую свежую Alpha/Prerelease и стабильную
+                const latestAlpha = data.find(r => r.prerelease || r.tag_name.includes('alpha'));
+                const latestRelease = data.find(r => !r.prerelease);
+                
+                let versionText = "Ядро Mihomo: ";
+                let link = "https://github.com/MetaCubeX/mihomo/releases";
+                
+                if (latestAlpha) {
+                    versionText += `🔥 ${latestAlpha.tag_name} (Alpha)`;
+                    link = latestAlpha.html_url;
+                } else if (latestRelease) {
+                    versionText += `✅ ${latestRelease.tag_name}`;
+                    link = latestRelease.html_url;
+                }
+                
+                document.getElementById('mihomoVersion').innerHTML = `<a href="${link}" target="_blank">${versionText}</a>`;
+            } catch (e) {
+                document.getElementById('mihomoVersion').innerText = "❌ Ошибка проверки ядра";
+            }
+        }
 
         function safeB64Decode(str) {
             try { return decodeURIComponent(escape(atob(str.replace(/-/g, '+').replace(/_/g, '/')))); } 
@@ -250,6 +299,7 @@
         });
 
         window.onload = () => {
+            fetchMihomoVersion();
             const savedProxies = localStorage.getItem('flclash_net_v9');
             if (savedProxies) { currentProxies = JSON.parse(savedProxies); if (currentProxies.length > 0) renderCards(); }
             toggleCustomTemplate();
@@ -302,14 +352,15 @@
 
         async function startProcess() {
             const input = document.getElementById('input').value.trim();
+            const out = document.getElementById('outputEditor');
             if (!input) { showToast("Пустое поле!", "#f85149"); return; }
 
             if (input.startsWith('http') && !input.includes('://') && !input.includes('@') && !input.includes('{')) {
-                document.getElementById('output').textContent = "⏳ Fetching...";
+                out.value = "⏳ Fetching...";
                 try {
                     const res = await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(input));
                     parseData(await res.text());
-                } catch (e) { document.getElementById('output').textContent = "❌ Fetch failed. Paste data manually."; }
+                } catch (e) { out.value = "❌ Fetch failed. Paste data manually."; }
             } else { parseData(input); }
         }
 
@@ -387,7 +438,11 @@
                         let b64 = line.slice(8); let decoded = safeB64Decode(b64);
                         if (decoded) {
                             let v = JSON.parse(decoded);
-                            proxyObj = { name: v.ps || "VMess_" + Math.floor(Math.random()*100), type: "vmess", server: v.add, port: parseInt(v.port), uuid: v.id, aid: v.aid || 0, network: v.net || "tcp", tls: v.tls === "tls", sni: v.sni || v.host || v.add, rawLink: line };
+                            proxyObj = {
+                                name: v.ps || "VMess_" + Math.floor(Math.random()*100),
+                                type: "vmess", server: v.add, port: parseInt(v.port), uuid: v.id,
+                                aid: v.aid || 0, network: v.net || "tcp", tls: v.tls === "tls", sni: v.sni || v.host || v.add, rawLink: line
+                            };
                         }
                     } else if (line.startsWith('ss://')) {
                         let uri = line.slice(5); let name = "SS_" + Math.floor(Math.random()*100);
@@ -399,40 +454,59 @@
                             let sp = parts[1].split(':'); server = sp[0]; port = parseInt(sp[1]);
                         } else {
                             let decoded = safeB64Decode(uri);
-                            if(decoded.includes('@')) { let parts = decoded.split('@'); let up = parts[0].split(':'); method = up[0]; password = up[1]; let sp = parts[1].split(':'); server = sp[0]; port = parseInt(sp[1]); }
+                            if(decoded.includes('@')) {
+                                let parts = decoded.split('@'); let up = parts[0].split(':'); method = up[0]; password = up[1];
+                                let sp = parts[1].split(':'); server = sp[0]; port = parseInt(sp[1]);
+                            }
                         }
                         if (server && port) proxyObj = { name: name, type: "ss", server: server, port: port, cipher: method, password: password, rawLink: line };
                     } else if (line.startsWith('ssr://')) {
                         let b64 = line.slice(6); let decoded = safeB64Decode(b64);
                         if (decoded) {
                             let parts = decoded.split(':');
-                            if (parts.length >= 6) { proxyObj = { name: "SSR_" + Math.floor(Math.random()*100), type: "ssr", server: parts[0], port: parseInt(parts[1]), protocol: parts[2], cipher: parts[3], obfs: parts[4], password: safeB64Decode(parts[5].split('/?')[0]), rawLink: line }; }
+                            if (parts.length >= 6) {
+                                proxyObj = { name: "SSR_" + Math.floor(Math.random()*100), type: "ssr", server: parts[0], port: parseInt(parts[1]), protocol: parts[2], cipher: parts[3], obfs: parts[4], password: safeB64Decode(parts[5].split('/?')[0]), rawLink: line };
+                            }
                         }
                     } else if (line.startsWith('hy2://') || line.startsWith('hysteria2://')) {
                         const url = new URL(line); const p = new URLSearchParams(url.search);
                         proxyObj = {
-                            name: decodeURIComponent(url.hash.slice(1)) || "HY2_" + Math.floor(Math.random()*100), type: "hysteria2", server: url.hostname, port: parseInt(url.port), password: url.username,
-                            sni: p.get('sni') || url.hostname, "skip-cert-verify": p.get('insecure') === '1', obfs: p.get('obfs') || undefined, "obfs-password": p.get('obfs-password') || undefined, rawLink: line
+                            name: decodeURIComponent(url.hash.slice(1)) || "HY2_" + Math.floor(Math.random()*100),
+                            type: "hysteria2", server: url.hostname, port: parseInt(url.port), password: url.username,
+                            sni: p.get('sni') || url.hostname, "skip-cert-verify": p.get('insecure') === '1',
+                            obfs: p.get('obfs') || undefined, "obfs-password": p.get('obfs-password') || undefined, rawLink: line
                         };
                     } else if (line.startsWith('trojan://')) {
                         const url = new URL(line); const p = new URLSearchParams(url.search);
-                        proxyObj = { name: decodeURIComponent(url.hash.slice(1)) || "Trojan_" + Math.floor(Math.random()*100), type: "trojan", server: url.hostname, port: parseInt(url.port), password: url.username, tls: true, sni: p.get('sni') || url.hostname, network: p.get('type') || "tcp", fp: p.get('fp') || "chrome", rawLink: line };
+                        proxyObj = {
+                            name: decodeURIComponent(url.hash.slice(1)) || "Trojan_" + Math.floor(Math.random()*100),
+                            type: "trojan", server: url.hostname, port: parseInt(url.port), password: url.username,
+                            tls: true, sni: p.get('sni') || url.hostname, network: p.get('type') || "tcp", fp: p.get('fp') || "chrome", rawLink: line
+                        };
                     } else if (line.startsWith('tuic://')) {
                         const url = new URL(line); const p = new URLSearchParams(url.search);
                         proxyObj = { name: decodeURIComponent(url.hash.slice(1)) || "TUIC_" + Math.floor(Math.random()*100), type: "tuic", server: url.hostname, port: parseInt(url.port), uuid: url.username, password: url.password, sni: p.get('sni') || url.hostname, rawLink: line };
                     } else if (line.startsWith('wireguard://') || line.startsWith('wg://')) {
                         let urlStr = line.replace('wireguard://', 'http://').replace('wg://', 'http://');
                         const url = new URL(urlStr); const p = new URLSearchParams(url.search);
-                        proxyObj = { name: decodeURIComponent(url.hash.slice(1)) || "WG_" + Math.floor(Math.random()*100), type: "wg", server: url.hostname, port: parseInt(url.port), "private-key": url.username || p.get('privateKey'), "public-key": p.get('publicKey') || p.get('peerPublicKey'), ip: p.get('ip') || "10.0.0.2/32", reserved: p.get('reserved'), rawLink: line };
+                        proxyObj = {
+                            name: decodeURIComponent(url.hash.slice(1)) || "WG_" + Math.floor(Math.random()*100), type: "wg", server: url.hostname, port: parseInt(url.port),
+                            "private-key": url.username || p.get('privateKey'), "public-key": p.get('publicKey') || p.get('peerPublicKey'),
+                            ip: p.get('ip') || "10.0.0.2/32", reserved: p.get('reserved'), rawLink: line
+                        };
                     } else if (line.startsWith('socks5://') || line.startsWith('socks://')) {
-                        let urlStr = line.replace('socks5://', 'http://').replace('socks://', 'http://'); const url = new URL(urlStr);
+                        let urlStr = line.replace('socks5://', 'http://').replace('socks://', 'http://');
+                        const url = new URL(urlStr);
                         proxyObj = { name: decodeURIComponent(url.hash.slice(1)) || "SOCKS_" + Math.floor(Math.random()*100), type: "socks", server: url.hostname, port: parseInt(url.port), username: url.username, password: url.password, rawLink: line };
                     } else if (line.startsWith('http://') && line.includes('@')) {
-                        const url = new URL(line); proxyObj = { name: decodeURIComponent(url.hash.slice(1)) || "HTTP_" + Math.floor(Math.random()*100), type: "http", server: url.hostname, port: parseInt(url.port), username: url.username, password: url.password, rawLink: line };
+                        const url = new URL(line);
+                        proxyObj = { name: decodeURIComponent(url.hash.slice(1)) || "HTTP_" + Math.floor(Math.random()*100), type: "http", server: url.hostname, port: parseInt(url.port), username: url.username, password: url.password, rawLink: line };
                     } else if (line.startsWith('ssh://')) {
-                        const url = new URL(line); proxyObj = { name: decodeURIComponent(url.hash.slice(1)) || "SSH_" + Math.floor(Math.random()*100), type: "ssh", server: url.hostname, port: parseInt(url.port), username: url.username, password: url.password, rawLink: line };
+                        const url = new URL(line);
+                        proxyObj = { name: decodeURIComponent(url.hash.slice(1)) || "SSH_" + Math.floor(Math.random()*100), type: "ssh", server: url.hostname, port: parseInt(url.port), username: url.username, password: url.password, rawLink: line };
                     } else if (line.startsWith('naive+https://')) {
-                        const url = new URL(line.replace('naive+', '')); proxyObj = { name: decodeURIComponent(url.hash.slice(1)) || "Naive_" + Math.floor(Math.random()*100), type: "naive", server: url.hostname, port: parseInt(url.port), username: url.username, password: url.password, rawLink: line };
+                        const url = new URL(line.replace('naive+', ''));
+                        proxyObj = { name: decodeURIComponent(url.hash.slice(1)) || "Naive_" + Math.floor(Math.random()*100), type: "naive", server: url.hostname, port: parseInt(url.port), username: url.username, password: url.password, rawLink: line };
                     }
 
                     if (proxyObj && proxyObj.server && !currentProxies.some(p => p.server === proxyObj.server && p.port === proxyObj.port)) { 
@@ -509,7 +583,7 @@
                 document.getElementById('outputActions').style.display = "flex";
             } else {
                 container.style.display = 'none'; document.getElementById('nodeCount').style.display = "none";
-                document.getElementById('output').textContent = "Вставьте ссылки или JSON конфиг...";
+                document.getElementById('outputEditor').value = "Вставьте ссылки или JSON конфиг...";
                 document.getElementById('downloadBtn').style.display = "none"; document.getElementById('copyBtn').style.display = "none";
                 document.getElementById('outputActions').style.display = "none";
             }
@@ -578,9 +652,10 @@
             outbounds.push({ type: "direct", tag: "direct" });
             outbounds.push({ type: "block", tag: "block" });
             outbounds.push({ type: "dns", tag: "dns-out" });
+
             outbounds.unshift({ type: "selector", tag: "🚀 Proxy Select", outbounds: proxyTags });
 
-            document.getElementById('output').textContent = JSON.stringify({ outbounds: outbounds }, null, 2);
+            document.getElementById('outputEditor').value = JSON.stringify({ outbounds: outbounds }, null, 2);
         }
 
         // =========================================================================
@@ -662,7 +737,7 @@
                 burstObservatory: { pingConfig: { timeout: "7s", interval: "30s", sampling: 3, httpMethod: "HEAD", destination: "http://connectivitycheck.gstatic.com/generate_204" }, subjectSelector: proxyTags },
                 remarks: "🌐 Xray Profile Generated"
             };
-            document.getElementById('output').textContent = JSON.stringify(finalJSON, null, 2);
+            document.getElementById('outputEditor').value = JSON.stringify(finalJSON, null, 2);
         }
 
         // =========================================================================
@@ -670,7 +745,7 @@
         // =========================================================================
         function generateYAML(profileType) {
             if (currentProxies.length === 0) return;
-            const output = document.getElementById('output');
+            const output = document.getElementById('outputEditor');
             
             let proxiesYAML = "proxies:\n";
             currentProxies.forEach(p => {
@@ -712,20 +787,18 @@
             const templateMode = document.getElementById('templateMode').value;
             let finalYAML = "";
 
-            // ЛОГИКА ДЛЯ ЧУЖОГО ШАБЛОНА
             if (templateMode === 'custom') {
                 finalYAML = document.getElementById('customTemplateInput').value;
                 if (!finalYAML.includes('{{PROXIES_YAML}}')) {
-                    output.textContent = "❌ Ошибка: В вашем кастомном шаблоне нет метки {{PROXIES_YAML}}.\nПожалуйста, напишите её там, куда нужно вставить настройки серверов.";
+                    output.value = "❌ Ошибка: В вашем кастомном шаблоне нет метки {{PROXIES_YAML}}.\nПожалуйста, напишите её там, куда нужно вставить настройки серверов.";
                     return;
                 }
                 finalYAML = finalYAML.replace(/\{\{PROXIES_YAML\}\}/g, proxiesYAML);
                 finalYAML = finalYAML.replace(/\{\{PROXY_NAMES\}\}/g, proxyNames);
-                output.textContent = finalYAML;
+                output.value = finalYAML;
                 return;
             }
 
-            // ЛОГИКА ДЛЯ ВШИТЫХ ШАБЛОНОВ
             let tunConfig = `tun:\n  enable: true\n  stack: mixed\n  device: Mihomo\n  gso: true\n  udp-timeout: 30\n  dns-hijack: [any:53, tcp://any:53]\n  auto-route: true\n  auto-detect-interface: true\n  strict-route: true\n  endpoint-independent-nat: true\n  mtu: 1420`;
             if (profileType === 'clash_router') {
                 tunConfig = `# ROUTER MODE (Keenetic/OpenWRT Compatible)\ntproxy-port: 7893\nredir-port: 7892\ntun:\n  enable: false`;
@@ -773,7 +846,6 @@ rules:
   - GEOIP,RU,DIRECT,no-resolve
   - MATCH,🌐 Global Proxy`;
             } else {
-                // ULTIMATE ВЕРСИЯ (Твой Крымский v77.0)
                 finalYAML = `# ─────────────────────────────────────────────
 # UNIVERSAL ROUTING PROFILE v77.0 (ULTIMATE)
 # MODE: ${profileType.toUpperCase()}
@@ -1693,27 +1765,28 @@ rules:
   - MATCH,🌐 Global Proxy
 `;
             }
-            document.getElementById('output').textContent = finalYAML;
+            output.value = finalYAML;
         }
 
         function downloadFile() {
-            const content = document.getElementById('output').textContent;
+            const content = document.getElementById('outputEditor').value;
             if (content.includes("Ошибка:")) { showToast("Сначала исправьте ошибку!", "#f85149"); return; }
             
             const format = document.getElementById('exportFormat').value;
             const ext = (format === 'xray' || format === 'singbox') ? 'json' : 'yaml';
-            const filename = `Network_Config_v9.1.${ext}`;
+            const filename = `Network_Config_v9.2.${ext}`;
             const mimeType = (format === 'xray' || format === 'singbox') ? 'application/json' : 'text/yaml';
 
             const a = document.createElement('a');
             a.href = window.URL.createObjectURL(new Blob([content], { type: mimeType }));
             a.download = filename;
-            document.body.appendChild(a); a.click(); window.URL.revokeObjectURL(url); document.body.removeChild(a);
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
         }
 
         function copyResult() {
-            if (document.getElementById('output').textContent.includes("Ошибка:")) return;
-            navigator.clipboard.writeText(document.getElementById('output').textContent);
+            const content = document.getElementById('outputEditor').value;
+            if (content.includes("Ошибка:")) return;
+            navigator.clipboard.writeText(content);
             showToast("✅ Copied to clipboard!");
         }
 
