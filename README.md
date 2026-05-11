@@ -1,90 +1,60 @@
-# ⚡ Network Builder Omni-Core (v13.1 Zenith)
+# ⚡ Network Builder Omni-Core (v15.1 Community Edition)
 
-**Network Builder** — это ультимативный, 100% локальный веб-комбайн для управления, тестирования и конвертации прокси-серверов. 
+[🇺🇸 Read in English](#english-version) | [🇷🇺 Читать на Русском](#russian-version)
 
-Создан для специалистов по информационной безопасности и энтузиастов. Позволяет собрать ваши узлы из разрозненных источников (ссылки, Base64-подписки, чужие JSON-конфиги) и в пару кликов сгенерировать идеальный профиль маршрутизации для **FlClash**, **Nekobox (Xray)** или **Sing-box**.
+<a name="russian-version"></a>
+## 🇷🇺 Описание проекта
 
-![Version](https://img.shields.io/badge/version-13.1_Zenith-3fb950?style=flat-square)
+**Network Builder** — это 100% локальный веб-инструмент (Single-File HTML) для управления, тестирования и конвертации прокси-серверов. 
+
+Создан для специалистов по информационной безопасности. Позволяет собрать ваши узлы из разрозненных источников и в один клик сгенерировать идеальный профиль маршрутизации для **FlClash**, **Nekobox (Xray)** или **Sing-box**.
+
+![Version](https://img.shields.io/badge/version-15.1_Community-3fb950?style=flat-square)
 ![License](https://img.shields.io/badge/license-MIT-58a6ff?style=flat-square)
 ![Security](https://img.shields.io/badge/security-100%25_Local-ea4aaa?style=flat-square)
 ![Architecture](https://img.shields.io/badge/architecture-Monolith_(Single_HTML)-8957e5?style=flat-square)
 
----
+### 🚀 Быстрый старт
+👉 **[ОТКРЫТЬ WEB-ВЕРСИЮ](https://jinxpil.github.io/flclash-converter/)**
 
-## 🚀 Как начать использовать (Переход к HTML)
+Или скачайте `index.html` и откройте в любом браузере. Работает в полном офлайне (Zero-Trust Architecture).
 
-Проект построен по принципу **Monolithic Architecture** — вся логика, парсеры и генераторы зашиты в один-единственный файл `index.html`. Никаких баз данных, бэкендов на Python/PHP или скрытых API.
+### 🔥 Главные фичи
+* 🛡️ **Локальная безопасность:** Приватные ключи и серверы не отправляются на чужие API. Все вычисления происходят в браузере (движок V8).
+* 📦 **Omni-Парсер:** Поддержка расшифровки Base64 подписок и реверс-инжиниринг JSON-конфигов (вытаскивает серверы, ключи Reality и SNI прямо из `outbounds`).
+* ✏️ **Mass Editor:** Выделяйте узлы и массово меняйте параметры (SNI, Flow, Fingerprint). Незаменимо для VLESS Reality.
+* 🌍 **Smart GeoIP:** Автоматическое определение страны сервера и добавление флагов (🇫🇮, 🇩🇪) через API `geojs.io`.
+* 🧹 **Smart Clean & Deduplication:** Удаление "мертвых" серверов после пинга и очистка дубликатов по IP.
 
-У вас есть два способа начать работу:
+### 🔌 Протоколы
+`VLESS` (Reality/Vision) • `VMess` • `Trojan` • `Hysteria2` • `SS/SSR` • `WireGuard` • `TUIC` • `Socks5/HTTP/SSH`
 
-### Способ 1: Онлайн (GitHub Pages)
-Самый простой вариант. Просто перейдите по ссылке на опубликованную страницу:
-👉 **[ОТКРЫТЬ NETWORK BUILDER](https://jinxpil.github.io/flclash-converter/)** *(замените ссылку на актуальную из настроек GitHub Pages)*
-
-### Способ 2: Офлайн (Локально)
-Так как скрипт полностью автономен, вы можете использовать его вообще без интернета:
-1. Скачайте файл `index.html` из этого репозитория.
-2. Просто дважды кликните по нему — он откроется в любом браузере (Chrome, Safari, Edge).
-3. Готово! Все конвертации и генерации будут происходить локально за счет мощностей вашего устройства.
-
----
-
-## 🔥 Главные фичи инструмента
-
-* 🛡️ **100% Локальная безопасность:** Вы не передаете свои приватные ключи на сторонние серверы. Вся криптография, расшифровка Base64 и пингование происходят локально в браузере (движок JS).
-* 📦 **Omni-Парсер (Реверс-инжиниринг JSON):** Скрипт умеет «распаковывать» готовые тяжелые JSON-конфиги Xray/Sing-box. Он находит массив серверов (включая ключи Reality и SNI) и превращает их обратно в редактируемые карточки.
-* ✏️ **Mass Editor (Массовое редактирование):** Выделите галочками нужные узлы (VLESS/Trojan) и измените им всем `SNI`, `Fingerprint` или `Flow` в один клик. Незаменимо для актуализации Reality-серверов.
-* 🧹 **Smart Clean & Deduplication:** Пропингуйте серверы, нажмите «Удалить мертвые» и очистите дубликаты по IP/Порту. Скрипт интеллектуально оставит только те дубликаты, у которых пинг ниже.
-* 🇬🇪 **Умные Geo-Tags:** Автоматическое определение страны сервера по домену или remarks и добавление красивых флагов (🇫🇮, 🇩🇪, 🇳🇱) в названия карточек.
-* 📱 **PWA Ready:** Откройте сайт на смартфоне и нажмите «Добавить на главный экран». Конвертер станет выглядеть и работать как отдельное мобильное приложение.
+### 💎 Вшитый профиль (Ultimate v77.0)
+При экспорте в FlClash используется глубоко оптимизированный профиль:
+* Блокировка рекламы, фишинга и трекеров (Hagezi, Adblock).
+* Прямая маршрутизация (`DIRECT`) для RU-сегмента (Госуслуги, банки, маркетплейсы).
+* Глобальное проксирование для AI-сервисов (ChatGPT, Claude, Gemini) и IT-инфраструктуры (GitHub, Docker).
 
 ---
 
-## 🔌 Поддерживаемые протоколы
+<a name="english-version"></a>
+## 🇺🇸 Project Overview
 
-Конвертер автоматически распознает ссылки, подписки и JSON-структуры следующих стандартов:
-* `VLESS` (включая параметры XTLS-Reality / Vision)
-* `VMess`
-* `Trojan`
-* `Hysteria2`
-* `Shadowsocks (SS)`
-* `ShadowsocksR (SSR)`
-* `WireGuard`
-* `TUIC`
-* `Socks5` / `HTTP` / `SSH` / `NaiveProxy`
+**Network Builder** is a 100% local web tool (Single-File HTML) for managing, testing, and converting proxy servers. 
 
----
+Designed for cybersecurity specialists and proxy enthusiasts. It allows you to gather your nodes from various sources and generate an ideal routing profile for **FlClash**, **Nekobox (Xray)**, or **Sing-box** in one click.
 
-## 📤 Форматы экспорта и профили
+### 🚀 Quick Start
+👉 **[OPEN WEB VERSION](https://jinxpil.github.io/flclash-converter/)**
 
-Вы можете выгрузить обработанные узлы в 5 разных форматах:
+Or download `index.html` and open it in any browser. It works completely offline (Zero-Trust Architecture).
 
-1. **📱 FlClash YAML (TUN)** — Профиль для мобильных устройств (iOS/Android) и ПК.
-2. **🌐 FlClash YAML (Router)** — Профиль для домашних роутеров (Keenetic, OpenWRT) с отключенным TUN (работает через tproxy/redir-port).
-3. **📦 Sing-box (JSON Outbound)** — Чистый массив `outbounds` для прямого импорта в ядро Sing-box.
-4. **📦 Exclave / Nekobox (Xray JSON)** — Готовый рабочий конфиг для Xray Core со встроенным балансировщиком (`proxy-balancer`), правилами роутинга и проверками доступности (`burstObservatory`).
-5. **⎘ Base64 Подписка** — Генерация локальной ссылки-подписки `data:application/yaml;base64,...` для вставки напрямую в клиенты.
+### 🔥 Key Features
+* 🛡️ **Local Security:** Private keys and servers are never sent to third-party APIs. All processing happens locally in your browser.
+* 📦 **Omni-Parser:** Supports Base64 subscription decoding and JSON config reverse-engineering (extracts servers, Reality keys, and SNI directly from `outbounds`).
+* ✏️ **Mass Editor:** Select nodes and batch-edit parameters (SNI, Flow, Fingerprint). Essential for VLESS Reality.
+* 🌍 **Smart GeoIP:** Automatically detects server location and appends country flags (🇫🇮, 🇩🇪) via the `geojs.io` API.
+* 🧹 **Smart Clean & Deduplication:** Removes "dead" servers after a ping test and clears IP/Port duplicates.
 
-### 💎 Вшитый профиль маршрутизации "Ultimate v77.0"
-При генерации YAML для FlClash используется глубоко оптимизированный профиль, который включает:
-* Защиту от утечек DNS (Fake-IP).
-* Встроенные правила (Rule-providers) для блокировки рекламы, фишинга и трекеров (Hagezi, Adblock).
-* Прямую маршрутизацию (`DIRECT`) для всего RU-сегмента: Госуслуги, банки (Сбер, ВТБ, Тинькофф), маркетплейсы, сервисы Яндекса и VK. Никаких тормозов при доступе к локальным ресурсам.
-* Глобальное проксирование для заблокированных социальных сетей, AI-сервисов (ChatGPT, Claude, Gemini) и IT-инфраструктуры (Docker, GitHub).
-
----
-
-## 🛠️ Кастомные YAML-шаблоны
-
-Если встроенный профиль вам не подходит, переключите "Логику маршрутизации" на **«Свой шаблон (Custom)»**. 
-Появится поле, куда можно вставить абсолютно любой YAML-код из интернета. 
-
-Просто добавьте в ваш код две метки в нужных местах:
-* `{{PROXIES_YAML}}` — сюда программа встроит физические параметры серверов.
-* `{{PROXY_NAMES}}` — сюда программа вставит список названий для групп (`proxy-groups`).
-
-Скрипт автоматически сошьет ваш кастомный шаблон с вашими серверами!
-
----
-
-*Разработано для обеспечения безопасного и быстрого доступа к информации.*
+### 🔌 Supported Protocols
+`VLESS` (Reality/Vision) • `VMess` • `Trojan` • `Hysteria2` • `SS/SSR` • `WireGuard` • `TUIC` • `Socks5/HTTP/SSH`
