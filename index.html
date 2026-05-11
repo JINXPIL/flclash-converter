@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Network Builder v7.0 Exclave Ed.</title>
+    <title>Network Builder v8.0 Omni-Core</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
@@ -16,7 +16,7 @@
 
         .container {
             background: #161b22; border: 1px solid #30363d;
-            border-radius: 12px; padding: 30px; max-width: 1000px; width: 100%;
+            border-radius: 12px; padding: 30px; max-width: 950px; width: 100%;
             box-shadow: 0 8px 24px rgba(0,0,0,0.5);
         }
 
@@ -99,7 +99,6 @@
             border-radius: 4px; font-size: 10px; font-weight: bold; text-transform: uppercase; margin-right: 5px;
         }
         
-        /* ЦВЕТА ПРОТОКОЛОВ */
         .type-vless { background: #238636; }
         .type-hy2 { background: #8957e5; }
         .type-trojan { background: #d29922; }
@@ -110,6 +109,8 @@
         .type-wg { background: #d23b3b; }
         .type-socks { background: #3bd2a2; color: #000; }
         .type-http { background: #a2d23b; color: #000; }
+        .type-ssh { background: #555; }
+        .type-naive { background: #ff7b00; }
         
         .card-actions { position: absolute; top: 8px; right: 8px; display: flex; gap: 4px; }
         .btn-card {
@@ -123,6 +124,7 @@
             background: #010409; padding: 20px; border: 1px solid #30363d; 
             border-radius: 8px; color: #a5d6ff; overflow-x: auto; 
             max-height: 400px; font-size: 12px; line-height: 1.5;
+            white-space: pre-wrap; word-wrap: break-word;
         }
 
         #toast {
@@ -150,7 +152,7 @@
 <body>
     <div class="container">
         <h2>
-            ⚡ Network Builder v7.0 Exclave
+            ⚡ Network Builder v8.0 Omni-Core
             <div class="header-actions">
                 <button class="icon-btn primary" onclick="pingAll()">⚡ Ping All</button>
                 <button class="icon-btn" onclick="sortProxies()">📶 Сортировка</button>
@@ -160,13 +162,12 @@
             </div>
         </h2>
         
-        <p>Поддержка: VLESS, VMess, Trojan, Hysteria2, SS, <b>SSR, WireGuard, Socks5, HTTP</b>. Перетащите .txt файл прямо в поле ниже.</p>
+        <p>Поддержка: VLESS, VMess, Trojan, Hysteria2, SS, SSR, WireGuard, Socks5, HTTP, SSH, Naive, TUIC. <br><b>Перетащите .txt файл прямо в поле ниже или вставьте ссылки.</b></p>
         
         <textarea id="input" placeholder="Drop .txt file here or paste links:
 vless://...
-hy2://...
 wireguard://...
-ssr://...
+ssh://...
 socks5://..."></textarea>
         
         <div class="btn-group">
@@ -176,6 +177,7 @@ socks5://..."></textarea>
             <select id="exportFormat" style="margin-left: auto;" onchange="updateOutput()">
                 <option value="clash_mobile">📱 FlClash YAML (TUN)</option>
                 <option value="clash_router">🌐 FlClash YAML (Router)</option>
+                <option value="singbox">📦 Sing-box (JSON Outbound)</option>
                 <option value="xray">📦 Exclave / Nekobox (JSON)</option>
             </select>
             
@@ -205,6 +207,7 @@ socks5://..."></textarea>
             catch(e) { try { return atob(str.replace(/-/g, '+').replace(/_/g, '/')); } catch(e2) { return ""; } }
         }
 
+        // === DRAG AND DROP ===
         const dropZone = document.getElementById('input');
         dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
         dropZone.addEventListener('dragleave', (e) => { e.preventDefault(); dropZone.classList.remove('dragover'); });
@@ -218,11 +221,11 @@ socks5://..."></textarea>
         });
 
         window.onload = () => {
-            const savedProxies = localStorage.getItem('flclash_net_v7');
+            const savedProxies = localStorage.getItem('flclash_net_v8');
             if (savedProxies) { currentProxies = JSON.parse(savedProxies); if (currentProxies.length > 0) renderCards(); }
         };
 
-        function saveState() { localStorage.setItem('flclash_net_v7', JSON.stringify(currentProxies)); }
+        function saveState() { localStorage.setItem('flclash_net_v8', JSON.stringify(currentProxies)); }
 
         function clearAll() {
             if(confirm('Очистить все узлы?')) { currentProxies = []; document.getElementById('input').value = ''; saveState(); renderCards(); }
@@ -265,11 +268,16 @@ socks5://..."></textarea>
             } else { parseData(input); }
         }
 
+        // РАСШИРЕННЫЙ ПАРСЕР ПРОТОКОЛОВ
         function parseData(rawText) {
             let text = rawText.trim();
-            if (!text.includes('://') && !text.includes('"outbounds"')) { try { text = atob(text.replace(/\s/g, '')); } catch (e) {} }
-
             let newProxiesCount = 0;
+
+            try {
+                let json = JSON.parse(text);
+                if (json.outbounds) { showToast("Конвертация из JSON пока не поддерживается, используйте ссылки.", "#d29922"); return; }
+            } catch(e){}
+
             text.split('\n').forEach(line => {
                 line = line.trim(); let proxyObj = null;
                 try {
@@ -313,11 +321,7 @@ socks5://..."></textarea>
                         if (decoded) {
                             let parts = decoded.split(':');
                             if (parts.length >= 6) {
-                                let server = parts[0]; let port = parseInt(parts[1]); let protocol = parts[2]; let cipher = parts[3]; let obfs = parts[4];
-                                let rem = parts[5].split('/?'); let password = safeB64Decode(rem[0]);
-                                let name = "SSR_" + Math.floor(Math.random()*100);
-                                if (rem.length > 1) { let p = new URLSearchParams(rem[1]); if(p.get('remarks')) name = safeB64Decode(p.get('remarks')); }
-                                proxyObj = { name: name, type: "ssr", server: server, port: port, cipher: cipher, password: password, protocol: protocol, obfs: obfs, rawLink: line };
+                                proxyObj = { name: "SSR_" + Math.floor(Math.random()*100), type: "ssr", server: parts[0], port: parseInt(parts[1]), protocol: parts[2], cipher: parts[3], obfs: parts[4], password: safeB64Decode(parts[5].split('/?')[0]), rawLink: line };
                             }
                         }
                     } else if (line.startsWith('hy2://') || line.startsWith('hysteria2://')) {
@@ -337,32 +341,28 @@ socks5://..."></textarea>
                         };
                     } else if (line.startsWith('tuic://')) {
                         const url = new URL(line); const p = new URLSearchParams(url.search);
-                        proxyObj = {
-                            name: decodeURIComponent(url.hash.slice(1)) || "TUIC_" + Math.floor(Math.random()*100),
-                            type: "tuic", server: url.hostname, port: parseInt(url.port), uuid: url.username, password: url.password, sni: p.get('sni') || url.hostname, rawLink: line
-                        };
+                        proxyObj = { name: decodeURIComponent(url.hash.slice(1)) || "TUIC_" + Math.floor(Math.random()*100), type: "tuic", server: url.hostname, port: parseInt(url.port), uuid: url.username, password: url.password, sni: p.get('sni') || url.hostname, rawLink: line };
                     } else if (line.startsWith('wireguard://') || line.startsWith('wg://')) {
                         let urlStr = line.replace('wireguard://', 'http://').replace('wg://', 'http://');
                         const url = new URL(urlStr); const p = new URLSearchParams(url.search);
                         proxyObj = {
-                            name: decodeURIComponent(url.hash.slice(1)) || "WG_" + Math.floor(Math.random()*100),
-                            type: "wg", server: url.hostname, port: parseInt(url.port),
+                            name: decodeURIComponent(url.hash.slice(1)) || "WG_" + Math.floor(Math.random()*100), type: "wg", server: url.hostname, port: parseInt(url.port),
                             "private-key": url.username || p.get('privateKey'), "public-key": p.get('publicKey') || p.get('peerPublicKey'),
                             ip: p.get('ip') || "10.0.0.2/32", reserved: p.get('reserved'), rawLink: line
                         };
                     } else if (line.startsWith('socks5://') || line.startsWith('socks://')) {
                         let urlStr = line.replace('socks5://', 'http://').replace('socks://', 'http://');
                         const url = new URL(urlStr);
-                        proxyObj = {
-                            name: decodeURIComponent(url.hash.slice(1)) || "SOCKS_" + Math.floor(Math.random()*100),
-                            type: "socks", server: url.hostname, port: parseInt(url.port), username: url.username, password: url.password, rawLink: line
-                        };
+                        proxyObj = { name: decodeURIComponent(url.hash.slice(1)) || "SOCKS_" + Math.floor(Math.random()*100), type: "socks", server: url.hostname, port: parseInt(url.port), username: url.username, password: url.password, rawLink: line };
                     } else if (line.startsWith('http://') && line.includes('@')) {
                         const url = new URL(line);
-                        proxyObj = {
-                            name: decodeURIComponent(url.hash.slice(1)) || "HTTP_" + Math.floor(Math.random()*100),
-                            type: "http", server: url.hostname, port: parseInt(url.port), username: url.username, password: url.password, rawLink: line
-                        };
+                        proxyObj = { name: decodeURIComponent(url.hash.slice(1)) || "HTTP_" + Math.floor(Math.random()*100), type: "http", server: url.hostname, port: parseInt(url.port), username: url.username, password: url.password, rawLink: line };
+                    } else if (line.startsWith('ssh://')) {
+                        const url = new URL(line);
+                        proxyObj = { name: decodeURIComponent(url.hash.slice(1)) || "SSH_" + Math.floor(Math.random()*100), type: "ssh", server: url.hostname, port: parseInt(url.port), username: url.username, password: url.password, rawLink: line };
+                    } else if (line.startsWith('naive+https://')) {
+                        const url = new URL(line.replace('naive+', ''));
+                        proxyObj = { name: decodeURIComponent(url.hash.slice(1)) || "Naive_" + Math.floor(Math.random()*100), type: "naive", server: url.hostname, port: parseInt(url.port), username: url.username, password: url.password, rawLink: line };
                     }
 
                     if (proxyObj && proxyObj.server && !currentProxies.some(p => p.server === proxyObj.server && p.port === proxyObj.port)) { 
@@ -454,7 +454,62 @@ socks5://..."></textarea>
 
         function updateOutput() {
             const format = document.getElementById('exportFormat').value;
-            if (format === 'xray') generateXrayJSON(); else generateYAML(format);
+            if (format === 'singbox') generateSingboxJSON();
+            else if (format === 'xray') generateXrayJSON(); 
+            else generateYAML(format);
+        }
+
+        // =========================================================================
+        // === ГЕНЕРАТОР JSON ДЛЯ SING-BOX OUTBOUNDS ===
+        // =========================================================================
+        function generateSingboxJSON() {
+            if (currentProxies.length === 0) return;
+            
+            let outbounds = [];
+            let proxyTags = [];
+
+            currentProxies.forEach((p, index) => {
+                let tag = p.name || `proxy-${index}`;
+                proxyTags.push(tag);
+                let ob = { tag: tag, type: p.type, server: p.server, server_port: p.port };
+
+                if (p.type === 'vless' || p.type === 'trojan') {
+                    if (p.uuid) ob.uuid = p.uuid;
+                    if (p.password) ob.password = p.password;
+                    if (p.network && p.network !== 'tcp') ob.transport = { type: p.network };
+                    if (p.tls) {
+                        ob.tls = { enabled: true, server_name: p.sni || p.server };
+                        if (p.fp) ob.tls.utls = { enabled: true, fingerprint: p.fp };
+                        if (p["reality-opts"]) ob.tls.reality = { enabled: true, public_key: p["reality-opts"]["public-key"], short_id: p["reality-opts"]["short-id"] || "" };
+                    }
+                    if (p.flow) ob.flow = p.flow;
+                } else if (p.type === 'vmess') {
+                    ob.uuid = p.uuid; ob.security = "auto"; ob.alter_id = parseInt(p.aid) || 0;
+                    if (p.tls) ob.tls = { enabled: true, server_name: p.sni || p.server };
+                    if (p.network && p.network !== 'tcp') ob.transport = { type: p.network };
+                } else if (p.type === 'ss' || p.type === 'shadowsocks') {
+                    ob.type = "shadowsocks"; ob.method = p.cipher; ob.password = p.password;
+                } else if (p.type === 'hysteria2') {
+                    ob.password = p.password; ob.tls = { enabled: true, server_name: p.sni || p.server, insecure: p["skip-cert-verify"] };
+                    if (p.obfs) ob.obfs = { type: p.obfs, password: p["obfs-password"] };
+                } else if (p.type === 'wg' || p.type === 'wireguard') {
+                    ob.type = "wireguard"; ob.local_address = [p.ip]; ob.private_key = p["private-key"]; ob.peer_public_key = p["public-key"];
+                    if (p.reserved) ob.reserved = p.reserved.split(',').map(Number);
+                } else if (p.type === 'tuic') {
+                    ob.uuid = p.uuid; ob.password = p.password;
+                } else if (p.type === 'socks' || p.type === 'http' || p.type === 'ssh') {
+                    if (p.username) { ob.username = p.username; ob.password = p.password; }
+                }
+                outbounds.push(ob);
+            });
+
+            outbounds.push({ type: "direct", tag: "direct" });
+            outbounds.push({ type: "block", tag: "block" });
+            outbounds.push({ type: "dns", tag: "dns-out" });
+
+            outbounds.unshift({ type: "selector", tag: "🚀 Proxy Select", outbounds: proxyTags });
+
+            document.getElementById('output').textContent = JSON.stringify({ outbounds: outbounds }, null, 2);
         }
 
         // =========================================================================
@@ -472,7 +527,9 @@ socks5://..."></textarea>
                     ob.protocol = "vless";
                     ob.settings = { vnext: [{ address: p.server, port: p.port, users: [{ id: p.uuid, encryption: "none", flow: p.flow || "" }] }] };
                     ob.streamSettings = { network: p.network || "tcp", security: p.tls ? "reality" : "none" };
-                    if (p.tls && p["reality-opts"]) ob.streamSettings.realitySettings = { serverName: p.sni || p.server, show: false, publicKey: p["reality-opts"]["public-key"], shortId: p["reality-opts"]["short-id"] || "", fingerprint: p.fp || "chrome" };
+                    if (p.tls && p["reality-opts"]) {
+                        ob.streamSettings.realitySettings = { serverName: p.sni || p.server, show: false, publicKey: p["reality-opts"]["public-key"], shortId: p["reality-opts"]["short-id"] || "", fingerprint: p.fp || "chrome" };
+                    }
                 } else if (p.type === 'vmess') {
                     ob.protocol = "vmess";
                     ob.settings = { vnext: [{ address: p.server, port: p.port, users: [{ id: p.uuid, alterId: parseInt(p.aid) || 0, security: "auto" }] }] };
@@ -538,7 +595,7 @@ socks5://..."></textarea>
         }
 
         // =========================================================================
-        // === ВШИТЫЙ ULTIMATE-КОНФИГ ДЛЯ FLCLASH ===
+        // === ВШИТЫЙ ULTIMATE-КОНФИГ ДЛЯ FLCLASH (МОНОЛИТ) ===
         // =========================================================================
         function generateYAML(profileType) {
             if (currentProxies.length === 0) return;
@@ -1600,18 +1657,19 @@ rules:
         function downloadFile() {
             const content = document.getElementById('output').textContent;
             const format = document.getElementById('exportFormat').value;
-            const ext = format === 'xray' ? 'json' : 'yaml';
-            const filename = `Network_Config_v7.${ext}`;
-            const blob = new Blob([content], { type: format === 'xray' ? 'application/json' : 'text/yaml' });
-            const url = window.URL.createObjectURL(blob);
+            const ext = (format === 'xray' || format === 'singbox') ? 'json' : 'yaml';
+            const filename = `Network_Config_v8.${ext}`;
+            const mimeType = (format === 'xray' || format === 'singbox') ? 'application/json' : 'text/yaml';
+
             const a = document.createElement('a');
-            a.href = url; a.download = filename;
-            document.body.appendChild(a); a.click(); window.URL.revokeObjectURL(url); document.body.removeChild(a);
+            a.href = window.URL.createObjectURL(new Blob([content], { type: mimeType }));
+            a.download = filename;
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
         }
 
         function copyResult() {
             navigator.clipboard.writeText(document.getElementById('output').textContent);
-            showToast("✅ Скопировано в буфер!");
+            showToast("✅ Copied to clipboard!");
         }
 
         function showToast(message, color = "#238636") {
