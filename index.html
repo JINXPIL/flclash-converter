@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Network Builder v8.1 Omni-Core</title>
+    <title>Network Builder v8.2 Omni-Core</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
@@ -152,7 +152,7 @@
 <body>
     <div class="container">
         <h2>
-            ⚡ Network Builder v8.1 Omni-Core
+            ⚡ Network Builder v8.2 Omni-Core
             <div class="header-actions">
                 <button class="icon-btn primary" onclick="pingAll()">⚡ Ping All</button>
                 <button class="icon-btn" onclick="sortProxies()">📶 Сортировка</button>
@@ -203,6 +203,7 @@
             catch(e) { try { return atob(str.replace(/-/g, '+').replace(/_/g, '/')); } catch(e2) { return ""; } }
         }
 
+        // === DRAG AND DROP ===
         const dropZone = document.getElementById('input');
         dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
         dropZone.addEventListener('dragleave', (e) => { e.preventDefault(); dropZone.classList.remove('dragover'); });
@@ -264,23 +265,30 @@
         }
 
         // =========================================================================
-        // ПАРСЕР (ВКЛЮЧАЯ ДЕСЕРИАЛИЗАЦИЮ XRAY JSON)
+        // ПАРСЕР (ВКЛЮЧАЯ ДЕСЕРИАЛИЗАЦИЮ XRAY JSON С УЧЕТОМ REMARKS)
         // =========================================================================
         function parseData(rawText) {
             let text = rawText.trim();
             let newProxiesCount = 0;
 
-            // 1. Пытаемся распарсить как Xray/Sing-box JSON
             try {
                 let json = JSON.parse(text);
                 if (json.outbounds && Array.isArray(json.outbounds)) {
+                    // Умный поиск имени профиля (remarks)
+                    let baseRemark = json.remarks || "";
+                    let validOutbounds = json.outbounds.filter(ob => ob.protocol !== 'freedom' && ob.protocol !== 'blackhole' && ob.protocol !== 'dns');
+                    let isMultiNode = validOutbounds.length > 1;
+
                     json.outbounds.forEach(ob => {
                         if (ob.protocol === 'freedom' || ob.protocol === 'blackhole' || ob.protocol === 'dns') return;
                         
                         let proxyObj = null;
                         let tag = ob.tag || "Node_" + Math.floor(Math.random()*1000);
+                        
+                        // Если в JSON есть remarks, используем его!
+                        let nodeName = baseRemark ? (isMultiNode ? `${baseRemark} (${tag})` : baseRemark) : tag;
 
-                        // Парсинг Xray VLESS (как в твоем примере)
+                        // Парсинг Xray VLESS
                         if (ob.protocol === 'vless' && ob.settings && ob.settings.vnext && ob.settings.vnext.length > 0) {
                             let vnext = ob.settings.vnext[0];
                             let user = (vnext.users && vnext.users.length > 0) ? vnext.users[0] : {};
@@ -289,7 +297,7 @@
                             let tls = stream.tlsSettings || {};
                             
                             proxyObj = {
-                                name: tag,
+                                name: nodeName,
                                 type: "vless",
                                 server: vnext.address,
                                 port: vnext.port,
@@ -303,6 +311,18 @@
                             };
                         }
                         
+                        // Парсинг Sing-box VLESS
+                        else if (ob.type === 'vless') {
+                             let tls = ob.tls || {}; let reality = tls.reality || {};
+                             proxyObj = {
+                                 name: nodeName, type: "vless", server: ob.server, port: ob.server_port, uuid: ob.uuid,
+                                 tls: tls.enabled === true,
+                                 "reality-opts": reality.enabled ? { "public-key": reality.public_key, "short-id": reality.short_id || "" } : undefined,
+                                 sni: tls.server_name || ob.server, network: (ob.transport && ob.transport.type) ? ob.transport.type : "tcp",
+                                 flow: ob.flow || "", fp: (tls.utls && tls.utls.fingerprint) ? tls.utls.fingerprint : "chrome"
+                             };
+                        }
+
                         if (proxyObj) {
                             // Собираем обратно стандартную ссылку
                             let link = `vless://${proxyObj.uuid}@${proxyObj.server}:${proxyObj.port}?type=${proxyObj.network}&security=${proxyObj.tls ? (proxyObj["reality-opts"] ? 'reality' : 'tls') : 'none'}&sni=${proxyObj.sni}&fp=${proxyObj.fp}`;
@@ -321,19 +341,15 @@
                         document.getElementById('input').value = '';
                         showToast(`+${newProxiesCount} узлов из JSON добавлено!`);
                         saveState(); renderCards();
-                        return; // Завершаем функцию, так как JSON успешно прочитан
+                        return;
                     }
                 }
-            } catch(e) {
-                // Если это не JSON, идем дальше к построчному парсингу
-            }
+            } catch(e) { }
 
-            // 2. Декодинг Base64 подписок (если это сплошной текст)
             if (newProxiesCount === 0 && !text.includes('://') && !text.includes('"outbounds"')) {
                 try { text = atob(text.replace(/\s/g, '')); } catch (e) {}
             }
 
-            // 3. Построчный парсинг ссылок (VLESS, Trojan, SSR и т.д.)
             text.split('\n').forEach(line => {
                 line = line.trim(); let proxyObj = null;
                 try {
@@ -492,7 +508,7 @@
                 document.getElementById('copyBtn').style.display = "inline-block";
             } else {
                 container.style.display = 'none'; document.getElementById('nodeCount').style.display = "none";
-                document.getElementById('output').textContent = "Вставьте ссылки или JSON конфиг...";
+                document.getElementById('output').textContent = "Waiting for data...";
                 document.getElementById('downloadBtn').style.display = "none"; document.getElementById('copyBtn').style.display = "none";
             }
         }
@@ -520,7 +536,9 @@
         // =========================================================================
         function generateSingboxJSON() {
             if (currentProxies.length === 0) return;
-            let outbounds = []; let proxyTags = [];
+            
+            let outbounds = [];
+            let proxyTags = [];
 
             currentProxies.forEach((p, index) => {
                 let tag = p.name || `proxy-${index}`;
@@ -560,6 +578,7 @@
             outbounds.push({ type: "direct", tag: "direct" });
             outbounds.push({ type: "block", tag: "block" });
             outbounds.push({ type: "dns", tag: "dns-out" });
+
             outbounds.unshift({ type: "selector", tag: "🚀 Proxy Select", outbounds: proxyTags });
 
             document.getElementById('output').textContent = JSON.stringify({ outbounds: outbounds }, null, 2);
@@ -855,105 +874,12 @@ dns:
     - 'openai.com'
     - '+.chatgpt.com'
     - 'chatgpt.com'
-    - '+.oaistatic.com'
-    - '+.oaiusercontent.com'
-    - 'android.chat.openai.com'
     - '+.deepseek.com'
     - '+.claude.ai'
     - '+.anthropic.com'
-    - '+.auth0.com'
-    - '+.livekit.cloud'
-    - 'challenges.cloudflare.com'
-    - '+.statsigapi.net'
-    - '+.statsig.com'
-    - '+.sentry.io'
-    - '+.workos.com'
-    - '+.intercom.io'
-    - '+.intercomcdn.com'
-    - '+.arkoselabs.com'
-    - '+.featuregates.org'
-    - '+.featureassets.org'
-    - '+.max.ru'          
-    - '+.lisaalert.org'
-    - '+.dobro.ru'
-    - '+.onf.ru'
-    - '+.znanie.ru'
-    - '+.vivo.com.cn'
-    - '+.vivo.com'
-    - '+.appmetrica.yandex.net'
-    - '+.doh.pub'
-    - '+.oneme.ru'
-    - '+.rustore.ru'
-    - '+.kaspersky-labs.com'
-    - '+.kaspersky.com'
-    - '+.svobodacard.ru'
-    - '+.appcenter.ms'
-    - '+.egks.ru'
-    - '+.polypay.ru'
-    - '+.facct.ru'
-    - '+.sevsu.ru'
-    - '+.uxfeedback.ru'
-    - '+.dbankcloud.ru'
-    - '+.urait.ru'
-    - '+.jivo.ru'
-    - '+.jivosite.com'
-    - '+.amplitude.com'
-
-  default-nameserver:
-    - 77.88.8.8          
-    - 8.8.8.8
-    - 2001:4860:4860::8888   
-    - 2001:4860:4860::8844   
-  nameserver:
-    - https://dns.yandex.ru/dns-query
-    - https://dns.quad9.net/dns-query
-    - https://cloudflare-dns.com/dns-query
-    - 2620:fe::fe            
-    - 2606:4700:4700::1111   
-  
-  proxy-server-nameserver:
-    - https://1.1.1.1/dns-query
-    - 8.8.8.8
-    - 1.0.0.1
-    - 77.88.8.8
-
-  fallback:
-    - https://dns.adguard-dns.com/dns-query
-    - https://1.0.0.1/dns-query
-  fallback-filter:
-    geoip: true
-    geoip-code: RU
-    ipcidr:
-      - 240.0.0.0/4
-    domain:
-      - '+.google.com'
-      - '+.youtube.com'
-      - '+.instagram.com'
-      - '+.facebook.com'
-      - '+.twitter.com'
-      - '+.github.com'
-
-  nameserver-policy:
-    '+.xbox.com': [https://xbox-dns.ru/dns-query, tls://xbox-dns.ru, 111.88.96.50, 111.88.96.51]
-    '+.xboxlive.com': [https://xbox-dns.ru/dns-query, tls://xbox-dns.ru, 111.88.96.50, 111.88.96.51]
-    '+.xbl.io': [https://xbox-dns.ru/dns-query, tls://xbox-dns.ru, 111.88.96.50, 111.88.96.51]
-    'xbox-dns.ru': "https://dns.yandex.ru/dns-query"
-    '+.googleapis.com': "https://dns.quad9.net/dns-query"
-    '+.gstatic.com': "https://dns.quad9.net/dns-query"
-    '+.googlevideo.com': "https://dns.quad9.net/dns-query"
-    '+.ytimg.com': "https://dns.quad9.net/dns-query"
-    '+.youtube.com': "https://dns.quad9.net/dns-query"
-    '+.youtubei.googleapis.com': "https://dns.quad9.net/dns-query"
-    '+.translate.googleapis.com': "https://dns.quad9.net/dns-query"
-    '+.gemini.google.com': "https://dns.quad9.net/dns-query"
-    '+.openai.com': "https://dns.quad9.net/dns-query"
-    '+.chatgpt.com': "https://dns.quad9.net/dns-query"
-    '+.deepseek.com': "https://dns.quad9.net/dns-query"
-    '+.claude.ai': "https://dns.quad9.net/dns-query"
-    '+.anthropic.com': "https://dns.quad9.net/dns-query"
-    '+.telegram.org': "https://dns.quad9.net/dns-query"
-    '+.t.me': "https://dns.quad9.net/dns-query"
-    '+.tiktokv.com': "https://dns.quad9.net/dns-query"
+    - '+.telegram.org'
+    - '+.t.me'
+    - '+.tiktokv.com'
 
 sniffer:
   enable: true
@@ -1709,21 +1635,19 @@ rules:
 
         function downloadFile() {
             const content = document.getElementById('output').textContent;
-            
             const format = document.getElementById('exportFormat').value;
             const ext = (format === 'xray' || format === 'singbox') ? 'json' : 'yaml';
-            const filename = `Network_Config_v8.1.${ext}`;
-            const mimeType = (format === 'xray' || format === 'singbox') ? 'application/json' : 'text/yaml';
-
+            const filename = `Network_Config_v8.2.${ext}`;
+            const blob = new Blob([content], { type: format === 'xray' ? 'application/json' : 'text/yaml' });
+            const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = window.URL.createObjectURL(new Blob([content], { type: mimeType }));
-            a.download = filename;
-            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+            a.href = url; a.download = filename;
+            document.body.appendChild(a); a.click(); window.URL.revokeObjectURL(url); document.body.removeChild(a);
         }
 
         function copyResult() {
             navigator.clipboard.writeText(document.getElementById('output').textContent);
-            showToast("✅ Copied to clipboard!");
+            showToast("✅ Скопировано в буфер!");
         }
 
         function showToast(message, color = "#238636") {
