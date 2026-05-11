@@ -98,9 +98,14 @@
             display: inline-block; color: white; padding: 2px 6px; 
             border-radius: 4px; font-size: 10px; font-weight: bold; text-transform: uppercase; margin-right: 5px;
         }
+        
+        /* Цвета для разных протоколов */
         .type-vless { background: #238636; }
         .type-hy2 { background: #8957e5; }
         .type-trojan { background: #d29922; }
+        .type-vmess { background: #0078d7; }
+        .type-ss { background: #3b82f6; }
+        .type-tuic { background: #ea4aaa; }
         
         .card-actions { position: absolute; top: 8px; right: 8px; display: flex; gap: 4px; }
         .btn-card {
@@ -146,15 +151,20 @@
                 <button class="icon-btn primary" onclick="pingAll()" title="Test all nodes">⚡ Ping All</button>
                 <button class="icon-btn" onclick="sortProxies()" title="Sort by latency">📶 Сортировка</button>
                 <button class="icon-btn" onclick="shuffleProxies()" title="Shuffle nodes">🔀 Перемешать</button>
-                <button class="icon-btn" onclick="exportRawNodes()" title="Export raw links">📥 Резервное копирование</button>
+                <button class="icon-btn" onclick="exportRawNodes()" title="Export raw links">📥 Backup</button>
                 <button class="icon-btn danger" onclick="clearAll()" title="Delete all">🗑 Очистить всё</button>
             </div>
         </h2>
         
-        <p>Поддержка VLESS, Trojan, Hysteria2. Вставьте ссылки или <b>перетащите .txt файл прямо в поле ниже.</b></p>
+        <p>Поддержка VLESS, VMess, Trojan, Hysteria2, Shadowsocks, TUIC. <b>Перетащите .txt файл прямо в поле ниже.</b></p>
         
-        <textarea id="input" placeholder="Перетащи файл с подпиской сюда...
-Или вставь vless:// ссылки вручную"></textarea>
+        <textarea id="input" placeholder="Drop .txt file here or paste links:
+vless://...
+vmess://...
+hy2://...
+ss://...
+trojan://...
+tuic://..."></textarea>
         
         <div class="btn-group">
             <button class="action-btn btn-convert" onclick="startProcess()">► PROCESS NODES</button>
@@ -187,6 +197,15 @@
     <script>
         let currentProxies = []; 
 
+        // Вспомогательная функция для безопасного декодирования Base64
+        function safeB64Decode(str) {
+            try {
+                return decodeURIComponent(escape(atob(str.replace(/-/g, '+').replace(/_/g, '/'))));
+            } catch(e) {
+                try { return atob(str.replace(/-/g, '+').replace(/_/g, '/')); } catch(e2) { return ""; }
+            }
+        }
+
         // === DRAG AND DROP ===
         const dropZone = document.getElementById('input');
         dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
@@ -201,11 +220,11 @@
         });
 
         window.onload = () => {
-            const savedProxies = localStorage.getItem('flclash_net_v5');
+            const savedProxies = localStorage.getItem('flclash_net_v6');
             if (savedProxies) { currentProxies = JSON.parse(savedProxies); if (currentProxies.length > 0) renderCards(); }
         };
 
-        function saveState() { localStorage.setItem('flclash_net_v5', JSON.stringify(currentProxies)); }
+        function saveState() { localStorage.setItem('flclash_net_v6', JSON.stringify(currentProxies)); }
 
         function clearAll() {
             if(confirm('Очистить все узлы?')) { currentProxies = []; document.getElementById('input').value = ''; saveState(); renderCards(); }
@@ -248,6 +267,7 @@
             } else { parseData(input); }
         }
 
+        // РАСШИРЕННЫЙ ПАРСЕР ПРОТОКОЛОВ
         function parseData(rawText) {
             let text = rawText.trim();
             if (!text.includes('://') && !text.includes('"outbounds"')) { try { text = atob(text.replace(/\s/g, '')); } catch (e) {} }
@@ -265,6 +285,34 @@
                             "reality-opts": p.get('pbk') ? { "public-key": p.get('pbk'), "short-id": p.get('sid') || "" } : undefined,
                             sni: p.get('sni') || url.hostname, network: p.get('type') || "tcp", flow: p.get('flow') || "", fp: p.get('fp') || "chrome", rawLink: line
                         };
+                    } else if (line.startsWith('vmess://')) {
+                        let b64 = line.slice(8); let decoded = safeB64Decode(b64);
+                        if (decoded) {
+                            let v = JSON.parse(decoded);
+                            proxyObj = {
+                                name: v.ps || "VMess_" + Math.floor(Math.random()*100),
+                                type: "vmess", server: v.add, port: parseInt(v.port), uuid: v.id,
+                                aid: v.aid || 0, network: v.net || "tcp", tls: v.tls === "tls", sni: v.sni || v.host || v.add, rawLink: line
+                            };
+                        }
+                    } else if (line.startsWith('ss://')) {
+                        let uri = line.slice(5); let name = "SS_" + Math.floor(Math.random()*100);
+                        if (uri.includes('#')) { let parts = uri.split('#'); name = decodeURIComponent(parts[1]); uri = parts[0]; }
+                        let method = "", password = "", server = "", port = 0;
+                        if (uri.includes('@')) {
+                            let parts = uri.split('@'); let userinfo = safeB64Decode(parts[0]) || parts[0];
+                            if(userinfo.includes(':')) { let up = userinfo.split(':'); method = up[0]; password = up[1]; }
+                            let sp = parts[1].split(':'); server = sp[0]; port = parseInt(sp[1]);
+                        } else {
+                            let decoded = safeB64Decode(uri);
+                            if(decoded.includes('@')) {
+                                let parts = decoded.split('@'); let up = parts[0].split(':'); method = up[0]; password = up[1];
+                                let sp = parts[1].split(':'); server = sp[0]; port = parseInt(sp[1]);
+                            }
+                        }
+                        if (server && port) {
+                            proxyObj = { name: name, type: "ss", server: server, port: port, cipher: method, password: password, rawLink: line };
+                        }
                     } else if (line.startsWith('hy2://') || line.startsWith('hysteria2://')) {
                         const url = new URL(line); const p = new URLSearchParams(url.search);
                         proxyObj = {
@@ -279,6 +327,13 @@
                             name: decodeURIComponent(url.hash.slice(1)) || "Trojan_" + Math.floor(Math.random()*100),
                             type: "trojan", server: url.hostname, port: parseInt(url.port), password: url.username,
                             tls: true, sni: p.get('sni') || url.hostname, network: p.get('type') || "tcp", fp: p.get('fp') || "chrome", rawLink: line
+                        };
+                    } else if (line.startsWith('tuic://')) {
+                        const url = new URL(line); const p = new URLSearchParams(url.search);
+                        proxyObj = {
+                            name: decodeURIComponent(url.hash.slice(1)) || "TUIC_" + Math.floor(Math.random()*100),
+                            type: "tuic", server: url.hostname, port: parseInt(url.port), uuid: url.username, password: url.password,
+                            sni: p.get('sni') || url.hostname, rawLink: line
                         };
                     }
                     if (proxyObj && !currentProxies.some(p => p.server === proxyObj.server && p.port === proxyObj.port)) { currentProxies.push(proxyObj); newProxiesCount++; }
@@ -325,7 +380,7 @@
                 document.getElementById('nodeCount').textContent = `${currentProxies.length} Nodes`;
 
                 currentProxies.forEach((p, index) => {
-                    let typeClass = p.type === "hysteria2" ? "type-hy2" : (p.type === "trojan" ? "type-trojan" : "type-vless");
+                    let typeClass = "type-" + p.type;
                     let pingLabel = p.lastPing === undefined ? "⚡" : (p.lastPing === 99999 ? "Err" : `${p.lastPing}ms`);
                     let pingColor = p.lastPing === undefined ? "#c9d1d9" : (p.lastPing === 99999 ? "#f85149" : "#3fb950");
                     const card = document.createElement('div'); card.className = 'proxy-card';
@@ -395,6 +450,14 @@
                             publicKey: p["reality-opts"]["public-key"], shortId: p["reality-opts"]["short-id"] || "", fingerprint: p.fp || "chrome"
                         };
                     }
+                } else if (p.type === 'vmess') {
+                    ob.protocol = "vmess";
+                    ob.settings = { vnext: [{ address: p.server, port: p.port, users: [{ id: p.uuid, alterId: parseInt(p.aid) || 0, security: "auto" }] }] };
+                    ob.streamSettings = { network: p.network || "tcp", security: p.tls ? "tls" : "none" };
+                    if (p.tls) ob.streamSettings.tlsSettings = { serverName: p.sni || p.server };
+                } else if (p.type === 'ss') {
+                    ob.protocol = "shadowsocks";
+                    ob.settings = { servers: [{ address: p.server, port: p.port, method: p.cipher, password: p.password }] };
                 } else if (p.type === 'trojan') {
                     ob.protocol = "trojan";
                     ob.settings = { servers: [{ address: p.server, port: p.port, password: p.password }] };
@@ -402,6 +465,9 @@
                 } else if (p.type === 'hysteria2') {
                     ob.protocol = "hysteria2";
                     ob.settings = { servers: [{ address: p.server, port: p.port, password: p.password, sni: p.sni || p.server, obfs: p.obfs || "", obfsPassword: p["obfs-password"] || "", insecure: p["skip-cert-verify"] || false }] };
+                } else if (p.type === 'tuic') {
+                    ob.protocol = "tuic";
+                    ob.settings = { users: [{ uuid: p.uuid, password: p.password }] }; 
                 }
                 outbounds.push(ob);
             });
@@ -451,10 +517,17 @@
                     if (p.flow) proxiesYAML += `    flow: ${p.flow}\n`;
                     if (p.tls) proxiesYAML += `    tls: true\n    sni: ${p.sni}\n    client-fingerprint: ${p.fp}\n`;
                     if (p["reality-opts"]) proxiesYAML += `    reality-opts:\n      public-key: ${p["reality-opts"]["public-key"]}\n      short-id: ${p["reality-opts"]["short-id"]}\n`;
+                } else if (p.type === 'vmess') {
+                    proxiesYAML += `    uuid: ${p.uuid}\n    alterId: ${p.aid}\n    cipher: auto\n    network: ${p.network}\n`;
+                    if (p.tls) proxiesYAML += `    tls: true\n    sni: ${p.sni}\n`;
+                } else if (p.type === 'ss') {
+                    proxiesYAML += `    cipher: ${p.cipher}\n    password: ${p.password}\n`;
                 } else if (p.type === 'hysteria2') {
                     proxiesYAML += `    password: ${p.password}\n    sni: ${p.sni}\n`;
                     if (p["skip-cert-verify"]) proxiesYAML += `    skip-cert-verify: true\n`;
                     if (p.obfs) proxiesYAML += `    obfs: ${p.obfs}\n    obfs-password: ${p["obfs-password"]}\n`;
+                } else if (p.type === 'tuic') {
+                    proxiesYAML += `    uuid: ${p.uuid}\n    password: ${p.password}\n    sni: ${p.sni}\n    udp-relay-mode: native\n`;
                 }
             });
 
