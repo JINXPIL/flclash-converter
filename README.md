@@ -2,7 +2,7 @@
 
 Простой и быстрый веб-инструмент для конвертации сырых VPN-ссылок и подписок (Happ, 2RayTun) в готовый YAML-конфиг для ядра **Mihomo (Clash)** и клиента **FlClash**.
 
-🌐 **[Попробовать конвертер онлайн](https://ТВОЙ_НИК.github.io/flclash-converter/)**
+🌐 **[Попробовать конвертер онлайн](https://JINXPIL.github.io/flclash-converter/)**
 
 ---
 
