@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>VPN Converter V3 (Reality Fix)</title>
+    <style>
+        body { background: #090c0e; color: #b8ccd8; font-family: monospace; padding: 20px; max-width: 800px; }
+        textarea { width: 100%; height: 150px; background: #0c1318; color: #00ff9f; border: 1px solid #172028; padding: 10px; margin-bottom: 10px; box-sizing: border-box; }
+        button { background: #00ff9f; color: #000; border: none; padding: 10px 20px; cursor: pointer; font-weight: bold; margin-right: 10px; margin-bottom: 10px; }
+        pre { background: #0c1318; padding: 15px; border: 1px solid #172028; color: #88b0c4; overflow-x: auto; max-height: 400px; }
+        .hint { color: #2a5a78; font-size: 12px; margin-top: 10px; background: #090f13; padding: 10px; border: 1px solid #121e28; }
+    </style>
+</head>
+<body>
+    <h2>FlClash Converter (YAML)</h2>
+    <p>Вставь сюда ссылку подписки (https://...), Base64-код или vless:// ссылки:</p>
+    
+    <textarea id="input" placeholder="vless://..."></textarea>
+    <br>
+    <button onclick="startProcess()">► КОНВЕРТИРОВАТЬ</button>
+    <button onclick="copyResult()" style="background:#2a4a5a; color:white;">⎘ КОПИРОВАТЬ YAML</button>
+    
+    <h3>Результат:</h3>
+    <pre id="output">Здесь появится готовый конфиг...</pre>
+
+    <script>
+        async function startProcess() {
+            const input = document.getElementById('input').value.trim();
+            const out = document.getElementById('output');
+            if (!input) { out.textContent = "Пустое поле!"; return; }
+
+            if (input.startsWith('http://') || input.startsWith('https://')) {
+                out.textContent = "Скачиваю...";
+                try {
+                    const res = await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(input));
+                    if (!res.ok) throw new Error("Ошибка");
+                    parseData(await res.text());
+                } catch (e) {
+                    out.textContent = "❌ Не удалось скачать автоматически. Скопируй текст со страницы вручную.";
+                }
+            } else {
+                parseData(input);
+            }
+        }
+
+        function parseData(rawText) {
+            let text = rawText.trim();
+            const out = document.getElementById('output');
+            let proxies = [];
+
+            if (!text.includes('vless://') && !text.includes('"outbounds"')) {
+                try { text = atob(text.replace(/\s/g, '')); } catch (e) {}
+            }
+
+            if (text.includes('vless://')) {
+                const lines = text.split('\n');
+                lines.forEach(line => {
+                    line = line.trim();
+                    if (line.startsWith('vless://')) {
+                        try {
+                            const url = new URL(line);
+                            const params = new URLSearchParams(url.search);
+                            proxies.push({
+                                name: decodeURIComponent(url.hash.slice(1)) || "Server_" + Math.floor(Math.random()*100),
+                                type: "vless",
+                                server: url.hostname,
+                                port: parseInt(url.port),
+                                uuid: url.username,
+                                tls: params.get('security') === 'reality' || params.get('security') === 'tls',
+                                "reality-opts": params.get('pbk') ? { "public-key": params.get('pbk'), "short-id": params.get('sid') || "" } : undefined,
+                                sni: params.get('sni') || url.hostname,
+                                network: params.get('type') || "tcp",
+                                flow: params.get('flow') || "",
+                                fp: params.get('fp') || "chrome", // Дефолтный отпечаток браузера
+                                udp: true
+                            });
+                        } catch (e) {}
+                    }
+                });
+            } 
+
+            if (proxies.length > 0) {
+                let yaml = "proxies:\n";
+                proxies.forEach(p => {
+                    yaml += `  - name: "${p.name}"\n    type: ${p.type}\n    server: ${p.server}\n    port: ${p.port}\n    uuid: ${p.uuid}\n    network: ${p.network}\n    udp: true\n`;
+                    if (p.flow) yaml += `    flow: ${p.flow}\n`;
+                    if (p.tls) {
+                        yaml += `    tls: true\n    sni: ${p.sni}\n    client-fingerprint: ${p.fp}\n`;
+                    }
+                    if (p["reality-opts"]) yaml += `    reality-opts:\n      public-key: ${p["reality-opts"]["public-key"]}\n      short-id: ${p["reality-opts"]["short-id"]}\n`;
+                });
+                out.textContent = yaml;
+            } else {
+                out.textContent = "❌ Не нашел рабочих серверов.";
+            }
+        }
+
+        function copyResult() {
+            const text = document.getElementById('output').textContent;
+            if (text.includes('proxies:')) {
+                navigator.clipboard.writeText(text);
+                document.querySelector('button[onclick="copyResult()"]').textContent = "✓ СКОПИРОВАНО";
+                setTimeout(() => document.querySelector('button[onclick="copyResult()"]').textContent = "⎘ КОПИРОВАТЬ YAML", 2000);
+            }
+        }
+    </script>
+</body>
+</html>
