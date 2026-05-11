@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Network Builder v10.2 Ultimate Pro</title>
+    <title>Network Builder v10.3 Flawless</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
@@ -27,7 +27,7 @@
         }
 
         .version-badge {
-            font-size: 12px; font-weight: bold; background: #21262d; 
+            font-size: 13px; font-weight: bold; background: #21262d; 
             padding: 6px 12px; border-radius: 6px; border: 1px solid #30363d;
             transition: 0.2s; display: flex; align-items: center; color: #3fb950;
         }
@@ -52,9 +52,10 @@
 
         .input-group { display: flex; gap: 10px; margin-bottom: 20px; }
         
+        /* ГИГАНТСКОЕ ПОЛЕ ВВОДА ДЛЯ УДОБСТВА */
         textarea#input { 
-            width: 100%; height: 160px; /* ОГРОМНАЯ ЗОНА */
-            background: #010409; color: #3fb950; font-size: 13px;
+            width: 100%; height: 180px; 
+            background: #010409; color: #3fb950; font-size: 14px;
             border: 2px dashed #30363d; border-radius: 8px; padding: 15px; 
             box-sizing: border-box; font-family: inherit;
             resize: vertical; outline: none; transition: all 0.2s ease;
@@ -111,11 +112,11 @@
             padding: 12px; position: relative; display: flex; flex-direction: column; gap: 8px;
             transition: 0.1s;
         }
-        .proxy-card:hover { border-color: #58a6ff; }
+        .proxy-card:hover { border-color: #58a6ff; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
         .proxy-card.selected { border-color: #2ea043; background: #1a271c; }
         
         .proxy-name { 
-            font-weight: bold; color: #58a6ff; font-size: 13px; white-space: nowrap; 
+            font-weight: bold; color: #58a6ff; font-size: 14px; white-space: nowrap; 
             overflow: hidden; text-overflow: ellipsis; padding-right: 90px; padding-left: 26px;
             outline: none; border-bottom: 1px dashed transparent; cursor: text;
         }
@@ -148,15 +149,15 @@
         .btn-card:hover { background: #58a6ff; color: white; }
         .btn-card.remove:hover { background: #f85149; color: white; }
 
-        /* ВЕРНУЛИ КРАСИВЫЙ РЕДАКТОР PRE */
-        pre#output { 
+        /* ИДЕАЛЬНЫЙ РЕДАКТОР КОДА (TEXTAREA) */
+        textarea#outputEditor { 
             background: #010409; padding: 20px; border: 1px solid #30363d; 
             border-radius: 8px; color: #a5d6ff; overflow-y: auto; 
             height: 400px; font-size: 12px; line-height: 1.5;
             width: 100%; box-sizing: border-box; font-family: 'JetBrains Mono', monospace;
-            white-space: pre-wrap; word-wrap: break-word; outline: none; margin-bottom: 20px;
+            resize: vertical; white-space: pre; outline: none; margin-bottom: 20px;
         }
-        pre#output:focus { border-color: #58a6ff; box-shadow: 0 0 12px rgba(88,166,255,0.2); }
+        textarea#outputEditor:focus { border-color: #58a6ff; box-shadow: 0 0 12px rgba(88,166,255,0.2); }
 
         .editor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .editor-header span { font-size: 12px; color: #8b949e; font-weight: bold; text-transform: uppercase; }
@@ -188,16 +189,16 @@
 <body>
     <div class="container">
         <h2>
-            <div>⚡ Network Builder <span style="color:#8b949e; font-size: 16px;">v10.2 Ultimate Pro</span></div>
+            <div>⚡ Network Builder <span style="color:#8b949e; font-size: 16px;">v10.3 Flawless</span></div>
             <div class="version-badge" id="mihomoVersion">⏳ Ядро...</div>
             
             <div class="header-actions">
                 <button class="icon-btn primary" onclick="pingAll()">⚡ Ping All</button>
-                <button class="icon-btn" onclick="sortProxies()">📶 Sort</button>
+                <button class="icon-btn" onclick="sortProxies()">📶 Сортировка</button>
                 <button class="icon-btn" onclick="removeDuplicates()" title="Удалить повторяющиеся IP">🔍 Очистить дубли</button>
-                <button class="icon-btn" onclick="shuffleProxies()">🔀 Shuffle</button>
-                <button class="icon-btn" onclick="exportRawNodes()">📥 Backup TXT</button>
-                <button class="icon-btn danger" onclick="clearAll()">🗑 Clear All</button>
+                <button class="icon-btn" onclick="shuffleProxies()">🔀 Перемешать</button>
+                <button class="icon-btn" onclick="exportRawNodes()">📥 Бэкап TXT</button>
+                <button class="icon-btn danger" onclick="clearAll()">🗑 Очистить</button>
             </div>
         </h2>
         
@@ -255,10 +256,10 @@
         <div id="cardsContainer" class="cards-grid"></div>
 
         <div class="editor-header">
-            <span>📝 Редактор кода (Кликните в текст, чтобы внести изменения)</span>
+            <span>📝 Редактор кода (Автосохранение включено)</span>
         </div>
         
-        <pre id="output" contenteditable="true" spellcheck="false" oninput="saveEditorState()">Ожидание серверов...</pre>
+        <textarea id="outputEditor" spellcheck="false" placeholder="Здесь появится готовый код..." oninput="saveEditorState()"></textarea>
 
         <div style="display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap;" id="outputActions">
             <button class="action-btn btn-copy" onclick="copyBase64Sub()" style="border-color:#8957e5; color:#8957e5; background:transparent;">⎘ BASE64 ПОДПИСКА</button>
@@ -280,7 +281,7 @@
     <div id="massEditModal" class="modal-overlay" onclick="closeMassEditModal(event)">
         <div class="modal-content" onclick="event.stopPropagation()" style="text-align: left;">
             <h3 style="margin-top:0; color:#d29922; text-align: center;">✏️ Mass Editor</h3>
-            <p style="font-size:12px; margin-bottom:15px; text-align:center; color:#8b949e;">Изменение параметров для выбранных узлов VLESS/Trojan</p>
+            <p style="font-size:12px; margin-bottom:15px; text-align:center; color:#8b949e;">Изменение параметров для выбранных узлов (VLESS/Trojan/Hysteria2)</p>
             
             <div style="margin-bottom: 12px;">
                 <label style="font-size:11px; color:#8b949e; font-weight:bold;">SNI (Domain):</label>
@@ -356,7 +357,7 @@
 
         // === AUTOSAVE ЛОГИКА ===
         function saveEditorState() {
-            localStorage.setItem('flclash_net_output_edit_v10', document.getElementById('output').innerText);
+            localStorage.setItem('flclash_net_output_edit_v10', document.getElementById('outputEditor').value);
         }
         document.getElementById('customTemplateInput').addEventListener('input', (e) => {
             localStorage.setItem('flclash_net_custom_tpl_v10', e.target.value);
@@ -394,7 +395,7 @@
                 renderCards();
             } else {
                 const savedOut = localStorage.getItem('flclash_net_output_edit_v10');
-                if(savedOut) document.getElementById('output').innerText = savedOut;
+                if(savedOut) document.getElementById('outputEditor').value = savedOut;
             }
         };
 
@@ -419,7 +420,7 @@
         function clearAll() {
             if(confirm('Очистить все узлы и редактор?')) { 
                 currentProxies = []; document.getElementById('input').value = ''; 
-                document.getElementById('output').innerText = 'Ожидание серверов...';
+                document.getElementById('outputEditor').value = '';
                 localStorage.removeItem('flclash_net_output_edit_v10');
                 saveState(); renderCards(); 
             }
@@ -489,18 +490,20 @@
 
         async function startProcess() {
             const input = document.getElementById('input').value.trim();
-            const out = document.getElementById('output');
             if (!input) { showToast("Пустое поле!", "#f85149"); return; }
 
             if (input.startsWith('http') && !input.includes('://') && !input.includes('@') && !input.includes('{')) {
-                out.innerText = "⏳ Fetching...";
+                document.getElementById('outputEditor').value = "⏳ Fetching...";
                 try {
                     const res = await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(input));
                     parseData(await res.text());
-                } catch (e) { out.innerText = "❌ Fetch failed. Paste data manually."; }
+                } catch (e) { document.getElementById('outputEditor').value = "❌ Fetch failed. Paste data manually."; }
             } else { parseData(input); }
         }
 
+        // =========================================================================
+        // ПАРСЕР УЗЛОВ И JSON
+        // =========================================================================
         function parseData(rawText) {
             let text = rawText.trim();
             let newProxiesCount = 0;
@@ -513,7 +516,9 @@
                     let isMultiNode = validOutbounds.length > 1;
 
                     json.outbounds.forEach(ob => {
-                        if (['freedom','blackhole','dns'].includes(ob.protocol) || ['direct','block','dns','selector','urltest'].includes(ob.type)) return;
+                        // Используем проверку protocol для Xray и type для Singbox
+                        let p_type = ob.protocol || ob.type;
+                        if (['freedom','blackhole','dns','direct','block','selector','urltest'].includes(p_type)) return;
                         
                         let proxyObj = null;
                         let tag = ob.tag || "Node_" + Math.floor(Math.random()*1000);
@@ -634,11 +639,12 @@
             saveState(); renderCards();
         }
 
-        // === ИСПРАВЛЕННЫЙ ПИНГ (РАБОТАЕТ НА ВСЕХ БРАУЗЕРАХ) ===
+        // === ИСПРАВЛЕННЫЙ ПИНГАТОР (МАКСИМАЛЬНО НАДЕЖНЫЙ) ===
         async function pingNode(index, button) {
             const p = currentProxies[index];
-            button.textContent = "⏳"; 
-            const start = performance.now();
+            button.textContent = "⏳"; const start = performance.now();
+            
+            // Используем старый надежный AbortController для совместимости со всеми браузерами
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 3000);
             
@@ -646,12 +652,12 @@
                 await fetch(`https://${p.server}:${p.port}`, { mode: 'no-cors', cache: 'no-store', signal: controller.signal });
                 clearTimeout(timeoutId);
                 const ping = Math.round(performance.now() - start);
-                button.textContent = ping + "ms"; button.style.color = "#3fb950"; p.lastPing = ping;
+                button.textContent = `${ping}ms`; button.style.color = "#3fb950"; p.lastPing = ping;
             } catch (e) {
+                clearTimeout(timeoutId);
                 if ((p.type === 'vless' && p["reality-opts"]) || p.type === 'wg' || p.type === 'tuic') { 
                     button.textContent = "🛡️ Stealth"; button.style.color = "#58a6ff"; p.lastPing = 99998; 
-                } 
-                else { 
+                } else { 
                     button.textContent = "Err"; button.style.color = "#f85149"; p.lastPing = 99999; 
                 }
             }
@@ -672,7 +678,7 @@
         }
         function closeQR(e) { if (!e || e.target.id === 'qrModal') document.getElementById('qrModal').style.display = 'none'; }
 
-        // === MASS EDIT LOGIC ===
+        // === ИСПРАВЛЕННЫЙ MASS EDIT (ЗАЩИТА ОТ VMESS/SSR) ===
         function openMassEditModal() {
             const checked = document.querySelectorAll('.proxy-checkbox:checked');
             if (checked.length === 0) { showToast("Выделите галочками узлы для изменения!", "#d29922"); return; }
@@ -701,15 +707,18 @@
                     if (flow !== "") { p.flow = flow === 'none' ? "" : flow; changed = true; }
                     
                     if (changed) {
-                        try {
-                            let url = new URL(p.rawLink);
-                            let params = new URLSearchParams(url.search);
-                            if(sni) params.set('sni', sni);
-                            if(fp) params.set('fp', fp);
-                            if(flow) { if(flow === 'none') params.delete('flow'); else params.set('flow', flow); }
-                            url.search = params.toString();
-                            p.rawLink = url.toString();
-                        } catch(e){}
+                        // Переписываем rawLink только для протоколов на базе URL-схем
+                        if (p.type === 'vless' || p.type === 'trojan' || p.type === 'hysteria2') {
+                            try {
+                                let url = new URL(p.rawLink);
+                                let params = new URLSearchParams(url.search);
+                                if(sni) params.set('sni', sni);
+                                if(fp) params.set('fp', fp);
+                                if(flow) { if(flow === 'none') params.delete('flow'); else params.set('flow', flow); }
+                                url.search = params.toString();
+                                p.rawLink = url.toString();
+                            } catch(e){}
+                        }
                         editedCount++;
                     }
                 }
@@ -734,7 +743,6 @@
                     let typeClass = "type-" + p.type;
                     let pingLabel = p.lastPing === undefined ? "⚡" : (p.lastPing === 99999 ? "Err" : (p.lastPing === 99998 ? "🛡️ Stealth" : `${p.lastPing}ms`));
                     let pingColor = p.lastPing === undefined ? "#c9d1d9" : (p.lastPing === 99999 ? "#f85149" : (p.lastPing === 99998 ? "#58a6ff" : "#3fb950"));
-                    
                     const card = document.createElement('div'); card.className = 'proxy-card';
                     card.innerHTML = `
                         <div style="position:absolute; top:12px; left:8px;">
@@ -760,8 +768,11 @@
                 container.style.display = 'none'; 
                 document.getElementById('cardsToolbar').style.display = "none";
                 document.getElementById('outputActions').style.display = "none";
+                if(!localStorage.getItem('flclash_net_output_edit_v10')) {
+                    document.getElementById('outputEditor').value = "Вставьте ссылки или JSON конфиг...";
+                }
             }
-            // Всегда обновляем вывод (даже если 0 серверов, чтобы генерировался шаблон)
+            // Всегда обновляем вывод
             updateOutput();
         }
 
@@ -836,7 +847,7 @@
                 outbounds.unshift({ type: "selector", tag: "🚀 Proxy Select", outbounds: proxyTags });
             }
 
-            document.getElementById('output').innerText = JSON.stringify({ outbounds: outbounds }, null, 2);
+            document.getElementById('outputEditor').value = JSON.stringify({ outbounds: outbounds }, null, 2);
         }
 
         // =========================================================================
@@ -901,7 +912,7 @@
                 routing: {
                     rules: [
                         { type: "field", protocol: ["bittorrent"], outboundTag: "direct" },
-                        { type: "field", domain: ["max.ru", "domain:2gis.ru", "domain:lamoda.ru", "domain:2gis.com", "domain:aif.ru", "domain:aeroflot.ru", "domain:alfabank.ru", "domain:avito.ru", "domain:beeline.ru", "domain:burgerkingrus.ru", "domain:dellin.ru", "domain:drive2.ru", "domain:dzen.ru", "domain:flypobeda.ru", "domain:forbes.ru", "domain:gazeta.ru", "domain:gazprombank.ru", "domain:gismeteo.ru", "domain:gosuslugi.ru", "domain:hh.ru", "domain:kontur.ru", "domain:kontur.host", "domain:kp.ru", "domain:kuper.ru", "domain:lenta.ru", "domain:mail.ru", "domain:megamarket.ru", "domain:megamarket.tech", "domain:megafon.ru", "domain:moex.com", "domain:motivtelecom.ru", "domain:ozon.ru", "domain:wildberries.ru", "domain:samokat.ru", "domain:kinopoisk.ru", "domain:pervye.ru", "domain:psbank.ru", "domain:rambler.ru", "domain:rambler-co.ru", "domain:rbc.ru", "domain:reg.ru", "domain:reviews.2gis.com", "domain:rg.ru", "domain:ria.ru", "domain:ruwiki.ru", "domain:rustore.ru", "domain:rustore.ru", "domain:rutube.ru", "domain:rzd.ru", "domain:sirena-travel.ru", "domain:sravni.ru", "domain:t-j.ru", "domain:t2.ru", "domain:tank-online.com", "domain:taximaxim.ru", "domain:tbank-online.com", "domain:tildaapi.com", "domain:tns-counter.ru", "domain:trvl.yandex.net", "domain:tutu.ru", "domain:vk.com", "domain:vk.ru", "domain:vkvideo.ru", "domain:vtb.ru", "domain:ya.ru", "domain:yandex.ru", "domain:yandex.net", "domain:yandex.com", "domain:yastatic.net", "domain:yandexcloud.net", "full:go.yandex", "full:ru.ruwiki.ru", "domain:xn--90acagbhgpca7c8c7f.xn--p1ai", "domain:xn--80ajghhoc2aj1c8b.xn--p1ai", "domain:xn--90aivcdt6dxbc.xn--p1ai", "domain:xn--b1aew.xn--p1ai", "domain:api.oneme.ru", "domain:fd.oneme.ru", "domain:i.oneme.ru", "domain:miniapps.max.ru", "domain:sdk-api.apptracer.ru", "domain:st.max.ru", "domain:tracker-api.vk-analytics.ru"], outboundTag: "direct" },
+                        { type: "field", domain: ["max.ru", "domain:2gis.ru", "domain:lamoda.ru", "domain:2gis.com", "domain:aif.ru", "domain:aeroflot.ru", "domain:alfabank.ru", "domain:avito.ru", "domain:beeline.ru", "domain:burgerkingrus.ru", "domain:dellin.ru", "domain:drive2.ru", "domain:dzen.ru", "domain:flypobeda.ru", "domain:forbes.ru", "domain:gazeta.ru", "domain:gazprombank.ru", "domain:gismeteo.ru", "domain:gosuslugi.ru", "domain:hh.ru", "domain:kontur.ru", "domain:kontur.host", "domain:kp.ru", "domain:kuper.ru", "domain:lenta.ru", "domain:mail.ru", "domain:max.ru", "domain:megamarket.ru", "domain:megamarket.tech", "domain:megafon.ru", "domain:moex.com", "domain:motivtelecom.ru", "domain:ozon.ru", "domain:wildberries.ru", "domain:samokat.ru", "domain:kinopoisk.ru", "domain:pervye.ru", "domain:psbank.ru", "domain:rambler.ru", "domain:rambler-co.ru", "domain:rbc.ru", "domain:reg.ru", "domain:reviews.2gis.com", "domain:rg.ru", "domain:ria.ru", "domain:ruwiki.ru", "domain:rustore.ru", "domain:rutube.ru", "domain:rzd.ru", "domain:sirena-travel.ru", "domain:sravni.ru", "domain:t-j.ru", "domain:t2.ru", "domain:tank-online.com", "domain:taximaxim.ru", "domain:tbank-online.com", "domain:tildaapi.com", "domain:tns-counter.ru", "domain:trvl.yandex.net", "domain:tutu.ru", "domain:vk.com", "domain:vk.ru", "domain:vkvideo.ru", "domain:vtb.ru", "domain:ya.ru", "domain:yandex.ru", "domain:yandex.net", "domain:yandex.com", "domain:yastatic.net", "domain:yandexcloud.net", "full:go.yandex", "full:ru.ruwiki.ru", "domain:xn--90acagbhgpca7c8c7f.xn--p1ai", "domain:xn--80ajghhoc2aj1c8b.xn--p1ai", "domain:xn--90aivcdt6dxbc.xn--p1ai", "domain:xn--b1aew.xn--p1ai", "domain:api.oneme.ru", "domain:fd.oneme.ru", "domain:i.oneme.ru", "domain:miniapps.max.ru", "domain:sdk-api.apptracer.ru", "domain:st.max.ru", "domain:tracker-api.vk-analytics.ru"], outboundTag: "direct" },
                         { type: "field", inboundTag: ["socks", "http"], balancerTag: "proxy-balancer" }
                     ],
                     balancers: proxyTags.length > 0 ? [{
@@ -919,14 +930,14 @@
                 burstObservatory: proxyTags.length > 0 ? { pingConfig: { timeout: "7s", interval: "30s", sampling: 3, httpMethod: "HEAD", destination: "http://connectivitycheck.gstatic.com/generate_204" }, subjectSelector: proxyTags } : undefined,
                 remarks: "🌐 Xray Profile Generated"
             };
-            document.getElementById('output').innerText = JSON.stringify(finalJSON, null, 2);
+            document.getElementById('outputEditor').value = JSON.stringify(finalJSON, null, 2);
         }
 
         // =========================================================================
         // === ГЕНЕРАТОР YAML С ПОДДЕРЖКОЙ СВОЕГО ШАБЛОНА И ULTIMATE ===
         // =========================================================================
         function generateYAML(profileType) {
-            const output = document.getElementById('output');
+            const output = document.getElementById('outputEditor');
             let proxiesYAML = "proxies:\n";
             
             if (currentProxies.length === 0) {
@@ -975,12 +986,12 @@
             if (templateMode === 'custom') {
                 finalYAML = document.getElementById('customTemplateInput').value;
                 if (!finalYAML.includes('{{PROXIES_YAML}}')) {
-                    output.innerText = "# Ошибка: В вашем кастомном шаблоне нет метки {{PROXIES_YAML}}.\n# Пожалуйста, напишите её там, куда нужно вставить настройки серверов.\n\n" + finalYAML;
+                    output.value = "# Ошибка: В вашем кастомном шаблоне нет метки {{PROXIES_YAML}}.\n# Пожалуйста, напишите её там, куда нужно вставить настройки серверов.\n\n" + finalYAML;
                     return;
                 }
                 finalYAML = finalYAML.replace(/\{\{PROXIES_YAML\}\}/g, proxiesYAML);
                 finalYAML = finalYAML.replace(/\{\{PROXY_NAMES\}\}/g, proxyNames);
-                output.innerText = finalYAML;
+                output.value = finalYAML;
                 return;
             }
 
@@ -1753,9 +1764,9 @@ rules:
   - DOMAIN-SUFFIX,api.x.ai,🤖 Premium AI
   - DOMAIN-SUFFIX,deepseek.com,🤖 Premium AI
   - DOMAIN-SUFFIX,claude.ai,🤖 Premium AI
-  - DOMAIN-SUFFIX,anthropic.com,🤖 Premium AI
+  - DOM-SUFFIX,anthropic.com,🤖 Premium AI
   - DOMAIN-SUFFIX,openai.com,🤖 Premium AI
-  - DOM-SUFFIX,chatgpt.com,🤖 Premium AI
+  - DOMAIN-SUFFIX,chatgpt.com,🤖 Premium AI
   - DOMAIN-SUFFIX,oaistatic.com,🤖 Premium AI
   - DOMAIN-SUFFIX,oaiusercontent.com,🤖 Premium AI
   - DOMAIN-SUFFIX,gemini.google.com,🤖 Premium AI
@@ -1950,16 +1961,16 @@ rules:
   - MATCH,🌐 Global Proxy
 `;
             }
-            output.innerText = finalYAML;
+            output.value = finalYAML;
         }
 
         function downloadFile() {
-            const content = document.getElementById('output').innerText;
+            const content = document.getElementById('outputEditor').value;
             if (content.includes("Ошибка:")) { showToast("Сначала исправьте ошибку!", "#f85149"); return; }
             
             const format = document.getElementById('exportFormat').value;
             const ext = (format === 'xray' || format === 'singbox') ? 'json' : 'yaml';
-            const filename = `Network_Config_v10.2.${ext}`;
+            const filename = `Network_Config_v10.3.${ext}`;
             const mimeType = (format === 'xray' || format === 'singbox') ? 'application/json' : 'text/yaml';
 
             const a = document.createElement('a');
@@ -1969,7 +1980,7 @@ rules:
         }
 
         function copyResult() {
-            const content = document.getElementById('output').innerText;
+            const content = document.getElementById('outputEditor').value;
             if (content.includes("Ошибка:")) return;
             navigator.clipboard.writeText(content);
             showToast("✅ Скопировано в буфер!");
