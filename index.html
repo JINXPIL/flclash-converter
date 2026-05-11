@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Network Builder v10.0 Anniversary</title>
+    <title>Network Builder v10.1 Pro</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
@@ -16,7 +16,7 @@
 
         .container {
             background: #161b22; border: 1px solid #30363d;
-            border-radius: 12px; padding: 30px; max-width: 950px; width: 100%;
+            border-radius: 12px; padding: 30px; max-width: 1000px; width: 100%;
             box-shadow: 0 8px 24px rgba(0,0,0,0.5);
         }
 
@@ -27,18 +27,18 @@
         }
 
         .version-badge {
-            font-size: 12px; font-weight: normal; background: #21262d; 
-            padding: 6px 10px; border-radius: 6px; border: 1px solid #30363d;
-            transition: 0.2s; display: flex; align-items: center;
+            font-size: 13px; font-weight: bold; background: #21262d; 
+            padding: 6px 12px; border-radius: 6px; border: 1px solid #30363d;
+            transition: 0.2s; display: flex; align-items: center; color: #3fb950;
         }
         .version-badge:hover { border-color: #58a6ff; background: #30363d; }
-        .version-badge a { color: #a5d6ff; text-decoration: none; }
+        .version-badge a { color: inherit; text-decoration: none; }
 
         .header-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; width: 100%; }
 
         .icon-btn {
             background: #21262d; border: 1px solid #30363d; color: #c9d1d9;
-            padding: 6px 12px; border-radius: 6px; font-size: 12px;
+            padding: 8px 14px; border-radius: 6px; font-size: 12px;
             cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 5px;
             font-family: inherit; font-weight: bold;
         }
@@ -48,40 +48,43 @@
         .icon-btn.danger { background: transparent; color: #f85149; border-color: #30363d; }
         .icon-btn.danger:hover { background: #f85149; color: white; border-color: #f85149; }
 
-        p { font-size: 13px; color: #8b949e; margin-bottom: 15px; line-height: 1.6; }
+        p { font-size: 14px; color: #8b949e; margin-bottom: 15px; line-height: 1.6; }
 
         .input-group { display: flex; gap: 10px; margin-bottom: 20px; }
-        textarea { 
-            width: 100%; height: 110px; background: #010409; color: #3fb950; 
+        
+        textarea#input { 
+            width: 100%; height: 200px; /* ОГРОМНАЯ ЗОНА ДЛЯ ВВОДА */
+            background: #010409; color: #3fb950; font-size: 14px;
             border: 2px dashed #30363d; border-radius: 8px; padding: 15px; 
             box-sizing: border-box; font-family: inherit;
             resize: vertical; outline: none; transition: all 0.2s ease;
         }
-        textarea:focus { border-color: #58a6ff; }
-        textarea.dragover { border-color: #58a6ff; background: #161b22; box-shadow: 0 0 15px rgba(88,166,255,0.2); }
+        textarea#input:focus { border-color: #58a6ff; }
+        textarea#input.dragover { border-color: #58a6ff; background: #161b22; box-shadow: 0 0 20px rgba(88,166,255,0.2); }
         
         #customTemplateInput {
             border: 1px solid #d29922; color: #d29922; display: none; height: 160px; margin-bottom: 20px;
+            width: 100%; background: #010409; border-radius: 8px; padding: 15px; box-sizing: border-box; font-family: inherit;
         }
 
         .settings-panel {
             background: #010409; border: 1px solid #30363d; border-radius: 8px;
-            padding: 15px; margin-bottom: 25px; display: flex; flex-wrap: wrap; gap: 15px;
+            padding: 15px; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 15px;
             align-items: center;
         }
 
-        .setting-item { display: flex; flex-direction: column; gap: 5px; flex-grow: 1; }
+        .setting-item { display: flex; flex-direction: column; gap: 6px; flex-grow: 1; }
         .setting-item label { font-size: 11px; font-weight: bold; color: #8b949e; text-transform: uppercase; }
 
         button.action-btn, select { 
-            border: none; padding: 10px 14px; border-radius: 6px; 
+            border: none; padding: 12px 18px; border-radius: 6px; 
             font-weight: bold; font-family: inherit; cursor: pointer; 
             transition: all 0.2s ease; font-size: 13px;
         }
 
         select { background: #21262d; color: #c9d1d9; border: 1px solid #30363d; outline: none; width: 100%; }
 
-        .btn-convert { background: #238636; color: #ffffff; width: 100%; padding: 14px; font-size: 14px; margin-bottom: 20px;}
+        .btn-convert { background: #238636; color: #ffffff; width: 100%; padding: 16px; font-size: 15px; margin-bottom: 20px;}
         .btn-convert:hover { background: #2ea043; }
         .btn-copy { background: #21262d; color: #c9d1d9; border: 1px solid #30363d; }
         .btn-download { background: #58a6ff; color: #ffffff; }
@@ -92,11 +95,11 @@
             font-size: 12px; display: inline-flex; align-items: center; font-weight: bold;
         }
 
-        .cards-toolbar { display: none; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .cards-toolbar { display: none; justify-content: space-between; align-items: center; margin-bottom: 15px; background: #010409; padding: 10px 15px; border-radius: 8px; border: 1px solid #30363d; }
 
         .cards-grid {
-            display: none; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 12px; margin-bottom: 20px; max-height: 380px; overflow-y: auto; padding-right: 5px;
+            display: none; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 12px; margin-bottom: 20px; max-height: 450px; overflow-y: auto; padding-right: 5px;
         }
         .cards-grid::-webkit-scrollbar { width: 6px; }
         .cards-grid::-webkit-scrollbar-track { background: #010409; border-radius: 3px; }
@@ -104,22 +107,22 @@
 
         .proxy-card {
             background: #161b22; border: 1px solid #30363d; border-radius: 8px;
-            padding: 12px; position: relative; display: flex; flex-direction: column; gap: 6px;
+            padding: 12px; position: relative; display: flex; flex-direction: column; gap: 8px;
             transition: 0.1s;
         }
-        .proxy-card:hover { border-color: #58a6ff; }
+        .proxy-card:hover { border-color: #58a6ff; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
         .proxy-card.selected { border-color: #2ea043; background: #1a271c; }
         
         .proxy-name { 
-            font-weight: bold; color: #58a6ff; font-size: 13px; white-space: nowrap; 
-            overflow: hidden; text-overflow: ellipsis; padding-right: 90px; padding-left: 24px;
+            font-weight: bold; color: #58a6ff; font-size: 14px; white-space: nowrap; 
+            overflow: hidden; text-overflow: ellipsis; padding-right: 90px; padding-left: 26px;
             outline: none; border-bottom: 1px dashed transparent; cursor: text;
         }
         .proxy-name:focus { border-bottom: 1px dashed #58a6ff; }
         
-        .proxy-detail { font-size: 11px; color: #8b949e; display: flex; align-items: center; justify-content: space-between; padding-left: 24px;}
+        .proxy-detail { font-size: 11px; color: #8b949e; display: flex; align-items: center; justify-content: space-between; padding-left: 26px;}
         .proxy-type { 
-            display: inline-block; color: white; padding: 2px 6px; 
+            display: inline-block; color: white; padding: 3px 6px; 
             border-radius: 4px; font-size: 10px; font-weight: bold; text-transform: uppercase; margin-right: 5px;
         }
         
@@ -136,10 +139,10 @@
         .type-ssh { background: #555; }
         .type-naive { background: #ff7b00; }
         
-        .card-actions { position: absolute; top: 8px; right: 8px; display: flex; gap: 4px; }
+        .card-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 4px; }
         .btn-card {
-            background: #21262d; border: none; border-radius: 4px; cursor: pointer;
-            font-size: 12px; padding: 5px 6px; color: #c9d1d9; min-width: 26px; text-align: center;
+            background: #30363d; border: none; border-radius: 4px; cursor: pointer;
+            font-size: 12px; padding: 5px 6px; color: #c9d1d9; min-width: 28px; text-align: center;
         }
         .btn-card:hover { background: #58a6ff; color: white; }
         .btn-card.remove:hover { background: #f85149; color: white; }
@@ -147,7 +150,7 @@
         #outputEditor { 
             background: #010409; padding: 20px; border: 1px solid #30363d; 
             border-radius: 8px; color: #a5d6ff; overflow-y: auto; 
-            height: 400px; font-size: 12px; line-height: 1.5;
+            height: 400px; font-size: 13px; line-height: 1.5;
             width: 100%; box-sizing: border-box; font-family: 'JetBrains Mono', monospace;
             resize: vertical; white-space: pre; outline: none; margin-bottom: 20px;
         }
@@ -161,20 +164,21 @@
             text-align: center; border-radius: 6px; padding: 12px; position: fixed;
             z-index: 100; bottom: 30px; left: 50%; transform: translateX(-50%); font-size: 14px;
             opacity: 0; transition: opacity 0.3s, visibility 0.3s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
         }
         #toast.show { visibility: visible; opacity: 1; }
 
-        /* Modal Styles */
+        /* Модальные окна */
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.8); z-index: 50; justify-content: center; align-items: center;
         }
         .modal-content {
             background: #161b22; padding: 25px; border-radius: 12px; border: 1px solid #30363d;
-            text-align: center; max-width: 350px; width: 100%;
+            text-align: center; max-width: 350px; width: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
         }
         .modal-close {
-            background: #f85149; color: white; border: none; padding: 8px 16px;
+            background: #f85149; color: white; border: none; padding: 10px 16px;
             border-radius: 6px; cursor: pointer; margin-top: 15px; width: 100%; font-weight: bold;
         }
     </style>
@@ -182,12 +186,12 @@
 <body>
     <div class="container">
         <h2>
-            <div>⚡ Network Builder <span style="color:#8b949e; font-size: 16px;">v10.0 Anniversary</span></div>
-            <div class="version-badge" id="mihomoVersion">⏳ Проверка ядра...</div>
+            <div>⚡ Network Builder <span style="color:#8b949e; font-size: 16px;">v10.1 Pro</span></div>
+            <div class="version-badge" id="mihomoVersion">⏳ Загрузка...</div>
             
             <div class="header-actions">
                 <button class="icon-btn primary" onclick="pingAll()">⚡ Ping All</button>
-                <button class="icon-btn" onclick="sortProxies()">📶 Sort</button>
+                <button class="icon-btn" onclick="sortProxies()">📶 Сортировка</button>
                 <button class="icon-btn" onclick="removeDuplicates()" title="Удалить повторяющиеся IP">🔍 Очистить дубли</button>
                 <button class="icon-btn" onclick="shuffleProxies()">🔀 Shuffle</button>
                 <button class="icon-btn" onclick="exportRawNodes()">📥 Backup TXT</button>
@@ -195,64 +199,63 @@
             </div>
         </h2>
         
-        <p>Поддержка: JSON Configs (Xray/Sing-box), VLESS, VMess, Trojan, Hysteria2, SS, SSR, WireGuard, Socks5, HTTP, SSH, Naive, TUIC.</p>
+        <p>Поддержка форматов: <b>JSON (Xray/Sing-box)</b>, VLESS, VMess, Trojan, Hysteria2, SS, SSR, WireGuard, Socks5, HTTP, SSH, Naive, TUIC.</p>
         
         <div class="input-group">
-            <textarea id="input" placeholder="Drop .txt/.json file here or paste links / raw JSON config"></textarea>
-            <button class="icon-btn" style="height: 110px; width: 60px; flex-direction: column; justify-content: center;" onclick="pasteFromClipboard()" title="Вставить из буфера обмена">
-                <span style="font-size: 20px;">📋</span>
+            <textarea id="input" placeholder="Перетащите файл .txt или .json в это огромное поле!
+Или вставьте массив ссылок из буфера обмена."></textarea>
+            <button class="icon-btn" style="height: auto; width: 70px; flex-direction: column; justify-content: center; background: #21262d;" onclick="pasteFromClipboard()" title="Вставить из буфера обмена">
+                <span style="font-size: 24px; margin-bottom: 5px;">📋</span>
                 Paste
             </button>
         </div>
         
-        <button class="action-btn btn-convert" onclick="startProcess()">► ДОБАВИТЬ И РАСПОЗНАТЬ УЗЛЫ</button>
+        <button class="action-btn btn-convert" onclick="startProcess()">► РАСПОЗНАТЬ И ДОБАВИТЬ УЗЛЫ</button>
 
         <div class="settings-panel">
             <div class="setting-item">
-                <label>Формат экспорта</label>
+                <label>Формат вывода</label>
                 <select id="exportFormat" onchange="updateOutput()">
-                    <option value="clash_mobile">📱 FlClash YAML (Mobile/PC)</option>
+                    <option value="clash_mobile">📱 FlClash YAML (TUN)</option>
                     <option value="clash_router">🌐 FlClash YAML (Router - No TUN)</option>
                     <option value="singbox">📦 Sing-box (JSON Outbound)</option>
                     <option value="xray">📦 Exclave / Nekobox (JSON)</option>
                 </select>
             </div>
             <div class="setting-item" id="templateModeContainer">
-                <label>Режим YAML-Шаблона (Правила)</label>
+                <label>Логика маршрутизации (YAML)</label>
                 <select id="templateMode" onchange="toggleCustomTemplate()">
-                    <option value="ultimate">💎 Крымский профиль (Твоя RF-оптимизация)</option>
-                    <option value="basic">⚡ Базовый профиль (Легкий, только обход)</option>
-                    <option value="custom">🛠️ Свой шаблон (Вставить чужой код)</option>
+                    <option value="ultimate">💎 Крымский профиль (Optimized v77.0)</option>
+                    <option value="basic">⚡ Базовый профиль (Только проксирование)</option>
+                    <option value="custom">🛠️ Свой шаблон (Вставить кастомный код)</option>
                 </select>
             </div>
         </div>
 
-        <textarea id="customTemplateInput" placeholder="Вставьте сюда любой чужой YAML-шаблон (например, с Github). 
-Программа вставит ВАШИ серверы в ЭТОТ шаблон.
-
+        <textarea id="customTemplateInput" placeholder="Вставьте сюда любой чужой YAML-шаблон. 
 Чтобы скрипт понял, куда вставлять серверы, напишите в тексте:
 {{PROXIES_YAML}}   <-- Сюда встанут настройки серверов
 {{PROXY_NAMES}}    <-- Сюда встанет список их имен для групп"></textarea>
         
         <div class="cards-toolbar" id="cardsToolbar">
-            <div>
-                <input type="checkbox" id="selectAllCb" style="accent-color:#58a6ff; cursor:pointer;" onchange="toggleSelectAll()">
-                <label for="selectAllCb" style="font-size:12px; color:#8b949e; cursor:pointer;">Выбрать все</label>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <input type="checkbox" id="selectAllCb" style="accent-color:#58a6ff; width:16px; height:16px; cursor:pointer;" onchange="toggleSelectAll()">
+                <label for="selectAllCb" style="font-size:13px; font-weight:bold; color:#c9d1d9; cursor:pointer;">Выбрать все узлы</label>
             </div>
             <div style="display:flex; gap:10px; align-items:center;">
                 <span id="nodeCount" class="status-badge">0 Nodes</span>
-                <button class="icon-btn" onclick="openMassEditModal()">✏️ Mass Edit</button>
+                <button class="icon-btn" style="background:#d29922; border-color:#d29922; color:#fff;" onclick="openMassEditModal()">✏️ Mass Edit</button>
             </div>
         </div>
 
         <div id="cardsContainer" class="cards-grid"></div>
 
         <div class="editor-header">
-            <span>📝 Встроенный редактор кода (Изменения сохраняются автоматически)</span>
+            <span>📝 Редактор кода (Автосохранение включено)</span>
         </div>
         <textarea id="outputEditor" spellcheck="false" placeholder="Здесь появится готовый код..."></textarea>
 
-        <div style="display: flex; gap: 10px; margin-bottom: 10px; justify-content: flex-end;" id="outputActions">
+        <div style="display: flex; gap: 10px; margin-bottom: 10px; justify-content: flex-end; flex-wrap: wrap;" id="outputActions">
             <button class="action-btn btn-copy" onclick="copyBase64Sub()" style="border-color:#8957e5; color:#8957e5;">⎘ BASE64 ПОДПИСКА</button>
             <button id="copyBtn" class="action-btn btn-copy" onclick="copyResult()">⎘ СКОПИРОВАТЬ КОД</button>
             <button id="downloadBtn" class="action-btn btn-download" onclick="downloadFile()">⬇ СКАЧАТЬ ФАЙЛ</button>
@@ -269,16 +272,16 @@
 
     <div id="massEditModal" class="modal-overlay" onclick="closeMassEditModal(event)">
         <div class="modal-content" onclick="event.stopPropagation()" style="text-align: left;">
-            <h3 style="margin-top:0; color:#58a6ff; text-align: center;">✏️ Mass Editor</h3>
-            <p style="font-size:11px; margin-bottom:15px; text-align:center;">Изменит параметры у всех выделенных галочками серверов (VLESS/Trojan/Hysteria)</p>
+            <h3 style="margin-top:0; color:#d29922; text-align: center;">✏️ Mass Editor</h3>
+            <p style="font-size:12px; margin-bottom:15px; text-align:center; color:#8b949e;">Изменение параметров для всех выбранных VLESS/Trojan/Hysteria узлов</p>
             
-            <div style="margin-bottom: 10px;">
+            <div style="margin-bottom: 12px;">
                 <label style="font-size:11px; color:#8b949e; font-weight:bold;">SNI (Domain):</label>
-                <input type="text" id="massEditSni" style="width:100%; box-sizing:border-box; background:#0d1117; color:#c9d1d9; border:1px solid #30363d; padding:8px; border-radius:4px;" placeholder="Оставить пустым для пропуска">
+                <input type="text" id="massEditSni" style="width:100%; box-sizing:border-box; background:#0d1117; color:#c9d1d9; border:1px solid #30363d; padding:10px; border-radius:6px;" placeholder="Пусто = не менять">
             </div>
-            <div style="margin-bottom: 10px;">
+            <div style="margin-bottom: 12px;">
                 <label style="font-size:11px; color:#8b949e; font-weight:bold;">Fingerprint:</label>
-                <select id="massEditFp" style="width:100%; box-sizing:border-box; background:#0d1117; color:#c9d1d9; border:1px solid #30363d; padding:8px; border-radius:4px;">
+                <select id="massEditFp" style="width:100%; box-sizing:border-box; background:#0d1117; color:#c9d1d9; border:1px solid #30363d; padding:10px; border-radius:6px;">
                     <option value="">-- Не менять --</option>
                     <option value="chrome">chrome</option>
                     <option value="ios">ios</option>
@@ -287,9 +290,9 @@
                     <option value="random">random</option>
                 </select>
             </div>
-            <div style="margin-bottom: 15px;">
+            <div style="margin-bottom: 20px;">
                 <label style="font-size:11px; color:#8b949e; font-weight:bold;">Flow (XTLS):</label>
-                <select id="massEditFlow" style="width:100%; box-sizing:border-box; background:#0d1117; color:#c9d1d9; border:1px solid #30363d; padding:8px; border-radius:4px;">
+                <select id="massEditFlow" style="width:100%; box-sizing:border-box; background:#0d1117; color:#c9d1d9; border:1px solid #30363d; padding:10px; border-radius:6px;">
                     <option value="">-- Не менять --</option>
                     <option value="xtls-rprx-vision">xtls-rprx-vision</option>
                     <option value="none">Удалить flow (Пусто)</option>
@@ -297,8 +300,8 @@
             </div>
             
             <div style="display:flex; gap:10px;">
-                <button class="action-btn btn-convert" style="margin-bottom:0;" onclick="applyMassEdit()">Применить</button>
-                <button class="modal-close" style="margin-top:0;" onclick="closeMassEditModal()">Отмена</button>
+                <button class="action-btn btn-convert" style="margin-bottom:0; background:#d29922;" onclick="applyMassEdit()">ПРИМЕНИТЬ</button>
+                <button class="modal-close" style="margin-top:0; background:#30363d;" onclick="closeMassEditModal()">Отмена</button>
             </div>
         </div>
     </div>
@@ -320,7 +323,7 @@
                 else if (latestRelease) { versionText += `✅ ${latestRelease.tag_name}`; link = latestRelease.html_url; }
                 
                 document.getElementById('mihomoVersion').innerHTML = `<a href="${link}" target="_blank">${versionText}</a>`;
-            } catch (e) { document.getElementById('mihomoVersion').innerText = "❌ Ошибка проверки ядра"; }
+            } catch (e) { document.getElementById('mihomoVersion').innerText = "❌ Ошибка API"; }
         }
 
         // === CLIPBOARD API ===
@@ -333,17 +336,17 @@
                     startProcess();
                 }
             } catch (err) {
-                showToast("❌ Дайте браузеру разрешение на чтение буфера", "#f85149");
+                showToast("❌ Дайте разрешение на чтение буфера", "#f85149");
             }
         }
 
         // === AUTOSAVE ЛОГИКА ===
         document.getElementById('customTemplateInput').addEventListener('input', (e) => {
-            localStorage.setItem('flclash_net_custom_tpl', e.target.value);
+            localStorage.setItem('flclash_net_custom_tpl_v10', e.target.value);
             updateOutput();
         });
         document.getElementById('outputEditor').addEventListener('input', (e) => {
-            localStorage.setItem('flclash_net_output_edit', e.target.value);
+            localStorage.setItem('flclash_net_output_edit_v10', e.target.value);
         });
 
         function safeB64Decode(str) {
@@ -359,7 +362,7 @@
             e.preventDefault(); dropZone.classList.remove('dragover');
             if (e.dataTransfer.files.length > 0) {
                 const reader = new FileReader();
-                reader.onload = (event) => { dropZone.value = event.target.result; showToast(`📁 Файл прочитан! Жми PROCESS NODES`); };
+                reader.onload = (event) => { dropZone.value = event.target.result; showToast(`📁 Файл прочитан! Жми PROCESS`); };
                 reader.readAsText(e.dataTransfer.files[0]);
             }
         });
@@ -369,14 +372,15 @@
             const savedProxies = localStorage.getItem('flclash_net_v10');
             if (savedProxies) { currentProxies = JSON.parse(savedProxies); }
             
-            const savedTpl = localStorage.getItem('flclash_net_custom_tpl');
+            const savedTpl = localStorage.getItem('flclash_net_custom_tpl_v10');
             if(savedTpl) document.getElementById('customTemplateInput').value = savedTpl;
             
             toggleCustomTemplate();
             
-            if (currentProxies.length > 0) renderCards();
-            else {
-                const savedOut = localStorage.getItem('flclash_net_output_edit');
+            if (currentProxies.length > 0) {
+                renderCards();
+            } else {
+                const savedOut = localStorage.getItem('flclash_net_output_edit_v10');
                 if(savedOut) document.getElementById('outputEditor').value = savedOut;
             }
         };
@@ -403,7 +407,7 @@
             if(confirm('Очистить все узлы и редактор?')) { 
                 currentProxies = []; document.getElementById('input').value = ''; 
                 document.getElementById('outputEditor').value = '';
-                localStorage.removeItem('flclash_net_output_edit');
+                localStorage.removeItem('flclash_net_output_edit_v10');
                 saveState(); renderCards(); 
             }
         }
@@ -492,7 +496,7 @@
         }
 
         // =========================================================================
-        // ПАРСЕР
+        // ПАРСЕР УЗЛОВ И JSON
         // =========================================================================
         function parseData(rawText) {
             let text = rawText.trim();
@@ -720,7 +724,7 @@
                     
                     const card = document.createElement('div'); card.className = 'proxy-card';
                     card.innerHTML = `
-                        <div style="position:absolute; top:8px; left:8px;">
+                        <div style="position:absolute; top:12px; left:8px;">
                             <input type="checkbox" class="proxy-checkbox" style="accent-color:#58a6ff; width:15px; height:15px; cursor:pointer;" onchange="handleCheckboxChange(this)">
                         </div>
                         <div class="card-actions">
@@ -744,7 +748,7 @@
                 container.style.display = 'none'; 
                 document.getElementById('cardsToolbar').style.display = "none";
                 document.getElementById('outputActions').style.display = "none";
-                if(!localStorage.getItem('flclash_net_output_edit')) {
+                if(!localStorage.getItem('flclash_net_output_edit_v10')) {
                     document.getElementById('outputEditor').value = "Вставьте ссылки или JSON конфиг...";
                 }
             }
@@ -768,7 +772,7 @@
             else generateYAML(format);
             
             // Автосохранение результата в Storage
-            localStorage.setItem('flclash_net_output_edit', document.getElementById('outputEditor').value);
+            localStorage.setItem('flclash_net_output_edit_v10', document.getElementById('outputEditor').value);
         }
 
         // =========================================================================
@@ -816,7 +820,6 @@
             outbounds.push({ type: "direct", tag: "direct" });
             outbounds.push({ type: "block", tag: "block" });
             outbounds.push({ type: "dns", tag: "dns-out" });
-
             outbounds.unshift({ type: "selector", tag: "🚀 Proxy Select", outbounds: proxyTags });
 
             document.getElementById('outputEditor').value = JSON.stringify({ outbounds: outbounds }, null, 2);
@@ -1938,7 +1941,7 @@ rules:
             
             const format = document.getElementById('exportFormat').value;
             const ext = (format === 'xray' || format === 'singbox') ? 'json' : 'yaml';
-            const filename = `Network_Config_v10.${ext}`;
+            const filename = `Network_Config_v10.1.${ext}`;
             const mimeType = (format === 'xray' || format === 'singbox') ? 'application/json' : 'text/yaml';
 
             const a = document.createElement('a');
@@ -1951,7 +1954,7 @@ rules:
             const content = document.getElementById('outputEditor').value;
             if (content.includes("Ошибка:")) return;
             navigator.clipboard.writeText(content);
-            showToast("✅ Copied to clipboard!");
+            showToast("✅ Скопировано в буфер!");
         }
 
         function showToast(message, color = "#238636") {
