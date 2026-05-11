@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#0d1117">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Network Builder v15.0 AI & Diagnostics</title>
+    <title>Network Builder v15.1 Community Edition</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
@@ -73,23 +72,29 @@
 
         /* Модальные окна */
         .modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:100;justify-content:center;align-items:center;}
-        .modal-content{background:#161b22;padding:25px;border-radius:12px;border:1px solid #30363d;text-align:center;max-width:380px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,0.8);}
+        .modal-content{background:#161b22;padding:25px;border-radius:12px;border:1px solid #30363d;text-align:center;max-width:420px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,0.8); max-height: 80vh; overflow-y: auto;}
         .modal-close{background:#f85149;color:white;border:none;padding:10px 16px;border-radius:6px;cursor:pointer;margin-top:15px;width:100%;font-weight:bold;}
         .btn-copy{background:#21262d;color:#c9d1d9;border:1px solid #30363d;transition:0.2s;} .btn-copy:hover{background:#30363d;}
         .btn-download{background:#58a6ff;color:#ffffff;transition:0.2s;} .btn-download:hover{background:#79c0ff;}
+
+        .tooltip { position: relative; display: inline-block; cursor: help; border-bottom: 1px dotted #8b949e; }
+        .tooltip .tooltiptext { visibility: hidden; width: 220px; background-color: #21262d; color: #c9d1d9; text-align: center; border-radius: 6px; padding: 10px; border: 1px solid #30363d; position: absolute; z-index: 1; bottom: 125%; left: 50%; transform: translateX(-50%); opacity: 0; transition: opacity 0.3s; font-size: 11px; font-weight: normal; font-family: sans-serif; line-height: 1.4; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+        .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
     </style>
 </head>
 <body>
     <div class="container">
         <h2>
-            <div>⚡ Network Builder <span style="color:#8b949e; font-size:16px;">v15.0 AI Edition</span></div>
+            <div>⚡ Network Builder <span style="color:#8b949e; font-size:16px;">v15.1 Community</span></div>
             <div class="badges-wrapper">
                 <div class="version-badge" id="mihomoVersion" title="Версия ядра Mihomo">⏳ Ядро...</div>
                 <div class="version-badge" id="rulesVersion" style="color:#58a6ff;" title="Базы обхода блокировок">🛡️ Базы...</div>
             </div>
             
             <div class="header-actions">
-                <button class="icon-btn primary" onclick="pingAll()">⚡ Ping All</button>
+                <button class="icon-btn primary tooltip" onclick="pingAll()">⚡ Ping All
+                    <span class="tooltiptext">Используется HTTP/TCP ping (fetch), а не ICMP. Серверы без открытых 80/443 портов могут отображаться как Err или Stealth, оставаясь рабочими.</span>
+                </button>
                 <button class="icon-btn" onclick="cleanDeadNodes()" style="border-color:#f85149; color:#f85149;">🧹 Удалить мертвые</button>
                 <button class="icon-btn" onclick="sortProxies()">📶 Сорт.</button>
                 <button class="icon-btn" onclick="removeDuplicates()">🔍 Очистить дубли</button>
@@ -125,7 +130,7 @@
                 <select id="templateMode" onchange="toggleCustomTemplate()">
                     <option value="ultimate">💎 Крымский профиль (Optimized v77.0)</option>
                     <option value="basic">⚡ Базовый профиль (Только проксирование)</option>
-                    <option value="custom">🛠️ Свой шаблон (Умный парсер)</option>
+                    <option value="custom">🛠️ Свой шаблон (URL или текст)</option>
                 </select>
             </div>
         </div>
@@ -210,15 +215,16 @@
     <div id="errorModal" class="modal-overlay">
         <div class="modal-content">
             <h3 style="margin-top:0; color:#f85149; text-align:center;">⚠️ Внимание!</h3>
-            <p id="errorModalMsg" style="font-size:13px; color:#c9d1d9; text-align:center; line-height: 1.5;"></p>
+            <div id="errorModalMsg" style="font-size:12px; color:#c9d1d9; text-align:left; line-height: 1.5; background:#0d1117; padding:10px; border-radius:6px; border:1px solid #30363d; overflow-x:auto;"></div>
             <button class="modal-close" onclick="document.getElementById('errorModal').style.display='none'">Понятно</button>
         </div>
     </div>
 
     <script>
-        // === ГЛОБАЛЬНЫЙ ПЕРЕХВАТ ОШИБОК (SELF-DIAGNOSTICS) ===
+        // === ГЛОБАЛЬНЫЙ ПЕРЕХВАТ ОШИБОК ===
         window.onerror = function(msg, url, lineNo, columnNo, error) {
-            showDiagnosticError(`Произошла критическая ошибка в логике.<br>Сбой: <b>${msg}</b><br>Попробуйте нажать "Очистить всё" и повторить.`);
+            let stack = error && error.stack ? error.stack : 'Stack trace недоступен';
+            showDiagnosticError(`<b>Сбой:</b> ${msg}<br><b>Строка:</b> ${lineNo}:${columnNo}<br><br><span style="color:#8b949e;">Stack:</span><br>${stack}`);
             return false;
         };
 
@@ -227,21 +233,19 @@
             document.getElementById('errorModal').style.display = 'flex';
         }
 
-        // === СМАРТ-НОТИФИКАЦИИ ===
         function showToast(msg, type="success") {
             const t = document.getElementById("toast");
             t.textContent = msg; 
             t.className = "show";
             if (type === "#f85149" || type === "error") t.className = "show error";
             else if (type === "#d29922" || type === "warning") t.className = "show warning";
-            else t.style.background = "#238636"; // success
-            
+            else t.style.background = "#238636"; 
             setTimeout(() => t.className = "", 3500);
         }
 
+        // === БАЗОВЫЕ ПРАВИЛА МАРШРУТИЗАЦИИ ===
         let currentProxies = []; 
         
-        // Базовый YAML для Крымского профиля (v77.0) сохранен в константах для оптимизации памяти
         const YAML_RULES_BASE = `rule-providers:
   adblock-rules:
     type: http
@@ -459,28 +463,38 @@ sniffer:
             return name;
         }
 
-        // === ИНИЦИАЛИЗАЦИЯ И API ===
+        // === ИНИЦИАЛИЗАЦИЯ И СИНХРОНИЗАЦИЯ ===
         window.onload = () => {
             fetchMihomoVersion();
             fetchRulesVersion();
+            
             if (localStorage.getItem('flclash_exportFormat')) document.getElementById('exportFormat').value = localStorage.getItem('flclash_exportFormat');
             if (localStorage.getItem('flclash_templateMode')) document.getElementById('templateMode').value = localStorage.getItem('flclash_templateMode');
             
-            const savedProxies = localStorage.getItem('flclash_net_v15');
+            const savedProxies = localStorage.getItem('flclash_net_v15_1');
             if (savedProxies) currentProxies = JSON.parse(savedProxies);
             
-            const savedTpl = localStorage.getItem('flclash_net_custom_tpl_v15');
+            const savedTpl = localStorage.getItem('flclash_net_custom_tpl_v15_1');
             if(savedTpl) document.getElementById('customTemplateInput').value = savedTpl;
             
             toggleCustomTemplate();
             
             if (currentProxies.length > 0) renderCards();
             else {
-                const savedOut = localStorage.getItem('flclash_net_output_edit_v15');
+                const savedOut = localStorage.getItem('flclash_net_output_edit_v15_1');
                 if(savedOut) document.getElementById('outputEditor').innerText = savedOut;
             }
         };
 
+        function saveState() { 
+            localStorage.setItem('flclash_net_v15_1', JSON.stringify(currentProxies)); 
+            saveEditorState();
+        }
+        function saveEditorState() { 
+            localStorage.setItem('flclash_net_output_edit_v15_1', document.getElementById('outputEditor').innerText); 
+        }
+
+        // GITHUB API
         async function fetchMihomoVersion() {
             try {
                 const res = await fetch('https://api.github.com/repos/MetaCubeX/mihomo/releases?per_page=5');
@@ -503,8 +517,7 @@ sniffer:
             } catch (e) { document.getElementById('rulesVersion').innerText = "🛡️ Базы: Актуальны"; }
         }
 
-        // === SMART GEOIP (GEOJS.IO) ===
-        // geojs.io лучше переваривает домены (например it.n1etwork...) чем ipwho.is
+        // SMART GEOIP (GEOJS.IO)
         async function resolveGeoIP() {
             if (currentProxies.length === 0) return;
             const btn = document.getElementById('btnGeo');
@@ -514,50 +527,35 @@ sniffer:
             for (let i = 0; i < currentProxies.length; i++) {
                 let p = currentProxies[i];
                 try {
-                    // Используем geojs (он бесплатен, поддерживает домены и не имеет жесткого CORS)
                     const res = await fetch(`https://get.geojs.io/v1/ip/geo/${p.server}.json`);
                     if(res.ok) {
                         const data = await res.json();
                         if (data && data.country_code) {
                             const flag = data.country_code.toUpperCase().replace(/./g, char => String.fromCodePoint(char.charCodeAt(0) + 127397));
                             const city = data.city || data.country;
-                            
-                            // Очищаем старые флаги и конструкции [ТЕКСТ]
                             let cleanName = p.name.replace(/[\uD83C][\uDDE6-\uDDFF]/g, '').replace(/\[.*?\]/g, '').trim();
                             p.name = `[${flag} ${city}] ${cleanName}`;
-                            
-                            // Переписываем rawLink
                             try { let u=new URL(p.rawLink); u.hash=encodeURIComponent(p.name); p.rawLink=u.toString(); } catch(e){}
                             updated++;
                         }
                     }
                 } catch(e) { console.warn("GeoIP skip:", p.server); }
-                
-                // Микро-пауза чтобы не задудосить API
                 await new Promise(r => setTimeout(r, 200));
             }
             
             btn.innerHTML = "🌍 Авто-Геолокация";
-            if (updated > 0) {
-                saveState(); renderCards(); showToast(`✅ Локация обновлена у ${updated} серверов`);
-            } else {
-                showToast("Не удалось определить локации (возможно блокировка API)", "warning");
-            }
+            if (updated > 0) { saveState(); renderCards(); showToast(`✅ Локация обновлена у ${updated} серверов`); } 
+            else showToast("Не удалось определить локации", "warning");
         }
 
-        // === SMART TEMPLATE FETCHER ===
+        // URL IMPORT
         async function fetchTemplateFromUrl() {
             let url = document.getElementById('templateUrl').value.trim();
             if (!url) return showToast("Введите URL", "warning");
-            
-            // Если это обычная ссылка Github, меняем на raw (чтобы получить код)
-            if (url.includes('github.com') && url.includes('/blob/')) {
-                url = url.replace('github.com', 'raw.githubusercontent.com').replace('/blob/', '/');
-            }
+            if (url.includes('github.com') && url.includes('/blob/')) url = url.replace('github.com', 'raw.githubusercontent.com').replace('/blob/', '/');
 
             const btn = document.querySelector("button[onclick='fetchTemplateFromUrl()']");
-            const oldText = btn.innerText;
-            btn.innerText = "⏳ Загрузка...";
+            const oldText = btn.innerText; btn.innerText = "⏳ Загрузка...";
 
             try {
                 let res = await fetch(url);
@@ -565,19 +563,15 @@ sniffer:
                 let text = await res.text();
                 document.getElementById('customTemplateInput').value = text;
             } catch(e) {
-                // Фоллбэк: обход CORS через AllOrigins
                 try {
                     let res = await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(url));
                     let text = await res.text();
                     document.getElementById('customTemplateInput').value = text;
-                } catch(err) {
-                    showToast("❌ Ошибка скачивания шаблона", "error");
-                }
+                } catch(err) { showToast("❌ Ошибка скачивания", "error"); }
             }
             btn.innerText = oldText;
-            localStorage.setItem('flclash_net_custom_tpl_v15', document.getElementById('customTemplateInput').value);
-            updateOutput();
-            showToast("✅ Шаблон успешно загружен!");
+            localStorage.setItem('flclash_net_custom_tpl_v15_1', document.getElementById('customTemplateInput').value);
+            updateOutput(); showToast("✅ Шаблон загружен!");
         }
 
         function toggleCustomTemplate() {
@@ -591,9 +585,6 @@ sniffer:
             updateOutput();
         }
 
-        function saveState() { localStorage.setItem('flclash_net_v15', JSON.stringify(currentProxies)); }
-        function saveEditorState() { localStorage.setItem('flclash_net_output_edit_v15', document.getElementById('outputEditor').innerText); }
-
         async function pasteFromClipboard() {
             try {
                 const text = await navigator.clipboard.readText();
@@ -601,7 +592,7 @@ sniffer:
             } catch (e) { showToast("❌ Разрешите чтение буфера", "error"); }
         }
 
-        // === DRAG & DROP ===
+        // DRAG & DROP
         const dz = document.getElementById('input');
         dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
         dz.addEventListener('dragleave', e => { e.preventDefault(); dz.classList.remove('dragover'); });
@@ -614,12 +605,12 @@ sniffer:
             }
         });
 
-        // === ACTIONS ===
+        // ACTIONS
         function clearAll() {
             if(confirm('Очистить все узлы и редактор?')) { 
                 currentProxies = []; document.getElementById('input').value = ''; 
                 document.getElementById('outputEditor').innerText = 'Ожидание данных...';
-                localStorage.removeItem('flclash_net_output_edit_v15');
+                localStorage.removeItem('flclash_net_output_edit_v15_1');
                 saveState(); renderCards(); 
             }
         }
@@ -627,7 +618,7 @@ sniffer:
             const b = currentProxies.length;
             currentProxies = currentProxies.filter(p => p.lastPing !== 99999);
             if(b - currentProxies.length > 0) { saveState(); renderCards(); showToast(`🧹 Удалено: ${b - currentProxies.length}`); } 
-            else showToast("Мертвых нет (нужно сделать Ping)", "warning");
+            else showToast("Мертвых нет (нужен Ping All)", "warning");
         }
         function removeDuplicates() {
             const u = {}; let rm = 0;
@@ -663,7 +654,7 @@ sniffer:
             a.download = `Nodes_${Date.now()}.txt`; a.click();
         }
 
-        // === SMART PARSER (V15) ===
+        // === SMART PARSER ===
         async function startProcess() {
             const inp = document.getElementById('input').value.trim();
             if (!inp) return showToast("Поле пустое!", "error");
@@ -681,16 +672,13 @@ sniffer:
             let text = rawText.trim();
             let added = 0;
 
-            // 1. SMART JSON PARSER
+            // 1. JSON
             if (text.startsWith('{')) {
                 try {
                     let json = JSON.parse(text);
                     if (json.outbounds && Array.isArray(json.outbounds)) {
                         let baseRem = json.remarks || "";
-                        let validOutbounds = json.outbounds.filter(ob => {
-                            let pt = ob.protocol || ob.type;
-                            return !['freedom','blackhole','dns','direct','block','selector','urltest'].includes(pt);
-                        });
+                        let validOutbounds = json.outbounds.filter(ob => !['freedom','blackhole','dns','direct','block','selector','urltest'].includes(ob.protocol || ob.type));
                         let isMultiNode = validOutbounds.length > 1;
 
                         json.outbounds.forEach(ob => {
@@ -701,13 +689,11 @@ sniffer:
                             let nn = addGeoFlag(baseRem ? (isMultiNode ? `${baseRem} (${tag})` : baseRem) : tag);
                             let p = null;
 
-                            // Xray Core Format
                             if (ob.protocol === 'vless' && ob.settings && ob.settings.vnext && ob.settings.vnext.length > 0) {
                                 let vn = ob.settings.vnext[0];
                                 let st = ob.streamSettings || {}; let re = st.realitySettings || {}; let tl = st.tlsSettings || {};
                                 p = { name: nn, type: "vless", server: vn.address, port: vn.port, uuid: vn.users?.[0]?.id, tls: st.security==='reality'||st.security==='tls', "reality-opts": st.security==='reality'?{"public-key":re.publicKey,"short-id":re.shortId||""}:null, sni: re.serverName||tl.serverName||vn.address, network: st.network||"tcp", flow: vn.users?.[0]?.flow||"", fp: re.fingerprint||tl.fingerprint||"chrome" };
                             } 
-                            // Sing-box Format
                             else if (ob.type === 'vless') {
                                  let tl = ob.tls || {}; let re = tl.reality || {};
                                  p = { name: nn, type: "vless", server: ob.server, port: ob.server_port, uuid: ob.uuid, tls: tl.enabled === true, "reality-opts": re.enabled?{"public-key":re.public_key,"short-id":re.short_id||""}:null, sni: tl.server_name||ob.server, network: ob.transport?.type||"tcp", flow: ob.flow||"", fp: tl.utls?.fingerprint||"chrome" };
@@ -722,22 +708,17 @@ sniffer:
                             }
                         });
                         if (added > 0) { document.getElementById('input').value=''; showToast(`+${added} узлов из JSON`); saveState(); renderCards(); return; }
-                        else { showDiagnosticError("Скрипт прочитал JSON, но не нашел в массиве <b>outbounds</b> поддерживаемых серверов (VLESS/Trojan)."); return; }
+                        else { showDiagnosticError("Скрипт прочитал JSON, но не нашел в массиве <b>outbounds</b> поддерживаемых серверов."); return; }
                     } else {
-                        showDiagnosticError("Это JSON файл, но в нем нет массива <b>outbounds</b>. Скрипт поддерживает конфиги Xray Core и Sing-box."); return;
+                        showDiagnosticError("Это JSON файл, но в нем нет массива <b>outbounds</b>."); return;
                     }
-                } catch(e) {
-                    showDiagnosticError(`Ошибка синтаксиса JSON.<br>Возможно, вы забыли скобку или запятую.<br>Подробно: ${e.message}`);
-                    return;
-                }
+                } catch(e) { showDiagnosticError(`Ошибка синтаксиса JSON.<br>Возможно, пропущена скобка.<br>Подробно: ${e.message}`); return; }
             }
 
-            // 2. Base64 Подписки (Расшифровка)
-            if (added === 0 && !text.includes('://') && !text.includes('{')) {
-                try { text = safeB64Decode(text); } catch(e){}
-            }
+            // 2. Base64
+            if (added === 0 && !text.includes('://') && !text.includes('{')) { try { text = safeB64Decode(text); } catch(e){} }
 
-            // 3. String Link Parser (Auto-Healing)
+            // 3. String Link Parser
             text.split('\n').forEach(line => {
                 line = line.trim(); let p = null;
                 if(!line) return;
@@ -745,7 +726,6 @@ sniffer:
                     if (line.startsWith('vless://')) {
                         const url = new URL(line); 
                         const sp = new URLSearchParams(url.search);
-                        // Auto-healing: если нет type, ставим tcp по умолчанию
                         p = {
                             name: addGeoFlag(decodeURIComponent(url.hash.slice(1)) || "VLESS_" + Math.floor(Math.random()*100)),
                             type: "vless", server: url.hostname, port: parseInt(url.port), uuid: url.username,
@@ -778,16 +758,16 @@ sniffer:
                             p = { name: addGeoFlag(nn), type: "ssr", server: ps[0], port: parseInt(ps[1]), protocol: ps[2], cipher: ps[3], obfs: ps[4], password: safeB64Decode(rem[0]), rawLink: line };
                         }
                     } else if (line.startsWith('hy2://') || line.startsWith('hysteria2://')) {
-                        let u = new URL(line); let sp = new URLSearchParams(u.search);
-                        p = { name: addGeoFlag(decodeURIComponent(u.hash.slice(1))||"HY2"), type: "hysteria2", server: u.hostname, port: parseInt(u.port), password: u.username, sni: sp.get('sni')||u.hostname, "skip-cert-verify": sp.get('insecure')==='1', obfs: sp.get('obfs')||"", "obfs-password": sp.get('obfs-password')||"", rawLink: line };
+                        let url = new URL(line); let sp = new URLSearchParams(url.search);
+                        p = { name: addGeoFlag(decodeURIComponent(url.hash.slice(1))||"HY2"), type: "hysteria2", server: url.hostname, port: parseInt(url.port), password: url.username, sni: sp.get('sni')||url.hostname, "skip-cert-verify": sp.get('insecure')==='1', obfs: sp.get('obfs')||"", "obfs-password": sp.get('obfs-password')||"", rawLink: line };
                     } else if (line.startsWith('trojan://')) {
-                        let u = new URL(line); let sp = new URLSearchParams(u.search);
-                        p = { name: addGeoFlag(decodeURIComponent(u.hash.slice(1))||"Trojan"), type: "trojan", server: u.hostname, port: parseInt(u.port), password: u.username, tls: true, sni: sp.get('sni')||u.hostname, network: sp.get('type')||"tcp", fp: sp.get('fp')||"chrome", rawLink: line };
+                        let url = new URL(line); let sp = new URLSearchParams(url.search);
+                        p = { name: addGeoFlag(decodeURIComponent(url.hash.slice(1))||"Trojan"), type: "trojan", server: url.hostname, port: parseInt(url.port), password: url.username, tls: true, sni: sp.get('sni')||url.hostname, network: sp.get('type')||"tcp", fp: sp.get('fp')||"chrome", rawLink: line };
                     } else if (line.startsWith('wg://') || line.startsWith('wireguard://')) {
-                        let u = new URL(line.replace(/^(wg|wireguard):\/\//,'http://')); let sp = new URLSearchParams(u.search);
-                        p = { name: addGeoFlag(decodeURIComponent(u.hash.slice(1))||"WG"), type: "wg", server: u.hostname, port: parseInt(u.port), "private-key": u.username||sp.get('privateKey'), "public-key": sp.get('publicKey')||sp.get('peerPublicKey'), ip: sp.get('ip')||"10.0.0.2/32", reserved: sp.get('reserved'), rawLink: line };
+                        let url = new URL(line.replace(/^(wg|wireguard):\/\//,'http://')); let sp = new URLSearchParams(url.search);
+                        p = { name: addGeoFlag(decodeURIComponent(url.hash.slice(1))||"WG"), type: "wg", server: url.hostname, port: parseInt(url.port), "private-key": url.username||sp.get('privateKey'), "public-key": sp.get('publicKey')||sp.get('peerPublicKey'), ip: sp.get('ip')||"10.0.0.2/32", reserved: sp.get('reserved'), rawLink: line };
                     } else if (line.startsWith('tuic://')) {
-                        let u = new URL(line); p = { name: addGeoFlag(decodeURIComponent(u.hash.slice(1))||"TUIC"), type: "tuic", server: u.hostname, port: parseInt(u.port), uuid: u.username, password: u.password, sni: new URLSearchParams(u.search).get('sni')||u.hostname, rawLink: line };
+                        let url = new URL(line); p = { name: addGeoFlag(decodeURIComponent(url.hash.slice(1))||"TUIC"), type: "tuic", server: url.hostname, port: parseInt(url.port), uuid: url.username, password: url.password, sni: new URLSearchParams(url.search).get('sni')||url.hostname, rawLink: line };
                     }
 
                     if (p && p.server && !currentProxies.some(x => x.server === p.server && x.port === p.port)) { currentProxies.push(p); added++; }
@@ -799,7 +779,7 @@ sniffer:
             saveState(); renderCards();
         }
 
-        // === PING CORE ===
+        // === PING ===
         async function pingNode(index, btn) {
             const p = currentProxies[index]; btn.textContent = "⏳"; const start = performance.now();
             const ac = new AbortController(); const tid = setTimeout(()=>ac.abort(), 3000);
@@ -849,6 +829,7 @@ sniffer:
                         <div class="card-actions">
                             <button class="btn-card btn-ping" style="color:${pc}" onclick="pingNode(${i},this)">${pl}</button>
                             <button class="btn-card" onclick="showQR(${i})">📱</button>
+                            <button class="btn-card" onclick="copyLink(${i})">🔗</button>
                             <button class="btn-card remove" onclick="removeProxy(${i})">✖</button>
                         </div>
                         <div class="proxy-name" contenteditable="true" spellcheck="false" onblur="renameProxy(${i},this.innerText)">${p.name}</div>
@@ -938,7 +919,14 @@ sniffer:
                 currentProxies.forEach(p => {
                     py += `  - name: "${p.name}"\n    server: ${p.server}\n    port: ${p.port}\n`;
                     if(p.type==='vless'||p.type==='trojan'){ py+=`    type: ${p.type}\n    udp: true\n    uuid: ${p.uuid}\n    network: ${p.network||'tcp'}\n`; if(p.flow)py+=`    flow: ${p.flow}\n`; if(p.tls){py+=`    tls: true\n    sni: ${p.sni}\n    client-fingerprint: ${p.fp||'chrome'}\n`; if(p["reality-opts"])py+=`    reality-opts:\n      public-key: ${p["reality-opts"]["public-key"]}\n      short-id: ${p["reality-opts"]["short-id"]}\n`;} }
+                    else if(p.type==='vmess'){ py+=`    type: vmess\n    udp: true\n    uuid: ${p.uuid}\n    alterId: ${p.aid}\n    cipher: auto\n    network: ${p.network}\n`; if(p.tls)py+=`    tls: true\n    sni: ${p.sni}\n`; }
+                    else if(p.type==='ss'){ py+=`    type: ss\n    udp: true\n    cipher: ${p.cipher}\n    password: ${p.password}\n`; }
+                    else if(p.type==='ssr'){ py+=`    type: ssr\n    udp: true\n    cipher: ${p.cipher}\n    password: ${p.password}\n    protocol: ${p.protocol}\n    obfs: ${p.obfs}\n`; }
+                    else if(p.type==='hysteria2'){ py+=`    type: hysteria2\n    password: ${p.password}\n    sni: ${p.sni}\n`; if(p["skip-cert-verify"])py+=`    skip-cert-verify: true\n`; if(p.obfs)py+=`    obfs: ${p.obfs}\n    obfs-password: ${p["obfs-password"]}\n`; }
+                    else if(p.type==='tuic'){ py+=`    type: tuic\n    uuid: ${p.uuid}\n    password: ${p.password}\n    sni: ${p.sni}\n    udp-relay-mode: native\n`; }
                     else if(p.type==='wg'){ py+=`    type: wireguard\n    ip: ${p.ip}\n    public-key: ${p["public-key"]}\n    private-key: ${p["private-key"]}\n    udp: true\n`; if(p.reserved)py+=`    reserved: [${p.reserved}]\n`; }
+                    else if(p.type==='socks'){ py+=`    type: socks5\n    udp: true\n`; if(p.username)py+=`    username: ${p.username}\n    password: ${p.password}\n`; }
+                    else if(p.type==='http'){ py+=`    type: http\n`; if(p.username)py+=`    username: ${p.username}\n    password: ${p.password}\n`; }
                 });
                 
                 const pn = currentProxies.length ? currentProxies.map(p => `      - "${p.name}"`).join('\n') : "      - DIRECT";
@@ -946,9 +934,8 @@ sniffer:
                 
                 if (mode === 'custom') {
                     let ct = document.getElementById('customTemplateInput').value;
-                    if (ct && !ct.includes('{{PROXIES_YAML}}')) {
-                        // SMART LINTER ДЛЯ КАСТОМА
-                        out.innerText = `# ⚠️ СИНТАКСИЧЕСКАЯ ОШИБКА ШАБЛОНА\n# Мы не нашли метку {{PROXIES_YAML}} в вашем коде.\n# \n# КАК ИСПРАВИТЬ:\n# Вставьте {{PROXIES_YAML}} туда, где должны быть настройки серверов.\n# Вставьте {{PROXY_NAMES}} в блок proxy-groups.\n\n` + ct;
+                    if (ct && (!ct.includes('{{PROXIES_YAML}}') || !ct.includes('{{PROXY_NAMES}}'))) {
+                        out.innerText = `# ⚠️ ОШИБКА ШАБЛОНА\n# Мы не нашли метку {{PROXIES_YAML}} или {{PROXY_NAMES}} в вашем коде.\n# Добавьте их, чтобы скрипт понял, куда вставлять серверы!\n\n` + ct;
                     } else {
                         out.innerText = ct.replace(/\{\{PROXIES_YAML\}\}/g, py).replace(/\{\{PROXY_NAMES\}\}/g, pn);
                     }
@@ -961,17 +948,32 @@ sniffer:
             saveEditorState();
         }
 
+        function basicYamlLinter(code) {
+            // Простейшая проверка структуры (остановка, если кто-то случайно стер proxies: или rules:)
+            if (!code.includes('proxies:') || !code.includes('rules:')) {
+                return confirm('⚠️ Внимание! В итоговом коде отсутствуют обязательные блоки YAML (proxies: или rules:). Конфиг может не заработать.\n\nВы уверены, что хотите продолжить?');
+            }
+            return true;
+        }
+
         function downloadFile() {
             const c = document.getElementById('outputEditor').innerText;
-            if(c.includes("⚠️ СИНТАКСИЧЕСКАЯ ОШИБКА")) return showToast("Сначала исправьте ошибку в шаблоне!", "error");
+            if(c.includes("ОШИБКА:")) return showToast("Сначала исправьте ошибку в шаблоне!", "error");
+            
             const f = document.getElementById('exportFormat').value;
+            if (f.includes('clash') && !basicYamlLinter(c)) return;
+
             const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([c], { type: f.includes('clash')?'text/yaml':'application/json' }));
-            a.download = `Config_v15.${f.includes('clash')?'yaml':'json'}`; a.click();
+            a.download = `Config_v15.1.${f.includes('clash')?'yaml':'json'}`; a.click();
         }
 
         function copyResult() {
             const c = document.getElementById('outputEditor').innerText;
-            if (c.includes("⚠️ СИНТАКСИЧЕСКАЯ ОШИБКА")) return showToast("Исправьте ошибку в шаблоне!", "error");
+            if (c.includes("ОШИБКА:")) return showToast("Исправьте ошибку в шаблоне!", "error");
+            
+            const f = document.getElementById('exportFormat').value;
+            if (f.includes('clash') && !basicYamlLinter(c)) return;
+
             navigator.clipboard.writeText(c); showToast("✅ Скопировано!");
         }
     </script>
