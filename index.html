@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Network Builder v9.2 Studio</title>
+    <title>Network Builder v9.3 Studio</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
@@ -26,13 +26,16 @@
             display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
         }
 
-        .version-badge {
-            font-size: 12px; font-weight: normal; background: #21262d; 
-            padding: 6px 10px; border-radius: 6px; border: 1px solid #30363d;
-            transition: 0.2s; display: flex; align-items: center;
+        .version-badges {
+            display: flex; gap: 8px;
         }
-        .version-badge:hover { border-color: #58a6ff; background: #30363d; }
-        .version-badge a { color: #a5d6ff; text-decoration: none; }
+
+        .version-badge {
+            font-size: 11px; font-weight: bold; background: #21262d; 
+            padding: 6px 10px; border-radius: 6px; border: 1px solid #30363d;
+            transition: 0.2s; display: flex; align-items: center; text-decoration: none; color: #a5d6ff;
+        }
+        .version-badge:hover { border-color: #58a6ff; background: #30363d; color: #ffffff; }
 
         .header-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; width: 100%; }
 
@@ -177,9 +180,10 @@
 <body>
     <div class="container">
         <h2>
-            <div>⚡ Network Builder <span style="color:#8b949e; font-size: 16px;">v9.2 Studio</span></div>
-            <div class="version-badge" id="mihomoVersion">
-                ⏳ Загрузка версии ядра...
+            <div>⚡ Network Builder <span style="color:#8b949e; font-size: 16px;">v9.3 Studio</span></div>
+            
+            <div class="version-badges" id="versionBadges">
+                <span class="version-badge">⏳ Проверка версий...</span>
             </div>
             
             <div class="header-actions">
@@ -253,30 +257,33 @@
     <script>
         let currentProxies = []; 
 
-        // === ИНТЕГРАЦИЯ GITHUB API ДЛЯ ПРОВЕРКИ ВЕРСИИ MIHOMO ===
+        // === ИНТЕГРАЦИЯ GITHUB API ДЛЯ ПРОВЕРКИ ВЕРСИИ MIHOMO (ДВА БЕЙДЖА) ===
         async function fetchMihomoVersion() {
             try {
-                const res = await fetch('https://api.github.com/repos/MetaCubeX/mihomo/releases?per_page=5');
+                // Делаем запрос к API GitHub. Берем 10 последних релизов, чтобы точно захватить и стабильную, и альфу
+                const res = await fetch('https://api.github.com/repos/MetaCubeX/mihomo/releases?per_page=10');
                 const data = await res.json();
                 
-                // Ищем самую свежую Alpha/Prerelease и стабильную
-                const latestAlpha = data.find(r => r.prerelease || r.tag_name.includes('alpha'));
-                const latestRelease = data.find(r => !r.prerelease);
+                // Ищем свежую стабильную (не prerelease и без слов alpha/beta в теге)
+                const latestStable = data.find(r => !r.prerelease && !r.tag_name.toLowerCase().includes('alpha') && !r.tag_name.toLowerCase().includes('beta'));
+                // Ищем свежую тестовую (prerelease или содержит alpha/beta в теге)
+                const latestAlpha = data.find(r => r.prerelease || r.tag_name.toLowerCase().includes('alpha') || r.tag_name.toLowerCase().includes('beta'));
                 
-                let versionText = "Ядро Mihomo: ";
-                let link = "https://github.com/MetaCubeX/mihomo/releases";
+                let badgesHTML = '';
                 
-                if (latestAlpha) {
-                    versionText += `🔥 ${latestAlpha.tag_name} (Alpha)`;
-                    link = latestAlpha.html_url;
-                } else if (latestRelease) {
-                    versionText += `✅ ${latestRelease.tag_name}`;
-                    link = latestRelease.html_url;
+                if (latestStable) {
+                    badgesHTML += `<a href="${latestStable.html_url}" target="_blank" class="version-badge" title="Стабильная версия">✅ Stable: ${latestStable.tag_name}</a>`;
                 }
                 
-                document.getElementById('mihomoVersion').innerHTML = `<a href="${link}" target="_blank">${versionText}</a>`;
+                if (latestAlpha) {
+                    badgesHTML += `<a href="${latestAlpha.html_url}" target="_blank" class="version-badge" title="Тестовая версия">🔥 Alpha: ${latestAlpha.tag_name}</a>`;
+                }
+
+                if(badgesHTML === '') badgesHTML = `<span class="version-badge">❌ Релизы не найдены</span>`;
+                
+                document.getElementById('versionBadges').innerHTML = badgesHTML;
             } catch (e) {
-                document.getElementById('mihomoVersion').innerText = "❌ Ошибка проверки ядра";
+                document.getElementById('versionBadges').innerHTML = `<span class="version-badge">❌ Ошибка API Github</span>`;
             }
         }
 
@@ -438,11 +445,7 @@
                         let b64 = line.slice(8); let decoded = safeB64Decode(b64);
                         if (decoded) {
                             let v = JSON.parse(decoded);
-                            proxyObj = {
-                                name: v.ps || "VMess_" + Math.floor(Math.random()*100),
-                                type: "vmess", server: v.add, port: parseInt(v.port), uuid: v.id,
-                                aid: v.aid || 0, network: v.net || "tcp", tls: v.tls === "tls", sni: v.sni || v.host || v.add, rawLink: line
-                            };
+                            proxyObj = { name: v.ps || "VMess_" + Math.floor(Math.random()*100), type: "vmess", server: v.add, port: parseInt(v.port), uuid: v.id, aid: v.aid || 0, network: v.net || "tcp", tls: v.tls === "tls", sni: v.sni || v.host || v.add, rawLink: line };
                         }
                     } else if (line.startsWith('ss://')) {
                         let uri = line.slice(5); let name = "SS_" + Math.floor(Math.random()*100);
@@ -454,59 +457,40 @@
                             let sp = parts[1].split(':'); server = sp[0]; port = parseInt(sp[1]);
                         } else {
                             let decoded = safeB64Decode(uri);
-                            if(decoded.includes('@')) {
-                                let parts = decoded.split('@'); let up = parts[0].split(':'); method = up[0]; password = up[1];
-                                let sp = parts[1].split(':'); server = sp[0]; port = parseInt(sp[1]);
-                            }
+                            if(decoded.includes('@')) { let parts = decoded.split('@'); let up = parts[0].split(':'); method = up[0]; password = up[1]; let sp = parts[1].split(':'); server = sp[0]; port = parseInt(sp[1]); }
                         }
                         if (server && port) proxyObj = { name: name, type: "ss", server: server, port: port, cipher: method, password: password, rawLink: line };
                     } else if (line.startsWith('ssr://')) {
                         let b64 = line.slice(6); let decoded = safeB64Decode(b64);
                         if (decoded) {
                             let parts = decoded.split(':');
-                            if (parts.length >= 6) {
-                                proxyObj = { name: "SSR_" + Math.floor(Math.random()*100), type: "ssr", server: parts[0], port: parseInt(parts[1]), protocol: parts[2], cipher: parts[3], obfs: parts[4], password: safeB64Decode(parts[5].split('/?')[0]), rawLink: line };
-                            }
+                            if (parts.length >= 6) { proxyObj = { name: "SSR_" + Math.floor(Math.random()*100), type: "ssr", server: parts[0], port: parseInt(parts[1]), protocol: parts[2], cipher: parts[3], obfs: parts[4], password: safeB64Decode(parts[5].split('/?')[0]), rawLink: line }; }
                         }
                     } else if (line.startsWith('hy2://') || line.startsWith('hysteria2://')) {
                         const url = new URL(line); const p = new URLSearchParams(url.search);
                         proxyObj = {
-                            name: decodeURIComponent(url.hash.slice(1)) || "HY2_" + Math.floor(Math.random()*100),
-                            type: "hysteria2", server: url.hostname, port: parseInt(url.port), password: url.username,
-                            sni: p.get('sni') || url.hostname, "skip-cert-verify": p.get('insecure') === '1',
-                            obfs: p.get('obfs') || undefined, "obfs-password": p.get('obfs-password') || undefined, rawLink: line
+                            name: decodeURIComponent(url.hash.slice(1)) || "HY2_" + Math.floor(Math.random()*100), type: "hysteria2", server: url.hostname, port: parseInt(url.port), password: url.username,
+                            sni: p.get('sni') || url.hostname, "skip-cert-verify": p.get('insecure') === '1', obfs: p.get('obfs') || undefined, "obfs-password": p.get('obfs-password') || undefined, rawLink: line
                         };
                     } else if (line.startsWith('trojan://')) {
                         const url = new URL(line); const p = new URLSearchParams(url.search);
-                        proxyObj = {
-                            name: decodeURIComponent(url.hash.slice(1)) || "Trojan_" + Math.floor(Math.random()*100),
-                            type: "trojan", server: url.hostname, port: parseInt(url.port), password: url.username,
-                            tls: true, sni: p.get('sni') || url.hostname, network: p.get('type') || "tcp", fp: p.get('fp') || "chrome", rawLink: line
-                        };
+                        proxyObj = { name: decodeURIComponent(url.hash.slice(1)) || "Trojan_" + Math.floor(Math.random()*100), type: "trojan", server: url.hostname, port: parseInt(url.port), password: url.username, tls: true, sni: p.get('sni') || url.hostname, network: p.get('type') || "tcp", fp: p.get('fp') || "chrome", rawLink: line };
                     } else if (line.startsWith('tuic://')) {
                         const url = new URL(line); const p = new URLSearchParams(url.search);
                         proxyObj = { name: decodeURIComponent(url.hash.slice(1)) || "TUIC_" + Math.floor(Math.random()*100), type: "tuic", server: url.hostname, port: parseInt(url.port), uuid: url.username, password: url.password, sni: p.get('sni') || url.hostname, rawLink: line };
                     } else if (line.startsWith('wireguard://') || line.startsWith('wg://')) {
                         let urlStr = line.replace('wireguard://', 'http://').replace('wg://', 'http://');
                         const url = new URL(urlStr); const p = new URLSearchParams(url.search);
-                        proxyObj = {
-                            name: decodeURIComponent(url.hash.slice(1)) || "WG_" + Math.floor(Math.random()*100), type: "wg", server: url.hostname, port: parseInt(url.port),
-                            "private-key": url.username || p.get('privateKey'), "public-key": p.get('publicKey') || p.get('peerPublicKey'),
-                            ip: p.get('ip') || "10.0.0.2/32", reserved: p.get('reserved'), rawLink: line
-                        };
+                        proxyObj = { name: decodeURIComponent(url.hash.slice(1)) || "WG_" + Math.floor(Math.random()*100), type: "wg", server: url.hostname, port: parseInt(url.port), "private-key": url.username || p.get('privateKey'), "public-key": p.get('publicKey') || p.get('peerPublicKey'), ip: p.get('ip') || "10.0.0.2/32", reserved: p.get('reserved'), rawLink: line };
                     } else if (line.startsWith('socks5://') || line.startsWith('socks://')) {
-                        let urlStr = line.replace('socks5://', 'http://').replace('socks://', 'http://');
-                        const url = new URL(urlStr);
+                        let urlStr = line.replace('socks5://', 'http://').replace('socks://', 'http://'); const url = new URL(urlStr);
                         proxyObj = { name: decodeURIComponent(url.hash.slice(1)) || "SOCKS_" + Math.floor(Math.random()*100), type: "socks", server: url.hostname, port: parseInt(url.port), username: url.username, password: url.password, rawLink: line };
                     } else if (line.startsWith('http://') && line.includes('@')) {
-                        const url = new URL(line);
-                        proxyObj = { name: decodeURIComponent(url.hash.slice(1)) || "HTTP_" + Math.floor(Math.random()*100), type: "http", server: url.hostname, port: parseInt(url.port), username: url.username, password: url.password, rawLink: line };
+                        const url = new URL(line); proxyObj = { name: decodeURIComponent(url.hash.slice(1)) || "HTTP_" + Math.floor(Math.random()*100), type: "http", server: url.hostname, port: parseInt(url.port), username: url.username, password: url.password, rawLink: line };
                     } else if (line.startsWith('ssh://')) {
-                        const url = new URL(line);
-                        proxyObj = { name: decodeURIComponent(url.hash.slice(1)) || "SSH_" + Math.floor(Math.random()*100), type: "ssh", server: url.hostname, port: parseInt(url.port), username: url.username, password: url.password, rawLink: line };
+                        const url = new URL(line); proxyObj = { name: decodeURIComponent(url.hash.slice(1)) || "SSH_" + Math.floor(Math.random()*100), type: "ssh", server: url.hostname, port: parseInt(url.port), username: url.username, password: url.password, rawLink: line };
                     } else if (line.startsWith('naive+https://')) {
-                        const url = new URL(line.replace('naive+', ''));
-                        proxyObj = { name: decodeURIComponent(url.hash.slice(1)) || "Naive_" + Math.floor(Math.random()*100), type: "naive", server: url.hostname, port: parseInt(url.port), username: url.username, password: url.password, rawLink: line };
+                        const url = new URL(line.replace('naive+', '')); proxyObj = { name: decodeURIComponent(url.hash.slice(1)) || "Naive_" + Math.floor(Math.random()*100), type: "naive", server: url.hostname, port: parseInt(url.port), username: url.username, password: url.password, rawLink: line };
                     }
 
                     if (proxyObj && proxyObj.server && !currentProxies.some(p => p.server === proxyObj.server && p.port === proxyObj.port)) { 
@@ -1774,7 +1758,7 @@ rules:
             
             const format = document.getElementById('exportFormat').value;
             const ext = (format === 'xray' || format === 'singbox') ? 'json' : 'yaml';
-            const filename = `Network_Config_v9.2.${ext}`;
+            const filename = `Network_Config_v9.3.${ext}`;
             const mimeType = (format === 'xray' || format === 'singbox') ? 'application/json' : 'text/yaml';
 
             const a = document.createElement('a');
