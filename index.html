@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#0d1117">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>Network Builder v15.1 Community Edition</title>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Network Builder v15.2</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
@@ -65,10 +66,8 @@
         .editor-header span{font-size:12px;color:#8b949e;font-weight:bold;text-transform:uppercase;}
         
         /* Умные Уведомления */
-        #toast{visibility:hidden;min-width:250px;background:#238636;color:white;text-align:center;border-radius:8px;padding:12px 20px;position:fixed;z-index:9999;bottom:30px;left:50%;transform:translateX(-50%);font-size:13px;font-weight:bold;opacity:0;transition:0.3s;box-shadow:0 8px 24px rgba(0,0,0,0.6);}
+        #toast{visibility:hidden;min-width:250px;color:white;text-align:center;border-radius:8px;padding:12px 20px;position:fixed;z-index:9999;bottom:30px;left:50%;transform:translateX(-50%);font-size:13px;font-weight:bold;opacity:0;transition:0.3s;box-shadow:0 8px 24px rgba(0,0,0,0.6);}
         #toast.show{visibility:visible;opacity:1;}
-        #toast.error{background:#f85149;}
-        #toast.warning{background:#d29922; color:#0d1117;}
 
         /* Модальные окна */
         .modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:100;justify-content:center;align-items:center;}
@@ -78,14 +77,14 @@
         .btn-download{background:#58a6ff;color:#ffffff;transition:0.2s;} .btn-download:hover{background:#79c0ff;}
 
         .tooltip { position: relative; display: inline-block; cursor: help; border-bottom: 1px dotted #8b949e; }
-        .tooltip .tooltiptext { visibility: hidden; width: 220px; background-color: #21262d; color: #c9d1d9; text-align: center; border-radius: 6px; padding: 10px; border: 1px solid #30363d; position: absolute; z-index: 1; bottom: 125%; left: 50%; transform: translateX(-50%); opacity: 0; transition: opacity 0.3s; font-size: 11px; font-weight: normal; font-family: sans-serif; line-height: 1.4; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+        .tooltip .tooltiptext { visibility: hidden; width: 240px; background-color: #21262d; color: #c9d1d9; text-align: center; border-radius: 6px; padding: 10px; border: 1px solid #30363d; position: absolute; z-index: 1; bottom: 125%; left: 50%; transform: translateX(-50%); opacity: 0; transition: opacity 0.3s; font-size: 11px; font-weight: normal; font-family: sans-serif; line-height: 1.4; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
         .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
     </style>
 </head>
 <body>
     <div class="container">
         <h2>
-            <div>⚡ Network Builder <span style="color:#8b949e; font-size:16px;">v15.1 Community</span></div>
+            <div>⚡ Network Builder <span style="color:#8b949e; font-size:16px;">v15.2 Code Review</span></div>
             <div class="badges-wrapper">
                 <div class="version-badge" id="mihomoVersion" title="Версия ядра Mihomo">⏳ Ядро...</div>
                 <div class="version-badge" id="rulesVersion" style="color:#58a6ff;" title="Базы обхода блокировок">🛡️ Базы...</div>
@@ -93,7 +92,7 @@
             
             <div class="header-actions">
                 <button class="icon-btn primary tooltip" onclick="pingAll()">⚡ Ping All
-                    <span class="tooltiptext">Используется HTTP/TCP ping (fetch), а не ICMP. Серверы без открытых 80/443 портов могут отображаться как Err или Stealth, оставаясь рабочими.</span>
+                    <span class="tooltiptext">Используется HTTP/TCP ping (fetch), а не ICMP. Серверы без открытых 80/443 портов могут отображаться как Err или Stealth, оставаясь при этом рабочими.</span>
                 </button>
                 <button class="icon-btn" onclick="cleanDeadNodes()" style="border-color:#f85149; color:#f85149;">🧹 Удалить мертвые</button>
                 <button class="icon-btn" onclick="sortProxies()">📶 Сорт.</button>
@@ -233,14 +232,17 @@
             document.getElementById('errorModal').style.display = 'flex';
         }
 
+        // === ИСПРАВЛЕННЫЙ TOAST (Без CSS-загрязнения) ===
         function showToast(msg, type="success") {
             const t = document.getElementById("toast");
-            t.textContent = msg; 
+            t.innerHTML = msg; 
             t.className = "show";
-            if (type === "#f85149" || type === "error") t.className = "show error";
-            else if (type === "#d29922" || type === "warning") t.className = "show warning";
-            else t.style.background = "#238636"; 
-            setTimeout(() => t.className = "", 3500);
+            
+            // Чистое управление цветом через inline стили
+            t.style.background = type === "error" ? "#f85149" : (type === "warning" ? "#d29922" : "#238636");
+            t.style.color = type === "warning" ? "#0d1117" : "#ffffff";
+            
+            setTimeout(() => { t.className = t.className.replace("show", "").trim(); }, 3500);
         }
 
         // === БАЗОВЫЕ ПРАВИЛА МАРШРУТИЗАЦИИ ===
@@ -447,7 +449,6 @@ sniffer:
             catch(e) { try { return atob(str.replace(/-/g, '+').replace(/_/g, '/')); } catch(e2) { return ""; } }
         }
 
-        // Локальные флаги (fallback)
         function addGeoFlag(name) {
             const n = name.toUpperCase();
             if (n.includes('FI') || n.includes('FINLAND') || n.includes('ФИНЛЯНДИЯ') || n.includes('HELSINKI')) return '🇫🇮 ' + name.replace(/🇫🇮\s*/g, '');
@@ -468,30 +469,33 @@ sniffer:
             fetchMihomoVersion();
             fetchRulesVersion();
             
+            // Загружаем настройки редактора из localStorage
             if (localStorage.getItem('flclash_exportFormat')) document.getElementById('exportFormat').value = localStorage.getItem('flclash_exportFormat');
             if (localStorage.getItem('flclash_templateMode')) document.getElementById('templateMode').value = localStorage.getItem('flclash_templateMode');
             
-            const savedProxies = localStorage.getItem('flclash_net_v15_1');
+            // Загружаем прокси ИЗ SESSION STORAGE (чтобы переживали F5, но не забивали браузер навечно)
+            const savedProxies = sessionStorage.getItem('flclash_net_proxies_v15');
             if (savedProxies) currentProxies = JSON.parse(savedProxies);
             
-            const savedTpl = localStorage.getItem('flclash_net_custom_tpl_v15_1');
+            const savedTpl = localStorage.getItem('flclash_net_custom_tpl_v15');
             if(savedTpl) document.getElementById('customTemplateInput').value = savedTpl;
             
             toggleCustomTemplate();
             
             if (currentProxies.length > 0) renderCards();
             else {
-                const savedOut = localStorage.getItem('flclash_net_output_edit_v15_1');
+                const savedOut = localStorage.getItem('flclash_net_output_edit_v15');
                 if(savedOut) document.getElementById('outputEditor').innerText = savedOut;
             }
         };
 
         function saveState() { 
-            localStorage.setItem('flclash_net_v15_1', JSON.stringify(currentProxies)); 
+            // СТРОГАЯ ЗАПИСЬ В SESSION STORAGE ПРИ ЛЮБОМ ИЗМЕНЕНИИ
+            sessionStorage.setItem('flclash_net_proxies_v15', JSON.stringify(currentProxies)); 
             saveEditorState();
         }
         function saveEditorState() { 
-            localStorage.setItem('flclash_net_output_edit_v15_1', document.getElementById('outputEditor').innerText); 
+            localStorage.setItem('flclash_net_output_edit_v15', document.getElementById('outputEditor').innerText); 
         }
 
         // GITHUB API
@@ -570,7 +574,7 @@ sniffer:
                 } catch(err) { showToast("❌ Ошибка скачивания", "error"); }
             }
             btn.innerText = oldText;
-            localStorage.setItem('flclash_net_custom_tpl_v15_1', document.getElementById('customTemplateInput').value);
+            localStorage.setItem('flclash_net_custom_tpl_v15', document.getElementById('customTemplateInput').value);
             updateOutput(); showToast("✅ Шаблон загружен!");
         }
 
@@ -610,7 +614,8 @@ sniffer:
             if(confirm('Очистить все узлы и редактор?')) { 
                 currentProxies = []; document.getElementById('input').value = ''; 
                 document.getElementById('outputEditor').innerText = 'Ожидание данных...';
-                localStorage.removeItem('flclash_net_output_edit_v15_1');
+                localStorage.removeItem('flclash_net_output_edit_v15');
+                sessionStorage.removeItem('flclash_net_proxies_v15');
                 saveState(); renderCards(); 
             }
         }
@@ -654,7 +659,7 @@ sniffer:
             a.download = `Nodes_${Date.now()}.txt`; a.click();
         }
 
-        // === SMART PARSER ===
+        // === OMNI-PARSER ===
         async function startProcess() {
             const inp = document.getElementById('input').value.trim();
             if (!inp) return showToast("Поле пустое!", "error");
@@ -672,7 +677,7 @@ sniffer:
             let text = rawText.trim();
             let added = 0;
 
-            // 1. JSON
+            // 1. JSON PARSING
             if (text.startsWith('{')) {
                 try {
                     let json = JSON.parse(text);
@@ -689,14 +694,23 @@ sniffer:
                             let nn = addGeoFlag(baseRem ? (isMultiNode ? `${baseRem} (${tag})` : baseRem) : tag);
                             let p = null;
 
-                            if (ob.protocol === 'vless' && ob.settings && ob.settings.vnext && ob.settings.vnext.length > 0) {
+                            if (ob.protocol === 'vless' && ob.settings?.vnext?.length > 0) {
                                 let vn = ob.settings.vnext[0];
                                 let st = ob.streamSettings || {}; let re = st.realitySettings || {}; let tl = st.tlsSettings || {};
-                                p = { name: nn, type: "vless", server: vn.address, port: vn.port, uuid: vn.users?.[0]?.id, tls: st.security==='reality'||st.security==='tls', "reality-opts": st.security==='reality'?{"public-key":re.publicKey,"short-id":re.shortId||""}:null, sni: re.serverName||tl.serverName||vn.address, network: st.network||"tcp", flow: vn.users?.[0]?.flow||"", fp: re.fingerprint||tl.fingerprint||"chrome" };
+                                p = { 
+                                    name: nn, type: "vless", server: vn.address, port: vn.port, uuid: vn.users?.[0]?.id, 
+                                    tls: st.security==='reality'||st.security==='tls', 
+                                    "reality-opts": st.security==='reality' ? {"public-key":re.publicKey,"short-id":re.shortId||""} : null, 
+                                    sni: re.serverName||tl.serverName||vn.address, network: st.network||"tcp", flow: vn.users?.[0]?.flow||"", fp: re.fingerprint||tl.fingerprint||"chrome" 
+                                };
                             } 
                             else if (ob.type === 'vless') {
                                  let tl = ob.tls || {}; let re = tl.reality || {};
-                                 p = { name: nn, type: "vless", server: ob.server, port: ob.server_port, uuid: ob.uuid, tls: tl.enabled === true, "reality-opts": re.enabled?{"public-key":re.public_key,"short-id":re.short_id||""}:null, sni: tl.server_name||ob.server, network: ob.transport?.type||"tcp", flow: ob.flow||"", fp: tl.utls?.fingerprint||"chrome" };
+                                 p = { 
+                                     name: nn, type: "vless", server: ob.server, port: ob.server_port, uuid: ob.uuid, tls: tl.enabled === true, 
+                                     "reality-opts": re.enabled ? {"public-key":re.public_key,"short-id":re.short_id||""} : null, 
+                                     sni: tl.server_name||ob.server, network: ob.transport?.type||"tcp", flow: ob.flow||"", fp: tl.utls?.fingerprint||"chrome" 
+                                 };
                             }
 
                             if(p) {
@@ -716,7 +730,9 @@ sniffer:
             }
 
             // 2. Base64
-            if (added === 0 && !text.includes('://') && !text.includes('{')) { try { text = safeB64Decode(text); } catch(e){} }
+            if (added === 0 && !text.includes('://') && !text.includes('{')) {
+                try { text = safeB64Decode(text); } catch(e){}
+            }
 
             // 3. String Link Parser
             text.split('\n').forEach(line => {
@@ -948,33 +964,51 @@ sniffer:
             saveEditorState();
         }
 
-        function basicYamlLinter(code) {
-            // Простейшая проверка структуры (остановка, если кто-то случайно стер proxies: или rules:)
-            if (!code.includes('proxies:') || !code.includes('rules:')) {
-                return confirm('⚠️ Внимание! В итоговом коде отсутствуют обязательные блоки YAML (proxies: или rules:). Конфиг может не заработать.\n\nВы уверены, что хотите продолжить?');
+        // === ПРЕД-ЭКСПОРТНАЯ ВАЛИДАЦИЯ (LINTER) ===
+        function validateOutput(content, format) {
+            if (content.includes("⚠️ ОШИБКА") || content.includes("❌ Ошибка")) {
+                showToast("Сначала исправьте ошибку в шаблоне!", "error");
+                return false;
+            }
+            
+            if (format.includes('clash')) {
+                if (!content.includes('proxies:')) {
+                    showDiagnosticError("В итоговом коде нет блока <b>proxies:</b>.<br>Ваш YAML сломан. Если вы правили код вручную, верните этот блок.");
+                    return false;
+                }
+                if (!content.includes('rules:')) {
+                    showDiagnosticError("В итоговом коде нет блока <b>rules:</b>.<br>Ваш YAML сломан. Если вы правили код вручную, верните этот блок.");
+                    return false;
+                }
+            } else {
+                try {
+                    JSON.parse(content);
+                } catch (e) {
+                    showDiagnosticError(`Ошибка синтаксиса JSON в итоговом коде.<br>Вы случайно удалили скобку или запятую при ручном редактировании.<br>Детали: ${e.message}`);
+                    return false;
+                }
             }
             return true;
         }
 
         function downloadFile() {
             const c = document.getElementById('outputEditor').innerText;
-            if(c.includes("ОШИБКА:")) return showToast("Сначала исправьте ошибку в шаблоне!", "error");
-            
             const f = document.getElementById('exportFormat').value;
-            if (f.includes('clash') && !basicYamlLinter(c)) return;
+            if (!validateOutput(c, f)) return;
 
-            const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([c], { type: f.includes('clash')?'text/yaml':'application/json' }));
-            a.download = `Config_v15.1.${f.includes('clash')?'yaml':'json'}`; a.click();
+            const a = document.createElement('a'); 
+            a.href = URL.createObjectURL(new Blob([c], { type: f.includes('clash') ? 'text/yaml' : 'application/json' }));
+            a.download = `Config_v15.2.${f.includes('clash') ? 'yaml' : 'json'}`; 
+            a.click();
         }
 
         function copyResult() {
             const c = document.getElementById('outputEditor').innerText;
-            if (c.includes("ОШИБКА:")) return showToast("Исправьте ошибку в шаблоне!", "error");
-            
             const f = document.getElementById('exportFormat').value;
-            if (f.includes('clash') && !basicYamlLinter(c)) return;
-
-            navigator.clipboard.writeText(c); showToast("✅ Скопировано!");
+            if (!validateOutput(c, f)) return;
+            
+            navigator.clipboard.writeText(c); 
+            showToast("✅ Скопировано!");
         }
     </script>
 </body>
