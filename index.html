@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Network Builder v6.0 Omni</title>
+    <title>Network Builder v7.0 Exclave Ed.</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
@@ -16,7 +16,7 @@
 
         .container {
             background: #161b22; border: 1px solid #30363d;
-            border-radius: 12px; padding: 30px; max-width: 950px; width: 100%;
+            border-radius: 12px; padding: 30px; max-width: 1000px; width: 100%;
             box-shadow: 0 8px 24px rgba(0,0,0,0.5);
         }
 
@@ -99,13 +99,17 @@
             border-radius: 4px; font-size: 10px; font-weight: bold; text-transform: uppercase; margin-right: 5px;
         }
         
-        /* Цвета для разных протоколов */
+        /* ЦВЕТА ПРОТОКОЛОВ */
         .type-vless { background: #238636; }
         .type-hy2 { background: #8957e5; }
         .type-trojan { background: #d29922; }
         .type-vmess { background: #0078d7; }
         .type-ss { background: #3b82f6; }
+        .type-ssr { background: #d23bb7; }
         .type-tuic { background: #ea4aaa; }
+        .type-wg { background: #d23b3b; }
+        .type-socks { background: #3bd2a2; color: #000; }
+        .type-http { background: #a2d23b; color: #000; }
         
         .card-actions { position: absolute; top: 8px; right: 8px; display: flex; gap: 4px; }
         .btn-card {
@@ -146,25 +150,24 @@
 <body>
     <div class="container">
         <h2>
-            ⚡ Network Builder v6.0 Omni
+            ⚡ Network Builder v7.0 Exclave
             <div class="header-actions">
-                <button class="icon-btn primary" onclick="pingAll()" title="Test all nodes">⚡ Ping All</button>
-                <button class="icon-btn" onclick="sortProxies()" title="Sort by latency">📶 Сортировка</button>
-                <button class="icon-btn" onclick="shuffleProxies()" title="Shuffle nodes">🔀 Перемешать</button>
-                <button class="icon-btn" onclick="exportRawNodes()" title="Export raw links">📥 Backup</button>
-                <button class="icon-btn danger" onclick="clearAll()" title="Delete all">🗑 Очистить всё</button>
+                <button class="icon-btn primary" onclick="pingAll()">⚡ Ping All</button>
+                <button class="icon-btn" onclick="sortProxies()">📶 Сортировка</button>
+                <button class="icon-btn" onclick="shuffleProxies()">🔀 Перемешать</button>
+                <button class="icon-btn" onclick="exportRawNodes()">📥 Бэкап TXT</button>
+                <button class="icon-btn danger" onclick="clearAll()">🗑 Очистить</button>
             </div>
         </h2>
         
-        <p>Поддержка VLESS, VMess, Trojan, Hysteria2, Shadowsocks, TUIC. <b>Перетащите .txt файл прямо в поле ниже.</b></p>
+        <p>Поддержка: VLESS, VMess, Trojan, Hysteria2, SS, <b>SSR, WireGuard, Socks5, HTTP</b>. Перетащите .txt файл прямо в поле ниже.</p>
         
         <textarea id="input" placeholder="Drop .txt file here or paste links:
 vless://...
-vmess://...
 hy2://...
-ss://...
-trojan://...
-tuic://..."></textarea>
+wireguard://...
+ssr://...
+socks5://..."></textarea>
         
         <div class="btn-group">
             <button class="action-btn btn-convert" onclick="startProcess()">► PROCESS NODES</button>
@@ -173,11 +176,11 @@ tuic://..."></textarea>
             <select id="exportFormat" style="margin-left: auto;" onchange="updateOutput()">
                 <option value="clash_mobile">📱 FlClash YAML (TUN)</option>
                 <option value="clash_router">🌐 FlClash YAML (Router)</option>
-                <option value="xray">📦 Nekobox / Xray Core (JSON)</option>
+                <option value="xray">📦 Exclave / Nekobox (JSON)</option>
             </select>
             
             <button id="copyBtn" class="action-btn btn-copy" onclick="copyResult()">⎘ КОПИРОВАТЬ</button>
-            <button id="downloadBtn" class="action-btn btn-download" onclick="downloadFile()">⬇ СКАЧАТЬ ФАЙЛ</button>
+            <button id="downloadBtn" class="action-btn btn-download" onclick="downloadFile()">⬇ СКАЧАТЬ</button>
         </div>
         
         <div id="cardsContainer" class="cards-grid"></div>
@@ -197,16 +200,11 @@ tuic://..."></textarea>
     <script>
         let currentProxies = []; 
 
-        // Вспомогательная функция для безопасного декодирования Base64
         function safeB64Decode(str) {
-            try {
-                return decodeURIComponent(escape(atob(str.replace(/-/g, '+').replace(/_/g, '/'))));
-            } catch(e) {
-                try { return atob(str.replace(/-/g, '+').replace(/_/g, '/')); } catch(e2) { return ""; }
-            }
+            try { return decodeURIComponent(escape(atob(str.replace(/-/g, '+').replace(/_/g, '/')))); } 
+            catch(e) { try { return atob(str.replace(/-/g, '+').replace(/_/g, '/')); } catch(e2) { return ""; } }
         }
 
-        // === DRAG AND DROP ===
         const dropZone = document.getElementById('input');
         dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
         dropZone.addEventListener('dragleave', (e) => { e.preventDefault(); dropZone.classList.remove('dragover'); });
@@ -214,17 +212,17 @@ tuic://..."></textarea>
             e.preventDefault(); dropZone.classList.remove('dragover');
             if (e.dataTransfer.files.length > 0) {
                 const reader = new FileReader();
-                reader.onload = (event) => { dropZone.value = event.target.result; showToast(`📁 File read successfully!`); };
+                reader.onload = (event) => { dropZone.value = event.target.result; showToast(`📁 Файл прочитан!`); };
                 reader.readAsText(e.dataTransfer.files[0]);
             }
         });
 
         window.onload = () => {
-            const savedProxies = localStorage.getItem('flclash_net_v6');
+            const savedProxies = localStorage.getItem('flclash_net_v7');
             if (savedProxies) { currentProxies = JSON.parse(savedProxies); if (currentProxies.length > 0) renderCards(); }
         };
 
-        function saveState() { localStorage.setItem('flclash_net_v6', JSON.stringify(currentProxies)); }
+        function saveState() { localStorage.setItem('flclash_net_v7', JSON.stringify(currentProxies)); }
 
         function clearAll() {
             if(confirm('Очистить все узлы?')) { currentProxies = []; document.getElementById('input').value = ''; saveState(); renderCards(); }
@@ -258,7 +256,7 @@ tuic://..."></textarea>
             const out = document.getElementById('output');
             if (!input) { showToast("Пустое поле!", "#f85149"); return; }
 
-            if (input.startsWith('http') && !input.includes('://')) {
+            if (input.startsWith('http') && !input.includes('://') && !input.includes('@')) {
                 out.textContent = "⏳ Fetching...";
                 try {
                     const res = await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(input));
@@ -267,7 +265,6 @@ tuic://..."></textarea>
             } else { parseData(input); }
         }
 
-        // РАСШИРЕННЫЙ ПАРСЕР ПРОТОКОЛОВ
         function parseData(rawText) {
             let text = rawText.trim();
             if (!text.includes('://') && !text.includes('"outbounds"')) { try { text = atob(text.replace(/\s/g, '')); } catch (e) {} }
@@ -310,8 +307,18 @@ tuic://..."></textarea>
                                 let sp = parts[1].split(':'); server = sp[0]; port = parseInt(sp[1]);
                             }
                         }
-                        if (server && port) {
-                            proxyObj = { name: name, type: "ss", server: server, port: port, cipher: method, password: password, rawLink: line };
+                        if (server && port) proxyObj = { name: name, type: "ss", server: server, port: port, cipher: method, password: password, rawLink: line };
+                    } else if (line.startsWith('ssr://')) {
+                        let b64 = line.slice(6); let decoded = safeB64Decode(b64);
+                        if (decoded) {
+                            let parts = decoded.split(':');
+                            if (parts.length >= 6) {
+                                let server = parts[0]; let port = parseInt(parts[1]); let protocol = parts[2]; let cipher = parts[3]; let obfs = parts[4];
+                                let rem = parts[5].split('/?'); let password = safeB64Decode(rem[0]);
+                                let name = "SSR_" + Math.floor(Math.random()*100);
+                                if (rem.length > 1) { let p = new URLSearchParams(rem[1]); if(p.get('remarks')) name = safeB64Decode(p.get('remarks')); }
+                                proxyObj = { name: name, type: "ssr", server: server, port: port, cipher: cipher, password: password, protocol: protocol, obfs: obfs, rawLink: line };
+                            }
                         }
                     } else if (line.startsWith('hy2://') || line.startsWith('hysteria2://')) {
                         const url = new URL(line); const p = new URLSearchParams(url.search);
@@ -332,11 +339,35 @@ tuic://..."></textarea>
                         const url = new URL(line); const p = new URLSearchParams(url.search);
                         proxyObj = {
                             name: decodeURIComponent(url.hash.slice(1)) || "TUIC_" + Math.floor(Math.random()*100),
-                            type: "tuic", server: url.hostname, port: parseInt(url.port), uuid: url.username, password: url.password,
-                            sni: p.get('sni') || url.hostname, rawLink: line
+                            type: "tuic", server: url.hostname, port: parseInt(url.port), uuid: url.username, password: url.password, sni: p.get('sni') || url.hostname, rawLink: line
+                        };
+                    } else if (line.startsWith('wireguard://') || line.startsWith('wg://')) {
+                        let urlStr = line.replace('wireguard://', 'http://').replace('wg://', 'http://');
+                        const url = new URL(urlStr); const p = new URLSearchParams(url.search);
+                        proxyObj = {
+                            name: decodeURIComponent(url.hash.slice(1)) || "WG_" + Math.floor(Math.random()*100),
+                            type: "wg", server: url.hostname, port: parseInt(url.port),
+                            "private-key": url.username || p.get('privateKey'), "public-key": p.get('publicKey') || p.get('peerPublicKey'),
+                            ip: p.get('ip') || "10.0.0.2/32", reserved: p.get('reserved'), rawLink: line
+                        };
+                    } else if (line.startsWith('socks5://') || line.startsWith('socks://')) {
+                        let urlStr = line.replace('socks5://', 'http://').replace('socks://', 'http://');
+                        const url = new URL(urlStr);
+                        proxyObj = {
+                            name: decodeURIComponent(url.hash.slice(1)) || "SOCKS_" + Math.floor(Math.random()*100),
+                            type: "socks", server: url.hostname, port: parseInt(url.port), username: url.username, password: url.password, rawLink: line
+                        };
+                    } else if (line.startsWith('http://') && line.includes('@')) {
+                        const url = new URL(line);
+                        proxyObj = {
+                            name: decodeURIComponent(url.hash.slice(1)) || "HTTP_" + Math.floor(Math.random()*100),
+                            type: "http", server: url.hostname, port: parseInt(url.port), username: url.username, password: url.password, rawLink: line
                         };
                     }
-                    if (proxyObj && !currentProxies.some(p => p.server === proxyObj.server && p.port === proxyObj.port)) { currentProxies.push(proxyObj); newProxiesCount++; }
+
+                    if (proxyObj && proxyObj.server && !currentProxies.some(p => p.server === proxyObj.server && p.port === proxyObj.port)) { 
+                        currentProxies.push(proxyObj); newProxiesCount++; 
+                    }
                 } catch (e) {}
             });
 
@@ -431,25 +462,17 @@ tuic://..."></textarea>
         // =========================================================================
         function generateXrayJSON() {
             if (currentProxies.length === 0) return;
-            
-            let outbounds = [];
-            let proxyTags = [];
+            let outbounds = []; let proxyTags = [];
 
             currentProxies.forEach((p, index) => {
                 let tag = p.name || `proxy-${index}`;
-                proxyTags.push(tag);
-                let ob = { tag: tag };
+                proxyTags.push(tag); let ob = { tag: tag };
 
                 if (p.type === 'vless') {
                     ob.protocol = "vless";
                     ob.settings = { vnext: [{ address: p.server, port: p.port, users: [{ id: p.uuid, encryption: "none", flow: p.flow || "" }] }] };
                     ob.streamSettings = { network: p.network || "tcp", security: p.tls ? "reality" : "none" };
-                    if (p.tls && p["reality-opts"]) {
-                        ob.streamSettings.realitySettings = {
-                            serverName: p.sni || p.server, show: false,
-                            publicKey: p["reality-opts"]["public-key"], shortId: p["reality-opts"]["short-id"] || "", fingerprint: p.fp || "chrome"
-                        };
-                    }
+                    if (p.tls && p["reality-opts"]) ob.streamSettings.realitySettings = { serverName: p.sni || p.server, show: false, publicKey: p["reality-opts"]["public-key"], shortId: p["reality-opts"]["short-id"] || "", fingerprint: p.fp || "chrome" };
                 } else if (p.type === 'vmess') {
                     ob.protocol = "vmess";
                     ob.settings = { vnext: [{ address: p.server, port: p.port, users: [{ id: p.uuid, alterId: parseInt(p.aid) || 0, security: "auto" }] }] };
@@ -458,6 +481,9 @@ tuic://..."></textarea>
                 } else if (p.type === 'ss') {
                     ob.protocol = "shadowsocks";
                     ob.settings = { servers: [{ address: p.server, port: p.port, method: p.cipher, password: p.password }] };
+                } else if (p.type === 'ssr') {
+                    ob.protocol = "shadowsocksr";
+                    ob.settings = { servers: [{ address: p.server, port: p.port, method: p.cipher, password: p.password, protocol: p.protocol, obfs: p.obfs }] };
                 } else if (p.type === 'trojan') {
                     ob.protocol = "trojan";
                     ob.settings = { servers: [{ address: p.server, port: p.port, password: p.password }] };
@@ -468,6 +494,16 @@ tuic://..."></textarea>
                 } else if (p.type === 'tuic') {
                     ob.protocol = "tuic";
                     ob.settings = { users: [{ uuid: p.uuid, password: p.password }] }; 
+                } else if (p.type === 'wg') {
+                    ob.protocol = "wireguard";
+                    ob.settings = { secretKey: p["private-key"], peers: [{ endpoint: p.server + ":" + p.port, publicKey: p["public-key"] }], localAddress: [p.ip] };
+                    if (p.reserved) ob.settings.reserved = p.reserved.split(',').map(Number);
+                } else if (p.type === 'socks') {
+                    ob.protocol = "socks";
+                    ob.settings = { servers: [{ address: p.server, port: p.port, users: p.username ? [{ user: p.username, pass: p.password }] : [] }] };
+                } else if (p.type === 'http') {
+                    ob.protocol = "http";
+                    ob.settings = { servers: [{ address: p.server, port: p.port, users: p.username ? [{ user: p.username, pass: p.password }] : [] }] };
                 }
                 outbounds.push(ob);
             });
@@ -502,15 +538,16 @@ tuic://..."></textarea>
         }
 
         // =========================================================================
-        // === ВШИТЫЙ ULTIMATE-КОНФИГ ДЛЯ FLCLASH (МОНОЛИТ) ===
+        // === ВШИТЫЙ ULTIMATE-КОНФИГ ДЛЯ FLCLASH ===
         // =========================================================================
         function generateYAML(profileType) {
             if (currentProxies.length === 0) return;
 
             let proxiesYAML = "proxies:\n";
             currentProxies.forEach(p => {
-                proxiesYAML += `  - name: "${p.name}"\n    type: ${p.type}\n    server: ${p.server}\n    port: ${p.port}\n    udp: true\n`;
+                proxiesYAML += `  - name: "${p.name}"\n    server: ${p.server}\n    port: ${p.port}\n`;
                 if (p.type === 'vless' || p.type === 'trojan') {
+                    proxiesYAML += `    type: ${p.type}\n    udp: true\n`;
                     if (p.uuid) proxiesYAML += `    uuid: ${p.uuid}\n`;
                     if (p.password) proxiesYAML += `    password: ${p.password}\n`;
                     if (p.network) proxiesYAML += `    network: ${p.network}\n`;
@@ -518,16 +555,27 @@ tuic://..."></textarea>
                     if (p.tls) proxiesYAML += `    tls: true\n    sni: ${p.sni}\n    client-fingerprint: ${p.fp}\n`;
                     if (p["reality-opts"]) proxiesYAML += `    reality-opts:\n      public-key: ${p["reality-opts"]["public-key"]}\n      short-id: ${p["reality-opts"]["short-id"]}\n`;
                 } else if (p.type === 'vmess') {
-                    proxiesYAML += `    uuid: ${p.uuid}\n    alterId: ${p.aid}\n    cipher: auto\n    network: ${p.network}\n`;
+                    proxiesYAML += `    type: vmess\n    udp: true\n    uuid: ${p.uuid}\n    alterId: ${p.aid}\n    cipher: auto\n    network: ${p.network}\n`;
                     if (p.tls) proxiesYAML += `    tls: true\n    sni: ${p.sni}\n`;
                 } else if (p.type === 'ss') {
-                    proxiesYAML += `    cipher: ${p.cipher}\n    password: ${p.password}\n`;
+                    proxiesYAML += `    type: ss\n    udp: true\n    cipher: ${p.cipher}\n    password: ${p.password}\n`;
+                } else if (p.type === 'ssr') {
+                    proxiesYAML += `    type: ssr\n    udp: true\n    cipher: ${p.cipher}\n    password: ${p.password}\n    protocol: ${p.protocol}\n    obfs: ${p.obfs}\n`;
                 } else if (p.type === 'hysteria2') {
-                    proxiesYAML += `    password: ${p.password}\n    sni: ${p.sni}\n`;
+                    proxiesYAML += `    type: hysteria2\n    password: ${p.password}\n    sni: ${p.sni}\n`;
                     if (p["skip-cert-verify"]) proxiesYAML += `    skip-cert-verify: true\n`;
                     if (p.obfs) proxiesYAML += `    obfs: ${p.obfs}\n    obfs-password: ${p["obfs-password"]}\n`;
                 } else if (p.type === 'tuic') {
-                    proxiesYAML += `    uuid: ${p.uuid}\n    password: ${p.password}\n    sni: ${p.sni}\n    udp-relay-mode: native\n`;
+                    proxiesYAML += `    type: tuic\n    uuid: ${p.uuid}\n    password: ${p.password}\n    sni: ${p.sni}\n    udp-relay-mode: native\n`;
+                } else if (p.type === 'wg') {
+                    proxiesYAML += `    type: wireguard\n    ip: ${p.ip}\n    public-key: ${p["public-key"]}\n    private-key: ${p["private-key"]}\n    udp: true\n`;
+                    if (p.reserved) proxiesYAML += `    reserved: [${p.reserved}]\n`;
+                } else if (p.type === 'socks') {
+                    proxiesYAML += `    type: socks5\n    udp: true\n`;
+                    if (p.username) proxiesYAML += `    username: ${p.username}\n    password: ${p.password}\n`;
+                } else if (p.type === 'http') {
+                    proxiesYAML += `    type: http\n`;
+                    if (p.username) proxiesYAML += `    username: ${p.username}\n    password: ${p.password}\n`;
                 }
             });
 
@@ -1553,7 +1601,7 @@ rules:
             const content = document.getElementById('output').textContent;
             const format = document.getElementById('exportFormat').value;
             const ext = format === 'xray' ? 'json' : 'yaml';
-            const filename = `Network_Config_v6.${ext}`;
+            const filename = `Network_Config_v7.${ext}`;
             const blob = new Blob([content], { type: format === 'xray' ? 'application/json' : 'text/yaml' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
