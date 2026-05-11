@@ -22,7 +22,7 @@
             border: 1px solid #30363d;
             border-radius: 12px;
             padding: 30px;
-            max-width: 750px;
+            max-width: 800px;
             width: 100%;
             box-shadow: 0 8px 24px rgba(0,0,0,0.5);
         }
@@ -75,9 +75,76 @@
         .btn-convert { background: #238636; color: #ffffff; }
         .btn-convert:hover { background: #2ea043; }
 
-        .btn-copy { background: #21262d; color: #c9d1d9; border: 1px solid #30363d; }
+        .btn-copy { background: #21262d; color: #c9d1d9; border: 1px solid #30363d; display: none; }
         .btn-download { background: #58a6ff; color: #ffffff; display: none; }
         .btn-download:hover { background: #79c0ff; }
+
+        /* --- Стили для карточек серверов --- */
+        .cards-grid {
+            display: none;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+            max-height: 250px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        
+        .cards-grid::-webkit-scrollbar { width: 6px; }
+        .cards-grid::-webkit-scrollbar-track { background: #0d1117; border-radius: 3px; }
+        .cards-grid::-webkit-scrollbar-thumb { background: #30363d; border-radius: 3px; }
+
+        .proxy-card {
+            background: #1c2128;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 12px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            transition: border-color 0.2s;
+        }
+        .proxy-card:hover { border-color: #58a6ff; }
+        
+        .proxy-name { 
+            font-weight: bold; 
+            color: #58a6ff; 
+            font-size: 13px; 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            padding-right: 25px; /* место для крестика */
+        }
+        
+        .proxy-detail { font-size: 11px; color: #8b949e; }
+        
+        .proxy-type { 
+            display: inline-block; 
+            background: #238636; 
+            color: white; 
+            padding: 2px 6px; 
+            border-radius: 4px; 
+            font-size: 10px; 
+            font-weight: bold; 
+            text-transform: uppercase; 
+            margin-right: 5px;
+        }
+        
+        .btn-remove {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #30363d;
+            color: #f85149;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            padding: 4px 6px;
+            line-height: 1;
+        }
+        .btn-remove:hover { background: #f85149; color: white; }
 
         pre { 
             background: #0d1117; 
@@ -111,7 +178,7 @@
         
         <div class="btn-group">
             <button class="btn-convert" onclick="startProcess()">► КОНВЕРТИРОВАТЬ</button>
-            <button class="btn-copy" onclick="copyResult()">⎘ КОПИРОВАТЬ</button>
+            <button id="copyBtn" class="btn-copy" onclick="copyResult()">⎘ КОПИРОВАТЬ</button>
             
             <select id="extension">
                 <option value="yaml">.yaml</option>
@@ -122,18 +189,21 @@
             <button id="downloadBtn" class="btn-download" onclick="downloadFile()">⬇ СКАЧАТЬ ФАЙЛ</button>
         </div>
         
+        <div id="cardsContainer" class="cards-grid"></div>
+        
         <pre id="output">Здесь появится готовый конфиг...</pre>
 
         <div class="hint">
-            <strong>Совет:</strong> После появления результата выберите формат и нажмите «Скачать», чтобы сохранить файл для импорта во FlClash.
+            <strong>Совет:</strong> Вы можете удалить ненужные серверы из списка, нажав на ❌. Код ниже обновится автоматически!
         </div>
     </div>
 
     <script>
+        let currentProxies = []; // Храним сервера здесь
+
         async function startProcess() {
             const input = document.getElementById('input').value.trim();
             const out = document.getElementById('output');
-            const dlBtn = document.getElementById('downloadBtn');
 
             if (!input) { out.textContent = "Пустое поле!"; return; }
 
@@ -150,9 +220,7 @@
 
         function parseData(rawText) {
             let text = rawText.trim();
-            const out = document.getElementById('output');
-            const dlBtn = document.getElementById('downloadBtn');
-            let proxies = [];
+            currentProxies = []; // Очищаем старые перед новым парсингом
 
             if (!text.includes('vless://') && !text.includes('"outbounds"')) {
                 try { text = atob(text.replace(/\s/g, '')); } catch (e) {}
@@ -166,8 +234,8 @@
                         try {
                             const url = new URL(line);
                             const params = new URLSearchParams(url.search);
-                            proxies.push({
-                                name: decodeURIComponent(url.hash.slice(1)) || "Server_" + Math.floor(Math.random()*100),
+                            currentProxies.push({
+                                name: decodeURIComponent(url.hash.slice(1)) || "Server_" + Math.floor(Math.random()*1000),
                                 type: "vless",
                                 server: url.hostname,
                                 port: parseInt(url.port),
@@ -184,20 +252,58 @@
                 });
             }
 
-            if (proxies.length > 0) {
-                let yaml = "proxies:\n";
-                proxies.forEach(p => {
-                    yaml += `  - name: "${p.name}"\n    type: ${p.type}\n    server: ${p.server}\n    port: ${p.port}\n    uuid: ${p.uuid}\n    network: ${p.network}\n    udp: true\n`;
-                    if (p.flow) yaml += `    flow: ${p.flow}\n`;
-                    if (p.tls) yaml += `    tls: true\n    sni: ${p.sni}\n    client-fingerprint: ${p.fp}\n`;
-                    if (p["reality-opts"]) yaml += `    reality-opts:\n      public-key: ${p["reality-opts"]["public-key"]}\n      short-id: ${p["reality-opts"]["short-id"]}\n`;
+            renderCards(); // Рисуем интерфейс
+        }
+
+        function renderCards() {
+            const container = document.getElementById('cardsContainer');
+            const out = document.getElementById('output');
+            const dlBtn = document.getElementById('downloadBtn');
+            const copyBtn = document.getElementById('copyBtn');
+
+            container.innerHTML = ''; // Чистим контейнер
+
+            if (currentProxies.length > 0) {
+                // Создаем карточку для каждого сервера
+                currentProxies.forEach((p, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'proxy-card';
+                    card.innerHTML = `
+                        <button class="btn-remove" onclick="removeProxy(${index})" title="Удалить">✖</button>
+                        <div class="proxy-name" title="${p.name}">${p.name}</div>
+                        <div class="proxy-detail"><span class="proxy-type">${p.type}</span> ${p.server}:${p.port}</div>
+                    `;
+                    container.appendChild(card);
                 });
-                out.textContent = yaml;
-                dlBtn.style.display = "inline-block"; // Показываем кнопку скачивания
+                
+                generateYAML(); // Обновляем код
+                container.style.display = 'grid';
+                dlBtn.style.display = "inline-block";
+                copyBtn.style.display = "inline-block";
             } else {
-                out.textContent = "❌ Серверы не найдены.";
+                container.style.display = 'none';
+                out.textContent = "❌ Серверы не найдены или все удалены.";
                 dlBtn.style.display = "none";
+                copyBtn.style.display = "none";
             }
+        }
+
+        // Функция удаления сервера по его индексу в массиве
+        function removeProxy(index) {
+            currentProxies.splice(index, 1); // Удаляем 1 элемент
+            renderCards(); // Перерисовываем всё заново
+        }
+
+        function generateYAML() {
+            const out = document.getElementById('output');
+            let yaml = "proxies:\n";
+            currentProxies.forEach(p => {
+                yaml += `  - name: "${p.name}"\n    type: ${p.type}\n    server: ${p.server}\n    port: ${p.port}\n    uuid: ${p.uuid}\n    network: ${p.network}\n    udp: true\n`;
+                if (p.flow) yaml += `    flow: ${p.flow}\n`;
+                if (p.tls) yaml += `    tls: true\n    sni: ${p.sni}\n    client-fingerprint: ${p.fp}\n`;
+                if (p["reality-opts"]) yaml += `    reality-opts:\n      public-key: ${p["reality-opts"]["public-key"]}\n      short-id: ${p["reality-opts"]["short-id"]}\n`;
+            });
+            out.textContent = yaml;
         }
 
         function downloadFile() {
@@ -222,7 +328,7 @@
             const text = document.getElementById('output').textContent;
             if (text.includes('proxies:')) {
                 navigator.clipboard.writeText(text);
-                const btn = document.querySelector('.btn-copy');
+                const btn = document.getElementById('copyBtn');
                 btn.textContent = "✓ СКОПИРОВАНО";
                 setTimeout(() => btn.textContent = "⎘ КОПИРОВАТЬ", 2000);
             }
