@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#0d1117">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Network Builder v15.2</title>
+    <title>Network Builder v15.3</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
@@ -65,26 +65,24 @@
         .editor-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
         .editor-header span{font-size:12px;color:#8b949e;font-weight:bold;text-transform:uppercase;}
         
-        /* Умные Уведомления */
         #toast{visibility:hidden;min-width:250px;color:white;text-align:center;border-radius:8px;padding:12px 20px;position:fixed;z-index:9999;bottom:30px;left:50%;transform:translateX(-50%);font-size:13px;font-weight:bold;opacity:0;transition:0.3s;box-shadow:0 8px 24px rgba(0,0,0,0.6);}
         #toast.show{visibility:visible;opacity:1;}
 
-        /* Модальные окна */
         .modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:100;justify-content:center;align-items:center;}
-        .modal-content{background:#161b22;padding:25px;border-radius:12px;border:1px solid #30363d;text-align:center;max-width:420px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,0.8); max-height: 80vh; overflow-y: auto;}
-        .modal-close{background:#f85149;color:white;border:none;padding:10px 16px;border-radius:6px;cursor:pointer;margin-top:15px;width:100%;font-weight:bold;}
+        .modal-content{background:#161b22;padding:25px;border-radius:12px;border:1px solid #30363d;text-align:left;max-width:420px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,0.8); max-height: 80vh; overflow-y: auto;}
+        .modal-close{background:#f85149;color:white;border:none;padding:10px 16px;border-radius:6px;cursor:pointer;margin-top:15px;width:100%;font-weight:bold;text-align:center;}
         .btn-copy{background:#21262d;color:#c9d1d9;border:1px solid #30363d;transition:0.2s;} .btn-copy:hover{background:#30363d;}
         .btn-download{background:#58a6ff;color:#ffffff;transition:0.2s;} .btn-download:hover{background:#79c0ff;}
 
         .tooltip { position: relative; display: inline-block; cursor: help; border-bottom: 1px dotted #8b949e; }
-        .tooltip .tooltiptext { visibility: hidden; width: 240px; background-color: #21262d; color: #c9d1d9; text-align: center; border-radius: 6px; padding: 10px; border: 1px solid #30363d; position: absolute; z-index: 1; bottom: 125%; left: 50%; transform: translateX(-50%); opacity: 0; transition: opacity 0.3s; font-size: 11px; font-weight: normal; font-family: sans-serif; line-height: 1.4; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+        .tooltip .tooltiptext { visibility: hidden; width: 260px; background-color: #21262d; color: #c9d1d9; text-align: center; border-radius: 6px; padding: 10px; border: 1px solid #30363d; position: absolute; z-index: 1; bottom: 125%; left: 50%; transform: translateX(-50%); opacity: 0; transition: opacity 0.3s; font-size: 11px; font-weight: normal; font-family: sans-serif; line-height: 1.4; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
         .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
     </style>
 </head>
 <body>
     <div class="container">
         <h2>
-            <div>⚡ Network Builder <span style="color:#8b949e; font-size:16px;">v15.2 Code Review</span></div>
+            <div>⚡ Network Builder <span style="color:#8b949e; font-size:16px;">v15.3 Fix</span></div>
             <div class="badges-wrapper">
                 <div class="version-badge" id="mihomoVersion" title="Версия ядра Mihomo">⏳ Ядро...</div>
                 <div class="version-badge" id="rulesVersion" style="color:#58a6ff;" title="Базы обхода блокировок">🛡️ Базы...</div>
@@ -92,7 +90,7 @@
             
             <div class="header-actions">
                 <button class="icon-btn primary tooltip" onclick="pingAll()">⚡ Ping All
-                    <span class="tooltiptext">Используется HTTP/TCP ping (fetch), а не ICMP. Серверы без открытых 80/443 портов могут отображаться как Err или Stealth, оставаясь при этом рабочими.</span>
+                    <span class="tooltiptext">Используется HTTP/TCP (fetch), а не ICMP. Серверы без открытых web-портов могут отображаться как Err или Stealth, оставаясь при этом рабочими.</span>
                 </button>
                 <button class="icon-btn" onclick="cleanDeadNodes()" style="border-color:#f85149; color:#f85149;">🧹 Удалить мертвые</button>
                 <button class="icon-btn" onclick="sortProxies()">📶 Сорт.</button>
@@ -106,7 +104,7 @@
         
         <div class="input-group">
             <textarea id="input" placeholder="Перетащите файл (.txt / .json) в это окно.
-Или вставьте массив ссылок (поддерживается автоматическая расшифровка Base64 подписок)."></textarea>
+Или вставьте массив ссылок (поддерживается расшифровка Base64 подписок)."></textarea>
             <button class="paste-btn" onclick="pasteFromClipboard()" title="Вставить из буфера">
                 <span>📋</span>Paste
             </button>
@@ -171,15 +169,15 @@
     <div id="toast">✅ Done!</div>
 
     <div id="qrModal" class="modal-overlay" onclick="closeQR(event)">
-        <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-content" onclick="event.stopPropagation(); text-align:center;">
             <h3 style="margin-top:0; color:#58a6ff;" id="qrTitle">QR Code</h3>
             <canvas id="qrCanvas" style="background:white; padding:10px; border-radius:8px; margin: 0 auto; display: block;"></canvas>
-            <button class="modal-close" onclick="closeQR()">Закрыть</button>
+            <button class="modal-close" style="text-align:center;" onclick="closeQR()">Закрыть</button>
         </div>
     </div>
 
     <div id="massEditModal" class="modal-overlay" onclick="closeMassEditModal(event)">
-        <div class="modal-content" onclick="event.stopPropagation()" style="text-align:left;">
+        <div class="modal-content" onclick="event.stopPropagation()">
             <h3 style="margin-top:0; color:#d29922; text-align:center;">✏️ Mass Editor</h3>
             <p style="font-size:12px; margin-bottom:15px; text-align:center; color:#8b949e;">Массовое изменение VLESS / Trojan</p>
             <div style="margin-bottom:12px;">
@@ -206,7 +204,7 @@
             </div>
             <div style="display:flex; gap:10px;">
                 <button class="action-btn btn-convert" style="margin-bottom:0; background:#d29922;" onclick="applyMassEdit()">ПРИМЕНИТЬ</button>
-                <button class="modal-close" style="margin-top:0; background:#30363d;" onclick="closeMassEditModal()">Отмена</button>
+                <button class="modal-close" style="margin-top:0; background:#30363d; text-align:center;" onclick="closeMassEditModal()">Отмена</button>
             </div>
         </div>
     </div>
@@ -215,7 +213,7 @@
         <div class="modal-content">
             <h3 style="margin-top:0; color:#f85149; text-align:center;">⚠️ Внимание!</h3>
             <div id="errorModalMsg" style="font-size:12px; color:#c9d1d9; text-align:left; line-height: 1.5; background:#0d1117; padding:10px; border-radius:6px; border:1px solid #30363d; overflow-x:auto;"></div>
-            <button class="modal-close" onclick="document.getElementById('errorModal').style.display='none'">Понятно</button>
+            <button class="modal-close" style="text-align:center;" onclick="document.getElementById('errorModal').style.display='none'">Понятно</button>
         </div>
     </div>
 
@@ -236,17 +234,22 @@
         function showToast(msg, type="success") {
             const t = document.getElementById("toast");
             t.innerHTML = msg; 
-            t.className = "show";
+            t.classList.add("show");
             
             // Чистое управление цветом через inline стили
             t.style.background = type === "error" ? "#f85149" : (type === "warning" ? "#d29922" : "#238636");
             t.style.color = type === "warning" ? "#0d1117" : "#ffffff";
             
-            setTimeout(() => { t.className = t.className.replace("show", "").trim(); }, 3500);
+            setTimeout(() => { t.classList.remove("show"); }, 3500);
         }
 
-        // === БАЗОВЫЕ ПРАВИЛА МАРШРУТИЗАЦИИ ===
+        // === DRY КОНСТАНТЫ СЖАТЫХ ПРАВИЛ МАРШРУТИЗАЦИИ (v77.0) ===
         let currentProxies = []; 
+        
+        // Массивы сжаты для компактности
+        const f_ip_f = ['+.stun.*.*', '+.time.*.*', '+.ntp.*.*', 'mtalk.google.com', 'wifi.vivo.com.cn', 'netcheck.vivo.com.cn', 'captive.apple.com', '+.msftconnecttest.com', '+.msftncsi.com', 'connectivitycheck.gstatic.com', 'cp.cloudflare.com', '+.lan', '+.local', '+.рф', '+.su', '+.yandex.ru', '+.yandex.net', '+.yandex.com', '+.ya.ru', '+.vk.com', '+.mail.ru', '+.ok.ru', '+.dzen.ru', '+.gosuslugi.ru', '+.nalog.gov.ru', '+.sberbank.ru', '+.vtb.ru', '+.ozon.ru', '+.wildberries.ru', '+.avito.ru', '+.mts.ru', '+.beeline.ru', '+.megafon.ru', '+.vkvideo.ru', '+.okko.tv', '+.kinopoisk.ru', '+.rutube.ru', '+.speedtest.net', '+.openai.com', '+.chatgpt.com', '+.deepseek.com', '+.telegram.org', '+.t.me', '+.tiktokv.com'];
+        const fb_f_dom = ['+.google.com', '+.youtube.com', '+.instagram.com', '+.twitter.com', '+.github.com'];
+        const s_dom = ['*.msftconnecttest.com', '*.openai.com', '*.chatgpt.com', '*.apple.com', '*.dobro.ru'];
         
         const YAML_RULES_BASE = `rule-providers:
   adblock-rules:
@@ -302,63 +305,16 @@ dns:
   prefer-h3: false         
   cache-algorithm: arc
   cache-capacity: 4096
-  fake-ip-filter:
-    - '+.stun.*.*'
-    - '+.time.*.*'
-    - '+.ntp.*.*'
-    - 'mtalk.google.com'
-    - 'wifi.vivo.com.cn'
-    - 'netcheck.vivo.com.cn'
-    - 'captive.apple.com'
-    - '+.msftconnecttest.com'
-    - '+.msftncsi.com'
-    - 'connectivitycheck.gstatic.com'
-    - 'cp.cloudflare.com'
-    - '+.lan'
-    - '+.local'
-    - '+.рф'
-    - '+.su'
-    - '+.yandex.ru'
-    - '+.yandex.net'
-    - '+.yandex.com'      
-    - '+.ya.ru'
-    - '+.vk.com'
-    - '+.mail.ru'
-    - '+.ok.ru'
-    - '+.dzen.ru'
-    - '+.gosuslugi.ru'
-    - '+.nalog.gov.ru'
-    - '+.sberbank.ru'
-    - '+.vtb.ru'
-    - '+.ozon.ru'
-    - '+.wildberries.ru'
-    - '+.avito.ru'
-    - '+.mts.ru'
-    - '+.beeline.ru'
-    - '+.megafon.ru'
-    - '+.vkvideo.ru'
-    - '+.okko.tv'
-    - '+.kinopoisk.ru'
-    - '+.rutube.ru'
-    - '+.speedtest.net'
-    - '+.openai.com'
-    - '+.chatgpt.com'
-    - '+.deepseek.com'
-    - '+.telegram.org'
-    - '+.t.me'
-    - '+.tiktokv.com'
+  fake-ip-filter: [${f_ip_f.map(s => `'${s}'`).join(', ')}]
   default-nameserver: [77.88.8.8, 8.8.8.8]
-  nameserver:
-    - https://dns.yandex.ru/dns-query
-    - https://dns.quad9.net/dns-query
-    - https://cloudflare-dns.com/dns-query
+  nameserver: [https://dns.yandex.ru/dns-query, https://dns.quad9.net/dns-query, https://cloudflare-dns.com/dns-query]
   proxy-server-nameserver: [https://1.1.1.1/dns-query, 8.8.8.8]
   fallback: [https://dns.adguard-dns.com/dns-query]
   fallback-filter:
     geoip: true
     geoip-code: RU
     ipcidr: [240.0.0.0/4]
-    domain: ['+.google.com', '+.youtube.com', '+.instagram.com', '+.twitter.com', '+.github.com']
+    domain: [${fb_f_dom.map(s => `'${s}'`).join(', ')}]
 
 sniffer:
   enable: true
@@ -368,7 +324,7 @@ sniffer:
   sniff:
     tls: {ports: [443, 8443]}
     http: {ports: [80, 8080-8880]}
-  skip-domain: ['*.msftconnecttest.com', '*.openai.com', '*.chatgpt.com', '*.apple.com', '*.dobro.ru']
+  skip-domain: [${s_dom.map(s => `'${s}'`).join(', ')}]
   skip-src-address: [fe80::/10, fc00::/7]
   skip-dst-address: [149.154.160.0/20, 91.108.4.0/22, 91.108.8.0/21, 91.108.56.0/22]`;
 
@@ -449,6 +405,7 @@ sniffer:
             catch(e) { try { return atob(str.replace(/-/g, '+').replace(/_/g, '/')); } catch(e2) { return ""; } }
         }
 
+        // Локальные флаги (fallback)
         function addGeoFlag(name) {
             const n = name.toUpperCase();
             if (n.includes('FI') || n.includes('FINLAND') || n.includes('ФИНЛЯНДИЯ') || n.includes('HELSINKI')) return '🇫🇮 ' + name.replace(/🇫🇮\s*/g, '');
@@ -469,33 +426,33 @@ sniffer:
             fetchMihomoVersion();
             fetchRulesVersion();
             
-            // Загружаем настройки редактора из localStorage
+            // Настройки (навсегда)
             if (localStorage.getItem('flclash_exportFormat')) document.getElementById('exportFormat').value = localStorage.getItem('flclash_exportFormat');
             if (localStorage.getItem('flclash_templateMode')) document.getElementById('templateMode').value = localStorage.getItem('flclash_templateMode');
             
-            // Загружаем прокси ИЗ SESSION STORAGE (чтобы переживали F5, но не забивали браузер навечно)
-            const savedProxies = sessionStorage.getItem('flclash_net_proxies_v15');
+            // Прокси и редактор (до конца сессии браузера - F5 переживет)
+            const savedProxies = sessionStorage.getItem('flclash_net_proxies_v15_3');
             if (savedProxies) currentProxies = JSON.parse(savedProxies);
             
-            const savedTpl = localStorage.getItem('flclash_net_custom_tpl_v15');
+            const savedTpl = localStorage.getItem('flclash_net_custom_tpl_v15_3');
             if(savedTpl) document.getElementById('customTemplateInput').value = savedTpl;
             
             toggleCustomTemplate();
             
             if (currentProxies.length > 0) renderCards();
             else {
-                const savedOut = localStorage.getItem('flclash_net_output_edit_v15');
+                const savedOut = sessionStorage.getItem('flclash_net_output_edit_v15_3');
                 if(savedOut) document.getElementById('outputEditor').innerText = savedOut;
             }
         };
 
         function saveState() { 
-            // СТРОГАЯ ЗАПИСЬ В SESSION STORAGE ПРИ ЛЮБОМ ИЗМЕНЕНИИ
-            sessionStorage.setItem('flclash_net_proxies_v15', JSON.stringify(currentProxies)); 
+            // СТРОГАЯ ЗАПИСЬ В SESSION STORAGE ПРИ ЛЮБОМ ИЗМЕНЕНИИ СЕРВЕРОВ
+            sessionStorage.setItem('flclash_net_proxies_v15_3', JSON.stringify(currentProxies)); 
             saveEditorState();
         }
         function saveEditorState() { 
-            localStorage.setItem('flclash_net_output_edit_v15', document.getElementById('outputEditor').innerText); 
+            sessionStorage.setItem('flclash_net_output_edit_v15_3', document.getElementById('outputEditor').innerText); 
         }
 
         // GITHUB API
@@ -574,7 +531,7 @@ sniffer:
                 } catch(err) { showToast("❌ Ошибка скачивания", "error"); }
             }
             btn.innerText = oldText;
-            localStorage.setItem('flclash_net_custom_tpl_v15', document.getElementById('customTemplateInput').value);
+            localStorage.setItem('flclash_net_custom_tpl_v15_3', document.getElementById('customTemplateInput').value);
             updateOutput(); showToast("✅ Шаблон загружен!");
         }
 
@@ -614,8 +571,8 @@ sniffer:
             if(confirm('Очистить все узлы и редактор?')) { 
                 currentProxies = []; document.getElementById('input').value = ''; 
                 document.getElementById('outputEditor').innerText = 'Ожидание данных...';
-                localStorage.removeItem('flclash_net_output_edit_v15');
-                sessionStorage.removeItem('flclash_net_proxies_v15');
+                sessionStorage.removeItem('flclash_net_proxies_v15_3');
+                sessionStorage.removeItem('flclash_net_output_edit_v15_3');
                 saveState(); renderCards(); 
             }
         }
@@ -659,7 +616,9 @@ sniffer:
             a.download = `Nodes_${Date.now()}.txt`; a.click();
         }
 
-        // === OMNI-PARSER ===
+        // =========================================================================
+        // === OMNI-PARSER (VLESS, VMESS, TROJAN, JSON, HY2, ETC) ===
+        // =========================================================================
         async function startProcess() {
             const inp = document.getElementById('input').value.trim();
             if (!inp) return showToast("Поле пустое!", "error");
@@ -677,7 +636,7 @@ sniffer:
             let text = rawText.trim();
             let added = 0;
 
-            // 1. JSON PARSING
+            // 1. JSON (Xray / Sing-box)
             if (text.startsWith('{')) {
                 try {
                     let json = JSON.parse(text);
@@ -694,6 +653,7 @@ sniffer:
                             let nn = addGeoFlag(baseRem ? (isMultiNode ? `${baseRem} (${tag})` : baseRem) : tag);
                             let p = null;
 
+                            // Xray Format
                             if (ob.protocol === 'vless' && ob.settings?.vnext?.length > 0) {
                                 let vn = ob.settings.vnext[0];
                                 let st = ob.streamSettings || {}; let re = st.realitySettings || {}; let tl = st.tlsSettings || {};
@@ -704,6 +664,7 @@ sniffer:
                                     sni: re.serverName||tl.serverName||vn.address, network: st.network||"tcp", flow: vn.users?.[0]?.flow||"", fp: re.fingerprint||tl.fingerprint||"chrome" 
                                 };
                             } 
+                            // Sing-box Format
                             else if (ob.type === 'vless') {
                                  let tl = ob.tls || {}; let re = tl.reality || {};
                                  p = { 
@@ -739,6 +700,7 @@ sniffer:
                 line = line.trim(); let p = null;
                 if(!line) return;
                 try {
+                    // VLESS PARSING
                     if (line.startsWith('vless://')) {
                         const url = new URL(line); 
                         const sp = new URLSearchParams(url.search);
@@ -749,10 +711,14 @@ sniffer:
                             "reality-opts": sp.get('pbk') ? { "public-key": sp.get('pbk'), "short-id": sp.get('sid') || "" } : null,
                             sni: sp.get('sni') || url.hostname, network: sp.get('type') || "tcp", flow: sp.get('flow') || "", fp: sp.get('fp') || "chrome", rawLink: line
                         };
-                    } else if (line.startsWith('vmess://')) {
+                    } 
+                    // VMESS PARSING
+                    else if (line.startsWith('vmess://')) {
                         let v = JSON.parse(safeB64Decode(line.slice(8)));
                         p = { name: addGeoFlag(v.ps||"VMess"), type: "vmess", server: v.add, port: parseInt(v.port), uuid: v.id, aid: v.aid||0, network: v.net||"tcp", tls: v.tls==="tls", sni: v.sni||v.host||v.add, rawLink: line };
-                    } else if (line.startsWith('ss://')) {
+                    } 
+                    // SS PARSING
+                    else if (line.startsWith('ss://')) {
                         let uri = line.slice(5); let nn = "SS";
                         if (uri.includes('#')) { let ps = uri.split('#'); nn = decodeURIComponent(ps[1]); uri = ps[0]; }
                         nn = addGeoFlag(nn);
@@ -766,14 +732,18 @@ sniffer:
                             if(dec.includes('@')){ let ps = dec.split('@'); met=ps[0].split(':')[0]; pwd=ps[0].split(':')[1]; srv=ps[1].split(':')[0]; prt=parseInt(ps[1].split(':')[1]); }
                         }
                         if(srv) p = { name: nn, type: "ss", server: srv, port: prt, cipher: met, password: pwd, rawLink: line };
-                    } else if (line.startsWith('ssr://')) {
+                    } 
+                    // SSR PARSING
+                    else if (line.startsWith('ssr://')) {
                         let ps = safeB64Decode(line.slice(6)).split(':');
                         if(ps.length>=6) {
                             let nn = "SSR"; let rem = ps[5].split('/?');
                             if(rem.length>1) { let up = new URLSearchParams(rem[1]); if(up.get('remarks')) nn=safeB64Decode(up.get('remarks')); }
                             p = { name: addGeoFlag(nn), type: "ssr", server: ps[0], port: parseInt(ps[1]), protocol: ps[2], cipher: ps[3], obfs: ps[4], password: safeB64Decode(rem[0]), rawLink: line };
                         }
-                    } else if (line.startsWith('hy2://') || line.startsWith('hysteria2://')) {
+                    } 
+                    // HY2 / TROJAN / WG / TUIC
+                    else if (line.startsWith('hy2://') || line.startsWith('hysteria2://')) {
                         let url = new URL(line); let sp = new URLSearchParams(url.search);
                         p = { name: addGeoFlag(decodeURIComponent(url.hash.slice(1))||"HY2"), type: "hysteria2", server: url.hostname, port: parseInt(url.port), password: url.username, sni: sp.get('sni')||url.hostname, "skip-cert-verify": sp.get('insecure')==='1', obfs: sp.get('obfs')||"", "obfs-password": sp.get('obfs-password')||"", rawLink: line };
                     } else if (line.startsWith('trojan://')) {
@@ -964,29 +934,17 @@ sniffer:
             saveEditorState();
         }
 
-        // === ПРЕД-ЭКСПОРТНАЯ ВАЛИДАЦИЯ (LINTER) ===
+        // === ВАЛИДАЦИЯ (LINTER) ===
         function validateOutput(content, format) {
             if (content.includes("⚠️ ОШИБКА") || content.includes("❌ Ошибка")) {
-                showToast("Сначала исправьте ошибку в шаблоне!", "error");
-                return false;
+                showToast("Сначала исправьте ошибку в шаблоне!", "error"); return false;
             }
             
             if (format.includes('clash')) {
-                if (!content.includes('proxies:')) {
-                    showDiagnosticError("В итоговом коде нет блока <b>proxies:</b>.<br>Ваш YAML сломан. Если вы правили код вручную, верните этот блок.");
-                    return false;
-                }
-                if (!content.includes('rules:')) {
-                    showDiagnosticError("В итоговом коде нет блока <b>rules:</b>.<br>Ваш YAML сломан. Если вы правили код вручную, верните этот блок.");
-                    return false;
-                }
+                if (!content.includes('proxies:')) { showDiagnosticError("В коде нет блока <b>proxies:</b>.<br>Ваш YAML сломан."); return false; }
+                if (!content.includes('rules:')) { showDiagnosticError("В коде нет блока <b>rules:</b>.<br>Ваш YAML сломан."); return false; }
             } else {
-                try {
-                    JSON.parse(content);
-                } catch (e) {
-                    showDiagnosticError(`Ошибка синтаксиса JSON в итоговом коде.<br>Вы случайно удалили скобку или запятую при ручном редактировании.<br>Детали: ${e.message}`);
-                    return false;
-                }
+                try { JSON.parse(content); } catch (e) { showDiagnosticError(`Ошибка синтаксиса JSON в итоговом коде.<br>Детали: ${e.message}`); return false; }
             }
             return true;
         }
@@ -995,20 +953,15 @@ sniffer:
             const c = document.getElementById('outputEditor').innerText;
             const f = document.getElementById('exportFormat').value;
             if (!validateOutput(c, f)) return;
-
-            const a = document.createElement('a'); 
-            a.href = URL.createObjectURL(new Blob([c], { type: f.includes('clash') ? 'text/yaml' : 'application/json' }));
-            a.download = `Config_v15.2.${f.includes('clash') ? 'yaml' : 'json'}`; 
-            a.click();
+            const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([c], { type: f.includes('clash')?'text/yaml':'application/json' }));
+            a.download = `Config_v15.2.${f.includes('clash')?'yaml':'json'}`; a.click();
         }
 
         function copyResult() {
             const c = document.getElementById('outputEditor').innerText;
             const f = document.getElementById('exportFormat').value;
             if (!validateOutput(c, f)) return;
-            
-            navigator.clipboard.writeText(c); 
-            showToast("✅ Скопировано!");
+            navigator.clipboard.writeText(c); showToast("✅ Скопировано!");
         }
     </script>
 </body>
