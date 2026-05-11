@@ -3,96 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FlClash Network Builder</title>
+    <title>Network Builder v4.0 Clean</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
 
         body { 
-            background-color: #0d1117; 
-            color: #c9d1d9; 
-            font-family: 'JetBrains Mono', monospace; 
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            padding: 40px 20px;
+            background-color: #0d1117; color: #c9d1d9; 
+            font-family: 'JetBrains Mono', monospace; margin: 0;
+            display: flex; justify-content: center; padding: 40px 20px;
         }
 
         .container {
-            background: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 12px;
-            padding: 30px;
-            max-width: 850px;
-            width: 100%;
+            background: #161b22; border: 1px solid #30363d;
+            border-radius: 12px; padding: 30px; max-width: 900px; width: 100%;
             box-shadow: 0 8px 24px rgba(0,0,0,0.5);
         }
 
         h2 { 
-            margin-top: 0; 
-            color: #58a6ff; 
-            font-size: 24px;
-            border-bottom: 1px solid #30363d;
-            padding-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            margin-top: 0; color: #58a6ff; font-size: 24px;
+            border-bottom: 1px solid #30363d; padding-bottom: 15px;
+            display: flex; justify-content: space-between; align-items: center;
         }
 
-        .header-actions { display: flex; gap: 10px; }
+        .header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
         .icon-btn {
-            background: transparent;
-            border: 1px solid #30363d;
-            color: #8b949e;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            cursor: pointer;
-            transition: 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 5px;
+            background: #21262d; border: 1px solid #30363d; color: #c9d1d9;
+            padding: 6px 12px; border-radius: 6px; font-size: 12px;
+            cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 5px;
+            font-family: inherit; font-weight: bold;
         }
-        .icon-btn:hover { background: #30363d; color: #c9d1d9; }
+        .icon-btn:hover { background: #30363d; border-color: #8b949e; }
+        .icon-btn.primary { background: #238636; border-color: #2ea043; color: white;}
+        .icon-btn.primary:hover { background: #2ea043; }
+        .icon-btn.danger { background: transparent; color: #f85149; border-color: #30363d; }
         .icon-btn.danger:hover { background: #f85149; color: white; border-color: #f85149; }
 
         p { font-size: 13px; color: #8b949e; margin-bottom: 15px; line-height: 1.6; }
 
         textarea { 
-            width: 100%; 
-            height: 120px;
-            background: #010409; 
-            color: #3fb950; 
-            border: 1px solid #30363d; 
-            border-radius: 8px;
-            padding: 15px; 
-            margin-bottom: 20px; 
-            box-sizing: border-box;
-            font-family: inherit;
-            resize: vertical;
-            outline: none;
-            transition: border-color 0.2s;
+            width: 100%; height: 100px; background: #010409; color: #3fb950; 
+            border: 2px dashed #30363d; border-radius: 8px; padding: 15px; 
+            margin-bottom: 20px; box-sizing: border-box; font-family: inherit;
+            resize: vertical; outline: none; transition: border-color 0.2s, background 0.2s;
         }
         textarea:focus { border-color: #58a6ff; }
+        textarea.dragover { border-color: #58a6ff; background: #0d1117; }
 
         .btn-group { display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap; align-items: center; }
 
-        button, select { 
-            border: none; 
-            padding: 12px 18px; 
-            border-radius: 6px; 
-            font-weight: bold; 
-            font-family: inherit;
-            cursor: pointer; 
-            transition: all 0.2s ease;
-            font-size: 13px;
+        button.action-btn, select { 
+            border: none; padding: 12px 18px; border-radius: 6px; 
+            font-weight: bold; font-family: inherit; cursor: pointer; 
+            transition: all 0.2s ease; font-size: 13px;
         }
 
         select { background: #21262d; color: #c9d1d9; border: 1px solid #30363d; outline: none; }
 
         .btn-convert { background: #238636; color: #ffffff; }
         .btn-convert:hover { background: #2ea043; }
-
         .btn-copy { background: #21262d; color: #c9d1d9; border: 1px solid #30363d; display: none; }
         .btn-download { background: #58a6ff; color: #ffffff; display: none; }
         .btn-download:hover { background: #79c0ff; }
@@ -103,49 +73,39 @@
         }
 
         .cards-grid {
-            display: none;
-            grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-            gap: 12px;
-            margin-bottom: 20px;
-            max-height: 300px;
-            overflow-y: auto;
-            padding-right: 5px;
+            display: none; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 12px; margin-bottom: 20px; max-height: 350px; overflow-y: auto; padding-right: 5px;
         }
-        
         .cards-grid::-webkit-scrollbar { width: 6px; }
         .cards-grid::-webkit-scrollbar-track { background: #010409; border-radius: 3px; }
         .cards-grid::-webkit-scrollbar-thumb { background: #30363d; border-radius: 3px; }
 
         .proxy-card {
-            background: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 8px;
-            padding: 12px;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
+            background: #161b22; border: 1px solid #30363d; border-radius: 8px;
+            padding: 12px; position: relative; display: flex; flex-direction: column; gap: 6px;
         }
         .proxy-card:hover { border-color: #58a6ff; }
         
         .proxy-name { 
-            font-weight: bold; color: #58a6ff; font-size: 13px; 
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
-            padding-right: 30px; outline: none; border-bottom: 1px dashed transparent; cursor: text;
+            font-weight: bold; color: #58a6ff; font-size: 13px; white-space: nowrap; 
+            overflow: hidden; text-overflow: ellipsis; padding-right: 80px; 
+            outline: none; border-bottom: 1px dashed transparent; cursor: text;
         }
         .proxy-name:focus { border-bottom: 1px dashed #58a6ff; }
         
-        .proxy-detail { font-size: 11px; color: #8b949e; }
+        .proxy-detail { font-size: 11px; color: #8b949e; display: flex; align-items: center; justify-content: space-between;}
         .proxy-type { 
-            display: inline-block; background: #238636; color: white; 
-            padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; 
-            text-transform: uppercase; margin-right: 5px;
+            display: inline-block; color: white; padding: 2px 6px; 
+            border-radius: 4px; font-size: 10px; font-weight: bold; text-transform: uppercase; margin-right: 5px;
         }
+        .type-vless { background: #238636; }
+        .type-hy2 { background: #8957e5; }
+        .type-trojan { background: #d29922; }
         
-        .card-actions { position: absolute; top: 8px; right: 8px; display: flex; gap: 5px; }
+        .card-actions { position: absolute; top: 8px; right: 8px; display: flex; gap: 4px; }
         .btn-card {
             background: #21262d; border: none; border-radius: 4px; cursor: pointer;
-            font-size: 12px; padding: 5px 7px; color: #c9d1d9;
+            font-size: 12px; padding: 5px 6px; color: #c9d1d9; min-width: 26px; text-align: center;
         }
         .btn-card:hover { background: #58a6ff; color: white; }
         .btn-card.remove:hover { background: #f85149; color: white; }
@@ -159,36 +119,53 @@
         #toast {
             visibility: hidden; min-width: 200px; background-color: #238636; color: #fff;
             text-align: center; border-radius: 6px; padding: 12px; position: fixed;
-            z-index: 10; bottom: 30px; left: 50%; transform: translateX(-50%); font-size: 14px;
+            z-index: 100; bottom: 30px; left: 50%; transform: translateX(-50%); font-size: 14px;
             opacity: 0; transition: opacity 0.3s, visibility 0.3s;
         }
         #toast.show { visibility: visible; opacity: 1; }
+
+        #qrModal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 50; justify-content: center; align-items: center;
+        }
+        .qr-content {
+            background: #161b22; padding: 25px; border-radius: 12px; border: 1px solid #30363d;
+            text-align: center; max-width: 300px; width: 100%;
+        }
+        .qr-close {
+            background: #f85149; color: white; border: none; padding: 8px 16px;
+            border-radius: 6px; cursor: pointer; margin-top: 15px; width: 100%; font-weight: bold;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h2>
-            ⚡ Network Builder v77
+            ⚡ Network Builder v4.0 (Clean)
             <div class="header-actions">
-                <button class="icon-btn" onclick="shuffleProxies()" title="Shuffle nodes">🔀 Shuffle</button>
-                <button class="icon-btn danger" onclick="clearAll()">🗑 Clear</button>
+                <button class="icon-btn primary" onclick="pingAll()" title="Проверить все серверы на доступность">⚡ Ping All</button>
+                <button class="icon-btn" onclick="sortProxies()" title="Отсортировать по скорости (нужно пропинговать)">📶 Sort</button>
+                <button class="icon-btn" onclick="shuffleProxies()" title="Перемешать узлы случайным образом">🔀 Shuffle</button>
+                <button class="icon-btn" onclick="exportRawNodes()" title="Сохранить сырые ссылки в TXT">📥 Backup</button>
+                <button class="icon-btn danger" onclick="clearAll()" title="Удалить всё">🗑 Clear</button>
             </div>
         </h2>
         
-        <p>Утилита для генерации профилей маршрутизации. Поддерживает vless/vmess/trojan ссылки, подписки в Base64 и формат Sing-box JSON (Happ/2RayTun).</p>
+        <p>Поддержка: VLESS, Trojan, Hysteria2. Перетащите файл со списком узлов прямо в это окно или вставьте ссылки.</p>
         
-        <textarea id="input" placeholder="Paste nodes or Sing-box JSON here..."></textarea>
+        <textarea id="input" placeholder="Drop .txt file here or paste links:&#10;vless://...&#10;hy2://..."></textarea>
         
         <div class="btn-group">
-            <button class="btn-convert" onclick="startProcess()">► BUILD CONFIG</button>
+            <button class="action-btn btn-convert" onclick="startProcess()">► BUILD CONFIG</button>
             <span id="nodeCount" class="status-badge">0 Nodes</span>
             
-            <button id="copyBtn" class="btn-copy" onclick="copyResult()" style="margin-left: auto;">⎘ COPY YAML</button>
-            <select id="extension">
-                <option value="yaml">.yaml</option>
-                <option value="yml">.yml</option>
+            <select id="deviceProfile" style="margin-left: auto;" onchange="generateYAML()">
+                <option value="mobile">📱 Mobile / PC (TUN)</option>
+                <option value="router">🌐 Router (Keenetic / OpenWRT)</option>
             </select>
-            <button id="downloadBtn" class="btn-download" onclick="downloadFile()">⬇ DOWNLOAD</button>
+            
+            <button id="copyBtn" class="action-btn btn-copy" onclick="copyResult()">⎘ COPY</button>
+            <button id="downloadBtn" class="action-btn btn-download" onclick="downloadFile()">⬇ DOWNLOAD</button>
         </div>
         
         <div id="cardsContainer" class="cards-grid"></div>
@@ -197,11 +174,35 @@
 
     <div id="toast">✅ Done!</div>
 
+    <div id="qrModal" onclick="closeQR(event)">
+        <div class="qr-content" onclick="event.stopPropagation()">
+            <h3 style="margin-top:0; color:#58a6ff;" id="qrTitle">QR Code</h3>
+            <canvas id="qrCanvas" style="background: white; padding: 10px; border-radius: 8px;"></canvas>
+            <button class="qr-close" onclick="closeQR()">Close</button>
+        </div>
+    </div>
+
     <script>
         let currentProxies = []; 
+        let cachedTemplate = null;
+
+        // DRAG AND DROP LOGIC
+        const dropZone = document.getElementById('input');
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+        dropZone.addEventListener('dragleave', (e) => { e.preventDefault(); dropZone.classList.remove('dragover'); });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length > 0) {
+                const file = e.dataTransfer.files[0];
+                const reader = new FileReader();
+                reader.onload = (event) => { dropZone.value = event.target.result; showToast("Файл прочитан!"); };
+                reader.readAsText(file);
+            }
+        });
 
         window.onload = () => {
-            const savedProxies = localStorage.getItem('flclash_net_proxies');
+            const savedProxies = localStorage.getItem('flclash_net_v4');
             if (savedProxies) {
                 currentProxies = JSON.parse(savedProxies);
                 if (currentProxies.length > 0) renderCards();
@@ -209,15 +210,13 @@
         };
 
         function saveState() {
-            localStorage.setItem('flclash_net_proxies', JSON.stringify(currentProxies));
+            localStorage.setItem('flclash_net_v4', JSON.stringify(currentProxies));
         }
 
         function clearAll() {
             if(confirm('Clear all nodes?')) {
-                currentProxies = [];
-                document.getElementById('input').value = '';
-                saveState();
-                renderCards();
+                currentProxies = []; document.getElementById('input').value = '';
+                saveState(); renderCards();
             }
         }
 
@@ -227,1275 +226,260 @@
                 const j = Math.floor(Math.random() * (i + 1));
                 [currentProxies[i], currentProxies[j]] = [currentProxies[j], currentProxies[i]];
             }
-            saveState();
-            renderCards();
-            showToast("🔀 Список узлов перемешан!");
+            saveState(); renderCards(); showToast("🔀 Nodes shuffled!");
+        }
+
+        function sortProxies() {
+            if (currentProxies.length < 2) return;
+            currentProxies.sort((a, b) => (a.lastPing === undefined ? 99999 : a.lastPing) - (b.lastPing === undefined ? 99999 : b.lastPing));
+            saveState(); renderCards(); showToast("📶 Nodes sorted by Ping!");
+        }
+
+        function exportRawNodes() {
+            if (currentProxies.length === 0) return;
+            const blob = new Blob([currentProxies.map(p => p.rawLink).join('\n')], { type: 'text/plain' });
+            const a = document.createElement('a');
+            a.href = window.URL.createObjectURL(blob);
+            a.download = `Nodes_Backup_${new Date().getTime()}.txt`;
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
         }
 
         async function startProcess() {
             const input = document.getElementById('input').value.trim();
-            const out = document.getElementById('output');
-
             if (!input) { showToast("Input is empty!", "#f85149"); return; }
-
-            if (input.startsWith('http://') || input.startsWith('https://')) {
-                out.textContent = "⏳ Fetching...";
+            if (input.startsWith('http') && !input.includes('://')) {
+                document.getElementById('output').textContent = "⏳ Fetching...";
                 try {
                     const res = await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(input));
                     parseData(await res.text());
-                } catch (e) { out.textContent = "❌ Fetch failed. Paste data manually."; }
-            } else {
-                parseData(input);
-            }
+                } catch (e) { document.getElementById('output').textContent = "❌ Fetch failed. Paste data manually."; }
+            } else { parseData(input); }
         }
 
         function parseData(rawText) {
             let text = rawText.trim();
-            let newProxiesCount = 0;
-
-            // Попытка декодировать Base64, если это не JSON и не ссылки
-            if (!text.includes('://') && !text.includes('"outbounds"') && !text.startsWith('{') && !text.startsWith('[')) {
+            if (!text.includes('://') && !text.includes('"outbounds"')) {
                 try { text = atob(text.replace(/\s/g, '')); } catch (e) {}
             }
 
-            // 1. ПАРСЕР SING-BOX JSON
-            if (text.includes('"outbounds"') || text.startsWith('{') || text.startsWith('[')) {
-                try {
-                    const data = JSON.parse(text);
-                    const outbounds = data.outbounds || (Array.isArray(data) ? data : [data]);
-                    
-                    outbounds.forEach(ob => {
-                        if (!ob || !ob.server) return;
-                        
-                        const isSupported = ['vless', 'vmess', 'trojan', 'hysteria2'].includes(ob.type);
-                        if (isSupported) {
-                            const isDuplicate = currentProxies.some(p => p.server === ob.server && p.port === ob.server_port);
-                            if (!isDuplicate) {
-                                let proxy = {
-                                    name: ob.tag || `${ob.type}_${ob.server}`,
-                                    type: ob.type,
-                                    server: ob.server,
-                                    port: ob.server_port,
-                                    udp: true
-                                };
-
-                                if (ob.type === 'vless' || ob.type === 'vmess') proxy.uuid = ob.uuid;
-                                if (ob.type === 'trojan' || ob.type === 'hysteria2') proxy.password = ob.password;
-                                if (ob.type === 'vless' && ob.flow) proxy.flow = ob.flow;
-                                
-                                if (ob.type === 'vmess') {
-                                    proxy.alterId = ob.alter_id || 0;
-                                    proxy.cipher = ob.security || "auto";
-                                }
-
-                                if (ob.type === 'hysteria2') {
-                                    proxy.sni = ob.tls?.server_name || ob.server;
-                                    proxy['skip-cert-verify'] = ob.tls?.insecure || false;
-                                    if (ob.obfs) {
-                                        proxy.obfs = ob.obfs.type;
-                                        proxy['obfs-password'] = ob.obfs.password;
-                                    }
-                                }
-
-                                // Парсинг TLS & Reality
-                                if (ob.tls && ob.tls.enabled !== false && ob.type !== 'hysteria2') {
-                                    proxy.tls = true;
-                                    proxy.sni = ob.tls.server_name || ob.server;
-                                    proxy['skip-cert-verify'] = ob.tls.insecure || false;
-                                    proxy.fp = ob.tls.utls?.fingerprint || "chrome";
-                                    
-                                    if (ob.tls.reality && ob.tls.reality.enabled) {
-                                        proxy['reality-opts'] = {
-                                            'public-key': ob.tls.reality.public_key || "",
-                                            'short-id': ob.tls.reality.short_id || ""
-                                        };
-                                    }
-                                }
-
-                                // Парсинг Transport
-                                if (ob.transport) {
-                                    proxy.network = ob.transport.type;
-                                    if (proxy.network === 'ws') {
-                                        proxy['ws-opts'] = { path: ob.transport.path || "/" };
-                                        if (ob.transport.headers) proxy['ws-opts'].headers = { Host: ob.transport.headers.Host || ob.transport.headers.host || ob.server };
-                                    } else if (proxy.network === 'grpc') {
-                                        proxy['grpc-opts'] = { 'grpc-service-name': ob.transport.service_name || "" };
-                                    } else if (['httpupgrade', 'xhttp', 'splithttp'].includes(proxy.network)) {
-                                        proxy.network = 'xhttp';
-                                        proxy['xhttp-opts'] = { path: ob.transport.path || "/" };
-                                    }
-                                } else if (!proxy.network && ob.type !== 'hysteria2') {
-                                    proxy.network = "tcp";
-                                }
-
-                                currentProxies.push(proxy);
-                                newProxiesCount++;
-                            }
-                        }
-                    });
-                } catch (e) { console.error("JSON Error:", e); }
-            }
-
-            // 2. ПАРСЕР ССЫЛОК (vless://)
-            const lines = text.split('\n');
-            lines.forEach(line => {
+            let newProxiesCount = 0;
+            text.split('\n').forEach(line => {
                 line = line.trim();
-                if (line.startsWith('vless://')) {
-                    try {
-                        const url = new URL(line);
-                        const params = new URLSearchParams(url.search);
-                        const isDuplicate = currentProxies.some(p => p.server === url.hostname && p.port === parseInt(url.port));
-                        
-                        if (!isDuplicate) {
-                            currentProxies.push({
-                                name: decodeURIComponent(url.hash.slice(1)) || "Node_" + Math.floor(Math.random()*100),
-                                type: "vless",
-                                server: url.hostname,
-                                port: parseInt(url.port),
-                                uuid: url.username,
-                                tls: params.get('security') === 'reality' || params.get('security') === 'tls',
-                                "reality-opts": params.get('pbk') ? { "public-key": params.get('pbk'), "short-id": params.get('sid') || "" } : undefined,
-                                sni: params.get('sni') || url.hostname,
-                                network: params.get('type') || "tcp",
-                                flow: params.get('flow') || "",
-                                fp: params.get('fp') || "chrome"
-                            });
-                            newProxiesCount++;
-                        }
-                    } catch (e) {}
-                }
+                let proxyObj = null;
+                try {
+                    if (line.startsWith('vless://')) {
+                        const url = new URL(line); const p = new URLSearchParams(url.search);
+                        proxyObj = {
+                            name: decodeURIComponent(url.hash.slice(1)) || "VLESS_" + Math.floor(Math.random()*100),
+                            type: "vless", server: url.hostname, port: parseInt(url.port), uuid: url.username,
+                            tls: p.get('security') === 'reality' || p.get('security') === 'tls',
+                            "reality-opts": p.get('pbk') ? { "public-key": p.get('pbk'), "short-id": p.get('sid') || "" } : undefined,
+                            sni: p.get('sni') || url.hostname, network: p.get('type') || "tcp", flow: p.get('flow') || "", fp: p.get('fp') || "chrome", rawLink: line
+                        };
+                    } else if (line.startsWith('hy2://') || line.startsWith('hysteria2://')) {
+                        const url = new URL(line); const p = new URLSearchParams(url.search);
+                        proxyObj = {
+                            name: decodeURIComponent(url.hash.slice(1)) || "HY2_" + Math.floor(Math.random()*100),
+                            type: "hysteria2", server: url.hostname, port: parseInt(url.port), password: url.username,
+                            sni: p.get('sni') || url.hostname, "skip-cert-verify": p.get('insecure') === '1',
+                            obfs: p.get('obfs') || undefined, "obfs-password": p.get('obfs-password') || undefined, rawLink: line
+                        };
+                    } else if (line.startsWith('trojan://')) {
+                        const url = new URL(line); const p = new URLSearchParams(url.search);
+                        proxyObj = {
+                            name: decodeURIComponent(url.hash.slice(1)) || "Trojan_" + Math.floor(Math.random()*100),
+                            type: "trojan", server: url.hostname, port: parseInt(url.port), password: url.username,
+                            tls: true, sni: p.get('sni') || url.hostname, network: p.get('type') || "tcp", fp: p.get('fp') || "chrome", rawLink: line
+                        };
+                    }
+                    if (proxyObj && !currentProxies.some(p => p.server === proxyObj.server && p.port === proxyObj.port)) {
+                        currentProxies.push(proxyObj); newProxiesCount++;
+                    }
+                } catch (e) {}
             });
 
-            if (newProxiesCount > 0) {
-                document.getElementById('input').value = '';
-                showToast(`+${newProxiesCount} nodes added`);
-            } else {
-                showToast("No new valid nodes found.", "#d29922");
+            if (newProxiesCount > 0) { document.getElementById('input').value = ''; showToast(`+${newProxiesCount} nodes added`); } 
+            else { showToast("No valid new nodes found.", "#d29922"); }
+            saveState(); renderCards();
+        }
+
+        async function pingNode(index, button) {
+            button.textContent = "⏳";
+            const start = performance.now();
+            try {
+                await fetch(`https://${currentProxies[index].server}:${currentProxies[index].port}`, { mode: 'no-cors', cache: 'no-store', signal: AbortSignal.timeout(3000) });
+                const ping = Math.round(performance.now() - start);
+                button.textContent = `${ping}ms`; button.style.color = "#3fb950"; currentProxies[index].lastPing = ping;
+            } catch (e) {
+                button.textContent = "Err"; button.style.color = "#f85149"; currentProxies[index].lastPing = 99999;
             }
             saveState();
-            renderCards();
         }
+
+        async function pingAll() {
+            if (currentProxies.length === 0) return;
+            showToast("⏳ Testing all nodes...", "#d29922");
+            const buttons = document.querySelectorAll('.btn-ping');
+            await Promise.all(currentProxies.map((_, i) => buttons[i] ? pingNode(i, buttons[i]) : Promise.resolve()));
+            showToast("✅ All tests completed!");
+        }
+
+        function showQR(index) {
+            document.getElementById('qrTitle').textContent = currentProxies[index].name;
+            new QRious({ element: document.getElementById('qrCanvas'), value: currentProxies[index].rawLink, size: 250, background: 'white', foreground: 'black' });
+            document.getElementById('qrModal').style.display = 'flex';
+        }
+        function closeQR(e) { if (!e || e.target.id === 'qrModal') document.getElementById('qrModal').style.display = 'none'; }
 
         function renderCards() {
             const container = document.getElementById('cardsContainer');
-            const dlBtn = document.getElementById('downloadBtn');
-            const copyBtn = document.getElementById('copyBtn');
-            const nodeBadge = document.getElementById('nodeCount');
-
             container.innerHTML = ''; 
 
             if (currentProxies.length > 0) {
-                nodeBadge.style.display = "inline-flex";
-                nodeBadge.textContent = `${currentProxies.length} Nodes`;
+                document.getElementById('nodeCount').style.display = "inline-flex";
+                document.getElementById('nodeCount').textContent = `${currentProxies.length} Nodes`;
 
                 currentProxies.forEach((p, index) => {
-                    const card = document.createElement('div');
-                    card.className = 'proxy-card';
+                    let pingLabel = p.lastPing === undefined ? "⚡" : (p.lastPing === 99999 ? "Err" : `${p.lastPing}ms`);
+                    let pingColor = p.lastPing === undefined ? "#c9d1d9" : (p.lastPing === 99999 ? "#f85149" : "#3fb950");
+                    const card = document.createElement('div'); card.className = 'proxy-card';
                     card.innerHTML = `
                         <div class="card-actions">
-                            <button class="btn-card remove" onclick="removeProxy(${index})" title="Remove">✖</button>
+                            <button class="btn-card btn-ping" style="color: ${pingColor}" onclick="pingNode(${index}, this)">${pingLabel}</button>
+                            <button class="btn-card" onclick="showQR(${index})">📱</button>
+                            <button class="btn-card" onclick="copyLink(${index})">🔗</button>
+                            <button class="btn-card remove" onclick="removeProxy(${index})">✖</button>
                         </div>
                         <div class="proxy-name" contenteditable="true" spellcheck="false" 
                              onblur="renameProxy(${index}, this.innerText)" 
                              onkeydown="if(event.key === 'Enter'){this.blur(); return false;}">${p.name}</div>
-                        <div class="proxy-detail"><span class="proxy-type">${p.type}</span> ${p.server}:${p.port}</div>
+                        <div class="proxy-detail"><div><span class="proxy-type ${p.type==='hysteria2'?'type-hy2':p.type==='trojan'?'type-trojan':'type-vless'}">${p.type}</span> ${p.server}:${p.port}</div></div>
                     `;
                     container.appendChild(card);
                 });
                 
                 generateYAML(); 
                 container.style.display = 'grid';
-                dlBtn.style.display = "inline-block";
-                copyBtn.style.display = "inline-block";
+                document.getElementById('downloadBtn').style.display = "inline-block";
+                document.getElementById('copyBtn').style.display = "inline-block";
             } else {
                 container.style.display = 'none';
-                nodeBadge.style.display = "none";
+                document.getElementById('nodeCount').style.display = "none";
                 document.getElementById('output').textContent = "Waiting for nodes...";
-                dlBtn.style.display = "none";
-                copyBtn.style.display = "none";
+                document.getElementById('downloadBtn').style.display = "none";
+                document.getElementById('copyBtn').style.display = "none";
             }
         }
 
         function removeProxy(index) { currentProxies.splice(index, 1); saveState(); renderCards(); }
         function renameProxy(index, newName) {
             const cleanName = newName.trim().replace(/\n/g, '');
-            if (cleanName) currentProxies[index].name = cleanName;
+            if (cleanName) {
+                currentProxies[index].name = cleanName;
+                try { let url = new URL(currentProxies[index].rawLink); url.hash = encodeURIComponent(cleanName); currentProxies[index].rawLink = url.toString(); } catch(e){}
+            }
             saveState(); generateYAML();
         }
+        function copyLink(index) { navigator.clipboard.writeText(currentProxies[index].rawLink); showToast("🔗 Link copied!"); }
 
-        // === ГЕНЕРАТОР YAML С ПОДДЕРЖКОЙ РАЗНЫХ ТИПОВ ===
-        function generateYAML() {
+        // =========================================================================
+        // === МАГИЯ CLEAN ARCHITECTURE: СКАЧИВАНИЕ ШАБЛОНА ===
+        // =========================================================================
+        async function fetchTemplate() {
+            if (cachedTemplate) return cachedTemplate;
+            try {
+                // Пытаемся скачать файл template.yaml с сервера GitHub Pages
+                const res = await fetch('template.yaml');
+                if (!res.ok) throw new Error();
+                cachedTemplate = await res.text();
+                return cachedTemplate;
+            } catch (e) {
+                // Если файла нет (например, ты открыл html прямо с компьютера)
+                return null;
+            }
+        }
+
+        async function generateYAML() {
             if (currentProxies.length === 0) return;
-
+            const output = document.getElementById('output');
+            
+            // 1. Формируем список прокси
             let proxiesYAML = "proxies:\n";
             currentProxies.forEach(p => {
-                proxiesYAML += `  - name: "${p.name}"\n    type: ${p.type}\n    server: ${p.server}\n    port: ${p.port}\n`;
-                if (p.type === 'vless' || p.type === 'vmess') proxiesYAML += `    uuid: ${p.uuid}\n`;
-                if (p.type === 'trojan' || p.type === 'hysteria2') proxiesYAML += `    password: ${p.password}\n`;
-                if (p.type === 'vmess') proxiesYAML += `    alterId: ${p.alterId}\n    cipher: ${p.cipher}\n`;
-                if (p.network) proxiesYAML += `    network: ${p.network}\n`;
-                proxiesYAML += `    udp: true\n`;
-                if (p.flow) proxiesYAML += `    flow: ${p.flow}\n`;
-                
-                if (p.tls) proxiesYAML += `    tls: true\n    sni: ${p.sni}\n    client-fingerprint: ${p.fp || 'chrome'}\n`;
-                
-                if (p.type === 'hysteria2') {
-                    proxiesYAML += `    sni: ${p.sni}\n    skip-cert-verify: ${p['skip-cert-verify']}\n`;
-                    if (p.obfs) proxiesYAML += `    obfs: ${p.obfs}\n    obfs-password: ${p['obfs-password']}\n`;
-                } else if (p['skip-cert-verify']) {
-                    proxiesYAML += `    skip-cert-verify: true\n`;
+                proxiesYAML += `  - name: "${p.name}"\n    type: ${p.type}\n    server: ${p.server}\n    port: ${p.port}\n    udp: true\n`;
+                if (p.type === 'vless' || p.type === 'trojan') {
+                    if (p.uuid) proxiesYAML += `    uuid: ${p.uuid}\n`;
+                    if (p.password) proxiesYAML += `    password: ${p.password}\n`;
+                    if (p.network) proxiesYAML += `    network: ${p.network}\n`;
+                    if (p.flow) proxiesYAML += `    flow: ${p.flow}\n`;
+                    if (p.tls) proxiesYAML += `    tls: true\n    sni: ${p.sni}\n    client-fingerprint: ${p.fp}\n`;
+                    if (p["reality-opts"]) proxiesYAML += `    reality-opts:\n      public-key: ${p["reality-opts"]["public-key"]}\n      short-id: ${p["reality-opts"]["short-id"]}\n`;
+                } 
+                else if (p.type === 'hysteria2') {
+                    proxiesYAML += `    password: ${p.password}\n    sni: ${p.sni}\n`;
+                    if (p["skip-cert-verify"]) proxiesYAML += `    skip-cert-verify: true\n`;
+                    if (p.obfs) proxiesYAML += `    obfs: ${p.obfs}\n    obfs-password: ${p["obfs-password"]}\n`;
                 }
-
-                if (p['reality-opts']) proxiesYAML += `    reality-opts:\n      public-key: ${p['reality-opts']['public-key']}\n      short-id: ${p['reality-opts']['short-id']}\n`;
-                if (p['ws-opts']) proxiesYAML += `    ws-opts:\n      path: ${p['ws-opts'].path}\n` + (p['ws-opts'].headers ? `      headers:\n        Host: ${p['ws-opts'].headers.Host}\n` : "");
-                if (p['grpc-opts']) proxiesYAML += `    grpc-opts:\n      grpc-service-name: "${p['grpc-opts']['grpc-service-name']}"\n`;
-                if (p['xhttp-opts']) proxiesYAML += `    xhttp-opts:\n      path: ${p['xhttp-opts'].path}\n`;
             });
 
             const proxyNames = currentProxies.map(p => `      - "${p.name}"`).join('\n');
 
-            const finalYAML = `# ─────────────────────────────────────────────
-# UNIVERSAL ROUTING PROFILE v77.0
-# AUTO-GENERATED CORE
-# ─────────────────────────────────────────────
-
-geodata-loader: memconservative
-global-client-fingerprint: chrome  
-
-geox-url:
-  geoip: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.dat"
-  geosite: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geosite.dat"
-  mmdb: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/country.mmdb"
-
-geo-auto-update: true
-geo-update-interval: 24
-
-mode: rule
-ipv6: true                     
-log-level: warning
-allow-lan: false
-mixed-port: 7890
-tcp-concurrent: true
-keep-alive-idle: 30
-keep-alive-interval: 15
-unified-delay: true
-geodata-mode: true
-find-process-mode: strict
-external-controller: 127.0.0.1:9090
-profile:
-  store-selected: true
-  store-fake-ip: true
-  tracing: true
-
-rule-providers:
-  adblock-rules:
-    type: http
-    behavior: domain
-    format: mrs 
-    url: "https://cdn.jsdelivr.net/gh/DustinWin/ruleset_geodata@mihomo-ruleset/ads.mrs"
-    path: ./rules/adblock.mrs
-    interval: 86400
-  hagezi-tif:
-    type: http
-    behavior: domain
-    format: mrs
-    url: "https://cdn.jsdelivr.net/gh/MiHomoer/MiHomo-Hagezi@release/HageziUltimate.mrs"
-    path: ./rules/hagezi-tif.mrs
-    interval: 86415
-  sukka-phishing:
-    type: http
-    behavior: domain
-    format: text
-    url: "https://ruleset.skk.moe/Clash/domainset/reject_phishing.txt"
-    path: ./rules/sukka-phishing.txt
-    interval: 86430
-  blockhttpdns:
-    type: http
-    behavior: classical
-    url: "https://cdn.jsdelivr.net/gh/Accademia/Additional_Rule_For_Clash@main/BlockHttpDNSPlus/BlockHttpDNSPlus.yaml"
-    path: ./rules/blockhttpdns.yaml
-    interval: 86445
-  hijacking-plus:
-    type: http
-    behavior: classical
-    url: "https://cdn.jsdelivr.net/gh/Accademia/Additional_Rule_For_Clash@main/HijackingPlus/HijackingPlus.yaml"
-    path: ./rules/hijacking.yaml
-    interval: 86460
-  apple-ai:
-    type: http
-    behavior: classical
-    url: "https://cdn.jsdelivr.net/gh/Accademia/Additional_Rule_For_Clash@main/AppleAI/AppleAI.yaml"
-    path: ./rules/apple-ai.yaml
-    interval: 86490
-
-dns:
-  enable: true
-  ipv6: true                     
-  listen: 0.0.0.0:1053
-  enhanced-mode: fake-ip
-  fake-ip-range: 198.18.0.1/16
-  use-hosts: true
-  use-system-hosts: true
-  respect-rules: false
-  
-  independent-cache: true  
-  prefer-h3: false         
-  cache-algorithm: arc
-  cache-capacity: 4096
-
-  fake-ip-filter:
-    - '+.stun.*.*'
-    - '+.stun.*.*.*'
-    - '+.time.*.*'
-    - '+.time.*'
-    - '+.ntp.*.*'
-    - '+.ntp.*'
-    - 'mtalk.google.com'
-    - 'alt1-mtalk.google.com'
-    - 'wifi.vivo.com.cn'
-    - 'netcheck.vivo.com.cn'
-    - 'captive.apple.com'
-    - '+.msftconnecttest.com'
-    - '+.msftncsi.com'
-    - 'connectivitycheck.gstatic.com'
-    - 'connectivitycheck.android.com'
-    - 'clients3.google.com'
-    - 'cp.cloudflare.com'
-    - '+.lan'
-    - '+.local'
-    - '+.рф'
-    - '+.su'
-    - '+.yandex.ru'
-    - '+.yandex.net'
-    - '+.yandex.com'      
-    - '+.yastatic.net'
-    - '+.ya.ru'
-    - '+.vk.com'
-    - '+.mail.ru'
-    - '+.imgsmail.ru'
-    - '+.ok.ru'
-    - '+.dzen.ru'
-    - '+.gosuslugi.ru'
-    - '+.nalog.gov.ru'
-    - '+.sberbank.ru'
-    - '+.vtb.ru'
-    - '+.ozon.ru'
-    - '+.wildberries.ru'
-    - '+.wb.ru'
-    - '+.avito.ru'
-    - '+.mts.ru'
-    - '+.beeline.ru'
-    - '+.megafon.ru'
-    - '+.dns-shop.ru'
-    - '+.vkvideo.ru'
-    - '+.okko.tv'
-    - '+.pobeda.aero'
-    - '+.crimea.ru'
-    - '+.rbc.ru'
-    - '+.rt.com'
-    - '+.kinopoisk.ru'
-    - '+.rutube.ru'
-    - '+.ivi.ru'
-    - '+.speedtest.net'
-    - '+.ookla.com'
-    - '+.ooklaserver.net'
-    - '+.fast.com'
-    - '+.copilot.microsoft.com'
-    - '+.copilot.cloud.microsoft'
-    - '+.bing.com'
-    - '+.edge.microsoft.com'
-    - '+.xbox.com'
-    - '+.xboxlive.com'
-    - '+.xbl.io'
-    - '+.openai.com'
-    - 'openai.com'
-    - '+.chatgpt.com'
-    - 'chatgpt.com'
-    - '+.oaistatic.com'
-    - '+.oaiusercontent.com'
-    - 'android.chat.openai.com'
-    - '+.deepseek.com'
-    - '+.claude.ai'
-    - '+.anthropic.com'
-    - '+.auth0.com'
-    - '+.livekit.cloud'
-    - 'challenges.cloudflare.com'
-    - '+.statsigapi.net'
-    - '+.statsig.com'
-    - '+.sentry.io'
-    - '+.workos.com'
-    - '+.intercom.io'
-    - '+.intercomcdn.com'
-    - '+.arkoselabs.com'
-    - '+.featuregates.org'
-    - '+.featureassets.org'
-    - '+.max.ru'          
-    - '+.lisaalert.org'
-    - '+.dobro.ru'
-    - '+.onf.ru'
-    - '+.znanie.ru'
-    - '+.vivo.com.cn'
-    - '+.vivo.com'
-    - '+.appmetrica.yandex.net'
-    - '+.doh.pub'
-    - '+.oneme.ru'
-    - '+.rustore.ru'
-    - '+.kaspersky-labs.com'
-    - '+.kaspersky.com'
-    - '+.svobodacard.ru'
-    - '+.appcenter.ms'
-    - '+.egks.ru'
-    - '+.polypay.ru'
-    - '+.facct.ru'
-    - '+.sevsu.ru'
-    - '+.uxfeedback.ru'
-    - '+.dbankcloud.ru'
-    - '+.urait.ru'
-    - '+.jivo.ru'
-    - '+.jivosite.com'
-    - '+.amplitude.com'
-
-  default-nameserver:
-    - 77.88.8.8          
-    - 8.8.8.8
-    - 2001:4860:4860::8888   
-    - 2001:4860:4860::8844   
-  nameserver:
-    - https://dns.yandex.ru/dns-query
-    - https://dns.quad9.net/dns-query
-    - https://cloudflare-dns.com/dns-query
-    - 2620:fe::fe            
-    - 2606:4700:4700::1111   
-  
-  proxy-server-nameserver:
-    - https://1.1.1.1/dns-query
-    - 8.8.8.8
-    - 1.0.0.1
-    - 77.88.8.8
-
-  fallback:
-    - https://dns.adguard-dns.com/dns-query
-    - https://1.0.0.1/dns-query
-  fallback-filter:
-    geoip: true
-    geoip-code: RU
-    ipcidr:
-      - 240.0.0.0/4
-    domain:
-      - '+.google.com'
-      - '+.youtube.com'
-      - '+.instagram.com'
-      - '+.facebook.com'
-      - '+.twitter.com'
-      - '+.github.com'
-
-  nameserver-policy:
-    '+.xbox.com': [https://xbox-dns.ru/dns-query, tls://xbox-dns.ru, 111.88.96.50, 111.88.96.51]
-    '+.xboxlive.com': [https://xbox-dns.ru/dns-query, tls://xbox-dns.ru, 111.88.96.50, 111.88.96.51]
-    '+.xbl.io': [https://xbox-dns.ru/dns-query, tls://xbox-dns.ru, 111.88.96.50, 111.88.96.51]
-    'xbox-dns.ru': "https://dns.yandex.ru/dns-query"
-    '+.googleapis.com': "https://dns.quad9.net/dns-query"
-    '+.gstatic.com': "https://dns.quad9.net/dns-query"
-    '+.googlevideo.com': "https://dns.quad9.net/dns-query"
-    '+.ytimg.com': "https://dns.quad9.net/dns-query"
-    '+.youtube.com': "https://dns.quad9.net/dns-query"
-    '+.youtubei.googleapis.com': "https://dns.quad9.net/dns-query"
-    '+.translate.googleapis.com': "https://dns.quad9.net/dns-query"
-    '+.gemini.google.com': "https://dns.quad9.net/dns-query"
-    '+.openai.com': "https://dns.quad9.net/dns-query"
-    '+.chatgpt.com': "https://dns.quad9.net/dns-query"
-    '+.deepseek.com': "https://dns.quad9.net/dns-query"
-    '+.claude.ai': "https://dns.quad9.net/dns-query"
-    '+.anthropic.com': "https://dns.quad9.net/dns-query"
-    '+.telegram.org': "https://dns.quad9.net/dns-query"
-    '+.t.me': "https://dns.quad9.net/dns-query"
-    '+.tiktokv.com': "https://dns.quad9.net/dns-query"
-
-sniffer:
-  enable: true
-  parse-pure-ip: true
-  override-destination: true 
-  sniff-client-payload: true
-  sniff:
-    tls: { ports: [443, 8443] }
-    http: { ports: [80, 8080-8880] }
-  skip-domain:
-    - '*.msftconnecttest.com'
-    - '*.msftncsi.com'
-    - '*.xbox.com'
-    - '*.xboxlive.com'
-    - '*.xbl.io'
-    - '*.openai.com'
-    - 'openai.com'
-    - '*.chatgpt.com'
-    - 'chatgpt.com'
-    - '*.deepseek.com'
-    - '*.claude.ai'
-    - '*.anthropic.com'
-    - '*.oaistatic.com'
-    - '*.oaiusercontent.com'
-    - 'android.chat.openai.com'
-    - '*.statsigapi.net'
-    - '*.statsig.com'
-    - '*.sentry.io'
-    - '*.auth0.com'
-    - '*.livekit.cloud'
-    - '*.arkoselabs.com'
-    - '*.intercom.io'
-    - '*.intercomcdn.com'
-    - '*.workos.com'
-    - '*.featuregates.org'
-    - '*.featureassets.org'
-    - '*.push.apple.com'
-    - '*.apple.com'
-    - 'challenges.cloudflare.com'
-    - '*.copilot.microsoft.com'
-    - '*.copilot.cloud.microsoft'
-    - '*.bing.com'
-    - '*.edge.microsoft.com'
-    - '*.oray.com'
-    - '219.151.25.183'
-    - '*.max.ru'           
-    - '*.lisaalert.org'
-    - '*.dobro.ru'
-
-  skip-src-address: [fe80::/10, fc00::/7]
-  skip-dst-address:
-    - 149.154.160.0/20     
-    - 91.108.4.0/22
-    - 91.108.8.0/21
-    - 91.108.56.0/22
-
-tun:
+            // 2. Настраиваем TUN (Мобилка или Роутер)
+            let tunConfig = `tun:
   enable: true
   stack: mixed
   device: Mihomo
   gso: true
   udp-timeout: 30
-  dns-hijack: [any:53, tcp://any:53]
+  dns-hijack:
+    - any:53
+    - tcp://any:53
   auto-route: true
   auto-detect-interface: true
   strict-route: true
   endpoint-independent-nat: true
-  mtu: 1420
+  mtu: 1420`;
 
-${proxiesYAML}
+            if (document.getElementById('deviceProfile').value === 'router') {
+                tunConfig = `# ROUTER MODE (Keenetic/OpenWRT Compatible)
+tproxy-port: 7893
+redir-port: 7892
+tun:
+  enable: false`;
+            }
 
-proxy-groups:
-  - name: "🌐 Global Proxy"
-    type: select
-    proxies:
-      - "♻️ Auto-Select"
-      - "🤖 Premium AI"
-${proxyNames}
-
-  - name: "♻️ Auto-Select"
-    type: url-test
-    url: "https://cp.cloudflare.com/generate_204"
-    interval: 180
-    tolerance: 30
-    timeout: 5000
-    lazy: true
-    proxies:
-${proxyNames}
-    exclude-filter: "(?i)Traffic|Direct|Relay"
-
-  - name: "🤖 Premium AI"
-    type: url-test
-    url: "https://cp.cloudflare.com/generate_204"
-    interval: 180
-    tolerance: 30
-    timeout: 5000
-    lazy: true
-    proxies:
-${proxyNames}
-
-rules:
-  # System
-  - PROCESS-NAME,wireshark.exe,DIRECT
-  - PROCESS-NAME,nmap.exe,DIRECT
-  - PROCESS-NAME,dumpcap.exe,DIRECT
-  - DOMAIN-SUFFIX,push.apple.com,DIRECT
-  - DOMAIN,aps.apple.com,DIRECT
-  - DOMAIN-SUFFIX,ls.apple.com,DIRECT
-  - PROCESS-NAME,nsurlsessiond,DIRECT
-  - PROCESS-NAME,apsd,DIRECT
-  - PROCESS-NAME,trustd,DIRECT
-  - PROCESS-NAME,svchost.exe,DIRECT
-  - PROCESS-NAME,System,DIRECT
-  - DOMAIN-SUFFIX,do.dsp.mp.microsoft.com,DIRECT
-  - DOMAIN-SUFFIX,windowsupdate.com,DIRECT
-  - DOMAIN-SUFFIX,msftncsi.com,DIRECT
-  - DOMAIN-SUFFIX,msftconnecttest.com,DIRECT
-  - DOMAIN,vpushonrt-stsdk.vivo.com.cn,DIRECT    
-  - DOMAIN,accountinfo.vivo.com.cn,DIRECT        
-  - DOMAIN-SUFFIX,vivo.com.cn,DIRECT
-  - DOMAIN,os-content-recommend.vivo.com,DIRECT  
-  - DOMAIN,newfind.vivo.com,DIRECT
-  - DOMAIN,content-aware.vivo.com,DIRECT
-  - DOMAIN-SUFFIX,com.vivo.pushservice,DIRECT
-  - DOMAIN-SUFFIX,push.vivo.com.cn,DIRECT
-  - DOMAIN,wifi.vivo.com.cn,DIRECT
-  - DOMAIN,netcheck.vivo.com.cn,DIRECT
-
-  # Security & Ads
-  - RULE-SET,hijacking-plus,REJECT
-  - GEOSITE,category-ads-all,REJECT 
-  - RULE-SET,hagezi-tif,REJECT
-  - RULE-SET,sukka-phishing,REJECT
-  - RULE-SET,adblock-rules,REJECT
-  - RULE-SET,blockhttpdns,REJECT
-  - DOMAIN,os-content-recommend.vivo.com,REJECT  
-  - DOMAIN,newfind.vivo.com,REJECT
-  - DOMAIN,content-aware.vivo.com,REJECT
-  - DOMAIN-SUFFIX,mediation.goog,REJECT
-  - DOMAIN-SUFFIX,vungle.com,REJECT
-  - DOMAIN,adservice.google.com.pe,REJECT
-  - DOMAIN-SUFFIX,adservice.google.co.kr,REJECT
-  - DOMAIN,fundingchoicesmessages.google.com,REJECT
-
-  # Local Networks & P2P
-  - DST-PORT,7680,REJECT
-  - GEOSITE,private,DIRECT
-  - GEOIP,private,DIRECT,no-resolve
-  - GEOIP,lan,DIRECT,no-resolve
-  - DST-PORT,5228,DIRECT  
-  - DST-PORT,5229,DIRECT
-  - DST-PORT,5230,DIRECT
-  - DOMAIN-SUFFIX,mtalk.google.com,DIRECT
-  - DST-PORT,123,DIRECT
-  - DST-PORT,3478,DIRECT
-  - DST-PORT,3479,DIRECT
-  - PROCESS-NAME,qBittorrent.exe,DIRECT
-  - PROCESS-NAME,uTorrent.exe,DIRECT
-  - PROCESS-NAME,qbittorrent,DIRECT
-  - PROCESS-NAME,transmission-daemon,DIRECT
-  - PROCESS-NAME,aria2c,DIRECT
-  - PROCESS-NAME,fdm.exe,DIRECT
-  - PROCESS-NAME,FreeDownloadManager.exe,DIRECT
-  - GEOSITE,category-pt,DIRECT
-  - GEOSITE,tracker,DIRECT
-  - DOMAIN-KEYWORD,torrent,DIRECT
-  - DOMAIN,cp.cloudflare.com,DIRECT 
-  - DOMAIN-SUFFIX,cloudflare-dns.com,🌐 Global Proxy
-
-  # App Proxy Rules
-  - PROCESS-NAME,Telegram.exe,🌐 Global Proxy
-  - PROCESS-NAME,org.telegram.messenger,🌐 Global Proxy
-  - PROCESS-NAME,org.telegram.messenger.web,🌐 Global Proxy
-  - PROCESS-NAME,org.telegram.plus,🌐 Global Proxy
-  - PROCESS-NAME,org.thunderdog.challegram,🌐 Global Proxy
-  - PROCESS-NAME,com.discord,🌐 Global Proxy
-
-  # Direct Routing (Local/Regional)
-  - DOMAIN-SUFFIX,ru,DIRECT
-  - DOMAIN-SUFFIX,рф,DIRECT
-  - DOMAIN-SUFFIX,su,DIRECT
-  - PROCESS-NAME,com.allgoritm.youla,DIRECT
-  - PROCESS-NAME,ru.ok.android,DIRECT
-  - PROCESS-NAME,com.vivo.car.networking,DIRECT
-  - PROCESS-NAME,ru.sberbankmobile,DIRECT
-  - PROCESS-NAME,ru.nspk.sbpay,DIRECT
-  - PROCESS-NAME,ru.cian.main,DIRECT
-  - PROCESS-NAME,com.vk.vkvideo,DIRECT
-  - PROCESS-NAME,ru.sutochno_redesign,DIRECT
-  - PROCESS-NAME,ru.zdravcity.app,DIRECT
-  - PROCESS-NAME,io.walletpasses.android,DIRECT
-  - PROCESS-NAME,com.avito.android,DIRECT
-  - PROCESS-NAME,ru.rx_loyalty.yabloko,DIRECT
-  - PROCESS-NAME,ru.rostel,DIRECT
-  - PROCESS-NAME,ru.gosuslugi.pos,DIRECT
-  - PROCESS-NAME,ru.biblioonline.reader,DIRECT
-  - PROCESS-NAME,com.yandex.browser,DIRECT       
-  - PROCESS-NAME,ru.vtb24.mobilebanking.android,DIRECT 
-  - PROCESS-NAME,ru.yandex.searchplugin,DIRECT   
-  - PROCESS-NAME,ru.yandex.mobile.search,DIRECT  
-  - PROCESS-NAME,com.google.android.apps.messaging,DIRECT 
-  - PROCESS-NAME,ru.svobodacard.svoboda,DIRECT   
-  - PROCESS-NAME,ru.polypay.egks,DIRECT          
-  - PROCESS-NAME,ru.vk.store,DIRECT              
-  - PROCESS-NAME,ru.oneme.app,DIRECT        
-  - PROCESS-NAME,com.vivo.findphone,DIRECT       
-  - PROCESS-NAME,com.bbk.account,DIRECT          
-  - PROCESS-NAME,com.mobile.cos.iroaming,DIRECT
-  - PROCESS-NAME,com.uma.musicvk,DIRECT
-  - PROCESS-NAME,com.bbk.appstore,DIRECT
-  - PROCESS-NAME,com.android.filemanager,DIRECT
-  - PROCESS-NAME,com.vivo.widget.gallery,DIRECT
-  - PROCESS-NAME,com.yandex.aliceapp,DIRECT
-  - PROCESS-NAME,ru.yandex.music,DIRECT
-  - PROCESS-NAME,ru.yandex.taxi,DIRECT
-  - PROCESS-NAME,com.vivo.hover,DIRECT
-  - PROCESS-NAME,com.vivo.nightpearl,DIRECT
-  - PROCESS-NAME,com.vivo.pushservice,DIRECT
-  - PROCESS-NAME,com.iqoo.secure,DIRECT
-  - PROCESS-NAME,com.vivo.hiboard,DIRECT
-  - PROCESS-NAME,com.vivo.safecenter,DIRECT
-  - PROCESS-NAME,com.vivo.connbase,DIRECT
-  - PROCESS-NAME,com.vivo.basemanager,DIRECT
-  - PROCESS-NAME,com.vkontakte.android,DIRECT
-  - PROCESS-NAME,ru.ozon.app.android,DIRECT
-  - PROCESS-NAME,ru.ozon.fintech.finance,DIRECT
-  - PROCESS-NAME,ru.wildberries.wbpayclient,DIRECT
-  - PROCESS-NAME,com.logistic.sdek,DIRECT
-  - PROCESS-NAME,ru.gazprombank.android,DIRECT
-  
-  # Regional Domains (Telemetry & Local Services)
-  - DOMAIN-SUFFIX,pool.ntp.org,DIRECT
-  - DOMAIN,firebaselogging-pa.googleapis.com,DIRECT
-  - DOMAIN-SUFFIX,protek.ru,DIRECT
-  - DOMAIN-SUFFIX,kaspersky.com,DIRECT
-  - DOMAIN-SUFFIX,cian.ru,DIRECT
-  - DOMAIN-SUFFIX,cdn-cian.ru,DIRECT
-  - DOMAIN-SUFFIX,sutochno.ru,DIRECT
-  - DOMAIN-SUFFIX,crashlytics.com,DIRECT
-  - DOMAIN-SUFFIX,appsflyer.com,DIRECT
-  - DOMAIN,connectivitycheck.gstatic.com,DIRECT
-  - DOMAIN,api.ipify.org,DIRECT
-  - DOMAIN-SUFFIX,uxfeedback.ru,DIRECT
-  - DOMAIN-SUFFIX,dbankcloud.ru,DIRECT
-  - DOMAIN-SUFFIX,urait.ru,DIRECT
-  - DOMAIN-SUFFIX,jivo.ru,DIRECT
-  - DOMAIN-SUFFIX,jivosite.com,DIRECT
-  - DOMAIN-SUFFIX,amplitude.com,DIRECT
-  - DOMAIN-SUFFIX,settings.crashlytics.com,DIRECT
-  - DOMAIN-SUFFIX,yandex.com,DIRECT              
-  - DOMAIN-SUFFIX,facct.ru,DIRECT                
-  - DOMAIN,mobileconfiguration-pa.googleapis.com,DIRECT 
-  - IP-CIDR,114.114.114.114/32,DIRECT,no-resolve            
-  - DOMAIN-SUFFIX,egks.ru,DIRECT     
-  - DOMAIN-SUFFIX,polypay.ru,DIRECT              
-  - DOMAIN-SUFFIX,svobodacard.ru,DIRECT          
-  - DOMAIN,in.appcenter.ms,DIRECT                
-  - IP-CIDR,42.81.82.209/32,DIRECT,no-resolve               
-  - DOMAIN-SUFFIX,oneme.ru,DIRECT                
-  - DOMAIN-SUFFIX,rustore.ru,DIRECT              
-  - DOMAIN-SUFFIX,kaspersky-labs.com,DIRECT      
-  - DOMAIN-SUFFIX,inappstory.ru,DIRECT           
-  - DOMAIN-SUFFIX,tns-counter.ru,DIRECT          
-  - DOMAIN,doh.pub,DIRECT                        
-  - DOMAIN-SUFFIX,doh.pub,DIRECT 
-  - IP-CIDR,120.53.53.53/32,DIRECT,no-resolve               
-  - DOMAIN,vpushonrt-stsdk.vivo.com.cn,DIRECT    
-  - DOMAIN,accountinfo.vivo.com.cn,DIRECT        
-  - DOMAIN-SUFFIX,vivo.com.cn,DIRECT
-  - DOMAIN-SUFFIX,yandex.net,DIRECT
-  - DOMAIN-SUFFIX,yandex.ru,DIRECT
-  - DOMAIN-SUFFIX,yastatic.net,DIRECT
-  - DOMAIN-SUFFIX,yandex.st,DIRECT
-  - DOMAIN-SUFFIX,vk.com,DIRECT
-  - DOMAIN-SUFFIX,ms.vk.com,DIRECT
-  - DOMAIN-SUFFIX,mail.ru,DIRECT
-  - DOMAIN-SUFFIX,imgsmail.ru,DIRECT
-  - DOMAIN-SUFFIX,appmetrica.yandex.net,DIRECT
-  - DOMAIN,push.clients6.google.com,DIRECT
-  - DOMAIN,firebaselogging.googleapis.com,DIRECT
-  - DOMAIN,firebaseinstallations.googleapis.com,DIRECT
-  - DOMAIN-SUFFIX,appsflyersdk.com,DIRECT
-  - DOMAIN-SUFFIX,sev.gov.ru,DIRECT
-  - DOMAIN-SUFFIX,amap.com,DIRECT
-  - DOMAIN-SUFFIX,baidu.com,DIRECT
-  - DOMAIN-SUFFIX,ctobsnssdk.com,DIRECT
-  - DOMAIN-SUFFIX,qq.com,DIRECT
-  - DOMAIN-SUFFIX,amazonaws.com.cn,DIRECT
-  - DOMAIN-SUFFIX,ozone.ru,DIRECT
-  - DOMAIN-SUFFIX,ozonusercontent.com,DIRECT
-  - DOMAIN-SUFFIX,alidns.com,DIRECT
-  - DOMAIN-SUFFIX,copilot-voice.vivo.com.cn,DIRECT
-  - DOMAIN-SUFFIX,yango.tech,DIRECT
-
-  # OEMs & General Allowed
-  - DOMAIN-SUFFIX,apple.com,DIRECT
-  - DOMAIN-SUFFIX,icloud.com,DIRECT
-  - DOMAIN-SUFFIX,mzstatic.com,DIRECT
-  - DOMAIN-SUFFIX,mi.com,DIRECT
-  - DOMAIN-SUFFIX,xiaomi.com,DIRECT
-  - DOMAIN-SUFFIX,xiaomi.net,DIRECT
-  - DOMAIN-SUFFIX,vivo.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,vivoglobal.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,vivosmartphone.cn,🌐 Global Proxy
-  - DOMAIN-SUFFIX,bbk.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,com.vivo.magazine,DIRECT
-  - DOMAIN-SUFFIX,com.vivo.connbase,DIRECT
-  - DOMAIN-SUFFIX,com.vivo.base.gallery,DIRECT
-  - DOMAIN-SUFFIX,vhs.wwstat.com,DIRECT
-  - DOMAIN-SUFFIX,api.map.baidu.com,DIRECT
-  - DOMAIN-SUFFIX,on-device-ai.vivo.com.cn,DIRECT
-  - DOMAIN-SUFFIX,api.vivo.com.cn,DIRECT
-  - DOMAIN-SUFFIX,ota.vivo.com.cn,DIRECT
-  - DOMAIN-SUFFIX,cloud.vivo.com.cn,DIRECT
-  - DOMAIN-SUFFIX,miui.com,DIRECT
-  - DOMAIN-SUFFIX,api.mi.com,DIRECT
-  - DOMAIN-SUFFIX,push.mi.com,DIRECT
-  - DOMAIN-SUFFIX,ota.mi.com,DIRECT
-  - DOMAIN-SUFFIX,cloud.mi.com,DIRECT
-  - DOMAIN-SUFFIX,fota.mi.com,DIRECT
-  - DOMAIN-SUFFIX,update.mi.com,DIRECT
-  - DOMAIN-SUFFIX,account.mi.com,DIRECT
-  - DOMAIN-SUFFIX,auth.mi.com,DIRECT
-  - DOMAIN-SUFFIX,oppo.com,DIRECT
-  - DOMAIN-SUFFIX,oppo.com.cn,DIRECT
-  - DOMAIN-SUFFIX,api.oppo.com,DIRECT
-  - DOMAIN-SUFFIX,push.oppo.com,DIRECT
-  - DOMAIN-SUFFIX,ota.oppo.com,DIRECT
-  - DOMAIN-SUFFIX,cloud.oppo.com,DIRECT
-  - DOMAIN-SUFFIX,realme.com,DIRECT
-  - DOMAIN-SUFFIX,realme.com.cn,DIRECT
-  - DOMAIN-SUFFIX,api.realme.com,DIRECT
-  - DOMAIN-SUFFIX,push.realme.com,DIRECT
-  - DOMAIN-SUFFIX,ota.realme.com,DIRECT
-  - DOMAIN-SUFFIX,oneplus.com,DIRECT
-  - DOMAIN-SUFFIX,oneplus.net,DIRECT
-  - DOMAIN-SUFFIX,api.oneplus.com,DIRECT
-  - DOMAIN-SUFFIX,ota.oneplus.com,DIRECT
-  - DOMAIN-SUFFIX,cloud.oneplus.com,DIRECT
-  - DOMAIN-SUFFIX,huawei.com,DIRECT
-  - DOMAIN-SUFFIX,huawei.com.cn,DIRECT
-  - DOMAIN-SUFFIX,api.huawei.com,DIRECT
-  - DOMAIN-SUFFIX,push.huawei.com,DIRECT
-  - DOMAIN-SUFFIX,ota.huawei.com,DIRECT
-  - DOMAIN-SUFFIX,cloud.huawei.com,DIRECT
-  - DOMAIN-SUFFIX,harmonyos.huawei.com,DIRECT
-  - DOMAIN-SUFFIX,samsung.com,DIRECT
-  - DOMAIN-SUFFIX,api.samsung.com,DIRECT
-  - DOMAIN-SUFFIX,push.samsung.com,DIRECT
-  - DOMAIN-SUFFIX,ota.samsung.com,DIRECT
-  - DOMAIN-SUFFIX,fota.samsung.com,DIRECT
-  - DOMAIN-SUFFIX,cloud.samsung.com,DIRECT
-  - DOMAIN-SUFFIX,account.samsung.com,DIRECT
-  - DOMAIN-SUFFIX,auth.samsung.com,DIRECT
-  - DOMAIN-SUFFIX,samsungapps.com,DIRECT
-  - DOMAIN-SUFFIX,samsungknox.com,DIRECT
-  - DOMAIN-SUFFIX,sony.com,DIRECT
-  - DOMAIN-SUFFIX,sonymobile.com,DIRECT
-  - DOMAIN-SUFFIX,api.sony.com,DIRECT
-  - DOMAIN-SUFFIX,push.sony.com,DIRECT
-  - DOMAIN-SUFFIX,ota.sony.com,DIRECT
-  - DOMAIN-SUFFIX,cloud.sony.com,DIRECT
-
-  # Extended Regional Routing
-  - DOMAIN-SUFFIX,mobile-win.ru,DIRECT
-  - DOMAIN-SUFFIX,volnamobile.ru,DIRECT
-  - DOMAIN-SUFFIX,miranda-media.ru,DIRECT
-  - DOMAIN-SUFFIX,crpt.ru,DIRECT
-  - DOMAIN-SUFFIX,честныйзнак.рф,DIRECT
-  - DOMAIN-SUFFIX,xn--80ajghhoc2aj1c8b.xn--p1ai,DIRECT
-  - DOMAIN-SUFFIX,habr.com,DIRECT
-  - DOMAIN-SUFFIX,sevsu.ru,DIRECT
-  - DOMAIN-SUFFIX,sevastopol.ru,DIRECT          
-  - DOMAIN-SUFFIX,kerch.ru,DIRECT              
-  - DOMAIN-SUFFIX,feodosia.ru,DIRECT           
-  - DOMAIN-SUFFIX,yalta.ru,DIRECT              
-  - DOMAIN-SUFFIX,alushta.ru,DIRECT            
-  - DOMAIN-SUFFIX,crimea.gov.ru,DIRECT         
-  - DOMAIN-SUFFIX,sevastopol.gov.ru,DIRECT     
-  - DOMAIN-SUFFIX,rk.gov.ru,DIRECT             
-  - DOMAIN-SUFFIX,gosuslugi.ru,DIRECT
-  - DOMAIN-SUFFIX,gu-st.ru,DIRECT
-  - DOMAIN-SUFFIX,nalog.gov.ru,DIRECT
-  - DOMAIN-SUFFIX,cbr.ru,DIRECT
-  - DOMAIN-SUFFIX,vtb.ru,DIRECT
-  - DOMAIN-SUFFIX,psbank.ru,DIRECT
-  - DOMAIN-SUFFIX,pochta.ru,DIRECT
-  - DOMAIN-SUFFIX,vk.com,DIRECT          
-  - DOMAIN-SUFFIX,vk.ru,DIRECT           
-  - DOMAIN-SUFFIX,userapi.com,DIRECT
-  - DOMAIN-SUFFIX,vkvideo.ru,DIRECT
-  - DOMAIN-SUFFIX,m.vk.com,DIRECT
-  - DOMAIN-SUFFIX,api.vk.com,DIRECT
-  - DOMAIN-SUFFIX,oauth.vk.com,DIRECT
-  - DOMAIN-SUFFIX,ok.ru,DIRECT
-  - DOMAIN-SUFFIX,com.vkontakte.android,DIRECT
-  - DOMAIN-SUFFIX,crashlyticsreports-pa.googleapis.com,DIRECT
-  - DOMAIN-SUFFIX,sun10-2.vkuserphoto.ru,DIRECT
-  - DOMAIN-SUFFIX,vkvd468.okcdn.ru,DIRECT
-  - DOMAIN-SUFFIX,d0.mradx.net,DIRECT
-  - DOMAIN-SUFFIX,api.mycdn.me,DIRECT
-  - DOMAIN-SUFFIX,sun163-2.vkuserphoto.ru,DIRECT
-  - DOMAIN-SUFFIX,vk28-1.vkuser.net,DIRECT
-  - DOMAIN-SUFFIX,sun10-1.vkuserphoto.ru,DIRECT
-  - DOMAIN-SUFFIX,sun9-86.vkuserphoto.ru,DIRECT
-  - DOMAIN-SUFFIX,vkvd411.okcdn.ru,DIRECT
-  - DOMAIN-SUFFIX,iv.okcdn.ru,DIRECT
-  - DOMAIN-SUFFIX,vkvd516.okcdn.ru,DIRECT
-  - DOMAIN-SUFFIX,okcdn.ru,DIRECT
-  - DOMAIN-SUFFIX,vkuserphoto.ru,DIRECT
-  - DOMAIN-SUFFIX,vkuser.net,DIRECT
-  - DOMAIN-SUFFIX,mycdn.me,DIRECT
-  - DOMAIN-SUFFIX,mradx.net,DIRECT
-  - DOMAIN-SUFFIX,vkcdn.net,DIRECT
-  - DOMAIN-SUFFIX,vk-portal.net,DIRECT
-  - DOMAIN-SUFFIX,vk.me,DIRECT
-  - DOMAIN-SUFFIX,dzen.ru,DIRECT
-  - DOMAIN-SUFFIX,max.ru,DIRECT              
-  - DOMAIN-SUFFIX,vkontakte.ru,DIRECT
-  - DOMAIN-SUFFIX,api.vk.com,DIRECT
-  - DOMAIN-SUFFIX,oauth.vk.com,DIRECT
-  - DOMAIN-SUFFIX,login.vk.com,DIRECT
-  - DOMAIN-SUFFIX,static.vk.com,DIRECT
-  - DOMAIN-SUFFIX,im.vk.com,DIRECT
-  - DOMAIN-SUFFIX,chat.vk.com,DIRECT
-  - DOMAIN-SUFFIX,yandex.ru,DIRECT
-  - DOMAIN-SUFFIX,yandex.net,DIRECT
-  - DOMAIN-SUFFIX,ya.ru,DIRECT
-  - DOMAIN-SUFFIX,kinopoisk.ru,DIRECT
-  - DOMAIN-SUFFIX,rutube.ru,DIRECT
-  - DOMAIN-SUFFIX,okko.tv,DIRECT
-  - DOMAIN-SUFFIX,ivi.ru,DIRECT
-  - DOMAIN-SUFFIX,dns-shop.ru,DIRECT
-  - DOMAIN-SUFFIX,ozon.ru,DIRECT
-  - DOMAIN-SUFFIX,ozon.bank,DIRECT          
-  - DOMAIN-SUFFIX,wildberries.ru,DIRECT
-  - DOMAIN-SUFFIX,wb.ru,DIRECT
-  - DOMAIN-SUFFIX,bank.wildberries.ru,DIRECT  
-  - DOMAIN-SUFFIX,avito.ru,DIRECT
-  - DOMAIN-SUFFIX,megamarket.ru,DIRECT
-  - DOMAIN-SUFFIX,yandex.com,DIRECT
-  - DOMAIN-SUFFIX,passport.yandex.ru,DIRECT
-  - DOMAIN-SUFFIX,esia.gosuslugi.ru,DIRECT
-  - DOMAIN-SUFFIX,sberbank.ru,DIRECT
-  - DOMAIN-SUFFIX,tinkoff.ru,DIRECT
-  - DOMAIN-SUFFIX,alfabank.ru,DIRECT
-  - DOMAIN-SUFFIX,raiffeisen.ru,DIRECT
-  - DOMAIN-SUFFIX,1c.ru,DIRECT
-  - DOMAIN-SUFFIX,1c-bitrix.ru,DIRECT
-  - DOMAIN-SUFFIX,rzd.ru,DIRECT
-  - DOMAIN-SUFFIX,grandtrain.ru,DIRECT
-  - DOMAIN-SUFFIX,tutu.ru,DIRECT
-  - DOMAIN-SUFFIX,2gis.ru,DIRECT
-  - DOMAIN-SUFFIX,2gis.com,DIRECT
-  - DOMAIN-SUFFIX,cdek.ru,DIRECT
-  - DOMAIN-SUFFIX,kuper.ru,DIRECT
-  - DOMAIN-SUFFIX,samokat.ru,DIRECT
-  - DOMAIN-SUFFIX,aeroflot.ru,DIRECT
-  - DOMAIN-SUFFIX,pobeda.aero,DIRECT
-  - DOMAIN-SUFFIX,mts.ru,DIRECT
-  - DOMAIN-SUFFIX,beeline.ru,DIRECT
-  - DOMAIN-SUFFIX,megafon.ru,DIRECT
-  - DOMAIN-SUFFIX,t2.ru,DIRECT
-  - DOMAIN-SUFFIX,crimea.ru,DIRECT
-  - DOMAIN-SUFFIX,lisaalert.org,DIRECT
-  - DOMAIN-SUFFIX,dobro.ru,DIRECT
-  - DOMAIN-SUFFIX,onf.ru,DIRECT
-  - DOMAIN-SUFFIX,znanie.ru,DIRECT
-  - DOMAIN-SUFFIX,lenta.com,DIRECT
-  - DOMAIN-SUFFIX,dostavista.ru,DIRECT
-  - DOMAIN-SUFFIX,dodopizza.ru,DIRECT
-  - DOMAIN-SUFFIX,gazprombank.ru,DIRECT
-  - DOMAIN-SUFFIX,khl.ru,DIRECT
-  - DOMAIN-SUFFIX,delimobil.ru,DIRECT
-  - DOMAIN-SUFFIX,belkacar.ru,DIRECT
-  - DOMAIN-SUFFIX,medsi.ru,DIRECT
-  - DOMAIN-SUFFIX,ruviki.ru,DIRECT
-  - DOMAIN-SUFFIX,premier.one,DIRECT
-  - DOMAIN-SUFFIX,roskachestvo.ru,DIRECT
-  - DOMAIN-SUFFIX,rosatom.ru,DIRECT
-  - DOMAIN-SUFFIX,rostec.ru,DIRECT
-  - DOMAIN-SUFFIX,rosneft.ru,DIRECT
-  - DOMAIN-SUFFIX,nornickel.ru,DIRECT
-
-  # Global Proxy & App Rules
-  - DOMAIN,raw.githubusercontent.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,github.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,githubusercontent.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,jsdelivr.net,🌐 Global Proxy
-  - DOMAIN-SUFFIX,github.io,🌐 Global Proxy
-  - DOMAIN-SUFFIX,githubassets.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,githubapp.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,github.blog,🌐 Global Proxy
-  - DOMAIN-SUFFIX,githubstatus.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,github.dev,🌐 Global Proxy
-  - DOMAIN-SUFFIX,api.github.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,user-images.githubusercontent.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,avatars.githubusercontent.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,camo.githubusercontent.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,gist.github.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,gist.githubusercontent.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,pages.github.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,releases.githubusercontent.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,objects.githubusercontent.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,media.githubusercontent.com,🌐 Global Proxy
-  - DOMAIN,ipv6.msftconnecttest.com,REJECT
-  - DOMAIN,www.msftconnecttest.com,DIRECT
-
-  - PROCESS-NAME,com.zhiliaoapp.musically,🌐 Global Proxy
-  - PROCESS-NAME,com.ss.android.ugc.trill,🌐 Global Proxy
-  - GEOSITE,tiktok,🌐 Global Proxy
-  - DOMAIN-SUFFIX,tiktok.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,tiktokv.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,tiktokcdn.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,tiktokcdn-us.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,tiktokcdn-eu.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,tiktokd.org,🌐 Global Proxy
-  - DOMAIN-SUFFIX,byteoversea.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,byteoversea.net,🌐 Global Proxy
-  - DOMAIN-SUFFIX,ibyteimg.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,ttwstatic.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,snssdk.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,musically.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,musical.ly,🌐 Global Proxy
-  - DOMAIN-KEYWORD,tiktokcdn,🌐 Global Proxy
-
-  - AND,((DST-PORT,443),(NETWORK,UDP),(NOT,((GEOIP,RU))),(NOT,((GEOIP,telegram)))),REJECT
-
-  - RULE-SET,apple-ai,🌐 Global Proxy
-  - PROCESS-NAME,com.pinterest,🌐 Global Proxy
-  - DOMAIN-KEYWORD,pinterest,🌐 Global Proxy
-  - DOMAIN-SUFFIX,pinterest.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,pinimg.com,🌐 Global Proxy
-  - PROCESS-NAME,com.instagram.android,🌐 Global Proxy
-  - PROCESS-NAME,com.facebook.katana,🌐 Global Proxy
-  - DOMAIN-SUFFIX,instagram.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,instagr.am,🌐 Global Proxy
-  - DOMAIN-SUFFIX,cdninstagram.com,🌐 Global Proxy
-  - DOMAIN-KEYWORD,instagram,🌐 Global Proxy
-  - DOMAIN-SUFFIX,facebook.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,facebook.net,🌐 Global Proxy
-  - DOMAIN-SUFFIX,fbcdn.net,🌐 Global Proxy
-  - DOMAIN-SUFFIX,fbsbx.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,fb.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,fb.me,🌐 Global Proxy
-
-  - GEOSITE,youtube,🌐 Global Proxy
-  - DOMAIN-SUFFIX,youtube.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,youtu.be,🌐 Global Proxy
-  - DOMAIN-SUFFIX,googlevideo.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,ytimg.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,ggpht.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,youtubei.googleapis.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,jnn-pa.googleapis.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,youtube-nocookie.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,yt.be,🌐 Global Proxy
-  - DOMAIN-SUFFIX,widevine.com,🌐 Global Proxy
-  - DOMAIN-KEYWORD,youtube,🌐 Global Proxy
-
-  # AI Services
-  - DOMAIN-SUFFIX,api.x.ai,🤖 Premium AI
-  - DOMAIN-SUFFIX,deepseek.com,🤖 Premium AI
-  - DOMAIN-SUFFIX,claude.ai,🤖 Premium AI
-  - DOMAIN-SUFFIX,anthropic.com,🤖 Premium AI
-  - DOMAIN-SUFFIX,openai.com,🤖 Premium AI
-  - DOMAIN-SUFFIX,chatgpt.com,🤖 Premium AI
-  - DOMAIN-SUFFIX,oaistatic.com,🤖 Premium AI
-  - DOMAIN-SUFFIX,oaiusercontent.com,🤖 Premium AI
-  - DOMAIN-SUFFIX,gemini.google.com,🤖 Premium AI
-  - DOMAIN-SUFFIX,gemini.googleapis.com,🤖 Premium AI
-  - DOMAIN-SUFFIX,generativeai.google,🤖 Premium AI
-  - DOMAIN-SUFFIX,generativelanguage.googleapis.com,🤖 Premium AI
-  - DOMAIN-SUFFIX,aistudio.google.com,🤖 Premium AI
-  - DOMAIN-SUFFIX,copilot.microsoft.com,🤖 Premium AI
-  - DOMAIN-SUFFIX,copilot.cloud.microsoft,🤖 Premium AI
-  - DOMAIN-SUFFIX,sydney.bing.com,🤖 Premium AI
-  - DOMAIN-SUFFIX,substrate.office.com,🤖 Premium AI
-  - DOMAIN-SUFFIX,edge.microsoft.com,🤖 Premium AI
-  - DOMAIN-SUFFIX,edgeservices.bing.com,🤖 Premium AI
-  - DOMAIN-SUFFIX,www.bing.com,🤖 Premium AI
-  - DOMAIN-KEYWORD,copilot,🤖 Premium AI
-  - DOMAIN-SUFFIX,bing.com,🤖 Premium AI
-  - DOMAIN-SUFFIX,grok.com,🤖 Premium AI
-  - DOMAIN-SUFFIX,grok.x.ai,🤖 Premium AI
-  - DOMAIN-SUFFIX,grok.x.com,🤖 Premium AI
-  - DOMAIN-SUFFIX,x.ai,🤖 Premium AI
-  - DOMAIN-KEYWORD,grok,🤖 Premium AI
-  - DOMAIN-SUFFIX,huggingface.co,🤖 Premium AI
-  - DOMAIN-SUFFIX,civitai.com,🤖 Premium AI
-  - DOMAIN-SUFFIX,openaimerge.com,🤖 Premium AI
-  - DOMAIN-SUFFIX,statsigapi.net,🤖 Premium AI
-  - DOMAIN-SUFFIX,statsig.com,🤖 Premium AI
-  - DOMAIN-SUFFIX,workos.com,🤖 Premium AI
-  - DOMAIN-SUFFIX,workoscdn.com,🤖 Premium AI
-  - DOMAIN-SUFFIX,intercom.io,🤖 Premium AI
-  - DOMAIN-SUFFIX,intercomcdn.com,🤖 Premium AI
-  - DOMAIN-SUFFIX,featuregates.org,🤖 Premium AI
-  - DOMAIN-SUFFIX,featureassets.org,🤖 Premium AI
-  - DOMAIN-SUFFIX,sentry.io,🤖 Premium AI
-  - DOMAIN-SUFFIX,datadoghq.com,🤖 Premium AI
-  - DOMAIN-SUFFIX,imgix.net,🤖 Premium AI
-  - DOMAIN-SUFFIX,auth0.com,🤖 Premium AI
-  - DOMAIN-SUFFIX,livekit.cloud,🤖 Premium AI
-  - DOMAIN-SUFFIX,arkoselabs.com,🤖 Premium AI
-  - DOMAIN,challenges.cloudflare.com,🤖 Premium AI
-  - DOMAIN-SUFFIX,identrust.com,🤖 Premium AI
-
-  # Chat & Comms
-  - GEOSITE,discord,🌐 Global Proxy
-  - DOMAIN-SUFFIX,discord.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,discordapp.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,discordapp.net,🌐 Global Proxy
-  - DOMAIN-SUFFIX,discord.gg,🌐 Global Proxy
-  - DOMAIN-SUFFIX,discord.media,🌐 Global Proxy
-  - DOMAIN-SUFFIX,discord.co,🌐 Global Proxy
-  - DOMAIN-KEYWORD,discord,🌐 Global Proxy
-
-  - GEOSITE,telegram,🌐 Global Proxy
-  - GEOIP,telegram,🌐 Global Proxy
-  - IP-CIDR,91.108.4.0/22,🌐 Global Proxy,no-resolve
-  - IP-CIDR,91.108.8.0/21,🌐 Global Proxy,no-resolve
-  - IP-CIDR,91.108.56.0/22,🌐 Global Proxy,no-resolve
-  - IP-CIDR,149.154.160.0/20,🌐 Global Proxy,no-resolve
-  - IP-CIDR,185.76.151.0/24,🌐 Global Proxy,no-resolve
-  - IP-CIDR6,2001:b28f::/32,🌐 Global Proxy,no-resolve
-  - IP-CIDR6,2001:67c:4e8::/48,🌐 Global Proxy,no-resolve
-  - IP-CIDR6,2a0a:f280::/32,🌐 Global Proxy,no-resolve
-  - DOMAIN-SUFFIX,t.me,🌐 Global Proxy
-  - DOMAIN-SUFFIX,tx.me,🌐 Global Proxy
-  - DOMAIN-SUFFIX,telegram.me,🌐 Global Proxy
-  - DOMAIN-SUFFIX,telegram.org,🌐 Global Proxy
-  - DOMAIN-SUFFIX,telesco.pe,🌐 Global Proxy
-  - DOMAIN-KEYWORD,telegram,🌐 Global Proxy
-  - DOMAIN-SUFFIX,viber.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,skype.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,skypeassets.com,🌐 Global Proxy
-
-  # IT & Dev Services
-  - GEOSITE,category-dev,🌐 Global Proxy
-  - DOMAIN-SUFFIX,docker.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,docker.io,🌐 Global Proxy
-  - DOMAIN-SUFFIX,workers.dev,🌐 Global Proxy
-  - DOMAIN-SUFFIX,pages.dev,🌐 Global Proxy
-  - DOMAIN-SUFFIX,vercel.app,🌐 Global Proxy
-  - DOMAIN-SUFFIX,vercel.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,notion.so,🌐 Global Proxy
-  - DOMAIN-SUFFIX,notion.site,🌐 Global Proxy
-  - DOMAIN-SUFFIX,figma.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,canva.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,trello.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,atlassian.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,jira.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,miro.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,binance.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,stripe.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,tradingview.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,amazon.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,ebay.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,ebaystatic.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,ebayrtm.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,ggsel.net,🌐 Global Proxy
-  - DOMAIN-KEYWORD,ggsel,🌐 Global Proxy
-  - DOMAIN,dash.cloudflare.com,🌐 Global Proxy
-  - DOMAIN,api.cloudflare.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,nvidia.com,🌐 Global Proxy
-  - DOMAIN-KEYWORD,geforce,🌐 Global Proxy
-  - DOMAIN-SUFFIX,amd.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,intel.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,realtek.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,realtek.com.tw,🌐 Global Proxy
-  - GEOSITE,supercell,🌐 Global Proxy
-  - DOMAIN-SUFFIX,supercell.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,brawlstars.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,brawlstarsgame.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,clashofclans.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,clashroyale.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,z8games.com,🌐 Global Proxy
-  - DOMAIN-KEYWORD,z8games,🌐 Global Proxy
-  - DOMAIN-KEYWORD,crossfire,🌐 Global Proxy
-  - DOMAIN-SUFFIX,riotgames.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,valorant.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,playvalorant.com,🌐 Global Proxy
-  - PROCESS-NAME,riotclient.exe,🌐 Global Proxy
-  - PROCESS-NAME,valorant.exe,🌐 Global Proxy
-  - DOMAIN-SUFFIX,epicgames.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,unrealengine.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,adobe.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,adobe.io,🌐 Global Proxy
-  - DOMAIN-SUFFIX,adobelogin.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,topazlabs.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,capcut.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,capcutv.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,vscode-cdn.net,🌐 Global Proxy
-  - DOMAIN-SUFFIX,visualstudio.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,microsoft.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,microsoftonline.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,windows.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,windowsupdate.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,live.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,office.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,office365.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,whatsapp.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,whatsapp.net,🌐 Global Proxy
-  - DOMAIN-SUFFIX,wa.me,🌐 Global Proxy
-  - DOMAIN-SUFFIX,reddit.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,redditmedia.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,redditstatic.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,spotify.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,scdn.co,🌐 Global Proxy
-  - DOMAIN-SUFFIX,spoti.fi,🌐 Global Proxy
-  - DOMAIN-SUFFIX,speedtest.net,🌐 Global Proxy
-  - DOMAIN-SUFFIX,ookla.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,ooklaserver.net,🌐 Global Proxy
-  - DOMAIN-SUFFIX,fast.com,🌐 Global Proxy
-
-  # Uncensored Content (Direct Proxying)
-  - DOMAIN-SUFFIX,pornhub.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,phncdn.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,xvideos.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,xnxx.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,xhamster.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,redtube.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,youporn.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,pornhubpremium.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,redgifs.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,rule34.xxx,🌐 Global Proxy
-  - DOMAIN-SUFFIX,e621.net,🌐 Global Proxy
-  - DOMAIN-SUFFIX,onlyfans.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,fansly.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,manyvids.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,chaturbate.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,stripchat.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,myfreecams.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,bongacams.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,livejasmin.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,cam4.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,camsoda.com,🌐 Global Proxy
-  - DOMAIN-SUFFIX,flirt4free.com,🌐 Global Proxy
-  - DOMAIN-KEYWORD,pornhub,🌐 Global Proxy
-  - DOMAIN-KEYWORD,phncdn,🌐 Global Proxy
-  - DOMAIN-KEYWORD,xvideos,🌐 Global Proxy
-  - DOMAIN-KEYWORD,xnxx,🌐 Global Proxy
-  - DOMAIN-KEYWORD,onlyfans,🌐 Global Proxy
-  - DOMAIN-KEYWORD,fansly,🌐 Global Proxy
-  - DOMAIN-KEYWORD,chaturbate,🌐 Global Proxy
-  - DOMAIN-KEYWORD,stripchat,🌐 Global Proxy
-  - DOMAIN-KEYWORD,bongacams,🌐 Global Proxy
-  - DOMAIN-KEYWORD,porn,🌐 Global Proxy
-  - DOMAIN-KEYWORD,sex,🌐 Global Proxy
-  - DOMAIN-KEYWORD,xxx,🌐 Global Proxy
-  - DOMAIN-KEYWORD,hentai,🌐 Global Proxy
-  - DOMAIN-KEYWORD,nsfw,🌐 Global Proxy
-  - DOMAIN-KEYWORD,adult,🌐 Global Proxy
-
-  # Fallback Routing
-  - GEOIP,RU,DIRECT,no-resolve
-  - MATCH,🌐 Global Proxy
-`;
-            document.getElementById('output').textContent = finalYAML;
+            // 3. Скачиваем шаблон и подставляем значения
+            output.textContent = "⏳ Generating config...";
+            const template = await fetchTemplate();
+            
+            if (template) {
+                let finalYAML = template.replace('{{TUN_CONFIG}}', tunConfig);
+                finalYAML = finalYAML.replace('{{PROXIES_YAML}}', proxiesYAML);
+                finalYAML = finalYAML.replace(/\{\{PROXY_NAMES\}\}/g, proxyNames);
+                output.textContent = finalYAML;
+            } else {
+                output.textContent = "❌ Ошибка: файл template.yaml не найден рядом с index.html.\nПожалуйста, создайте этот файл в репозитории на GitHub.";
+            }
         }
 
         function downloadFile() {
             const content = document.getElementById('output').textContent;
-            const ext = document.getElementById('extension').value;
-            const filename = `Network_Config_v77.${ext}`;
-            const blob = new Blob([content], { type: 'text/yaml' });
-            const url = window.URL.createObjectURL(blob);
+            if (content.includes("Ошибка:")) { showToast("Сначала исправьте ошибку!", "#f85149"); return; }
             const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(a);
+            a.href = window.URL.createObjectURL(new Blob([content], { type: 'text/yaml' }));
+            a.download = `Network_Config_v4.${document.getElementById('extension').value}`;
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
         }
 
         function copyResult() {
+            if (document.getElementById('output').textContent.includes("Ошибка:")) return;
             navigator.clipboard.writeText(document.getElementById('output').textContent);
             showToast("✅ YAML Profile copied!");
         }
 
         function showToast(message, color = "#238636") {
             const toast = document.getElementById("toast");
-            toast.textContent = message;
-            toast.style.backgroundColor = color;
-            toast.className = "show";
+            toast.textContent = message; toast.style.backgroundColor = color; toast.className = "show";
             setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
         }
     </script>
