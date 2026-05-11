@@ -2,26 +2,128 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>VPN Converter V3 (Reality Fix)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlClash VPN Converter</title>
     <style>
-        body { background: #090c0e; color: #b8ccd8; font-family: monospace; padding: 20px; max-width: 800px; }
-        textarea { width: 100%; height: 150px; background: #0c1318; color: #00ff9f; border: 1px solid #172028; padding: 10px; margin-bottom: 10px; box-sizing: border-box; }
-        button { background: #00ff9f; color: #000; border: none; padding: 10px 20px; cursor: pointer; font-weight: bold; margin-right: 10px; margin-bottom: 10px; }
-        pre { background: #0c1318; padding: 15px; border: 1px solid #172028; color: #88b0c4; overflow-x: auto; max-height: 400px; }
-        .hint { color: #2a5a78; font-size: 12px; margin-top: 10px; background: #090f13; padding: 10px; border: 1px solid #121e28; }
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+
+        body { 
+            background-color: #0b1116; 
+            color: #c9d1d9; 
+            font-family: 'JetBrains Mono', monospace; 
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .container {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 700px;
+            width: 100%;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+        }
+
+        h2 { 
+            margin-top: 0; 
+            color: #58a6ff; 
+            font-size: 24px;
+            border-bottom: 1px solid #30363d;
+            padding-bottom: 15px;
+        }
+
+        p { font-size: 14px; color: #8b949e; }
+
+        textarea { 
+            width: 100%; 
+            height: 120px; 
+            background: #0d1117; 
+            color: #3fb950; 
+            border: 1px solid #30363d; 
+            border-radius: 8px;
+            padding: 15px; 
+            margin-bottom: 20px; 
+            box-sizing: border-box;
+            font-family: inherit;
+            resize: vertical;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        textarea:focus { border-color: #58a6ff; }
+
+        .btn-group { display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; }
+
+        button { 
+            border: none; 
+            padding: 12px 24px; 
+            border-radius: 6px; 
+            font-weight: bold; 
+            font-family: inherit;
+            cursor: pointer; 
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+
+        .btn-convert { 
+            background: #238636; 
+            color: #ffffff; 
+        }
+        .btn-convert:hover { background: #2ea043; transform: translateY(-1px); }
+
+        .btn-copy { 
+            background: #21262d; 
+            color: #c9d1d9; 
+            border: 1px solid #30363d;
+        }
+        .btn-copy:hover { background: #30363d; }
+
+        pre { 
+            background: #0d1117; 
+            padding: 20px; 
+            border: 1px solid #30363d; 
+            border-radius: 8px;
+            color: #a5d6ff; 
+            overflow-x: auto; 
+            max-height: 350px; 
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .hint { 
+            color: #8b949e; 
+            font-size: 12px; 
+            margin-top: 20px; 
+            background: #1c2128; 
+            padding: 15px; 
+            border-left: 4px solid #58a6ff; 
+            border-radius: 0 6px 6px 0;
+            line-height: 1.6;
+        }
     </style>
 </head>
 <body>
-    <h2>FlClash Converter (YAML)</h2>
-    <p>Вставь сюда ссылку подписки (https://...), Base64-код или vless:// ссылки:</p>
-    
-    <textarea id="input" placeholder="vless://..."></textarea>
-    <br>
-    <button onclick="startProcess()">► КОНВЕРТИРОВАТЬ</button>
-    <button onclick="copyResult()" style="background:#2a4a5a; color:white;">⎘ КОПИРОВАТЬ YAML</button>
-    
-    <h3>Результат:</h3>
-    <pre id="output">Здесь появится готовый конфиг...</pre>
+    <div class="container">
+        <h2>⚡ FlClash Конвертер</h2>
+        <p>Вставь ссылку на подписку (https://...), Base64 или набор vless:// серверов:</p>
+        
+        <textarea id="input" placeholder="vless://..."></textarea>
+        
+        <div class="btn-group">
+            <button class="btn-convert" onclick="startProcess()">► КОНВЕРТИРОВАТЬ</button>
+            <button class="btn-copy" onclick="copyResult()">⎘ КОПИРОВАТЬ YAML</button>
+        </div>
+        
+        <pre id="output">Здесь появится готовый конфиг для FlClash...</pre>
+
+        <div class="hint">
+            <strong>💡 Подсказка:</strong><br>
+            Если ссылка не скачивается автоматически (блок прокси), открой её в браузере, скопируй весь зашифрованный текст и вставь его сюда.
+        </div>
+    </div>
 
     <script>
         async function startProcess() {
@@ -30,13 +132,13 @@
             if (!input) { out.textContent = "Пустое поле!"; return; }
 
             if (input.startsWith('http://') || input.startsWith('https://')) {
-                out.textContent = "Скачиваю...";
+                out.textContent = "⏳ Скачиваю данные с сервера...";
                 try {
                     const res = await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(input));
                     if (!res.ok) throw new Error("Ошибка");
                     parseData(await res.text());
                 } catch (e) {
-                    out.textContent = "❌ Не удалось скачать автоматически. Скопируй текст со страницы вручную.";
+                    out.textContent = "❌ Сервер заблокировал запрос.\n\nСкопируй текст по ссылке вручную и вставь сюда.";
                 }
             } else {
                 parseData(input);
@@ -71,7 +173,7 @@
                                 sni: params.get('sni') || url.hostname,
                                 network: params.get('type') || "tcp",
                                 flow: params.get('flow') || "",
-                                fp: params.get('fp') || "chrome", // Дефолтный отпечаток браузера
+                                fp: params.get('fp') || "chrome",
                                 udp: true
                             });
                         } catch (e) {}
@@ -91,16 +193,21 @@
                 });
                 out.textContent = yaml;
             } else {
-                out.textContent = "❌ Не нашел рабочих серверов.";
+                out.textContent = "❌ Не нашел рабочих серверов VLESS в тексте.";
             }
         }
 
         function copyResult() {
             const text = document.getElementById('output').textContent;
+            const btn = document.querySelector('.btn-copy');
             if (text.includes('proxies:')) {
                 navigator.clipboard.writeText(text);
-                document.querySelector('button[onclick="copyResult()"]').textContent = "✓ СКОПИРОВАНО";
-                setTimeout(() => document.querySelector('button[onclick="copyResult()"]').textContent = "⎘ КОПИРОВАТЬ YAML", 2000);
+                btn.textContent = "✓ СКОПИРОВАНО";
+                btn.style.color = "#3fb950";
+                setTimeout(() => {
+                    btn.textContent = "⎘ КОПИРОВАТЬ YAML";
+                    btn.style.color = "#c9d1d9";
+                }, 2000);
             }
         }
     </script>
