@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Network Builder v4.0 Clean</title>
+    <title>Network Builder v5.0 Clean</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
@@ -16,7 +16,7 @@
 
         .container {
             background: #161b22; border: 1px solid #30363d;
-            border-radius: 12px; padding: 30px; max-width: 900px; width: 100%;
+            border-radius: 12px; padding: 30px; max-width: 950px; width: 100%;
             box-shadow: 0 8px 24px rgba(0,0,0,0.5);
         }
 
@@ -43,13 +43,13 @@
         p { font-size: 13px; color: #8b949e; margin-bottom: 15px; line-height: 1.6; }
 
         textarea { 
-            width: 100%; height: 100px; background: #010409; color: #3fb950; 
+            width: 100%; height: 110px; background: #010409; color: #3fb950; 
             border: 2px dashed #30363d; border-radius: 8px; padding: 15px; 
             margin-bottom: 20px; box-sizing: border-box; font-family: inherit;
-            resize: vertical; outline: none; transition: border-color 0.2s, background 0.2s;
+            resize: vertical; outline: none; transition: all 0.2s ease;
         }
         textarea:focus { border-color: #58a6ff; }
-        textarea.dragover { border-color: #58a6ff; background: #0d1117; }
+        textarea.dragover { border-color: #58a6ff; background: #161b22; box-shadow: 0 0 15px rgba(88,166,255,0.2); }
 
         .btn-group { display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap; align-items: center; }
 
@@ -73,8 +73,8 @@
         }
 
         .cards-grid {
-            display: none; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 12px; margin-bottom: 20px; max-height: 350px; overflow-y: auto; padding-right: 5px;
+            display: none; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 12px; margin-bottom: 20px; max-height: 380px; overflow-y: auto; padding-right: 5px;
         }
         .cards-grid::-webkit-scrollbar { width: 6px; }
         .cards-grid::-webkit-scrollbar-track { background: #010409; border-radius: 3px; }
@@ -88,7 +88,7 @@
         
         .proxy-name { 
             font-weight: bold; color: #58a6ff; font-size: 13px; white-space: nowrap; 
-            overflow: hidden; text-overflow: ellipsis; padding-right: 80px; 
+            overflow: hidden; text-overflow: ellipsis; padding-right: 90px; 
             outline: none; border-bottom: 1px dashed transparent; cursor: text;
         }
         .proxy-name:focus { border-bottom: 1px dashed #58a6ff; }
@@ -113,7 +113,7 @@
         pre { 
             background: #010409; padding: 20px; border: 1px solid #30363d; 
             border-radius: 8px; color: #a5d6ff; overflow-x: auto; 
-            max-height: 350px; font-size: 12px; line-height: 1.5;
+            max-height: 400px; font-size: 12px; line-height: 1.5;
         }
 
         #toast {
@@ -141,27 +141,31 @@
 <body>
     <div class="container">
         <h2>
-            ⚡ Network Builder v4.0 (Clean)
+            ⚡ Network Builder v5.0
             <div class="header-actions">
-                <button class="icon-btn primary" onclick="pingAll()" title="Проверить все серверы на доступность">⚡ Ping All</button>
-                <button class="icon-btn" onclick="sortProxies()" title="Отсортировать по скорости (нужно пропинговать)">📶 Sort</button>
-                <button class="icon-btn" onclick="shuffleProxies()" title="Перемешать узлы случайным образом">🔀 Shuffle</button>
-                <button class="icon-btn" onclick="exportRawNodes()" title="Сохранить сырые ссылки в TXT">📥 Backup</button>
+                <button class="icon-btn primary" onclick="pingAll()" title="Проверить все узлы">⚡ Ping All</button>
+                <button class="icon-btn" onclick="sortProxies()" title="Сортировка по задержке">📶 Sort</button>
+                <button class="icon-btn" onclick="shuffleProxies()" title="Перемешать">🔀 Shuffle</button>
+                <button class="icon-btn" onclick="exportRawNodes()" title="Выгрузить в .txt">📥 Backup</button>
                 <button class="icon-btn danger" onclick="clearAll()" title="Удалить всё">🗑 Clear</button>
             </div>
         </h2>
         
-        <p>Поддержка: VLESS, Trojan, Hysteria2. Перетащите файл со списком узлов прямо в это окно или вставьте ссылки.</p>
+        <p>Поддержка VLESS, Trojan, Hysteria2. Вставьте ссылки или <b>перетащите .txt файл прямо в поле ниже.</b></p>
         
-        <textarea id="input" placeholder="Drop .txt file here or paste links:&#10;vless://...&#10;hy2://..."></textarea>
+        <textarea id="input" placeholder="Drop .txt file here or paste links:
+vless://...
+hy2://...
+trojan://..."></textarea>
         
         <div class="btn-group">
-            <button class="action-btn btn-convert" onclick="startProcess()">► BUILD CONFIG</button>
+            <button class="action-btn btn-convert" onclick="startProcess()">► PROCESS NODES</button>
             <span id="nodeCount" class="status-badge">0 Nodes</span>
             
-            <select id="deviceProfile" style="margin-left: auto;" onchange="generateYAML()">
-                <option value="mobile">📱 Mobile / PC (TUN)</option>
-                <option value="router">🌐 Router (Keenetic / OpenWRT)</option>
+            <select id="exportFormat" style="margin-left: auto;" onchange="updateOutput()">
+                <option value="clash_mobile">📱 FlClash YAML (TUN)</option>
+                <option value="clash_router">🌐 FlClash YAML (Router)</option>
+                <option value="singbox">📦 Sing-box / Nekobox (JSON)</option>
             </select>
             
             <button id="copyBtn" class="action-btn btn-copy" onclick="copyResult()">⎘ COPY</button>
@@ -169,7 +173,7 @@
         </div>
         
         <div id="cardsContainer" class="cards-grid"></div>
-        <pre id="output">Waiting for nodes...</pre>
+        <pre id="output">Waiting for data...</pre>
     </div>
 
     <div id="toast">✅ Done!</div>
@@ -186,38 +190,43 @@
         let currentProxies = []; 
         let cachedTemplate = null;
 
-        // DRAG AND DROP LOGIC
+        // === 1. DRAG AND DROP ЛОГИКА ===
         const dropZone = document.getElementById('input');
-        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
-        dropZone.addEventListener('dragleave', (e) => { e.preventDefault(); dropZone.classList.remove('dragover'); });
+        
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+        
+        dropZone.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+        });
+        
         dropZone.addEventListener('drop', (e) => {
             e.preventDefault();
             dropZone.classList.remove('dragover');
+            
             if (e.dataTransfer.files.length > 0) {
                 const file = e.dataTransfer.files[0];
                 const reader = new FileReader();
-                reader.onload = (event) => { dropZone.value = event.target.result; showToast("Файл прочитан!"); };
+                reader.onload = (event) => {
+                    dropZone.value = event.target.result;
+                    showToast(`📁 Файл "${file.name}" прочитан!`);
+                };
                 reader.readAsText(file);
             }
         });
 
         window.onload = () => {
-            const savedProxies = localStorage.getItem('flclash_net_v4');
-            if (savedProxies) {
-                currentProxies = JSON.parse(savedProxies);
-                if (currentProxies.length > 0) renderCards();
-            }
+            const savedProxies = localStorage.getItem('flclash_net_v5');
+            if (savedProxies) { currentProxies = JSON.parse(savedProxies); if (currentProxies.length > 0) renderCards(); }
         };
 
-        function saveState() {
-            localStorage.setItem('flclash_net_v4', JSON.stringify(currentProxies));
-        }
+        function saveState() { localStorage.setItem('flclash_net_v5', JSON.stringify(currentProxies)); }
 
         function clearAll() {
-            if(confirm('Clear all nodes?')) {
-                currentProxies = []; document.getElementById('input').value = '';
-                saveState(); renderCards();
-            }
+            if(confirm('Clear all nodes?')) { currentProxies = []; document.getElementById('input').value = ''; saveState(); renderCards(); }
         }
 
         function shuffleProxies() {
@@ -238,34 +247,32 @@
         function exportRawNodes() {
             if (currentProxies.length === 0) return;
             const blob = new Blob([currentProxies.map(p => p.rawLink).join('\n')], { type: 'text/plain' });
-            const a = document.createElement('a');
-            a.href = window.URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.href = window.URL.createObjectURL(blob);
             a.download = `Nodes_Backup_${new Date().getTime()}.txt`;
             document.body.appendChild(a); a.click(); document.body.removeChild(a);
         }
 
         async function startProcess() {
             const input = document.getElementById('input').value.trim();
+            const out = document.getElementById('output');
             if (!input) { showToast("Input is empty!", "#f85149"); return; }
+
             if (input.startsWith('http') && !input.includes('://')) {
-                document.getElementById('output').textContent = "⏳ Fetching...";
+                out.textContent = "⏳ Fetching...";
                 try {
                     const res = await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(input));
                     parseData(await res.text());
-                } catch (e) { document.getElementById('output').textContent = "❌ Fetch failed. Paste data manually."; }
+                } catch (e) { out.textContent = "❌ Fetch failed. Paste data manually."; }
             } else { parseData(input); }
         }
 
         function parseData(rawText) {
             let text = rawText.trim();
-            if (!text.includes('://') && !text.includes('"outbounds"')) {
-                try { text = atob(text.replace(/\s/g, '')); } catch (e) {}
-            }
+            if (!text.includes('://') && !text.includes('"outbounds"')) { try { text = atob(text.replace(/\s/g, '')); } catch (e) {} }
 
             let newProxiesCount = 0;
             text.split('\n').forEach(line => {
-                line = line.trim();
-                let proxyObj = null;
+                line = line.trim(); let proxyObj = null;
                 try {
                     if (line.startsWith('vless://')) {
                         const url = new URL(line); const p = new URLSearchParams(url.search);
@@ -292,9 +299,7 @@
                             tls: true, sni: p.get('sni') || url.hostname, network: p.get('type') || "tcp", fp: p.get('fp') || "chrome", rawLink: line
                         };
                     }
-                    if (proxyObj && !currentProxies.some(p => p.server === proxyObj.server && p.port === proxyObj.port)) {
-                        currentProxies.push(proxyObj); newProxiesCount++;
-                    }
+                    if (proxyObj && !currentProxies.some(p => p.server === proxyObj.server && p.port === proxyObj.port)) { currentProxies.push(proxyObj); newProxiesCount++; }
                 } catch (e) {}
             });
 
@@ -304,8 +309,7 @@
         }
 
         async function pingNode(index, button) {
-            button.textContent = "⏳";
-            const start = performance.now();
+            button.textContent = "⏳"; const start = performance.now();
             try {
                 await fetch(`https://${currentProxies[index].server}:${currentProxies[index].port}`, { mode: 'no-cors', cache: 'no-store', signal: AbortSignal.timeout(3000) });
                 const ping = Math.round(performance.now() - start);
@@ -317,11 +321,10 @@
         }
 
         async function pingAll() {
-            if (currentProxies.length === 0) return;
-            showToast("⏳ Testing all nodes...", "#d29922");
+            if (currentProxies.length === 0) return; showToast("⏳ Testing nodes...", "#d29922");
             const buttons = document.querySelectorAll('.btn-ping');
             await Promise.all(currentProxies.map((_, i) => buttons[i] ? pingNode(i, buttons[i]) : Promise.resolve()));
-            showToast("✅ All tests completed!");
+            showToast("✅ Tests completed!");
         }
 
         function showQR(index) {
@@ -340,34 +343,33 @@
                 document.getElementById('nodeCount').textContent = `${currentProxies.length} Nodes`;
 
                 currentProxies.forEach((p, index) => {
+                    let typeClass = p.type === "hysteria2" ? "type-hy2" : (p.type === "trojan" ? "type-trojan" : "type-vless");
                     let pingLabel = p.lastPing === undefined ? "⚡" : (p.lastPing === 99999 ? "Err" : `${p.lastPing}ms`);
                     let pingColor = p.lastPing === undefined ? "#c9d1d9" : (p.lastPing === 99999 ? "#f85149" : "#3fb950");
                     const card = document.createElement('div'); card.className = 'proxy-card';
                     card.innerHTML = `
                         <div class="card-actions">
-                            <button class="btn-card btn-ping" style="color: ${pingColor}" onclick="pingNode(${index}, this)">${pingLabel}</button>
-                            <button class="btn-card" onclick="showQR(${index})">📱</button>
-                            <button class="btn-card" onclick="copyLink(${index})">🔗</button>
-                            <button class="btn-card remove" onclick="removeProxy(${index})">✖</button>
+                            <button class="btn-card btn-ping" style="color: ${pingColor}" onclick="pingNode(${index}, this)" title="Test latency">${pingLabel}</button>
+                            <button class="btn-card" onclick="showQR(${index})" title="Show QR">📱</button>
+                            <button class="btn-card" onclick="copyLink(${index})" title="Copy link">🔗</button>
+                            <button class="btn-card remove" onclick="removeProxy(${index})" title="Remove">✖</button>
                         </div>
                         <div class="proxy-name" contenteditable="true" spellcheck="false" 
                              onblur="renameProxy(${index}, this.innerText)" 
                              onkeydown="if(event.key === 'Enter'){this.blur(); return false;}">${p.name}</div>
-                        <div class="proxy-detail"><div><span class="proxy-type ${p.type==='hysteria2'?'type-hy2':p.type==='trojan'?'type-trojan':'type-vless'}">${p.type}</span> ${p.server}:${p.port}</div></div>
+                        <div class="proxy-detail"><div><span class="proxy-type ${typeClass}">${p.type}</span> ${p.server}:${p.port}</div></div>
                     `;
                     container.appendChild(card);
                 });
                 
-                generateYAML(); 
+                updateOutput(); 
                 container.style.display = 'grid';
                 document.getElementById('downloadBtn').style.display = "inline-block";
                 document.getElementById('copyBtn').style.display = "inline-block";
             } else {
-                container.style.display = 'none';
-                document.getElementById('nodeCount').style.display = "none";
-                document.getElementById('output').textContent = "Waiting for nodes...";
-                document.getElementById('downloadBtn').style.display = "none";
-                document.getElementById('copyBtn').style.display = "none";
+                container.style.display = 'none'; document.getElementById('nodeCount').style.display = "none";
+                document.getElementById('output').textContent = "Waiting for data...";
+                document.getElementById('downloadBtn').style.display = "none"; document.getElementById('copyBtn').style.display = "none";
             }
         }
 
@@ -378,32 +380,62 @@
                 currentProxies[index].name = cleanName;
                 try { let url = new URL(currentProxies[index].rawLink); url.hash = encodeURIComponent(cleanName); currentProxies[index].rawLink = url.toString(); } catch(e){}
             }
-            saveState(); generateYAML();
+            saveState(); updateOutput();
         }
         function copyLink(index) { navigator.clipboard.writeText(currentProxies[index].rawLink); showToast("🔗 Link copied!"); }
 
-        // =========================================================================
-        // === МАГИЯ CLEAN ARCHITECTURE: СКАЧИВАНИЕ ШАБЛОНА ===
-        // =========================================================================
+        // === ПЕРЕКЛЮЧЕНИЕ ФОРМАТА ЭКСПОРТА ===
+        function updateOutput() {
+            const format = document.getElementById('exportFormat').value;
+            if (format === 'singbox') {
+                generateJSON();
+            } else {
+                generateYAML(format);
+            }
+        }
+
+        // === 2. ЭКСПОРТ В JSON (SING-BOX / NEKOBOX) ===
+        function generateJSON() {
+            if (currentProxies.length === 0) return;
+            const outbounds = currentProxies.map(p => {
+                let ob = { tag: p.name, type: p.type, server: p.server, server_port: p.port };
+                if (p.type === 'vless' || p.type === 'trojan') {
+                    if (p.uuid) ob.uuid = p.uuid;
+                    if (p.password) ob.password = p.password;
+                    if (p.network && p.network !== 'tcp') ob.transport = { type: p.network };
+                    if (p.tls) {
+                        ob.tls = { enabled: true, server_name: p.sni || p.server, insecure: false };
+                        if (p.fp) ob.tls.utls = { enabled: true, fingerprint: p.fp };
+                        if (p["reality-opts"]) ob.tls.reality = { enabled: true, public_key: p["reality-opts"]["public-key"], short_id: p["reality-opts"]["short-id"] };
+                    }
+                    if (p.flow) ob.flow = p.flow;
+                } else if (p.type === 'hysteria2') {
+                    ob.password = p.password;
+                    ob.tls = { enabled: true, server_name: p.sni, insecure: p["skip-cert-verify"] };
+                    if (p.obfs) ob.obfs = { type: p.obfs, password: p["obfs-password"] };
+                }
+                return ob;
+            });
+            document.getElementById('output').textContent = JSON.stringify({ outbounds: outbounds }, null, 2);
+        }
+
+        // === 3. ИНТЕГРАЦИЯ CLEAN ARCHITECTURE: СКАЧИВАНИЕ ШАБЛОНА YAML ===
         async function fetchTemplate() {
             if (cachedTemplate) return cachedTemplate;
             try {
-                // Пытаемся скачать файл template.yaml с сервера GitHub Pages
                 const res = await fetch('template.yaml');
                 if (!res.ok) throw new Error();
                 cachedTemplate = await res.text();
                 return cachedTemplate;
             } catch (e) {
-                // Если файла нет (например, ты открыл html прямо с компьютера)
                 return null;
             }
         }
 
-        async function generateYAML() {
+        async function generateYAML(profileType) {
             if (currentProxies.length === 0) return;
             const output = document.getElementById('output');
             
-            // 1. Формируем список прокси
             let proxiesYAML = "proxies:\n";
             currentProxies.forEach(p => {
                 proxiesYAML += `  - name: "${p.name}"\n    type: ${p.type}\n    server: ${p.server}\n    port: ${p.port}\n    udp: true\n`;
@@ -424,31 +456,12 @@
 
             const proxyNames = currentProxies.map(p => `      - "${p.name}"`).join('\n');
 
-            // 2. Настраиваем TUN (Мобилка или Роутер)
-            let tunConfig = `tun:
-  enable: true
-  stack: mixed
-  device: Mihomo
-  gso: true
-  udp-timeout: 30
-  dns-hijack:
-    - any:53
-    - tcp://any:53
-  auto-route: true
-  auto-detect-interface: true
-  strict-route: true
-  endpoint-independent-nat: true
-  mtu: 1420`;
+            let tunConfig = `tun:\n  enable: true\n  stack: mixed\n  device: Mihomo\n  gso: true\n  udp-timeout: 30\n  dns-hijack:\n    - any:53\n    - tcp://any:53\n  auto-route: true\n  auto-detect-interface: true\n  strict-route: true\n  endpoint-independent-nat: true\n  mtu: 1420`;
 
-            if (document.getElementById('deviceProfile').value === 'router') {
-                tunConfig = `# ROUTER MODE (Keenetic/OpenWRT Compatible)
-tproxy-port: 7893
-redir-port: 7892
-tun:
-  enable: false`;
+            if (profileType === 'clash_router') {
+                tunConfig = `# ROUTER MODE (Keenetic/OpenWRT Compatible)\ntproxy-port: 7893\nredir-port: 7892\ntun:\n  enable: false`;
             }
 
-            // 3. Скачиваем шаблон и подставляем значения
             output.textContent = "⏳ Generating config...";
             const template = await fetchTemplate();
             
@@ -458,23 +471,29 @@ tun:
                 finalYAML = finalYAML.replace(/\{\{PROXY_NAMES\}\}/g, proxyNames);
                 output.textContent = finalYAML;
             } else {
-                output.textContent = "❌ Ошибка: файл template.yaml не найден рядом с index.html.\nПожалуйста, создайте этот файл в репозитории на GitHub.";
+                output.textContent = "❌ Ошибка: файл template.yaml не найден рядом с index.html.\nУбедитесь, что вы загрузили template.yaml на GitHub.";
             }
         }
 
         function downloadFile() {
             const content = document.getElementById('output').textContent;
             if (content.includes("Ошибка:")) { showToast("Сначала исправьте ошибку!", "#f85149"); return; }
+            
+            const format = document.getElementById('exportFormat').value;
+            const ext = format === 'singbox' ? 'json' : 'yaml';
+            const filename = `Network_Config_v5.${ext}`;
+            const mimeType = format === 'singbox' ? 'application/json' : 'text/yaml';
+
             const a = document.createElement('a');
-            a.href = window.URL.createObjectURL(new Blob([content], { type: 'text/yaml' }));
-            a.download = `Network_Config_v4.${document.getElementById('extension').value}`;
+            a.href = window.URL.createObjectURL(new Blob([content], { type: mimeType }));
+            a.download = filename;
             document.body.appendChild(a); a.click(); document.body.removeChild(a);
         }
 
         function copyResult() {
             if (document.getElementById('output').textContent.includes("Ошибка:")) return;
             navigator.clipboard.writeText(document.getElementById('output').textContent);
-            showToast("✅ YAML Profile copied!");
+            showToast("✅ Copied to clipboard!");
         }
 
         function showToast(message, color = "#238636") {
