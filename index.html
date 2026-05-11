@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Network Builder v9.3 Studio</title>
+    <title>Network Builder v10.0 Ultimate</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
@@ -26,9 +26,7 @@
             display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
         }
 
-        .version-badges {
-            display: flex; gap: 8px;
-        }
+        .version-badges { display: flex; gap: 8px; }
 
         .version-badge {
             font-size: 11px; font-weight: bold; background: #21262d; 
@@ -48,6 +46,8 @@
         .icon-btn:hover { background: #30363d; border-color: #8b949e; }
         .icon-btn.primary { background: #238636; border-color: #2ea043; color: white;}
         .icon-btn.primary:hover { background: #2ea043; }
+        .icon-btn.warning { background: #d29922; border-color: #b07e15; color: white; }
+        .icon-btn.warning:hover { background: #b07e15; }
         .icon-btn.danger { background: transparent; color: #f85149; border-color: #30363d; }
         .icon-btn.danger:hover { background: #f85149; color: white; border-color: #f85149; }
 
@@ -61,6 +61,13 @@
         }
         textarea:focus { border-color: #58a6ff; }
         textarea.dragover { border-color: #58a6ff; background: #161b22; box-shadow: 0 0 15px rgba(88,166,255,0.2); }
+
+        #searchInput {
+            width: 100%; padding: 12px 15px; margin-bottom: 15px; background: #010409;
+            border: 1px solid #30363d; border-radius: 8px; color: #c9d1d9; font-family: inherit; outline: none;
+            box-sizing: border-box; transition: 0.2s; display: none;
+        }
+        #searchInput:focus { border-color: #58a6ff; }
         
         #customTemplateInput {
             border: 1px solid #d29922; color: #d29922; display: none; height: 160px;
@@ -142,7 +149,6 @@
         .btn-card:hover { background: #58a6ff; color: white; }
         .btn-card.remove:hover { background: #f85149; color: white; }
 
-        /* Стили для редактора итогового кода */
         #outputEditor { 
             background: #010409; padding: 20px; border: 1px solid #30363d; 
             border-radius: 8px; color: #a5d6ff; overflow-y: auto; 
@@ -180,18 +186,20 @@
 <body>
     <div class="container">
         <h2>
-            <div>⚡ Network Builder <span style="color:#8b949e; font-size: 16px;">v9.3 Studio</span></div>
-            
+            <div>⚡ Network Builder <span style="color:#8b949e; font-size: 16px;">v10.0 Ultimate</span></div>
             <div class="version-badges" id="versionBadges">
                 <span class="version-badge">⏳ Проверка версий...</span>
             </div>
             
             <div class="header-actions">
                 <button class="icon-btn primary" onclick="pingAll()">⚡ Ping All</button>
+                <button class="icon-btn warning" onclick="cleanDead()">🧹 Удалить мертвые</button>
+                <button class="icon-btn" onclick="bulkRename()">🏷️ Переименовать</button>
+                <button class="icon-btn" onclick="addFlags()">🌍 Флаги (Geo)</button>
                 <button class="icon-btn" onclick="sortProxies()">📶 Sort</button>
                 <button class="icon-btn" onclick="shuffleProxies()">🔀 Shuffle</button>
-                <button class="icon-btn" onclick="exportRawNodes()">📥 Backup TXT</button>
-                <button class="icon-btn danger" onclick="clearAll()">🗑 Clear All</button>
+                <button class="icon-btn" onclick="exportRawNodes()">📥 Бэкап TXT</button>
+                <button class="icon-btn danger" onclick="clearAll()">🗑 Очистить всё</button>
             </div>
         </h2>
         
@@ -209,6 +217,7 @@
                     <option value="clash_router">🌐 FlClash YAML (Router - No TUN)</option>
                     <option value="singbox">📦 Sing-box (JSON Outbound)</option>
                     <option value="xray">📦 Exclave / Nekobox (JSON)</option>
+                    <option value="base64" style="color:#e3b341; font-weight:bold;">🔗 Base64 (Для создания своей подписки)</option>
                 </select>
             </div>
             <div class="setting-item" id="templateModeContainer">
@@ -227,10 +236,12 @@
         <textarea id="customTemplateInput" placeholder="Вставьте сюда любой чужой YAML-шаблон (например, с Github). 
 Программа вставит ВАШИ серверы в ЭТОТ шаблон.
 
-Чтобы скрипт понял, куда вставлять серверы, напишите в тексте:
+Метки для вставки:
 {{PROXIES_YAML}}   <-- Сюда встанут настройки серверов
 {{PROXY_NAMES}}    <-- Сюда встанет список их имен для групп" oninput="updateOutput()"></textarea>
         
+        <input type="text" id="searchInput" placeholder="🔍 Поиск по названию, IP или протоколу..." oninput="renderCards()">
+
         <div id="cardsContainer" class="cards-grid"></div>
 
         <div class="editor-header">
@@ -257,30 +268,16 @@
     <script>
         let currentProxies = []; 
 
-        // === ИНТЕГРАЦИЯ GITHUB API ДЛЯ ПРОВЕРКИ ВЕРСИИ MIHOMO (ДВА БЕЙДЖА) ===
         async function fetchMihomoVersion() {
             try {
-                // Делаем запрос к API GitHub. Берем 10 последних релизов, чтобы точно захватить и стабильную, и альфу
                 const res = await fetch('https://api.github.com/repos/MetaCubeX/mihomo/releases?per_page=10');
                 const data = await res.json();
-                
-                // Ищем свежую стабильную (не prerelease и без слов alpha/beta в теге)
                 const latestStable = data.find(r => !r.prerelease && !r.tag_name.toLowerCase().includes('alpha') && !r.tag_name.toLowerCase().includes('beta'));
-                // Ищем свежую тестовую (prerelease или содержит alpha/beta в теге)
                 const latestAlpha = data.find(r => r.prerelease || r.tag_name.toLowerCase().includes('alpha') || r.tag_name.toLowerCase().includes('beta'));
-                
                 let badgesHTML = '';
-                
-                if (latestStable) {
-                    badgesHTML += `<a href="${latestStable.html_url}" target="_blank" class="version-badge" title="Стабильная версия">✅ Stable: ${latestStable.tag_name}</a>`;
-                }
-                
-                if (latestAlpha) {
-                    badgesHTML += `<a href="${latestAlpha.html_url}" target="_blank" class="version-badge" title="Тестовая версия">🔥 Alpha: ${latestAlpha.tag_name}</a>`;
-                }
-
+                if (latestStable) badgesHTML += `<a href="${latestStable.html_url}" target="_blank" class="version-badge" title="Стабильная версия">✅ Stable: ${latestStable.tag_name}</a>`;
+                if (latestAlpha) badgesHTML += `<a href="${latestAlpha.html_url}" target="_blank" class="version-badge" title="Тестовая версия">🔥 Alpha: ${latestAlpha.tag_name}</a>`;
                 if(badgesHTML === '') badgesHTML = `<span class="version-badge">❌ Релизы не найдены</span>`;
-                
                 document.getElementById('versionBadges').innerHTML = badgesHTML;
             } catch (e) {
                 document.getElementById('versionBadges').innerHTML = `<span class="version-badge">❌ Ошибка API Github</span>`;
@@ -292,7 +289,6 @@
             catch(e) { try { return atob(str.replace(/-/g, '+').replace(/_/g, '/')); } catch(e2) { return ""; } }
         }
 
-        // === DRAG AND DROP ===
         const dropZone = document.getElementById('input');
         dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
         dropZone.addEventListener('dragleave', (e) => { e.preventDefault(); dropZone.classList.remove('dragover'); });
@@ -307,7 +303,7 @@
 
         window.onload = () => {
             fetchMihomoVersion();
-            const savedProxies = localStorage.getItem('flclash_net_v9');
+            const savedProxies = localStorage.getItem('flclash_net_v10');
             if (savedProxies) { currentProxies = JSON.parse(savedProxies); if (currentProxies.length > 0) renderCards(); }
             toggleCustomTemplate();
         };
@@ -328,10 +324,55 @@
             updateOutput();
         }
 
-        function saveState() { localStorage.setItem('flclash_net_v9', JSON.stringify(currentProxies)); }
+        function saveState() { localStorage.setItem('flclash_net_v10', JSON.stringify(currentProxies)); }
 
+        // === НОВЫЕ ФУНКЦИИ (CLEAN, RENAME, GEO-IP) ===
         function clearAll() {
             if(confirm('Очистить все узлы?')) { currentProxies = []; document.getElementById('input').value = ''; saveState(); renderCards(); }
+        }
+
+        function cleanDead() {
+            const startLen = currentProxies.length;
+            currentProxies = currentProxies.filter(p => p.lastPing !== 99999);
+            const removed = startLen - currentProxies.length;
+            if (removed === 0) { showToast("Нет мертвых серверов (Err)!", "#d29922"); return; }
+            saveState(); renderCards(); showToast(`🧹 Удалено мертвых узлов: ${removed}`);
+        }
+
+        function bulkRename() {
+            let prefix = prompt("Введите префикс для массового переименования (например: JINXPIL | ):\nОставьте пустым для отмены.");
+            if (!prefix) return;
+            currentProxies.forEach((p, i) => {
+                let newName = `${prefix} ${i + 1}`;
+                p.name = newName;
+                try { let url = new URL(p.rawLink); url.hash = encodeURIComponent(newName); p.rawLink = url.toString(); } catch(e){}
+            });
+            saveState(); updateOutput(); renderCards();
+            showToast("🏷️ Узлы переименованы!");
+        }
+
+        async function addFlags() {
+            if (currentProxies.length === 0) return;
+            showToast("🌍 Определяем страны...", "#d29922");
+            let modified = 0;
+            for (let i = 0; i < currentProxies.length; i++) {
+                let p = currentProxies[i];
+                // Пропускаем, если уже есть эмодзи-флаг
+                if (p.name.match(/[\uD83C][\uDDE6-\uDDFF][\uD83C][\uDDE6-\uDDFF]/)) continue; 
+                try {
+                    // Используем бесплатный быстрый API
+                    let res = await fetch(`https://api.country.is/${p.server}`);
+                    let data = await res.json();
+                    if (data.country) {
+                        let flag = data.country.toUpperCase().replace(/./g, char => String.fromCodePoint(char.charCodeAt(0) + 127397));
+                        p.name = `${flag} ${p.name}`;
+                        try { let url = new URL(p.rawLink); url.hash = encodeURIComponent(p.name); p.rawLink = url.toString(); } catch(e){}
+                        modified++;
+                    }
+                } catch(e) { } // Игнорируем ошибки (например, если это локальный IP)
+            }
+            if (modified > 0) { saveState(); renderCards(); showToast(`✅ Флаги добавлены (${modified})`); }
+            else { showToast("Флаги уже стоят или API недоступно.", "#d29922"); }
         }
 
         function shuffleProxies() {
@@ -535,12 +576,19 @@
         function renderCards() {
             const container = document.getElementById('cardsContainer');
             container.innerHTML = ''; 
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
 
             if (currentProxies.length > 0) {
                 document.getElementById('nodeCount').style.display = "inline-flex";
                 document.getElementById('nodeCount').textContent = `${currentProxies.length} Nodes`;
+                document.getElementById('searchInput').style.display = "block";
 
                 currentProxies.forEach((p, index) => {
+                    // Логика фильтрации поиска
+                    if (searchTerm && !p.name.toLowerCase().includes(searchTerm) && !p.server.toLowerCase().includes(searchTerm) && !p.type.toLowerCase().includes(searchTerm)) {
+                        return; // Скрываем карточку
+                    }
+
                     let typeClass = "type-" + p.type;
                     let pingLabel = p.lastPing === undefined ? "⚡" : (p.lastPing === 99999 ? "Err" : (p.lastPing === 99998 ? "🛡️ Stealth" : `${p.lastPing}ms`));
                     let pingColor = p.lastPing === undefined ? "#c9d1d9" : (p.lastPing === 99999 ? "#f85149" : (p.lastPing === 99998 ? "#58a6ff" : "#3fb950"));
@@ -566,7 +614,9 @@
                 document.getElementById('copyBtn').style.display = "inline-block";
                 document.getElementById('outputActions').style.display = "flex";
             } else {
-                container.style.display = 'none'; document.getElementById('nodeCount').style.display = "none";
+                container.style.display = 'none'; 
+                document.getElementById('searchInput').style.display = "none";
+                document.getElementById('nodeCount').style.display = "none";
                 document.getElementById('outputEditor').value = "Вставьте ссылки или JSON конфиг...";
                 document.getElementById('downloadBtn').style.display = "none"; document.getElementById('copyBtn').style.display = "none";
                 document.getElementById('outputActions').style.display = "none";
@@ -588,7 +638,19 @@
             const format = document.getElementById('exportFormat').value;
             if (format === 'singbox') generateSingboxJSON();
             else if (format === 'xray') generateXrayJSON(); 
+            else if (format === 'base64') generateBase64();
             else generateYAML(format);
+        }
+
+        // =========================================================================
+        // === ГЕНЕРАТОР BASE64 (СВОЯ ПОДПИСКА) ===
+        // =========================================================================
+        function generateBase64() {
+            if (currentProxies.length === 0) return;
+            const links = currentProxies.map(p => p.rawLink).join('\n');
+            // Безопасное кодирование UTF-8 в Base64
+            const b64 = btoa(unescape(encodeURIComponent(links)));
+            document.getElementById('outputEditor').value = b64;
         }
 
         // =========================================================================
@@ -703,7 +765,7 @@
                 routing: {
                     rules: [
                         { type: "field", protocol: ["bittorrent"], outboundTag: "direct" },
-                        { type: "field", domain: ["max.ru", "domain:2gis.ru", "domain:lamoda.ru", "domain:2gis.com", "domain:aif.ru", "domain:aeroflot.ru", "domain:alfabank.ru", "domain:avito.ru", "domain:beeline.ru", "domain:burgerkingrus.ru", "domain:dellin.ru", "domain:drive2.ru", "domain:dzen.ru", "domain:flypobeda.ru", "domain:forbes.ru", "domain:gazeta.ru", "domain:gazprombank.ru", "domain:gismeteo.ru", "domain:gosuslugi.ru", "domain:hh.ru", "domain:kontur.ru", "domain:kontur.host", "domain:kp.ru", "domain:kuper.ru", "domain:lenta.ru", "domain:mail.ru", "domain:megamarket.ru", "domain:megamarket.tech", "domain:megafon.ru", "domain:moex.com", "domain:motivtelecom.ru", "domain:ozon.ru", "domain:wildberries.ru", "domain:samokat.ru", "domain:kinopoisk.ru", "domain:pervye.ru", "domain:psbank.ru", "domain:rambler.ru", "domain:rambler-co.ru", "domain:rbc.ru", "domain:reg.ru", "domain:reviews.2gis.com", "domain:rg.ru", "domain:ria.ru", "domain:ruwiki.ru", "domain:rustore.ru", "domain:rutube.ru", "domain:rzd.ru", "domain:sirena-travel.ru", "domain:sravni.ru", "domain:t-j.ru", "domain:t2.ru", "domain:tank-online.com", "domain:taximaxim.ru", "domain:tbank-online.com", "domain:tildaapi.com", "domain:tns-counter.ru", "domain:trvl.yandex.net", "domain:tutu.ru", "domain:vk.com", "domain:vk.ru", "domain:vkvideo.ru", "domain:vtb.ru", "domain:ya.ru", "domain:yandex.ru", "domain:yandex.net", "domain:yandex.com", "domain:yastatic.net", "domain:yandexcloud.net", "full:go.yandex", "full:ru.ruwiki.ru", "domain:xn--90acagbhgpca7c8c7f.xn--p1ai", "domain:xn--80ajghhoc2aj1c8b.xn--p1ai", "domain:xn--90aivcdt6dxbc.xn--p1ai", "domain:xn--b1aew.xn--p1ai", "domain:api.oneme.ru", "domain:fd.oneme.ru", "domain:i.oneme.ru", "domain:miniapps.max.ru", "domain:sdk-api.apptracer.ru", "domain:st.max.ru", "domain:tracker-api.vk-analytics.ru"], outboundTag: "direct" },
+                        { type: "field", domain: ["max.ru", "domain:2gis.ru", "domain:lamoda.ru", "domain:2gis.com", "domain:aif.ru", "domain:aeroflot.ru", "domain:alfabank.ru", "domain:avito.ru", "domain:beeline.ru", "domain:burgerkingrus.ru", "domain:dellin.ru", "domain:drive2.ru", "domain:dzen.ru", "domain:flypobeda.ru", "domain:forbes.ru", "domain:gazeta.ru", "domain:gazprombank.ru", "domain:gismeteo.ru", "domain:gosuslugi.ru", "domain:hh.ru", "domain:kontur.ru", "domain:kontur.host", "domain:kp.ru", "domain:kuper.ru", "domain:lenta.ru", "domain:mail.ru", "domain:max.ru", "domain:megamarket.ru", "domain:megamarket.tech", "domain:megafon.ru", "domain:moex.com", "domain:motivtelecom.ru", "domain:ozon.ru", "domain:wildberries.ru", "domain:samokat.ru", "domain:kinopoisk.ru", "domain:pervye.ru", "domain:psbank.ru", "domain:rambler.ru", "domain:rambler-co.ru", "domain:rbc.ru", "domain:reg.ru", "domain:reviews.2gis.com", "domain:rg.ru", "domain:ria.ru", "domain:ruwiki.ru", "domain:rustore.ru", "domain:rutube.ru", "domain:rzd.ru", "domain:sirena-travel.ru", "domain:sravni.ru", "domain:t-j.ru", "domain:t2.ru", "domain:tank-online.com", "domain:taximaxim.ru", "domain:tbank-online.com", "domain:tildaapi.com", "domain:tns-counter.ru", "domain:trvl.yandex.net", "domain:tutu.ru", "domain:vk.com", "domain:vk.ru", "domain:vkvideo.ru", "domain:vtb.ru", "domain:ya.ru", "domain:yandex.ru", "domain:yandex.net", "domain:yandex.com", "domain:yastatic.net", "domain:yandexcloud.net", "full:go.yandex", "full:ru.ruwiki.ru", "domain:xn--90acagbhgpca7c8c7f.xn--p1ai", "domain:xn--80ajghhoc2aj1c8b.xn--p1ai", "domain:xn--90aivcdt6dxbc.xn--p1ai", "domain:xn--b1aew.xn--p1ai", "domain:api.oneme.ru", "domain:fd.oneme.ru", "domain:i.oneme.ru", "domain:miniapps.max.ru", "domain:sdk-api.apptracer.ru", "domain:st.max.ru", "domain:tracker-api.vk-analytics.ru"], outboundTag: "direct" },
                         { type: "field", inboundTag: ["socks", "http"], balancerTag: "proxy-balancer" }
                     ],
                     balancers: [{
@@ -1576,7 +1638,7 @@ rules:
   - DOMAIN-SUFFIX,grok.x.com,🤖 Premium AI
   - DOMAIN-SUFFIX,x.ai,🤖 Premium AI
   - DOMAIN-KEYWORD,grok,🤖 Premium AI
-  - DOMAIN-SUFFIX,huggingface.co,🤖 Premium AI
+  - DOM-SUFFIX,huggingface.co,🤖 Premium AI
   - DOMAIN-SUFFIX,civitai.com,🤖 Premium AI
   - DOMAIN-SUFFIX,openaimerge.com,🤖 Premium AI
   - DOMAIN-SUFFIX,statsigapi.net,🤖 Premium AI
@@ -1757,9 +1819,9 @@ rules:
             if (content.includes("Ошибка:")) { showToast("Сначала исправьте ошибку!", "#f85149"); return; }
             
             const format = document.getElementById('exportFormat').value;
-            const ext = (format === 'xray' || format === 'singbox') ? 'json' : 'yaml';
-            const filename = `Network_Config_v9.3.${ext}`;
-            const mimeType = (format === 'xray' || format === 'singbox') ? 'application/json' : 'text/yaml';
+            const ext = (format === 'xray' || format === 'singbox') ? 'json' : (format === 'base64' ? 'txt' : 'yaml');
+            const filename = `Network_Config_v10.${ext}`;
+            const mimeType = (format === 'xray' || format === 'singbox') ? 'application/json' : 'text/plain';
 
             const a = document.createElement('a');
             a.href = window.URL.createObjectURL(new Blob([content], { type: mimeType }));
