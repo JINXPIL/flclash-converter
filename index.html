@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Network Builder v5.0 Ready (No External Files)</title>
+    <title>Network Builder v6.0 Omni-Protocol</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
@@ -39,6 +39,8 @@
         .icon-btn.primary:hover { background: #2ea043; }
         .icon-btn.danger { background: transparent; color: #f85149; border-color: #30363d; }
         .icon-btn.danger:hover { background: #f85149; color: white; border-color: #f85149; }
+        .icon-btn.warning { background: transparent; color: #d29922; border-color: #30363d; }
+        .icon-btn.warning:hover { background: #d29922; color: white; border-color: #d29922; }
 
         p { font-size: 13px; color: #8b949e; margin-bottom: 15px; line-height: 1.6; }
 
@@ -101,6 +103,9 @@
         .type-vless { background: #238636; }
         .type-hy2 { background: #8957e5; }
         .type-trojan { background: #d29922; }
+        .type-vmess { background: #0078d7; }
+        .type-ss { background: #58a6ff; color: #0d1117;}
+        .type-tuic { background: #e34c26; }
         
         .card-actions { position: absolute; top: 8px; right: 8px; display: flex; gap: 4px; }
         .btn-card {
@@ -141,9 +146,10 @@
 <body>
     <div class="container">
         <h2>
-            ⚡ Network Builder v5.0 Ready
+            ⚡ Network Builder v6.0 Omni
             <div class="header-actions">
                 <button class="icon-btn primary" onclick="pingAll()" title="Проверить все узлы">⚡ Ping All</button>
+                <button class="icon-btn warning" onclick="cleanDead()" title="Удалить все мертвые серверы">🧹 Clean Dead</button>
                 <button class="icon-btn" onclick="sortProxies()" title="Сортировка по задержке">📶 Sort</button>
                 <button class="icon-btn" onclick="shuffleProxies()" title="Перемешать">🔀 Shuffle</button>
                 <button class="icon-btn" onclick="exportRawNodes()" title="Выгрузить в .txt">📥 Backup</button>
@@ -151,11 +157,14 @@
             </div>
         </h2>
         
-        <p>✅ Готовый вариант без внешних файлов! Поддержка VLESS, Trojan, Hysteria2. Вставьте ссылки или <b>перетащите .txt файл прямо в поле ниже.</b></p>
+        <p>Поддержка VLESS, VMess, Trojan, Hysteria2, Shadowsocks, TUIC. <b>Перетащите .txt файл прямо в поле ниже.</b></p>
         
         <textarea id="input" placeholder="Drop .txt file here or paste links:
 vless://...
+vmess://...
 hy2://...
+ss://...
+tuic://...
 trojan://..."></textarea>
         
         <div class="btn-group">
@@ -188,25 +197,13 @@ trojan://..."></textarea>
 
     <script>
         let currentProxies = []; 
-        let cachedTemplate = null;
 
-        // === 1. DRAG AND DROP ЛОГИКА ===
+        // === DRAG AND DROP ЛОГИКА ===
         const dropZone = document.getElementById('input');
-        
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropZone.classList.add('dragover');
-        });
-        
-        dropZone.addEventListener('dragleave', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('dragover');
-        });
-        
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+        dropZone.addEventListener('dragleave', (e) => { e.preventDefault(); dropZone.classList.remove('dragover'); });
         dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('dragover');
-            
+            e.preventDefault(); dropZone.classList.remove('dragover');
             if (e.dataTransfer.files.length > 0) {
                 const file = e.dataTransfer.files[0];
                 const reader = new FileReader();
@@ -219,14 +216,27 @@ trojan://..."></textarea>
         });
 
         window.onload = () => {
-            const savedProxies = localStorage.getItem('flclash_net_v5');
+            const savedProxies = localStorage.getItem('flclash_net_v6');
             if (savedProxies) { currentProxies = JSON.parse(savedProxies); if (currentProxies.length > 0) renderCards(); }
         };
 
-        function saveState() { localStorage.setItem('flclash_net_v5', JSON.stringify(currentProxies)); }
+        function saveState() { localStorage.setItem('flclash_net_v6', JSON.stringify(currentProxies)); }
 
         function clearAll() {
             if(confirm('Clear all nodes?')) { currentProxies = []; document.getElementById('input').value = ''; saveState(); renderCards(); }
+        }
+
+        // === SMART CLEAN ===
+        function cleanDead() {
+            if (currentProxies.length === 0) return;
+            const initLen = currentProxies.length;
+            currentProxies = currentProxies.filter(p => p.lastPing !== undefined && p.lastPing !== 99999);
+            const removed = initLen - currentProxies.length;
+            if (removed > 0) {
+                saveState(); renderCards(); showToast(`🧹 Удалено мертвых узлов: ${removed}`);
+            } else {
+                showToast("Нет мертвых узлов. Сначала пропингуйте (Ping All).", "#d29922");
+            }
         }
 
         function shuffleProxies() {
@@ -252,6 +262,25 @@ trojan://..."></textarea>
             document.body.appendChild(a); a.click(); document.body.removeChild(a);
         }
 
+        // === ГЕО-ТЕГИРОВАНИЕ (ФЛАГИ) ===
+        function getFlag(nameStr) {
+            const n = nameStr.toLowerCase();
+            if (n.includes('ru') || n.includes('russia')) return '🇷🇺 ';
+            if (n.includes('de') || n.includes('germany') || n.includes('frankfurt')) return '🇩🇪 ';
+            if (n.includes('nl') || n.includes('netherlands') || n.includes('amsterdam')) return '🇳🇱 ';
+            if (n.includes('us') || n.includes('usa') || n.includes('america')) return '🇺🇸 ';
+            if (n.includes('fi') || n.includes('finland') || n.includes('helsinki')) return '🇫🇮 ';
+            if (n.includes('fr') || n.includes('france') || n.includes('paris')) return '🇫🇷 ';
+            if (n.includes('gb') || n.includes('uk') || n.includes('london')) return '🇬🇧 ';
+            if (n.includes('tr') || n.includes('turkey') || n.includes('istanbul')) return '🇹🇷 ';
+            if (n.includes('pl') || n.includes('poland') || n.includes('warsaw')) return '🇵🇱 ';
+            if (n.includes('se') || n.includes('sweden') || n.includes('stockholm')) return '🇸🇪 ';
+            if (n.includes('ch') || n.includes('switzerland')) return '🇨🇭 ';
+            if (n.includes('ua') || n.includes('ukraine') || n.includes('kiev')) return '🇺🇦 ';
+            if (n.includes('kz') || n.includes('kazakhstan')) return '🇰🇿 ';
+            return '';
+        }
+
         async function startProcess() {
             const input = document.getElementById('input').value.trim();
             const out = document.getElementById('output');
@@ -266,6 +295,7 @@ trojan://..."></textarea>
             } else { parseData(input); }
         }
 
+        // === OMNI PARSER ===
         function parseData(rawText) {
             let text = rawText.trim();
             if (!text.includes('://') && !text.includes('"outbounds"')) { try { text = atob(text.replace(/\s/g, '')); } catch (e) {} }
@@ -276,29 +306,61 @@ trojan://..."></textarea>
                 try {
                     if (line.startsWith('vless://')) {
                         const url = new URL(line); const p = new URLSearchParams(url.search);
+                        let baseName = decodeURIComponent(url.hash.slice(1)) || "VLESS_" + Math.floor(Math.random()*100);
                         proxyObj = {
-                            name: decodeURIComponent(url.hash.slice(1)) || "VLESS_" + Math.floor(Math.random()*100),
+                            name: getFlag(baseName) + baseName,
                             type: "vless", server: url.hostname, port: parseInt(url.port), uuid: url.username,
                             tls: p.get('security') === 'reality' || p.get('security') === 'tls',
                             "reality-opts": p.get('pbk') ? { "public-key": p.get('pbk'), "short-id": p.get('sid') || "" } : undefined,
                             sni: p.get('sni') || url.hostname, network: p.get('type') || "tcp", flow: p.get('flow') || "", fp: p.get('fp') || "chrome", rawLink: line
                         };
-                    } else if (line.startsWith('hy2://') || line.startsWith('hysteria2://')) {
+                    } 
+                    else if (line.startsWith('hy2://') || line.startsWith('hysteria2://')) {
                         const url = new URL(line); const p = new URLSearchParams(url.search);
+                        let baseName = decodeURIComponent(url.hash.slice(1)) || "HY2_" + Math.floor(Math.random()*100);
                         proxyObj = {
-                            name: decodeURIComponent(url.hash.slice(1)) || "HY2_" + Math.floor(Math.random()*100),
+                            name: getFlag(baseName) + baseName,
                             type: "hysteria2", server: url.hostname, port: parseInt(url.port), password: url.username,
                             sni: p.get('sni') || url.hostname, "skip-cert-verify": p.get('insecure') === '1',
                             obfs: p.get('obfs') || undefined, "obfs-password": p.get('obfs-password') || undefined, rawLink: line
                         };
-                    } else if (line.startsWith('trojan://')) {
+                    } 
+                    else if (line.startsWith('trojan://')) {
                         const url = new URL(line); const p = new URLSearchParams(url.search);
+                        let baseName = decodeURIComponent(url.hash.slice(1)) || "Trojan_" + Math.floor(Math.random()*100);
                         proxyObj = {
-                            name: decodeURIComponent(url.hash.slice(1)) || "Trojan_" + Math.floor(Math.random()*100),
+                            name: getFlag(baseName) + baseName,
                             type: "trojan", server: url.hostname, port: parseInt(url.port), password: url.username,
                             tls: true, sni: p.get('sni') || url.hostname, network: p.get('type') || "tcp", fp: p.get('fp') || "chrome", rawLink: line
                         };
                     }
+                    else if (line.startsWith('tuic://')) {
+                        const url = new URL(line); const p = new URLSearchParams(url.search);
+                        let baseName = decodeURIComponent(url.hash.slice(1)) || "TUIC_" + Math.floor(Math.random()*100);
+                        proxyObj = {
+                            name: getFlag(baseName) + baseName,
+                            type: "tuic", server: url.hostname, port: parseInt(url.port), uuid: url.username, password: url.password,
+                            sni: p.get('sni') || url.hostname, rawLink: line
+                        };
+                    }
+                    else if (line.startsWith('vmess://')) {
+                        let json = JSON.parse(atob(line.slice(8)));
+                        let baseName = json.ps || "VMess_" + Math.floor(Math.random()*100);
+                        proxyObj = {
+                            name: getFlag(baseName) + baseName,
+                            type: "vmess", server: json.add, port: parseInt(json.port), uuid: json.id,
+                            network: json.net || "tcp", tls: json.tls === "tls", sni: json.sni || json.add, rawLink: line
+                        };
+                    }
+                    else if (line.startsWith('ss://')) {
+                        const url = new URL(line);
+                        let baseName = decodeURIComponent(url.hash.slice(1)) || "SS_" + Math.floor(Math.random()*100);
+                        proxyObj = {
+                            name: getFlag(baseName) + baseName,
+                            type: "ss", server: url.hostname, port: parseInt(url.port), rawLink: line
+                        };
+                    }
+
                     if (proxyObj && !currentProxies.some(p => p.server === proxyObj.server && p.port === proxyObj.port)) { currentProxies.push(proxyObj); newProxiesCount++; }
                 } catch (e) {}
             });
@@ -343,16 +405,16 @@ trojan://..."></textarea>
                 document.getElementById('nodeCount').textContent = `${currentProxies.length} Nodes`;
 
                 currentProxies.forEach((p, index) => {
-                    let typeClass = p.type === "hysteria2" ? "type-hy2" : (p.type === "trojan" ? "type-trojan" : "type-vless");
+                    let typeClass = `type-${p.type}`;
                     let pingLabel = p.lastPing === undefined ? "⚡" : (p.lastPing === 99999 ? "Err" : `${p.lastPing}ms`);
                     let pingColor = p.lastPing === undefined ? "#c9d1d9" : (p.lastPing === 99999 ? "#f85149" : "#3fb950");
                     const card = document.createElement('div'); card.className = 'proxy-card';
                     card.innerHTML = `
                         <div class="card-actions">
-                            <button class="btn-card btn-ping" style="color: ${pingColor}" onclick="pingNode(${index}, this)" title="Test latency">${pingLabel}</button>
-                            <button class="btn-card" onclick="showQR(${index})" title="Show QR">📱</button>
-                            <button class="btn-card" onclick="copyLink(${index})" title="Copy link">🔗</button>
-                            <button class="btn-card remove" onclick="removeProxy(${index})" title="Remove">✖</button>
+                            <button class="btn-card btn-ping" style="color: ${pingColor}" onclick="pingNode(${index}, this)">${pingLabel}</button>
+                            <button class="btn-card" onclick="showQR(${index})">📱</button>
+                            <button class="btn-card" onclick="copyLink(${index})">🔗</button>
+                            <button class="btn-card remove" onclick="removeProxy(${index})">✖</button>
                         </div>
                         <div class="proxy-name" contenteditable="true" spellcheck="false" 
                              onblur="renameProxy(${index}, this.innerText)" 
@@ -384,22 +446,17 @@ trojan://..."></textarea>
         }
         function copyLink(index) { navigator.clipboard.writeText(currentProxies[index].rawLink); showToast("🔗 Link copied!"); }
 
-        // === ПЕРЕКЛЮЧЕНИЕ ФОРМАТА ЭКСПОРТА ===
         function updateOutput() {
             const format = document.getElementById('exportFormat').value;
-            if (format === 'singbox') {
-                generateJSON();
-            } else {
-                generateYAML(format);
-            }
+            if (format === 'singbox') generateJSON(); else generateYAML(format);
         }
 
-        // === 2. ЭКСПОРТ В JSON (SING-BOX / NEKOBOX) ===
+        // === ЭКСПОРТ В JSON (SING-BOX / NEKOBOX) ===
         function generateJSON() {
             if (currentProxies.length === 0) return;
             const outbounds = currentProxies.map(p => {
                 let ob = { tag: p.name, type: p.type, server: p.server, server_port: p.port };
-                if (p.type === 'vless' || p.type === 'trojan') {
+                if (p.type === 'vless' || p.type === 'trojan' || p.type === 'vmess') {
                     if (p.uuid) ob.uuid = p.uuid;
                     if (p.password) ob.password = p.password;
                     if (p.network && p.network !== 'tcp') ob.transport = { type: p.network };
@@ -413,16 +470,46 @@ trojan://..."></textarea>
                     ob.password = p.password;
                     ob.tls = { enabled: true, server_name: p.sni, insecure: p["skip-cert-verify"] };
                     if (p.obfs) ob.obfs = { type: p.obfs, password: p["obfs-password"] };
+                } else if (p.type === 'tuic') {
+                    ob.uuid = p.uuid; ob.password = p.password; ob.tls = { enabled: true, server_name: p.sni };
                 }
                 return ob;
             });
             document.getElementById('output').textContent = JSON.stringify({ outbounds: outbounds }, null, 2);
         }
 
-        // === ШАБЛОН ЗАШИТ ПРЯМО В КОД (решает все проблемы с кодировкой и внешними файлами) ===
-        const BUILT_IN_TEMPLATE = `# ─────────────────────────────────────────────
-# ОПТИМИЗИРОВАННЫЙ КОНФИГ: ПК + iOS + ANDROID | КРЫМ 2026 v77.0 Ultimate
-# AUTO-GENERATED BY FLCLASH CONVERTER
+        // === ВШИТЫЙ ULTIMATE-КОНФИГ ДЛЯ FLCLASH (МОНОЛИТ) ===
+        function generateYAML(profileType) {
+            if (currentProxies.length === 0) return;
+
+            let proxiesYAML = "proxies:\n";
+            currentProxies.forEach(p => {
+                proxiesYAML += `  - name: "${p.name}"\n    type: ${p.type}\n    server: ${p.server}\n    port: ${p.port}\n`;
+                if (p.type !== 'ss') proxiesYAML += `    udp: true\n`;
+                
+                if (p.type === 'vless' || p.type === 'trojan' || p.type === 'vmess') {
+                    if (p.uuid) proxiesYAML += `    uuid: ${p.uuid}\n`;
+                    if (p.password) proxiesYAML += `    password: ${p.password}\n`;
+                    if (p.network) proxiesYAML += `    network: ${p.network}\n`;
+                    if (p.flow) proxiesYAML += `    flow: ${p.flow}\n`;
+                    if (p.tls) proxiesYAML += `    tls: true\n    sni: ${p.sni}\n    client-fingerprint: ${p.fp}\n`;
+                    if (p["reality-opts"]) proxiesYAML += `    reality-opts:\n      public-key: ${p["reality-opts"]["public-key"]}\n      short-id: ${p["reality-opts"]["short-id"]}\n`;
+                } else if (p.type === 'hysteria2') {
+                    proxiesYAML += `    password: ${p.password}\n    sni: ${p.sni}\n`;
+                    if (p["skip-cert-verify"]) proxiesYAML += `    skip-cert-verify: true\n`;
+                    if (p.obfs) proxiesYAML += `    obfs: ${p.obfs}\n    obfs-password: ${p["obfs-password"]}\n`;
+                } else if (p.type === 'tuic') {
+                    proxiesYAML += `    uuid: ${p.uuid}\n    password: ${p.password}\n    sni: ${p.sni}\n`;
+                }
+            });
+
+            const proxyNames = currentProxies.map(p => `      - "${p.name}"`).join('\n');
+            let tunConfig = `tun:\n  enable: true\n  stack: mixed\n  device: Mihomo\n  gso: true\n  udp-timeout: 30\n  dns-hijack: [any:53, tcp://any:53]\n  auto-route: true\n  auto-detect-interface: true\n  strict-route: true\n  endpoint-independent-nat: true\n  mtu: 1420`;
+            if (profileType === 'clash_router') tunConfig = `# ROUTER MODE (Keenetic/OpenWRT Compatible)\ntproxy-port: 7893\nredir-port: 7892\ntun:\n  enable: false`;
+
+            const finalYAML = `# ─────────────────────────────────────────────
+# UNIVERSAL ROUTING PROFILE v77.0
+# MODE: ${profileType.toUpperCase()}
 # ─────────────────────────────────────────────
 
 geodata-loader: memconservative
@@ -508,6 +595,7 @@ dns:
   use-hosts: true
   use-system-hosts: true
   respect-rules: false
+  
   independent-cache: true  
   prefer-h3: false         
   cache-algorithm: arc
@@ -740,9 +828,9 @@ sniffer:
     - 91.108.8.0/21
     - 91.108.56.0/22
 
-{{TUN_CONFIG}}
+${tunConfig}
 
-{{PROXIES_YAML}}
+${proxiesYAML}
 
 proxy-groups:
   - name: "🚀 Выбор сервера"
@@ -750,7 +838,7 @@ proxy-groups:
     proxies:
       - "♻️ Автовыбор"
       - "🤖 Premium AI (Auto)"
-{{PROXY_NAMES}}
+${proxyNames}
 
   - name: "♻️ Автовыбор"
     type: url-test
@@ -760,7 +848,7 @@ proxy-groups:
     timeout: 5000
     lazy: true
     proxies:
-{{PROXY_NAMES}}
+${proxyNames}
     exclude-filter: "(?i)Россия|Russia|Украина|Ukraine|Молдова|Moldova|РФ|России"
 
   - name: "🤖 Premium AI (Auto)"
@@ -771,7 +859,7 @@ proxy-groups:
     timeout: 5000
     lazy: true
     proxies:
-{{PROXY_NAMES}}
+${proxyNames}
 
 rules:
   - PROCESS-NAME,wireshark.exe,DIRECT
@@ -1107,6 +1195,7 @@ rules:
   - DOMAIN-SUFFIX,dns-shop.ru,DIRECT
   - DOMAIN-SUFFIX,ozon.ru,DIRECT
   - DOMAIN-SUFFIX,ozon.bank,DIRECT          
+  - DOMAIN-SUFFIX,wildberries.ru,DIRECT
   - DOMAIN-SUFFIX,wb.ru,DIRECT
   - DOMAIN-SUFFIX,bank.wildberries.ru,DIRECT  
   - DOMAIN-SUFFIX,avito.ru,DIRECT
@@ -1429,74 +1518,24 @@ rules:
   - DOMAIN-KEYWORD,adult,🚀 Выбор сервера
 
   - GEOIP,RU,DIRECT,no-resolve
-  - MATCH,🚀 Выбор сервера`;
-
-        async function fetchTemplate() {
-            if (cachedTemplate) return cachedTemplate;
-            cachedTemplate = BUILT_IN_TEMPLATE;
-            return cachedTemplate;
-        }
-
-        async function generateYAML(profileType) {
-            if (currentProxies.length === 0) return;
-            const output = document.getElementById('output');
-            
-            let proxiesYAML = "proxies:\n";
-            currentProxies.forEach(p => {
-                proxiesYAML += `  - name: "${p.name}"\n    type: ${p.type}\n    server: ${p.server}\n    port: ${p.port}\n    udp: true\n`;
-                if (p.type === 'vless' || p.type === 'trojan') {
-                    if (p.uuid) proxiesYAML += `    uuid: ${p.uuid}\n`;
-                    if (p.password) proxiesYAML += `    password: ${p.password}\n`;
-                    if (p.network) proxiesYAML += `    network: ${p.network}\n`;
-                    if (p.flow) proxiesYAML += `    flow: ${p.flow}\n`;
-                    if (p.tls) proxiesYAML += `    tls: true\n    sni: ${p.sni}\n    client-fingerprint: ${p.fp}\n`;
-                    if (p["reality-opts"]) proxiesYAML += `    reality-opts:\n      public-key: ${p["reality-opts"]["public-key"]}\n      short-id: ${p["reality-opts"]["short-id"]}\n`;
-                } 
-                else if (p.type === 'hysteria2') {
-                    proxiesYAML += `    password: ${p.password}\n    sni: ${p.sni}\n`;
-                    if (p["skip-cert-verify"]) proxiesYAML += `    skip-cert-verify: true\n`;
-                    if (p.obfs) proxiesYAML += `    obfs: ${p.obfs}\n    obfs-password: ${p["obfs-password"]}\n`;
-                }
-            });
-
-            const proxyNames = currentProxies.map(p => `      - "${p.name}"`).join('\n');
-
-            let tunConfig = `tun:\n  enable: true\n  stack: mixed\n  device: Mihomo\n  gso: true\n  udp-timeout: 30\n  dns-hijack:\n    - any:53\n    - tcp://any:53\n  auto-route: true\n  auto-detect-interface: true\n  strict-route: true\n  endpoint-independent-nat: true\n  mtu: 1420`;
-
-            if (profileType === 'clash_router') {
-                tunConfig = `# ROUTER MODE (Keenetic/OpenWRT Compatible)\ntproxy-port: 7893\nredir-port: 7892\ntun:\n  enable: false`;
-            }
-
-            output.textContent = "⏳ Generating config...";
-            const template = await fetchTemplate();
-            
-            if (template) {
-                let finalYAML = template.replace('{{TUN_CONFIG}}', tunConfig);
-                finalYAML = finalYAML.replace('{{PROXIES_YAML}}', proxiesYAML);
-                finalYAML = finalYAML.replace(/\{\{PROXY_NAMES\}\}/g, proxyNames);
-                output.textContent = finalYAML;
-            } else {
-                output.textContent = "❌ Ошибка генерации конфига. Попробуйте ещё раз.";
-            }
+  - MATCH,🚀 Выбор сервера
+`;
+            document.getElementById('output').textContent = finalYAML;
         }
 
         function downloadFile() {
             const content = document.getElementById('output').textContent;
-            if (content.includes("Ошибка:")) { showToast("Сначала исправьте ошибку!", "#f85149"); return; }
-            
             const format = document.getElementById('exportFormat').value;
             const ext = format === 'singbox' ? 'json' : 'yaml';
-            const filename = `Network_Config_v5.${ext}`;
-            const mimeType = format === 'singbox' ? 'application/json' : 'text/yaml';
-
+            const filename = `Network_Config_v6.${ext}`;
+            const blob = new Blob([content], { type: format === 'singbox' ? 'application/json' : 'text/yaml' });
+            const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = window.URL.createObjectURL(new Blob([content], { type: mimeType }));
-            a.download = filename;
-            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+            a.href = url; a.download = filename;
+            document.body.appendChild(a); a.click(); window.URL.revokeObjectURL(url); document.body.removeChild(a);
         }
 
         function copyResult() {
-            if (document.getElementById('output').textContent.includes("Ошибка:")) return;
             navigator.clipboard.writeText(document.getElementById('output').textContent);
             showToast("✅ Copied to clipboard!");
         }
