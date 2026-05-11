@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#0d1117">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Network Builder v15.5</title>
+    <title>Network Builder v16.0 Crimea Master</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
@@ -65,7 +65,6 @@
         .editor-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
         .editor-header span{font-size:12px;color:#8b949e;font-weight:bold;text-transform:uppercase;}
         
-        /* Умные Уведомления */
         #toast{visibility:hidden;min-width:250px;color:white;text-align:center;border-radius:8px;padding:12px 20px;position:fixed;z-index:9999;bottom:30px;left:50%;transform:translateX(-50%);font-size:13px;font-weight:bold;opacity:0;transition:0.3s;box-shadow:0 8px 24px rgba(0,0,0,0.6);}
         #toast.show{visibility:visible;opacity:1;}
 
@@ -81,169 +80,9 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>
-            <div>⚡ Network Builder <span style="color:#8b949e; font-size:16px;" id="titleVersion">v15.5</span></div>
-            <div class="badges-wrapper">
-                <div class="version-badge" id="mihomoVersion" title="Версия ядра Mihomo">⏳ Ядро...</div>
-                <div class="version-badge" id="rulesVersion" style="color:#58a6ff;" title="Базы обхода блокировок">🛡️ Базы...</div>
-            </div>
-            
-            <div class="header-actions">
-                <button class="icon-btn primary tooltip" onclick="pingAll()">⚡ Ping All
-                    <span class="tooltiptext">Используется HTTP/TCP ping (fetch), а не ICMP. Серверы без открытых 80/443 портов могут отображаться как Err или Stealth, оставаясь рабочими.</span>
-                </button>
-                <button class="icon-btn" onclick="cleanDeadNodes()" style="border-color:#f85149; color:#f85149;">🧹 Удалить мертвые</button>
-                <button class="icon-btn" onclick="sortProxies()">📶 Сорт.</button>
-                <button class="icon-btn" onclick="removeDuplicates()">🔍 Очистить дубли</button>
-                <button class="icon-btn" onclick="shuffleProxies()">🔀 Перемешать</button>
-                <button class="icon-btn danger" onclick="clearAll()">🗑 Очистить всё</button>
-            </div>
-        </h2>
-        
-        <p>Поддержка: <b>JSON (Xray/Sing-box)</b>, VLESS, VMess, Trojan, Hysteria2, SS, SSR, WG, Socks5, HTTP, SSH, Naive, TUIC.</p>
-        
-        <div class="input-group">
-            <textarea id="input" placeholder="Перетащите файл (.txt / .json) в это окно.
-Или вставьте массив ссылок (поддерживается расшифровка Base64 подписок)."></textarea>
-            <button class="paste-btn" onclick="pasteFromClipboard()" title="Вставить из буфера">
-                <span>📋</span>Paste
-            </button>
-        </div>
-        
-        <button class="action-btn btn-convert" onclick="startProcess()">► РАСПОЗНАТЬ И ДОБАВИТЬ УЗЛЫ</button>
 
-        <div class="settings-panel">
-            <div class="setting-item">
-                <label>Формат вывода (Экспорт)</label>
-                <select id="exportFormat" onchange="updateOutput()">
-                    <option value="clash_mobile">📱 FlClash YAML (Mobile/PC)</option>
-                    <option value="clash_router">🌐 FlClash YAML (Router - No TUN)</option>
-                    <option value="singbox">📦 Sing-box (JSON Outbound)</option>
-                    <option value="xray">📦 Exclave / Nekobox (Xray JSON)</option>
-                </select>
-            </div>
-            <div class="setting-item" id="templateModeContainer">
-                <label>Алгоритм маршрутизации (YAML)</label>
-                <select id="templateMode" onchange="toggleCustomTemplate()">
-                    <option value="ultimate">💎 Крымский профиль (Optimized v77.0)</option>
-                    <option value="basic">⚡ Базовый профиль (Только проксирование)</option>
-                    <option value="custom">🛠️ Свой шаблон (URL или текст)</option>
-                </select>
-            </div>
-        </div>
-
-        <div id="customTemplateWrapper">
-            <div style="display:flex; gap:10px;">
-                <input type="text" id="templateUrl" placeholder="URL кастомного YAML (Github, Pastebin...)">
-                <button class="icon-btn" style="background:#d29922; color:white; border:none;" onclick="fetchTemplateFromUrl()">📥 Загрузить</button>
-            </div>
-            <textarea id="customTemplateInput" placeholder="Вставьте код вручную. Скрипт сам найдет метки {{PROXIES_YAML}} и {{PROXY_NAMES}}." oninput="updateOutput()"></textarea>
-        </div>
-        
-        <div class="cards-toolbar" id="cardsToolbar">
-            <div style="display:flex; align-items:center; gap:10px;">
-                <input type="checkbox" id="selectAllCb" style="accent-color:#d29922; width:16px; height:16px; cursor:pointer;" onchange="toggleSelectAll()">
-                <label for="selectAllCb" style="font-size:13px; font-weight:bold; color:#c9d1d9; cursor:pointer;">Выбрать все</label>
-            </div>
-            <div style="display:flex; gap:10px; align-items:center;">
-                <span id="nodeCount" class="status-badge">0 Nodes</span>
-                <button class="icon-btn" id="btnGeo" style="border-color:#58a6ff; color:#58a6ff;" onclick="resolveGeoIP()">🌍 Авто-Геолокация</button>
-                <button class="icon-btn" style="background:#d29922; border-color:#d29922; color:#fff;" onclick="openMassEditModal()">✏️ Mass Edit</button>
-            </div>
-        </div>
-
-        <div id="cardsContainer" class="cards-grid"></div>
-
-        <div class="editor-header">
-            <span>📝 Финальный конфиг (Интерактивный редактор)</span>
-        </div>
-        <pre id="outputEditor" contenteditable="true" spellcheck="false" oninput="saveEditorState()">Ожидание данных...</pre>
-
-        <div style="display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap;" id="outputActions">
-            <button class="action-btn btn-copy" onclick="copyBase64Sub()" style="border-color:#8957e5; color:#8957e5; background:transparent;">⎘ BASE64 ПОДПИСКА</button>
-            <button id="copyBtn" class="action-btn btn-copy" onclick="copyResult()">⎘ СКОПИРОВАТЬ</button>
-            <button id="downloadBtn" class="action-btn btn-download" onclick="downloadFile()">⬇ СКАЧАТЬ</button>
-        </div>
-    </div>
-
-    <div id="toast">✅ Done!</div>
-
-    <div id="qrModal" class="modal-overlay" onclick="closeQR(event)">
-        <div class="modal-content" onclick="event.stopPropagation();" style="text-align:center;">
-            <h3 style="margin-top:0; color:#58a6ff;" id="qrTitle">QR Code</h3>
-            <canvas id="qrCanvas" style="background:white; padding:10px; border-radius:8px; margin: 0 auto; display: block;"></canvas>
-            <button class="modal-close" onclick="closeQR()">Закрыть</button>
-        </div>
-    </div>
-
-    <div id="massEditModal" class="modal-overlay" onclick="closeMassEditModal(event)">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <h3 style="margin-top:0; color:#d29922; text-align:center;">✏️ Mass Editor</h3>
-            <p style="font-size:12px; margin-bottom:15px; text-align:center; color:#8b949e;">Массовое изменение VLESS / Trojan</p>
-            <div style="margin-bottom:12px;">
-                <label style="font-size:11px; color:#8b949e; font-weight:bold;">SNI (Домен подмены):</label>
-                <input type="text" id="massEditSni" style="width:100%; box-sizing:border-box; background:#0d1117; color:#c9d1d9; border:1px solid #30363d; padding:10px; border-radius:6px;" placeholder="Пусто = не менять">
-            </div>
-            <div style="margin-bottom:12px;">
-                <label style="font-size:11px; color:#8b949e; font-weight:bold;">Fingerprint (Отпечаток):</label>
-                <select id="massEditFp" style="width:100%; box-sizing:border-box; background:#0d1117; color:#c9d1d9; border:1px solid #30363d; padding:10px; border-radius:6px;">
-                    <option value="">-- Не менять --</option>
-                    <option value="chrome">chrome</option>
-                    <option value="ios">ios</option>
-                    <option value="firefox">firefox</option>
-                    <option value="random">random</option>
-                </select>
-            </div>
-            <div style="margin-bottom:20px;">
-                <label style="font-size:11px; color:#8b949e; font-weight:bold;">Flow (XTLS):</label>
-                <select id="massEditFlow" style="width:100%; box-sizing:border-box; background:#0d1117; color:#c9d1d9; border:1px solid #30363d; padding:10px; border-radius:6px;">
-                    <option value="">-- Не менять --</option>
-                    <option value="xtls-rprx-vision">xtls-rprx-vision</option>
-                    <option value="none">Удалить flow (Пусто)</option>
-                </select>
-            </div>
-            <div style="display:flex; gap:10px;">
-                <button class="action-btn btn-convert" style="margin-bottom:0; background:#d29922;" onclick="applyMassEdit()">ПРИМЕНИТЬ</button>
-                <button class="modal-close" style="margin-top:0; background:#30363d; text-align:center;" onclick="closeMassEditModal()">Отмена</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="errorModal" class="modal-overlay">
-        <div class="modal-content">
-            <h3 style="margin-top:0; color:#f85149; text-align:center;">⚠️ Внимание!</h3>
-            <div id="errorModalMsg" style="font-size:12px; color:#c9d1d9; text-align:left; line-height: 1.5; background:#0d1117; padding:10px; border-radius:6px; border:1px solid #30363d; overflow-x:auto;"></div>
-            <button class="modal-close" style="text-align:center;" onclick="document.getElementById('errorModal').style.display='none'">Понятно</button>
-        </div>
-    </div>
-
-    <script>
-        const APP_VERSION = "15.5";
-        document.getElementById('titleVersion').innerText = `v${APP_VERSION} Crimea Ultimate`;
-
-        // === ПЕРЕХВАТ ОШИБОК ===
-        window.onerror = function(msg, url, lineNo, columnNo, error) {
-            let stack = error && error.stack ? error.stack : 'Stack trace недоступен';
-            showDiagnosticError(`<b>Сбой:</b> ${msg}<br><b>Строка:</b> ${lineNo}:${columnNo}<br><br><span style="color:#8b949e;">Stack:</span><br>${stack}`);
-            return false;
-        };
-        function showDiagnosticError(msg) {
-            document.getElementById('errorModalMsg').innerHTML = msg; document.getElementById('errorModal').style.display = 'flex';
-        }
-
-        function showToast(msg, type="success") {
-            const t = document.getElementById("toast");
-            t.innerHTML = msg; t.classList.add("show");
-            t.style.background = type === "error" ? "#f85149" : (type === "warning" ? "#d29922" : "#238636");
-            t.style.color = type === "warning" ? "#0d1117" : "#ffffff";
-            setTimeout(() => { t.classList.remove("show"); }, 3500);
-        }
-
-        // === ИМПОРТ ТОЧНОГО КОНФИГА ПОЛЬЗОВАТЕЛЯ GL_Crimea_ipv6_yan ===
-        let currentProxies = []; 
-        
-        const YAML_BASE_CONFIG = `geodata-loader: memconservative
+    <script type="text/plain" id="tpl-crimea-base">
+geodata-loader: memconservative
 global-client-fingerprint: chrome  
 
 geox-url:
@@ -279,6 +118,7 @@ rule-providers:
     url: "https://cdn.jsdelivr.net/gh/DustinWin/ruleset_geodata@mihomo-ruleset/ads.mrs"
     path: ./rules/adblock.mrs
     interval: 86400
+
   hagezi-tif:
     type: http
     behavior: domain
@@ -286,6 +126,7 @@ rule-providers:
     url: "https://cdn.jsdelivr.net/gh/MiHomoer/MiHomo-Hagezi@release/HageziUltimate.mrs"
     path: ./rules/hagezi-tif.mrs
     interval: 86415
+
   sukka-phishing:
     type: http
     behavior: domain
@@ -293,18 +134,21 @@ rule-providers:
     url: "https://ruleset.skk.moe/Clash/domainset/reject_phishing.txt"
     path: ./rules/sukka-phishing.txt
     interval: 86430
+
   blockhttpdns:
     type: http
     behavior: classical
     url: "https://cdn.jsdelivr.net/gh/Accademia/Additional_Rule_For_Clash@main/BlockHttpDNSPlus/BlockHttpDNSPlus.yaml"
     path: ./rules/blockhttpdns.yaml
     interval: 86445
+
   hijacking-plus:
     type: http
     behavior: classical
     url: "https://cdn.jsdelivr.net/gh/Accademia/Additional_Rule_For_Clash@main/HijackingPlus/HijackingPlus.yaml"
     path: ./rules/hijacking.yaml
     interval: 86460
+
   apple-ai:
     type: http
     behavior: classical
@@ -321,10 +165,12 @@ dns:
   use-hosts: true
   use-system-hosts: true
   respect-rules: false
+  
   independent-cache: true  
   prefer-h3: false         
   cache-algorithm: arc
   cache-capacity: 4096
+
   fake-ip-filter:
     - '+.stun.*.*'
     - '+.stun.*.*.*'
@@ -542,6 +388,7 @@ sniffer:
     - '*.max.ru'           
     - '*.lisaalert.org'
     - '*.dobro.ru'
+
   skip-src-address:
     - fe80::/10
     - fc00::/7
@@ -549,9 +396,11 @@ sniffer:
     - 149.154.160.0/20     
     - 91.108.4.0/22
     - 91.108.8.0/21
-    - 91.108.56.0/22`;
+    - 91.108.56.0/22
+    </script>
 
-        const YAML_USER_RULES = `rules:
+    <script type="text/plain" id="tpl-crimea-rules">
+rules:
   - PROCESS-NAME,wireshark.exe,DIRECT
   - PROCESS-NAME,nmap.exe,DIRECT
   - PROCESS-NAME,dumpcap.exe,DIRECT
@@ -1045,7 +894,7 @@ sniffer:
   - GEOSITE,telegram,🚀 Выбор сервера
   - GEOIP,telegram,🚀 Выбор сервера
   - IP-CIDR,91.108.4.0/22,🚀 Выбор сервера,no-resolve
-  - IP-CIDR,91.108.8.0/22,🚀 Выбор сервера,no-resolve
+  - IP-CIDR,91.108.8.0/21,🚀 Выбор сервера,no-resolve
   - IP-CIDR,91.108.12.0/22,🚀 Выбор сервера,no-resolve
   - IP-CIDR,91.108.16.0/22,🚀 Выбор сервера,no-resolve
   - IP-CIDR,91.108.20.0/22,🚀 Выбор сервера,no-resolve
@@ -1178,127 +1027,340 @@ sniffer:
   - DOMAIN-KEYWORD,nsfw,🚀 Выбор сервера
   - DOMAIN-KEYWORD,adult,🚀 Выбор сервера
   - GEOIP,RU,DIRECT,no-resolve
-  - MATCH,🚀 Выбор сервера`;
+  - MATCH,🚀 Выбор сервера
+    </script>
 
-        // === ВАЛИДАЦИЯ (LINTER) ===
-        function validateOutput(content, format) {
-            if (content.includes("⚠️ ОШИБКА") || content.includes("❌ Ошибка")) {
-                showToast("Сначала исправьте ошибку в шаблоне!", "error"); return false;
-            }
-            if (format.includes('clash')) {
-                if (!content.includes('proxies:')) { showDiagnosticError("В коде нет блока <b>proxies:</b>.<br>Ваш YAML сломан."); return false; }
-                if (!content.includes('rules:')) { showDiagnosticError("В коде нет блока <b>rules:</b>.<br>Ваш YAML сломан."); return false; }
-            } else {
-                try { JSON.parse(content); } catch (e) { showDiagnosticError(`Ошибка синтаксиса JSON в итоговом коде.<br>Детали: ${e.message}`); return false; }
-            }
-            return true;
+    <div class="container">
+        <h2>
+            <div>⚡ Network Builder <span style="color:#8b949e; font-size:16px;" id="titleVer">v16.0</span></div>
+            <div class="badges-wrapper">
+                <div class="version-badge" id="mihomoVersion">⏳ Ядро...</div>
+                <div class="version-badge" id="rulesVersion" style="color:#58a6ff;">🛡️ Базы...</div>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn primary tooltip" onclick="pingAll()">⚡ Ping All<span class="tooltiptext">HTTP/TCP (fetch) тест.</span></button>
+                <button class="icon-btn" onclick="cleanDeadNodes()" style="border-color:#f85149; color:#f85149;">🧹 Удалить мертвые</button>
+                <button class="icon-btn" onclick="sortProxies()">📶 Сорт.</button>
+                <button class="icon-btn" onclick="removeDuplicates()">🔍 Очистить дубли</button>
+                <button class="icon-btn danger" onclick="clearAll()">🗑 Очистить всё</button>
+            </div>
+        </h2>
+        <div class="input-group">
+            <textarea id="input" placeholder="Перетащите файл или вставьте массив ссылок..."></textarea>
+            <button class="paste-btn" onclick="pasteFromClipboard()"><span>📋</span>Paste</button>
+        </div>
+        <button class="action-btn btn-convert" onclick="startProcess()">► РАСПОЗНАТЬ И ДОБАВИТЬ УЗЛЫ</button>
+        <div class="settings-panel">
+            <div class="setting-item">
+                <label>Экспорт</label>
+                <select id="exportFormat" onchange="updateOutput()"><option value="clash_mobile">📱 FlClash YAML</option><option value="singbox">📦 Sing-box JSON</option><option value="xray">📦 Xray JSON</option></select>
+            </div>
+            <div class="setting-item" id="templateModeContainer">
+                <label>Шаблон</label>
+                <select id="templateMode" onchange="toggleCustomTemplate()"><option value="ultimate">💎 Крым Ultimate v77.0</option><option value="custom">🛠️ Свой шаблон</option></select>
+            </div>
+        </div>
+        <div id="customTemplateWrapper"><textarea id="customTemplateInput" oninput="updateOutput()"></textarea></div>
+        <div class="cards-toolbar" id="cardsToolbar">
+            <div style="display:flex; align-items:center; gap:10px;"><input type="checkbox" id="selectAllCb" onchange="toggleSelectAll()"><label for="selectAllCb">Выбрать все</label></div>
+            <div style="display:flex; gap:10px; align-items:center;"><span id="nodeCount" class="status-badge">0 Nodes</span><button class="icon-btn" id="btnGeo" style="border-color:#58a6ff; color:#58a6ff;" onclick="resolveGeoIP()">🌍 Авто-Геолокация</button><button class="icon-btn" style="background:#d29922; color:white;" onclick="openMassEditModal()">✏️ Mass Edit</button></div>
+        </div>
+        <div id="cardsContainer" class="cards-grid"></div>
+        <div class="editor-header"><span>📝 Финальный конфиг</span></div>
+        <pre id="outputEditor" contenteditable="true" oninput="saveEditorState()">Ожидание данных...</pre>
+        <div style="display:flex; gap:10px; justify-content:flex-end;" id="outputActions">
+            <button id="copyBtn" class="action-btn btn-copy" onclick="copyResult()">⎘ СКОПИРОВАТЬ</button>
+            <button id="downloadBtn" class="action-btn btn-download" onclick="downloadFile()">⬇ СКАЧАТЬ</button>
+        </div>
+    </div>
+    <div id="toast">✅ Done!</div>
+    <div id="qrModal" class="modal-overlay" onclick="closeQR()"><div class="modal-content" onclick="event.stopPropagation()"><h3 id="qrTitle" style="color:#58a6ff;">QR</h3><canvas id="qrCanvas" style="display:block; margin:0 auto;"></canvas><button class="modal-close" onclick="closeQR()">Закрыть</button></div></div>
+    <div id="massEditModal" class="modal-overlay" onclick="closeMassEditModal()"><div class="modal-content" onclick="event.stopPropagation()"><h3 style="color:#d29922;">✏️ Mass Editor</h3><label style="font-size:11px; color:#8b949e;">SNI:</label><input type="text" id="massEditSni" style="width:100%; margin-bottom:10px; padding:10px; border-radius:6px; background:#0d1117; color:#c9d1d9; border:1px solid #30363d;"><button class="action-btn" style="background:#d29922; color:white; width:100%;" onclick="applyMassEdit()">ПРИМЕНИТЬ</button></div></div>
+    <div id="errorModal" class="modal-overlay"><div class="modal-content"><h3 style="color:#f85149;">⚠️ Внимание!</h3><div id="errorModalMsg" style="font-size:12px; text-align:left; overflow-x:auto;"></div><button class="modal-close" onclick="document.getElementById('errorModal').style.display='none'">Понятно</button></div></div>
+
+    <script>
+        const VER = "16.0"; 
+        document.getElementById('titleVer').innerText = `v${VER}`;
+
+        let currentProxies = [];
+        let YAML_BASE = "";
+        let YAML_RULES = "";
+
+        // === ИНИЦИАЛИЗАЦИЯ И СИСТЕМНЫЕ ФУНКЦИИ ===
+        window.onerror = (m, u, l, c, e) => {
+            showDiagnosticError(`<b>Сбой:</b> ${m}<br><b>Строка:</b> ${l}:${c}<br><br><small>${e?.stack||''}</small>`);
+            return false;
+        };
+
+        function showDiagnosticError(msg) { document.getElementById('errorModalMsg').innerHTML = msg; document.getElementById('errorModal').style.display='flex'; }
+
+        function showToast(msg, type="success") {
+            const t = document.getElementById("toast"); t.innerHTML = msg; t.classList.add("show");
+            t.style.background = type === "error" ? "#f85149" : (type === "warning" ? "#d29922" : "#238636");
+            t.style.color = type === "warning" ? "#0d1117" : "#ffffff";
+            setTimeout(() => { t.classList.remove("show"); }, 3500);
         }
 
-        // === ФУНКЦИЯ ГЕНЕРАЦИИ ВЫВОДА ===
+        window.onload = () => {
+            fetchMihomoVersion(); fetchRulesVersion();
+            YAML_BASE = document.getElementById('tpl-crimea-base').textContent.trim();
+            YAML_RULES = document.getElementById('tpl-crimea-rules').textContent.trim();
+            
+            if (localStorage.getItem('flclash_exportFormat')) document.getElementById('exportFormat').value = localStorage.getItem('flclash_exportFormat');
+            
+            const saved = sessionStorage.getItem('flclash_net_proxies_v16');
+            if(saved) { currentProxies = JSON.parse(saved); renderCards(); }
+            toggleCustomTemplate();
+        };
+
+        async function fetchMihomoVersion() {
+            try {
+                const res = await fetch('https://api.github.com/repos/MetaCubeX/mihomo/releases?per_page=1');
+                const data = await res.json(); document.getElementById('mihomoVersion').innerText = `Mihomo: ${data[0].tag_name}`;
+            } catch(e){ document.getElementById('mihomoVersion').innerText = "Mihomo: Stable"; }
+        }
+
+        async function fetchRulesVersion() {
+            try {
+                const res = await fetch('https://api.github.com/repos/MetaCubeX/meta-rules-dat/releases/latest');
+                const data = await res.json(); document.getElementById('rulesVersion').innerText = `🛡️ Базы: ${new Date(data.published_at).toLocaleDateString()}`;
+            } catch(e){ document.getElementById('rulesVersion').innerText = "🛡️ Базы: OK"; }
+        }
+
+        function saveState() { sessionStorage.setItem('flclash_net_proxies_v16', JSON.stringify(currentProxies)); updateOutput(); }
+        function saveEditorState() { sessionStorage.setItem('flclash_net_output_edit_v16', document.getElementById('outputEditor').innerText); }
+
+        function addGeoFlag(name) {
+            const n = name.toUpperCase();
+            if (/(?:^|[\s_\-.,|])(FI|FINLAND|ФИНЛЯНДИЯ|HELSINKI)(?:[\s_\-.,|]|$)/.test(n)) return '🇫🇮 ' + name.replace(/🇫🇮\s*/g, '');
+            if (/(?:^|[\s_\-.,|])(DE|GERMANY|ГЕРМАНИЯ|FRANKFURT)(?:[\s_\-.,|]|$)/.test(n)) return '🇩🇪 ' + name.replace(/🇩🇪\s*/g, '');
+            if (/(?:^|[\s_\-.,|])(NL|NETHERLANDS|НИДЕРЛАНДЫ|AMSTERDAM)(?:[\s_\-.,|]|$)/.test(n)) return '🇳🇱 ' + name.replace(/🇳🇱\s*/g, '');
+            if (/(?:^|[\s_\-.,|])(US|USA|США)(?:[\s_\-.,|]|$)/.test(n)) return '🇺🇸 ' + name.replace(/🇺🇸\s*/g, '');
+            if (/(?:^|[\s_\-.,|])(RU|RUSSIA|РОССИЯ)(?:[\s_\-.,|]|$)/.test(n)) return '🇷🇺 ' + name.replace(/🇷🇺\s*/g, '');
+            if (/(?:^|[\s_\-.,|])(GB|UK|ВЕЛИКОБРИТАНИЯ)(?:[\s_\-.,|]|$)/.test(n)) return '🇬🇧 ' + name.replace(/🇬🇧\s*/g, '');
+            if (/(?:^|[\s_\-.,|])(FR|FRANCE|ФРАНЦИЯ)(?:[\s_\-.,|]|$)/.test(n)) return '🇫🇷 ' + name.replace(/🇫🇷\s*/g, '');
+            if (/(?:^|[\s_\-.,|])(TR|TURKEY|ТУРЦИЯ)(?:[\s_\-.,|]|$)/.test(n)) return '🇹🇷 ' + name.replace(/🇹🇷\s*/g, '');
+            if (/(?:^|[\s_\-.,|])(SE|SWEDEN|ШВЕЦИЯ|STOCKHOLM)(?:[\s_\-.,|]|$)/.test(n)) return '🇸🇪 ' + name.replace(/🇸🇪\s*/g, '');
+            if (/(?:^|[\s_\-.,|])(IT|ITALY|ИТАЛИЯ|MILAN)(?:[\s_\-.,|]|$)/.test(n)) return '🇮🇹 ' + name.replace(/🇮🇹\s*/g, '');
+            return name;
+        }
+
+        // === ПАРСЕР ===
+        async function startProcess() {
+            const inp = document.getElementById('input').value.trim();
+            if (!inp) return showToast("Пусто!", "error");
+            if ((inp.startsWith('http://') || inp.startsWith('https://')) && !inp.includes('\n') && !inp.includes('{')) {
+                try {
+                    const res = await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(inp));
+                    parseData(await res.text());
+                } catch(e){ showToast("Ошибка загрузки URL", "error"); }
+            } else parseData(inp);
+        }
+
+        function safeB64Decode(str) {
+            try { return decodeURIComponent(escape(atob(str.replace(/-/g, '+').replace(/_/g, '/')))); } 
+            catch(e) { try { return atob(str.replace(/-/g, '+').replace(/_/g, '/')); } catch(e2) { return ""; } }
+        }
+
+        function parseData(text) {
+            text = text.trim();
+            let added = 0;
+            if (text.startsWith('{')) {
+                try {
+                    let json = JSON.parse(text);
+                    let baseRem = json.remarks || "";
+                    json.outbounds?.forEach(ob => {
+                        let pt = ob.protocol || ob.type;
+                        if (['freedom','blackhole','dns','direct','block','selector','urltest'].includes(pt)) return;
+                        let nn = addGeoFlag(baseRem ? `${baseRem} (${ob.tag||'Node'})` : (ob.tag||"Node"));
+                        let p = null;
+                        
+                        if (ob.protocol === 'vless' && ob.settings?.vnext?.length) {
+                            let vn = ob.settings.vnext[0]; let st = ob.streamSettings || {}; let re = st.realitySettings || {}; let tl = st.tlsSettings || {};
+                            p = { name: nn, type: "vless", server: vn.address, port: vn.port, uuid: vn.users?.[0]?.id, tls: st.security==='reality'||st.security==='tls', "reality-opts": st.security==='reality'?{"public-key":re.publicKey,"short-id":re.shortId||""}:null, sni: re.serverName||tl.serverName||vn.address, network: st.network||"tcp", flow: vn.users?.[0]?.flow||"", fp: re.fingerprint||tl.fingerprint||"chrome" };
+                        } else if (ob.protocol === 'trojan' && ob.settings?.servers?.length) {
+                            let sv = ob.settings.servers[0]; let st = ob.streamSettings || {}; let tl = st.tlsSettings || {};
+                            p = { name: nn, type: "trojan", server: sv.address, port: sv.port, password: sv.password, tls: st.security==='tls', sni: tl.serverName||sv.address, network: st.network||"tcp", fp: tl.fingerprint||"chrome" };
+                        } else if (ob.type === 'vless') {
+                            let tl = ob.tls||{}; let re = tl.reality||{};
+                            p = { name: nn, type: "vless", server: ob.server, port: ob.server_port, uuid: ob.uuid, tls: tl.enabled, "reality-opts": re.enabled?{"public-key":re.public_key,"short-id":re.short_id||""}:null, sni: tl.server_name||ob.server, network: ob.transport?.type||"tcp", flow: ob.flow||"", fp: tl.utls?.fingerprint||"chrome" };
+                        } else if (ob.type === 'trojan') {
+                            let tl = ob.tls||{};
+                            p = { name: nn, type: "trojan", server: ob.server, port: ob.server_port, password: ob.password, tls: tl.enabled, sni: tl.server_name||ob.server, network: ob.transport?.type||"tcp", fp: tl.utls?.fingerprint||"chrome" };
+                        }
+
+                        if (p && p.server) {
+                            let l = ``;
+                            if (p.type === 'vless') { l = `vless://${p.uuid}@${p.server}:${p.port}?type=${p.network}&security=${p.tls?(p["reality-opts"]?'reality':'tls'):'none'}&sni=${p.sni}&fp=${p.fp}`; if(p.flow) l += `&flow=${p.flow}`; if(p["reality-opts"]) l += `&pbk=${p["reality-opts"]["public-key"]}&sid=${p["reality-opts"]["short-id"]}`; } 
+                            else if (p.type === 'trojan') { l = `trojan://${p.password}@${p.server}:${p.port}?type=${p.network}&security=${p.tls?'tls':'none'}&sni=${p.sni}&fp=${p.fp}`; }
+                            p.rawLink = l + `#${encodeURIComponent(p.name)}`;
+                            if (!currentProxies.some(x => x.server===p.server && x.port===p.port)) { currentProxies.push(p); added++; }
+                        }
+                    });
+                } catch(e){ showDiagnosticError("Ошибка JSON"); return; }
+            } else {
+                if (!text.includes('://') && !text.includes('{')) { try { text = safeB64Decode(text); } catch(e){} }
+                text.split('\n').forEach(line => {
+                    line = line.trim(); if(!line) return;
+                    try {
+                        if (line.startsWith('vless://') || line.startsWith('trojan://')) {
+                            const u = new URL(line); const sp = new URLSearchParams(u.search);
+                            let p = { name: addGeoFlag(decodeURIComponent(u.hash.slice(1)) || "Node"), type: u.protocol.replace(':',''), server: u.hostname, port: parseInt(u.port), tls: sp.get('security')==='reality'||sp.get('security')==='tls', sni: sp.get('sni')||u.hostname, network: sp.get('type')||"tcp", fp: sp.get('fp')||"chrome", flow: sp.get('flow')||"", rawLink: line };
+                            if (p.type === 'vless') { p.uuid = u.username; p["reality-opts"] = sp.get('pbk') ? {"public-key":sp.get('pbk'), "short-id":sp.get('sid')||""} : null; } 
+                            else p.password = u.username;
+                            if (!currentProxies.some(x => x.server===p.server && x.port===p.port)) { currentProxies.push(p); added++; }
+                        }
+                    } catch(e){}
+                });
+            }
+            if(added) { document.getElementById('input').value=''; showToast(`Добавлено ${added} узлов!`); saveState(); renderCards(); }
+            else showToast("Узлы не найдены", "warning");
+        }
+
+        // === UI RENDER ===
+        function renderCards() {
+            const cnt = document.getElementById('cardsContainer');
+            const frag = document.createDocumentFragment();
+            currentProxies.forEach((p, i) => {
+                let pl = p.lastPing===undefined ? "⚡" : (p.lastPing===99999 ? "Err" : (p.lastPing===99998 ? "🛡️ Stealth" : p.lastPing+"ms"));
+                let pc = p.lastPing===undefined ? "#c9d1d9" : (p.lastPing===99999 ? "#f85149" : (p.lastPing===99998 ? "#58a6ff" : "#3fb950"));
+                const d = document.createElement('div'); d.className = 'proxy-card';
+                d.innerHTML = `<input type="checkbox" class="proxy-checkbox" onchange="this.parentElement.classList.toggle('selected', this.checked)">
+                               <div class="card-actions">
+                                  <button class="btn-card btn-ping" style="color:${pc}" onclick="pingNode(${i},this)">${pl}</button>
+                                  <button class="btn-card" onclick="showQR(${i})">📱</button>
+                                  <button class="btn-card remove" onclick="removeProxy(${i})">✖</button>
+                               </div>
+                               <div class="proxy-name" contenteditable="true" spellcheck="false" onblur="renameProxy(${i},this.innerText)">${p.name}</div>
+                               <div class="proxy-detail"><span class="proxy-type type-${p.type}">${p.type}</span> ${p.server}:${p.port}</div>`;
+                frag.appendChild(d);
+            });
+            cnt.innerHTML = ''; cnt.appendChild(frag);
+            document.getElementById('cardsToolbar').style.display = currentProxies.length ? 'flex' : 'none';
+            document.getElementById('nodeCount').innerText = `${currentProxies.length} Nodes`;
+            document.getElementById('selectAllCb').checked = false;
+            updateOutput();
+        }
+
         function updateOutput() {
             const f = document.getElementById('exportFormat').value;
-            const out = document.getElementById('outputEditor');
+            const mode = document.getElementById('templateMode').value;
+            let res = "";
             
-            if (f === 'singbox') {
+            if (f.includes('clash')) {
+                let px = "proxies:\n" + currentProxies.map(p => `  - name: "${p.name}"\n    type: ${p.type}\n    server: ${p.server}\n    port: ${p.port}\n    ${p.type==='vless'?'uuid':'password'}: ${p.uuid||p.password}\n    udp: true\n    network: ${p.network}\n${p.flow?`    flow: ${p.flow}\n`:''}${p.tls?`    tls: true\n    sni: ${p.sni}\n    client-fingerprint: ${p.fp}\n`:''}${p["reality-opts"]?`    reality-opts:\n      public-key: ${p["reality-opts"]["public-key"]}\n      short-id: ${p["reality-opts"]["short-id"]}\n`:''}`).join('');
+                let names = currentProxies.map(p => `      - "${p.name}"`).join('\n') || "      - DIRECT";
+                
+                if (mode === 'ultimate') {
+                    let tun = 'tun:\n  enable: true\n  stack: mixed\n  device: Mihomo\n  gso: true\n  udp-timeout: 30\n  dns-hijack:\n    - any:53\n    - tcp://any:53\n  auto-route: true\n  auto-detect-interface: true\n  strict-route: true\n  endpoint-independent-nat: true\n  mtu: 1420';
+                    if (f === 'clash_router') tun = 'tun:\n  enable: false';
+                    
+                    let groups = `proxy-groups:\n  - name: "🚀 Выбор сервера"\n    type: select\n    proxies:\n      - "♻️ Автовыбор"\n      - "🤖 Premium AI (Auto)"\n${names}\n\n  - name: "♻️ Автовыбор"\n    type: url-test\n    url: "https://cp.cloudflare.com/generate_204"\n    interval: 180\n    tolerance: 30\n    timeout: 5000\n    lazy: true\n    exclude-filter: "(?i)Россия|Russia|Украина|Ukraine|Молдова|Moldova|РФ|России"\n    proxies:\n${names}\n\n  - name: "🤖 Premium AI (Auto)"\n    type: url-test\n    url: "https://cp.cloudflare.com/generate_204"\n    interval: 180\n    tolerance: 30\n    timeout: 5000\n    lazy: true\n    proxies:\n${names}`;
+                    res = `${YAML_BASE}\n\n${tun}\n\n${px}\n${groups}\n\n${YAML_RULES}`;
+                } else if (mode === 'custom') {
+                    let ct = document.getElementById('customTemplateInput').value;
+                    res = ct.replace(/\{\{PROXIES_YAML\}\}/g, px).replace(/\{\{PROXY_NAMES\}\}/g, names);
+                }
+            } else if (f === 'singbox') {
                 let obs = currentProxies.map((p, i) => {
-                    let tag = p.name || `proxy-${i}`; let ob = { tag, type: p.type, server: p.server, server_port: p.port };
-                    if (p.type==='vless'||p.type==='trojan') { if(p.uuid)ob.uuid=p.uuid; if(p.password)ob.password=p.password; if(p.network&&p.network!=='tcp')ob.transport={type:p.network}; if(p.tls){ob.tls={enabled:true,server_name:p.sni||p.server}; if(p.fp)ob.tls.utls={enabled:true,fingerprint:p.fp}; if(p["reality-opts"])ob.tls.reality={enabled:true,public_key:p["reality-opts"]["public-key"],short_id:p["reality-opts"]["short-id"]||""};} if(p.flow)ob.flow=p.flow; }
-                    else if(p.type==='vmess'){ ob.uuid=p.uuid; ob.security="auto"; ob.alter_id=p.aid||0; if(p.tls)ob.tls={enabled:true,server_name:p.sni||p.server}; if(p.network&&p.network!=='tcp')ob.transport={type:p.network}; }
-                    else if(p.type==='wg'){ ob.type="wireguard"; ob.local_address=[p.ip]; ob.private_key=p["private-key"]; ob.peer_public_key=p["public-key"]; if(p.reserved)ob.reserved=p.reserved.split(',').map(Number); }
+                    let ob = { tag: p.name, type: p.type, server: p.server, server_port: p.port };
+                    if(p.type==='vless'){ ob.uuid=p.uuid; ob.transport={type:p.network}; if(p.tls){ob.tls={enabled:true,server_name:p.sni,utls:{enabled:true,fingerprint:p.fp}}; if(p["reality-opts"])ob.tls.reality={enabled:true,public_key:p["reality-opts"]["public-key"],short_id:p["reality-opts"]["short-id"]};} if(p.flow)ob.flow=p.flow; }
                     return ob;
                 });
                 obs.push({type:"direct",tag:"direct"},{type:"block",tag:"block"},{type:"dns",tag:"dns-out"});
                 if(currentProxies.length) obs.unshift({type:"selector",tag:"🚀 Proxy Select",outbounds:currentProxies.map(p=>p.name)});
-                out.innerText = JSON.stringify({outbounds:obs}, null, 2);
-            } 
-            else if (f === 'xray') {
-                let obs = currentProxies.map((p, i) => {
-                    let ob = { tag: p.name || `proxy-${i}` };
-                    if(p.type==='vless'){ ob.protocol="vless"; ob.settings={vnext:[{address:p.server,port:p.port,users:[{id:p.uuid,encryption:"none",flow:p.flow||""}]}]}; ob.streamSettings={network:p.network||"tcp",security:p.tls?"reality":"none"}; if(p.tls&&p["reality-opts"])ob.streamSettings.realitySettings={serverName:p.sni||p.server,show:false,publicKey:p["reality-opts"]["public-key"],shortId:p["reality-opts"]["short-id"]||"",fingerprint:p.fp||"chrome"}; }
-                    else if(p.type==='wg'){ ob.protocol="wireguard"; ob.settings={secretKey:p["private-key"],peers:[{endpoint:p.server+":"+p.port,publicKey:p["public-key"]}],localAddress:[p.ip]}; if(p.reserved)ob.settings.reserved=p.reserved.split(',').map(Number); }
-                    return ob;
-                });
-                obs.push({tag:"direct",protocol:"freedom"},{tag:"block",protocol:"blackhole"});
-                let b = currentProxies.length ? [{tag:"proxy-balancer",selector:currentProxies.map(p=>p.name),strategy:{type:"leastLoad",settings:{costs:currentProxies.map(p=>({match:p.name,value:100,regexp:false}))}},fallbackTag:currentProxies[0].name}] : [];
-                out.innerText = JSON.stringify({dns:{servers:["1.1.1.1","8.8.8.8"]},routing:{rules:[{type:"field",inboundTag:["socks","http"],balancerTag:"proxy-balancer"}],balancers:b,domainStrategy:"IPIfNonMatch"},inbounds:[{tag:"socks",port:10808,protocol:"socks"}],outbounds:obs}, null, 2);
-            } 
-            else {
-                // YAML (CLASH)
-                let py = "proxies:\n" + (currentProxies.length ? "" : " []\n");
-                currentProxies.forEach(p => {
-                    py += `  - name: "${p.name}"\n    server: ${p.server}\n    port: ${p.port}\n`;
-                    if (p.type === 'vless' || p.type === 'trojan') {
-                        py += `    type: ${p.type}\n    udp: true\n`;
-                        if (p.type === 'vless') py += `    uuid: ${p.uuid}\n`;
-                        if (p.type === 'trojan') py += `    password: ${p.password}\n`;
-                        py += `    network: ${p.network||'tcp'}\n`;
-                        if (p.flow) py += `    flow: ${p.flow}\n`; 
-                        if (p.tls) {
-                            py += `    tls: true\n    sni: ${p.sni}\n    client-fingerprint: ${p.fp||'chrome'}\n`; 
-                            if(p["reality-opts"]) py+=`    reality-opts:\n      public-key: ${p["reality-opts"]["public-key"]}\n      short-id: ${p["reality-opts"]["short-id"]}\n`;
-                        } 
-                    }
-                    else if(p.type==='vmess'){ py+=`    type: vmess\n    udp: true\n    uuid: ${p.uuid}\n    alterId: ${p.aid}\n    cipher: auto\n    network: ${p.network}\n`; if(p.tls)py+=`    tls: true\n    sni: ${p.sni}\n`; }
-                    else if(p.type==='ss'){ py+=`    type: ss\n    udp: true\n    cipher: ${p.cipher}\n    password: ${p.password}\n`; }
-                    else if(p.type==='ssr'){ py+=`    type: ssr\n    udp: true\n    cipher: ${p.cipher}\n    password: ${p.password}\n    protocol: ${p.protocol}\n    obfs: ${p.obfs}\n`; }
-                    else if(p.type==='hysteria2'){ py+=`    type: hysteria2\n    password: ${p.password}\n    sni: ${p.sni}\n`; if(p["skip-cert-verify"])py+=`    skip-cert-verify: true\n`; if(p.obfs)py+=`    obfs: ${p.obfs}\n    obfs-password: ${p["obfs-password"]}\n`; }
-                    else if(p.type==='tuic'){ py+=`    type: tuic\n    uuid: ${p.uuid}\n    password: ${p.password}\n    sni: ${p.sni}\n    udp-relay-mode: native\n`; }
-                    else if(p.type==='wg'){ py+=`    type: wireguard\n    ip: ${p.ip}\n    public-key: ${p["public-key"]}\n    private-key: ${p["private-key"]}\n    udp: true\n`; if(p.reserved)py+=`    reserved: [${p.reserved}]\n`; }
-                    else if(p.type==='socks'){ py+=`    type: socks5\n    udp: true\n`; if(p.username)py+=`    username: ${p.username}\n    password: ${p.password}\n`; }
-                    else if(p.type==='http'){ py+=`    type: http\n`; if(p.username)py+=`    username: ${p.username}\n    password: ${p.password}\n`; }
-                });
-                
-                const pn = currentProxies.length ? currentProxies.map(p => `      - "${p.name}"`).join('\n') : "      - DIRECT";
-                const mode = document.getElementById('templateMode').value;
-                
-                if (mode === 'custom') {
-                    let ct = document.getElementById('customTemplateInput').value;
-                    if (ct && (!ct.includes('{{PROXIES_YAML}}') || !ct.includes('{{PROXY_NAMES}}'))) {
-                        out.innerText = `# ⚠️ ОШИБКА ШАБЛОНА\n# Мы не нашли метку {{PROXIES_YAML}} или {{PROXY_NAMES}} в вашем коде.\n# Добавьте их, чтобы скрипт понял, куда вставлять серверы!\n\n` + ct;
-                    } else {
-                        out.innerText = ct.replace(/\{\{PROXIES_YAML\}\}/g, py).replace(/\{\{PROXY_NAMES\}\}/g, pn);
-                    }
-                } else {
-                    // НАСТРОЙКА TUN В ЗАВИСИМОСТИ ОТ ВЫБРАННОГО ФОРМАТА
-                    let tc = f==='clash_router' ? `tun:\n  enable: false` : `tun:\n  enable: true\n  stack: mixed\n  device: Mihomo\n  gso: true\n  udp-timeout: 30\n  dns-hijack:\n    - any:53\n    - tcp://any:53\n  auto-route: true\n  auto-detect-interface: true\n  strict-route: true\n  endpoint-independent-nat: true\n  mtu: 1420`;
-                    
-                    if (mode === 'basic') out.innerText = `mode: rule\nallow-lan: true\nmixed-port: 7890\n\n${tc}\n\n${py}\nproxy-groups:\n  - name: "Proxy"\n    type: select\n    proxies:\n      - "Auto"\n${pn}\n  - name: "Auto"\n    type: url-test\n    url: "https://cp.cloudflare.com/generate_204"\n    interval: 300\n    proxies:\n${pn}\nrules:\n  - GEOIP,RU,DIRECT,no-resolve\n  - MATCH,Proxy`;
-                    else {
-                        // ФОРМИРУЕМ PROXY-GROUPS ПО ПОЛЬЗОВАТЕЛЬСКОМУ ШАБЛОНУ GL_Crimea
-                        let pg = `proxy-groups:
-  - name: "🚀 Выбор сервера"
-    type: select
-    proxies:
-      - "♻️ Автовыбор"
-      - "🤖 Premium AI (Auto)"
-${pn}
-
-  - name: "♻️ Автовыбор"
-    type: url-test
-    url: "https://cp.cloudflare.com/generate_204"
-    interval: 180
-    tolerance: 30
-    timeout: 5000
-    lazy: true
-    exclude-filter: "(?i)Россия|Russia|Украина|Ukraine|Молдова|Moldova|РФ|России"
-    proxies:
-${pn}
-
-  - name: "🤖 Premium AI (Auto)"
-    type: url-test
-    url: "https://cp.cloudflare.com/generate_204"
-    interval: 180
-    tolerance: 30
-    timeout: 5000
-    lazy: true
-    proxies:
-${pn}`;
-
-                        out.innerText = `${YAML_BASE_CONFIG}\n\n${tc}\n\n${py}\n${pg}\n\n${YAML_USER_RULES}`;
-                    }
-                }
+                res = JSON.stringify({outbounds:obs}, null, 2);
             }
-            saveEditorState();
+            document.getElementById('outputEditor').innerText = res; saveEditorState();
+        }
+
+        // === ОПЕРАЦИИ ===
+        async function resolveGeoIP() {
+            const btn = document.getElementById('btnGeo'); btn.innerText = "⏳...";
+            let upd = 0;
+            for (let p of currentProxies) {
+                try {
+                    const res = await fetch(`https://get.geojs.io/v1/ip/geo/${p.server}.json`);
+                    const data = await res.json();
+                    if(data.country_code) { p.name = `[${data.country_code}] ${p.name.replace(/\[.*?\]/g,'').trim()}`; upd++; }
+                } catch(e){}
+                await new Promise(r => setTimeout(r, 200));
+            }
+            btn.innerText = "🌍 Авто-Геолокация";
+            if(upd) { saveState(); renderCards(); showToast(`Локация обновлена: ${upd}`); }
+        }
+
+        async function pingNode(i, btn) {
+            const p = currentProxies[i]; btn.innerText = "⏳"; const start = Date.now();
+            try {
+                await fetch(`https://${p.server}:${p.port}`, {mode:'no-cors', signal: AbortSignal.timeout(3000)});
+                p.lastPing = Date.now()-start; btn.innerText = p.lastPing+"ms"; btn.style.color = "#3fb950";
+            } catch(e) {
+                if(p.tls) { p.lastPing = 99998; btn.innerText = "🛡️ Stealth"; btn.style.color = "#58a6ff"; }
+                else { p.lastPing = 99999; btn.innerText = "Err"; btn.style.color = "#f85149"; }
+            }
+            saveState();
+        }
+        async function pingAll() {
+            const btns = document.querySelectorAll('.btn-ping'); showToast("Тестирование...");
+            await Promise.all(currentProxies.map((_, i) => btns[i] ? pingNode(i, btns[i]) : Promise.resolve()));
+            showToast("✅ Завершено!");
+        }
+
+        function toggleSelectAll() {
+            const s = document.getElementById('selectAllCb').checked;
+            document.querySelectorAll('.proxy-checkbox').forEach(c => { c.checked = s; c.parentElement.classList.toggle('selected', s); });
+        }
+        function cleanDeadNodes() { currentProxies = currentProxies.filter(p => p.lastPing !== 99999); renderCards(); }
+        function removeDuplicates() { 
+            const u = new Set(); currentProxies = currentProxies.filter(p => { const k = p.server+p.port; return u.has(k)?false:u.add(k); }); 
+            renderCards(); 
+        }
+        function clearAll() { currentProxies=[]; sessionStorage.clear(); renderCards(); }
+        function shuffleProxies() { currentProxies.sort(() => Math.random() - 0.5); saveState(); renderCards(); }
+        function sortProxies() { currentProxies.sort((a,b) => (a.lastPing||99999) - (b.lastPing||99999)); saveState(); renderCards(); }
+        function removeProxy(i) { currentProxies.splice(i,1); saveState(); renderCards(); }
+        function renameProxy(i, nn) { nn=nn.trim(); if(nn) currentProxies[i].name = nn; saveState(); updateOutput(); }
+        
+        function openMassEditModal() { if(!document.querySelectorAll('.proxy-checkbox:checked').length) return showToast("Выделите узлы!", "warning"); document.getElementById('massEditModal').style.display='flex'; }
+        function closeMassEditModal() { document.getElementById('massEditModal').style.display='none'; }
+        function applyMassEdit() {
+            const sni = document.getElementById('massEditSni').value.trim(); const fp = document.getElementById('massEditFp').value; const fl = document.getElementById('massEditFlow').value;
+            let c = 0;
+            document.querySelectorAll('.proxy-checkbox').forEach((cb, i) => {
+                if (cb.checked) {
+                    let p = currentProxies[i]; if(sni)p.sni=sni; if(fp)p.fp=fp; if(fl)p.flow=fl==='none'?"":fl;
+                    if(sni||fp||fl) { try { let u=new URL(p.rawLink); let sp=new URLSearchParams(u.search); if(sni)sp.set('sni',sni); if(fp)sp.set('fp',fp); if(fl)fl==='none'?sp.delete('flow'):sp.set('flow',fl); u.search=sp.toString(); p.rawLink=u.toString(); } catch(e){} c++; }
+                }
+            });
+            closeMassEditModal(); if(c) { saveState(); renderCards(); showToast(`Изменено: ${c}`); }
+        }
+
+        function showQR(i) { document.getElementById('qrTitle').innerText = currentProxies[i].name; new QRious({ element: document.getElementById('qrCanvas'), value: currentProxies[i].rawLink, size: 220, background: 'white' }); document.getElementById('qrModal').style.display='flex'; }
+        function closeQR() { document.getElementById('qrModal').style.display='none'; }
+
+        function validateOutput(c, f) {
+            if(f.includes('clash') && (!c.includes('proxies:') || !c.includes('rules:'))) { showDiagnosticError("YAML сломан. Нет proxies или rules."); return false; }
+            if(f === 'singbox') { try { JSON.parse(c); } catch(e) { showDiagnosticError("Ошибка JSON: " + e.message); return false; } }
+            return true;
+        }
+
+        function downloadFile() {
+            const c = document.getElementById('outputEditor').innerText; const f = document.getElementById('exportFormat').value;
+            if(!validateOutput(c, f)) return;
+            const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([c], {type: f.includes('clash')?'text/yaml':'application/json'})); a.download = `Config_v${VER}.${f.includes('clash')?'yaml':'json'}`; a.click();
+        }
+        function copyResult() {
+            const c = document.getElementById('outputEditor').innerText; const f = document.getElementById('exportFormat').value;
+            if(!validateOutput(c, f)) return;
+            navigator.clipboard.writeText(c); showToast("Скопировано!");
+        }
+        function pasteFromClipboard() { navigator.clipboard.readText().then(t => { document.getElementById('input').value = t; startProcess(); }).catch(()=>showToast("Нет доступа к буферу", "error")); }
+        function toggleCustomTemplate() {
+            localStorage.setItem('flclash_exportFormat', document.getElementById('exportFormat').value);
+            localStorage.setItem('flclash_templateMode', document.getElementById('templateMode').value);
+            document.getElementById('customTemplateWrapper').style.display = document.getElementById('templateMode').value === 'custom' ? 'block' : 'none';
+            updateOutput();
         }
     </script>
 </body>
