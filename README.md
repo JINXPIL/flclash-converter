@@ -41,14 +41,6 @@
 
 `VLESS` (Reality/Vision) • `VMess` • `Trojan` • `Hysteria2` • `SS/SSR` • `WireGuard` • `TUIC` • `Socks5` • `HTTP`
 
-## 🙏 Благодарности (Acknowledgments)
-
-Этот проект использует и вдохновлен следующими открытыми решениями:
-- [MetaCubeX](https://github.com/MetaCubeX) — за ядро Mihomo и великолепные базы `meta-rules-dat`.
-- [js-yaml](https://github.com/nodeca/js-yaml) — за надежный парсер YAML конфигураций.
-- [qrious](https://github.com/neocotic/qrious) — за локальную генерацию QR-кодов.
-- [Hagezi](https://github.com/hagezi/dns-blocklists) — за списки блокировки рекламы и трекеров, используемые в профилях.
-
 ## ⭐ Поддержка проекта
 
 **Если этот проект оказался полезен для вас, пожалуйста, поставьте ему звезду!** :star2:
