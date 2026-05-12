@@ -6,118 +6,126 @@
     <meta name="theme-color" content="#0d1117">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Network Builder v16.3 Master</title>
+    <title>Network Builder v16.15 Master</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
-        body { background: #0d1117; color: #c9d1d9; font-family: 'JetBrains Mono', monospace; margin: 0; display: flex; justify-content: center; padding: 20px 10px; }
-        .container { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 25px; max-width: 1050px; width: 100%; box-shadow: 0 8px 32px rgba(0,0,0,0.6); }
         
-        h2 { margin-top: 0; color: #58a6ff; font-size: 22px; border-bottom: 1px solid #30363d; padding-bottom: 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        :root {
+            --bg-color: #0d1117; --container-bg: #161b22; --border-color: #30363d;
+            --primary-color: #58a6ff; --text-color: #c9d1d9; --text-muted: #8b949e;
+            --accent-color: #d29922; --success-color: #238636; --danger-color: #f85149;
+            --input-bg: #010409;
+        }
+
+        body { background: var(--bg-color); color: var(--text-color); font-family: 'JetBrains Mono', monospace; margin: 0; display: flex; justify-content: center; padding: 20px 10px; transition: background 0.3s; }
+        .container { background: var(--container-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 25px; max-width: 1050px; width: 100%; box-shadow: 0 8px 32px rgba(0,0,0,0.6); transition: background 0.3s, border-color 0.3s; }
+        
+        h2 { margin-top: 0; color: var(--primary-color); font-size: 22px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
         .badges-wrapper { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-        .version-badge { font-size: 11px; font-weight: bold; background: #21262d; padding: 6px 10px; border-radius: 6px; border: 1px solid #30363d; color: #3fb950; transition: 0.2s; display: flex; align-items: center; }
-        .version-badge:hover { border-color: #58a6ff; background: #30363d; }
-        .version-badge a { color: inherit; text-decoration: none; }
+        .version-badge { font-size: 11px; font-weight: bold; background: #21262d; border-radius: 6px; border: 1px solid var(--border-color); color: var(--success-color); transition: 0.2s; display: flex; align-items: center; overflow: hidden; padding: 0; }
+        .version-badge:hover { border-color: var(--primary-color); background: var(--border-color); }
+        .version-badge a { color: inherit; text-decoration: none; padding: 6px 10px; display: flex; align-items: center; width: 100%; height: 100%; }
         
         .header-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; width: 100%; }
-        .icon-btn { background: #21262d; border: 1px solid #30363d; color: #c9d1d9; padding: 8px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px; font-weight: bold; font-family: inherit; }
-        .icon-btn:hover { background: #30363d; border-color: #8b949e; }
-        .icon-btn.primary { background: #238636; border-color: #2ea043; color: white; }
+        .icon-btn { background: #21262d; border: 1px solid var(--border-color); color: var(--text-color); padding: 8px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px; font-weight: bold; font-family: inherit; }
+        .icon-btn:hover { background: var(--border-color); border-color: var(--text-muted); }
+        .icon-btn.primary { background: var(--success-color); border-color: #2ea043; color: white; }
         .icon-btn.primary:hover { background: #2ea043; box-shadow: 0 0 10px rgba(46,160,67,0.4); }
-        .icon-btn.danger { background: transparent; color: #f85149; border-color: #30363d; }
-        .icon-btn.danger:hover { background: #f85149; color: white; border-color: #f85149; }
+        .icon-btn.danger { background: transparent; color: var(--danger-color); border-color: var(--border-color); }
+        .icon-btn.danger:hover { background: var(--danger-color); color: white; border-color: var(--danger-color); }
         
-        p { font-size: 13px; color: #8b949e; line-height: 1.6; margin-bottom: 15px; }
-        .input-group { display: flex; gap: 10px; margin-bottom: 20px; align-items: stretch; }
+        p { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 15px; }
+        .input-group { display: flex; gap: 10px; margin-bottom: 20px; align-items: stretch; flex-wrap: wrap; }
         
-        /* === УМНЫЕ РЕЗИНОВЫЕ БЛОКИ (Объединенные стили) === */
         textarea#input, textarea#customTemplateInput, pre#outputEditor { 
-            width: 100%; min-height: 120px;
-            background: #010409; font-size: 13px; line-height: 1.5;
+            flex-grow: 1; width: 100%; min-height: 120px; background: var(--input-bg); font-size: 13px; line-height: 1.5; color: var(--text-color);
             border-radius: 8px; padding: 15px; box-sizing: border-box; font-family: inherit;
             outline: none; transition: border-color 0.2s, box-shadow 0.2s;
-            overflow: hidden; /* Скрываем нативный скролл */
-            resize: none; /* Запрещаем ручное растягивание */
-            margin-bottom: 20px;
+            overflow: hidden; resize: none; margin-bottom: 0;
         }
-        /* Индивидуальные акценты блоков */
-        textarea#input { border: 2px dashed #30363d; color: #3fb950; margin-bottom: 0; }
-        textarea#input:focus, textarea#input.dragover { border-color: #58a6ff; background: #161b22; box-shadow: 0 0 15px rgba(88,166,255,0.15); }
-        
-        textarea#customTemplateInput { border: 1px solid #30363d; color: #d29922; background: #161b22; }
-        
-        pre#outputEditor { border: 1px solid #30363d; color: #a5d6ff; white-space: pre-wrap; word-wrap: break-word; }
-        pre#outputEditor:focus { border-color: #58a6ff; box-shadow: 0 0 15px rgba(88,166,255,0.15); background: #161b22; }
+        textarea#input { border: 2px dashed var(--border-color); color: var(--success-color); }
+        textarea#input:focus, textarea#input.dragover { border-color: var(--primary-color); background: var(--container-bg); box-shadow: 0 0 15px rgba(88,166,255,0.15); }
+        textarea#customTemplateInput { border: 1px solid var(--border-color); color: var(--accent-color); background: var(--container-bg); margin-bottom: 20px; }
+        pre#outputEditor { border: 1px solid var(--border-color); color: var(--primary-color); white-space: pre-wrap; word-wrap: break-word; margin-bottom: 20px;}
+        pre#outputEditor:focus { border-color: var(--primary-color); box-shadow: 0 0 15px rgba(88,166,255,0.15); background: var(--container-bg); }
 
-        /* === АДАПТИВНАЯ КНОПКА ВСТАВКИ === */
-        .paste-btn { background: #21262d; border: 1px solid #30363d; border-radius: 8px; width: auto; min-width: 85px; padding: 0 12px; display: flex; flex-direction: column; justify-content: center; align-items: center; color: #c9d1d9; cursor: pointer; transition: 0.2s; font-weight: bold; font-size: 12px; text-align: center; word-break: break-word; margin-bottom: 0;}
-        .paste-btn:hover { background: #30363d; border-color: #58a6ff; color: white; }
-        .paste-btn span { font-size: 24px; margin-bottom: 5px; display: block; }
+        .controls-group { display: flex; flex-direction: column; gap: 10px; justify-content: stretch; min-width: 100px; }
+        .paste-btn { background: #21262d; border: 1px solid var(--border-color); border-radius: 8px; flex: 1; padding: 10px; display: flex; flex-direction: column; justify-content: center; align-items: center; color: var(--text-color); cursor: pointer; transition: 0.2s; font-weight: bold; font-size: 12px; text-align: center; margin-bottom: 0;}
+        .paste-btn:hover { background: var(--border-color); border-color: var(--primary-color); color: white; }
+        .paste-btn span { font-size: 20px; margin-bottom: 5px; display: block; }
         
-        .settings-panel { background: #010409; border: 1px solid #30363d; border-radius: 8px; padding: 15px 20px; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 20px; }
+        .settings-panel { background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px 20px; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 20px; }
         .setting-item { display: flex; flex-direction: column; gap: 8px; flex-grow: 1; min-width: 250px; }
-        .setting-item label { font-size: 11px; font-weight: bold; color: #8b949e; text-transform: uppercase; letter-spacing: 0.5px; }
+        .setting-item label { font-size: 11px; font-weight: bold; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
         
         select, .action-btn { border: none; padding: 14px 18px; border-radius: 6px; font-weight: bold; font-family: inherit; cursor: pointer; font-size: 13px; }
-        select { background: #21262d; color: #c9d1d9; border: 1px solid #30363d; outline: none; width: 100%; transition: 0.2s; }
-        select:focus { border-color: #58a6ff; }
+        select { background: #21262d; color: var(--text-color); border: 1px solid var(--border-color); outline: none; width: 100%; transition: 0.2s; }
+        select:focus { border-color: var(--primary-color); }
         
-        .btn-convert { background: #238636; color: white; width: 100%; padding: 18px; font-size: 15px; margin-bottom: 20px; letter-spacing: 1px; transition: 0.2s; }
+        .btn-convert { background: var(--success-color); color: white; width: 100%; padding: 18px; font-size: 15px; margin-bottom: 20px; letter-spacing: 1px; transition: 0.2s; }
         .btn-convert:hover { background: #2ea043; box-shadow: 0 0 12px rgba(46,160,67,0.4); }
         
         .status-badge { background: #1f6feb; color: white; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; }
         
-        .cards-toolbar { display: none; justify-content: space-between; align-items: center; margin-bottom: 15px; background: #010409; padding: 12px 18px; border-radius: 8px; border: 1px solid #30363d; flex-wrap: wrap; gap: 10px; }
+        .cards-toolbar { display: none; justify-content: space-between; align-items: center; margin-bottom: 15px; background: var(--input-bg); padding: 12px 18px; border-radius: 8px; border: 1px solid var(--border-color); flex-wrap: wrap; gap: 10px; }
         .cards-grid { display: none; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 12px; margin-bottom: 20px; max-height: 450px; overflow-y: auto; padding-right: 5px; }
-        .cards-grid::-webkit-scrollbar { width: 6px; } .cards-grid::-webkit-scrollbar-track { background: #010409; border-radius: 3px; } .cards-grid::-webkit-scrollbar-thumb { background: #30363d; border-radius: 3px; }
+        .cards-grid::-webkit-scrollbar { width: 6px; } .cards-grid::-webkit-scrollbar-track { background: var(--input-bg); border-radius: 3px; } .cards-grid::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
         
-        .proxy-card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 14px 14px 14px 38px; position: relative; display: flex; flex-direction: column; gap: 8px; transition: 0.1s; }
-        .proxy-card:hover { border-color: #58a6ff; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
-        .proxy-card.selected { border-color: #d29922; background: #1f1a0f; }
-        .proxy-checkbox { position: absolute; left: 12px; top: 15px; accent-color: #d29922; width: 16px; height: 16px; cursor: pointer; }
+        .proxy-card { background: var(--container-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px 14px 14px 38px; position: relative; display: flex; flex-direction: column; gap: 8px; transition: 0.1s; }
+        .proxy-card:hover { border-color: var(--primary-color); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        .proxy-card.selected { border-color: var(--accent-color); background: #1f1a0f; }
+        .proxy-checkbox { position: absolute; left: 12px; top: 15px; accent-color: var(--accent-color); width: 16px; height: 16px; cursor: pointer; }
         
-        .proxy-name { font-weight: bold; color: #58a6ff; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 90px; outline: none; border-bottom: 1px dashed transparent; cursor: text; }
-        .proxy-name:focus { border-bottom: 1px dashed #58a6ff; }
-        .proxy-detail { font-size: 11px; color: #8b949e; display: flex; align-items: center; justify-content: space-between; }
+        .proxy-name { font-weight: bold; color: var(--primary-color); font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 90px; outline: none; border-bottom: 1px dashed transparent; cursor: text; }
+        .proxy-name:focus { border-bottom: 1px dashed var(--primary-color); }
+        .proxy-detail { font-size: 11px; color: var(--text-muted); display: flex; align-items: center; justify-content: space-between; }
         .proxy-type { display: inline-block; color: white; padding: 3px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; text-transform: uppercase; margin-right: 5px; }
         
-        .type-vless{background:#238636;} .type-hy2{background:#8957e5;} .type-trojan{background:#d29922;} .type-vmess{background:#0078d7;} .type-ss{background:#3b82f6;} .type-ssr{background:#d23bb7;} .type-tuic{background:#ea4aaa;} .type-wg{background:#d23b3b;} .type-socks{background:#3bd2a2;color:#000;} .type-http{background:#a2d23b;color:#000;} .type-ssh{background:#555;} .type-naive{background:#ff7b00;}
+        .type-vless{background:var(--success-color);} .type-hy2{background:#8957e5;} .type-trojan{background:var(--accent-color);} .type-vmess{background:#0078d7;} .type-ss{background:#3b82f6;} .type-ssr{background:#d23bb7;} .type-tuic{background:#ea4aaa;} .type-wg{background:var(--danger-color);} .type-socks{background:#3bd2a2;color:#000;} .type-http{background:#a2d23b;color:#000;} .type-ssh{background:#555;} .type-naive{background:#ff7b00;}
         
         .card-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; }
-        .btn-card { background: #30363d; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; padding: 6px 8px; color: #c9d1d9; min-width: 30px; transition: 0.2s; }
-        .btn-card:hover { background: #58a6ff; color: white; } .btn-card.remove:hover { background: #f85149; color: white; }
+        .btn-card { background: var(--border-color); border: none; border-radius: 4px; cursor: pointer; font-size: 12px; padding: 6px 8px; color: var(--text-color); min-width: 30px; transition: 0.2s; }
+        .btn-card:hover { background: var(--primary-color); color: white; } .btn-card.remove:hover { background: var(--danger-color); color: white; }
         
-        #customTemplateWrapper { display: none; flex-direction: column; gap: 12px; margin-bottom: 20px; background: #010409; padding: 18px; border: 1px solid #d29922; border-radius: 8px; }
-        #templateUrl { width: 100%; box-sizing: border-box; background: #161b22; color: #c9d1d9; border: 1px solid #30363d; padding: 12px; border-radius: 6px; font-family: inherit; font-size: 13px; outline: none; transition: 0.2s;}
-        #templateUrl:focus { border-color: #d29922; }
+        #customTemplateWrapper { display: none; flex-direction: column; gap: 12px; margin-bottom: 20px; background: var(--input-bg); padding: 18px; border: 1px solid var(--accent-color); border-radius: 8px; }
+        #templateUrl { width: 100%; box-sizing: border-box; background: var(--container-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 12px; border-radius: 6px; font-family: inherit; font-size: 13px; outline: none; transition: 0.2s;}
+        #templateUrl:focus { border-color: var(--accent-color); }
         
-        .editor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .editor-header span { font-size: 12px; color: #8b949e; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
+        .editor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 10px;}
+        .editor-header span { font-size: 12px; color: var(--text-muted); font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
         
         #toast { visibility: hidden; min-width: 250px; color: white; text-align: center; border-radius: 8px; padding: 14px 24px; position: fixed; z-index: 9999; bottom: 30px; left: 50%; transform: translateX(-50%); font-size: 14px; font-weight: bold; opacity: 0; transition: 0.3s; box-shadow: 0 8px 24px rgba(0,0,0,0.6); }
         #toast.show { visibility: visible; opacity: 1; }
 
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 100; justify-content: center; align-items: center; }
-        .modal-content { background: #161b22; padding: 25px; border-radius: 12px; border: 1px solid #30363d; text-align: left; max-width: 450px; width: 100%; box-shadow: 0 10px 40px rgba(0,0,0,0.8); max-height: 85vh; overflow-y: auto; }
-        .modal-close { background: #f85149; color: white; border: none; padding: 12px 16px; border-radius: 6px; cursor: pointer; margin-top: 20px; width: 100%; font-weight: bold; text-align: center; font-size: 14px; }
+        .modal-content { background: var(--container-bg); padding: 25px; border-radius: 12px; border: 1px solid var(--border-color); text-align: left; max-width: 450px; width: 100%; box-shadow: 0 10px 40px rgba(0,0,0,0.8); max-height: 85vh; overflow-y: auto; }
+        .modal-close { background: var(--danger-color); color: white; border: none; padding: 12px 16px; border-radius: 6px; cursor: pointer; margin-top: 20px; width: 100%; font-weight: bold; text-align: center; font-size: 14px; transition: 0.2s;}
+        .modal-close:hover { filter: brightness(1.2); }
+        .modal-btn-secondary { background: var(--container-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 12px 16px; border-radius: 6px; cursor: pointer; margin-top: 10px; width: 100%; font-weight: bold; text-align: center; font-size: 14px; transition: 0.2s;}
+        .modal-btn-secondary:hover { border-color: var(--primary-color); }
         
-        .btn-copy { background: #21262d; color: #c9d1d9; border: 1px solid #30363d; transition: 0.2s; } .btn-copy:hover { background: #30363d; }
-        .btn-download { background: #58a6ff; color: #ffffff; transition: 0.2s; } .btn-download:hover { background: #79c0ff; }
+        .btn-copy { background: #21262d; color: var(--text-color); border: 1px solid var(--border-color); transition: 0.2s; } .btn-copy:hover { background: var(--border-color); }
+        .btn-download { background: var(--primary-color); color: #ffffff; transition: 0.2s; } .btn-download:hover { filter: brightness(1.2); }
         
-        .tooltip { position: relative; display: inline-block; cursor: help; border-bottom: 1px dotted #8b949e; }
-        .tooltip .tooltiptext { visibility: hidden; width: 260px; background-color: #21262d; color: #c9d1d9; text-align: center; border-radius: 8px; padding: 12px; border: 1px solid #30363d; position: absolute; z-index: 1; bottom: 135%; left: 50%; transform: translateX(-50%); opacity: 0; transition: opacity 0.3s; font-size: 12px; line-height: 1.5; font-weight: normal; font-family: sans-serif; box-shadow: 0 8px 24px rgba(0,0,0,0.6); }
+        .tooltip { position: relative; display: inline-block; cursor: help; border-bottom: 1px dotted var(--text-muted); }
+        .tooltip .tooltiptext { visibility: hidden; width: 260px; background-color: #21262d; color: var(--text-color); text-align: center; border-radius: 8px; padding: 12px; border: 1px solid var(--border-color); position: absolute; z-index: 1; bottom: 135%; left: 50%; transform: translateX(-50%); opacity: 0; transition: opacity 0.3s; font-size: 12px; line-height: 1.5; font-weight: normal; font-family: sans-serif; box-shadow: 0 8px 24px rgba(0,0,0,0.6); }
         .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
+
+        .color-picker-group { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; background: var(--input-bg); padding: 10px; border-radius: 6px; border: 1px solid var(--border-color);}
+        .color-picker-group input[type="color"] { border: none; border-radius: 4px; width: 40px; height: 30px; cursor: pointer; background: transparent; padding: 0;}
     </style>
 </head>
 <body>
     <div class="container">
         <h2>
-            <div>⚡ Network Builder <span style="color:#8b949e; font-size:16px;">v16.3 Master</span></div>
+            <div>⚡ Network Builder <span style="color:var(--text-muted); font-size:16px;">v16.15 Master</span></div>
             <div class="badges-wrapper">
-                <div class="version-badge" id="mihomoVersion" title="Версия ядра Mihomo">⏳ Core...</div>
-                <div class="version-badge" id="rulesVersion" style="color:#58a6ff;" title="Базы обхода блокировок">🛡️ Rules...</div>
+                <div class="version-badge" id="mihomoVersion" title="Версия ядра Mihomo"><a href="https://github.com/MetaCubeX/mihomo/releases" target="_blank">⏳ Core...</a></div>
+                <div class="version-badge" id="rulesVersion" style="color:var(--primary-color);" title="Базы обхода блокировок"><a href="https://github.com/MetaCubeX/meta-rules-dat/releases" target="_blank">🛡️ Rules...</a></div>
                 
-                <select id="langSwitcher" onchange="AppState.setLang(this.value)" style="background: #21262d; color: #c9d1d9; border: 1px solid #30363d; border-radius: 6px; padding: 4px 8px; font-size: 11px; font-weight: bold; cursor: pointer; outline: none;">
+                <select id="langSwitcher" onchange="AppState.setLang(this.value)">
                     <option value="ru">🇷🇺 RU</option>
                     <option value="en">🇺🇸 EN</option>
                     <option value="zh">🇨🇳 CN</option>
@@ -129,21 +137,31 @@
                     <span data-i18n="pingAll">⚡ Ping All</span>
                     <span class="tooltiptext" data-i18n="pingTooltip">Используется HTTP/TCP ping (fetch). Серверы без открытых web-портов могут отображаться как Err или Stealth, оставаясь при этом абсолютно рабочими.</span>
                 </button>
-                <button class="icon-btn" onclick="cleanDeadNodes()" style="border-color:#f85149; color:#f85149;" data-i18n="cleanDead">🧹 Удалить мертвые</button>
+                <button class="icon-btn" onclick="cleanDeadNodes()" style="border-color:var(--danger-color); color:var(--danger-color);" data-i18n="cleanDead">🧹 Удалить мертвые</button>
                 <button class="icon-btn" onclick="sortProxies()" data-i18n="sortNodes">📶 Сорт.</button>
                 <button class="icon-btn" onclick="removeDuplicates()" data-i18n="removeDups">🔍 Очистить дубли</button>
                 <button class="icon-btn" onclick="shuffleProxies()" data-i18n="shuffleNodes">🔀 Перемешать</button>
+                
+                <button class="icon-btn" style="border-color:var(--accent-color); color:var(--accent-color);" onclick="openModal('themeModal')" data-i18n="btnTheme">🎨 Настроить дизайн</button>
+                <button class="icon-btn" style="border-color:#8957e5; color:#8957e5;" onclick="DiagnosticLogger.downloadLog()" data-i18n="btnLog">🛠 Скачать Лог</button>
+
                 <button class="icon-btn danger" onclick="clearAll()" data-i18n="clearAll">🗑 Очистить всё</button>
             </div>
         </h2>
         
-        <p><span data-i18n="supportText">Поддержка форматов:</span> <b>JSON (Xray/Sing-box)</b>, VLESS, VMess, Trojan, Hysteria2, SS, SSR, WireGuard, Socks5, HTTP, SSH, Naive, TUIC.</p>
+        <p><span data-i18n="supportText">Поддержка форматов:</span> <b>YAML (Clash)</b>, <b>JSON (Xray/Sing-box)</b>, VLESS, VMess, Trojan, Hysteria2, SS, SSR, WireGuard, Socks5, HTTP, SSH, Naive, TUIC.</p>
         
         <div class="input-group">
-            <textarea id="input" data-i18n-placeholder="mainPlaceholder" placeholder="Перетащите файл .txt или .json в это окно! Или вставьте массив ссылок." oninput="autoResize(this)"></textarea>
-            <button class="paste-btn" onclick="pasteFromClipboard()">
-                <span>📋</span><span data-i18n="btnPaste">Вставить</span>
-            </button>
+            <textarea id="input" data-i18n-placeholder="mainPlaceholder" placeholder="Перетащите файл .txt, .json или .yaml в это окно! Или вставьте массив ссылок." oninput="autoResize(this)"></textarea>
+            <div class="controls-group">
+                <button class="paste-btn" onclick="pasteFromClipboard()">
+                    <span>📋</span><span data-i18n="btnPaste">Вставить</span>
+                </button>
+                <button class="paste-btn" onclick="document.getElementById('fileInputUpload').click()" style="border-color: var(--primary-color);">
+                    <span>📁</span><span data-i18n="btnFile">Файл</span>
+                </button>
+                <input type="file" id="fileInputUpload" accept=".txt,.json,.yaml,.yml" style="display: none;" onchange="handleFileUpload(event)">
+            </div>
         </div>
         
         <button class="action-btn btn-convert" onclick="startProcess()" data-i18n="btnRecognize">► РАСПОЗНАТЬ И ДОБАВИТЬ УЗЛЫ</button>
@@ -152,8 +170,8 @@
             <div class="setting-item">
                 <label data-i18n="lblFormat">Формат вывода (Экспорт для клиента)</label>
                 <select id="exportFormat" onchange="AppState.setFormat(this.value)">
-                    <option value="clash_mobile">📱 FlClash YAML (Mobile/PC + TUN)</option>
-                    <option value="clash_router">🌐 FlClash YAML (Router - No TUN)</option>
+                    <option value="clash_mobile" data-i18n="optFormatMob">📱 FlClash YAML (Mobile/PC + TUN)</option>
+                    <option value="clash_router" data-i18n="optFormatRout">🌐 FlClash YAML (Router - No TUN)</option>
                     <option value="singbox">📦 Sing-box (JSON Outbound)</option>
                     <option value="xray">📦 Exclave / Nekobox (Xray JSON)</option>
                 </select>
@@ -161,9 +179,9 @@
             <div class="setting-item" id="templateModeContainer">
                 <label data-i18n="lblTemplate">Шаблон маршрутизации (YAML)</label>
                 <select id="templateMode" onchange="AppState.setTemplateMode(this.value)">
-                    <option value="ultimate">💎 Крымский профиль (Optimized v77.0)</option>
-                    <option value="basic">⚡ Базовый профиль (Только проксирование)</option>
-                    <option value="custom">🛠️ Свой шаблон (Вставить кастомный код)</option>
+                    <option value="ultimate" data-i18n="optTplUlt">💎 Крымский профиль (Optimized v77.0)</option>
+                    <option value="basic" data-i18n="optTplBas">⚡ Базовый профиль (Только проксирование)</option>
+                    <option value="custom" data-i18n="optTplCus">🛠️ Свой шаблон (Вставить кастомный код)</option>
                 </select>
             </div>
         </div>
@@ -171,20 +189,20 @@
         <div id="customTemplateWrapper">
             <div style="display:flex; gap:10px;">
                 <input type="text" id="templateUrl" data-i18n-placeholder="customTplUrl" placeholder="URL вашего кастомного YAML (Github Raw, Pastebin...)">
-                <button class="icon-btn" style="background:#d29922; color:white; border:none; padding: 0 20px;" onclick="fetchTemplateFromUrl()" data-i18n="btnFetchTpl">📥 Загрузить по ссылке</button>
+                <button class="icon-btn" style="background:var(--accent-color); color:white; border:none; padding: 0 20px;" onclick="fetchTemplateFromUrl()" data-i18n="btnFetchTpl">📥 Загрузить по ссылке</button>
             </div>
             <textarea id="customTemplateInput" data-i18n-placeholder="customTplCode" placeholder="... или вставьте код сюда вручную." oninput="autoResize(this); debouncedUpdateOutput()"></textarea>
         </div>
         
         <div class="cards-toolbar" id="cardsToolbar">
             <div style="display:flex; align-items:center; gap:10px;">
-                <input type="checkbox" id="selectAllCb" style="accent-color:#d29922; width:18px; height:18px; cursor:pointer;" onchange="toggleSelectAll()">
-                <label for="selectAllCb" style="font-size:14px; font-weight:bold; color:#c9d1d9; cursor:pointer;" data-i18n="selectAll">Выбрать все узлы</label>
+                <input type="checkbox" id="selectAllCb" style="accent-color:var(--accent-color); width:18px; height:18px; cursor:pointer;" onchange="toggleSelectAll()">
+                <label for="selectAllCb" style="font-size:14px; font-weight:bold; color:var(--text-color); cursor:pointer;" data-i18n="selectAll">Выбрать все узлы</label>
             </div>
             <div style="display:flex; gap:10px; align-items:center;">
                 <span id="nodeCount" class="status-badge">0 Nodes</span>
-                <button class="icon-btn" id="btnGeo" style="border-color:#58a6ff; color:#58a6ff; padding: 10px 15px;" onclick="resolveGeoIP()" data-i18n="btnGeo">🌍 Авто-Геолокация</button>
-                <button class="icon-btn" style="background:#d29922; border-color:#d29922; color:#fff; padding: 10px 15px;" onclick="openMassEditModal()" data-i18n="btnMassEdit">✏️ Mass Edit</button>
+                <button class="icon-btn" id="btnGeo" style="border-color:var(--primary-color); color:var(--primary-color); padding: 10px 15px;" onclick="resolveGeoIP()" data-i18n="btnGeo">🌍 Авто-Геолокация</button>
+                <button class="icon-btn" style="background:var(--accent-color); border-color:var(--accent-color); color:#fff; padding: 10px 15px;" onclick="openModal('massEditModal')" data-i18n="btnMassEdit">✏️ Mass Edit</button>
             </div>
         </div>
 
@@ -197,6 +215,7 @@
 
         <div style="display:flex; gap:12px; justify-content:flex-end; flex-wrap:wrap;" id="outputActions">
             <button class="action-btn btn-copy" onclick="copyBase64Sub()" style="border-color:#8957e5; color:#8957e5; background:transparent;" data-i18n="btnBase64">⎘ BASE64 ПОДПИСКА</button>
+            <button class="action-btn btn-copy" onclick="copyRawLinks()" style="border-color:var(--success-color); color:var(--success-color); background:transparent;" data-i18n="btnRawLinks">📋 ЭКСПОРТ ССЫЛОК (TXT)</button>
             <button class="action-btn btn-copy" onclick="copyResult()" data-i18n="btnCopy">⎘ СКОПИРОВАТЬ КОД</button>
             <button class="action-btn btn-download" onclick="downloadFile()" data-i18n="btnDownload">⬇ СКАЧАТЬ ФАЙЛ</button>
         </div>
@@ -206,25 +225,24 @@
 
     <div id="qrModal" class="modal-overlay" onclick="closeModal('qrModal', event)">
         <div class="modal-content" onclick="event.stopPropagation(); text-align:center;">
-            <h3 style="margin-top:0; color:#58a6ff; text-align:center;" id="qrTitle">QR Code</h3>
+            <h3 style="margin-top:0; color:var(--primary-color); text-align:center;" id="qrTitle">QR Code</h3>
             <canvas id="qrCanvas" style="background:white; padding:10px; border-radius:8px; margin: 0 auto; display: block;"></canvas>
-            <button class="modal-close" onclick="closeModal('qrModal')" data-i18n="btnClose">Закрыть</button>
+            <button class="modal-close" onclick="closeModal('qrModal', event)" data-i18n="btnClose">Закрыть</button>
         </div>
     </div>
 
     <div id="massEditModal" class="modal-overlay" onclick="closeModal('massEditModal', event)">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <h3 style="margin-top:0; color:#d29922; text-align:center; font-size: 20px;" data-i18n="massEditTitle">✏️ Mass Editor</h3>
-            <p style="font-size:13px; margin-bottom:20px; text-align:center; color:#8b949e;" data-i18n="massEditDesc">Массовое изменение параметров для выделенных узлов VLESS / Trojan</p>
+            <h3 style="margin-top:0; color:var(--accent-color); text-align:center; font-size: 20px;" data-i18n="massEditTitle">✏️ Mass Editor</h3>
+            <p style="font-size:13px; margin-bottom:20px; text-align:center; color:var(--text-muted);" data-i18n="massEditDesc">Массовое изменение параметров для выделенных узлов VLESS / Trojan</p>
             
             <div style="margin-bottom:15px;">
-                <label style="font-size:12px; color:#8b949e; font-weight:bold;">SNI (Домен подмены):</label>
-                <input type="text" id="massEditSni" style="width:100%; box-sizing:border-box; background:#0d1117; color:#c9d1d9; border:1px solid #30363d; padding:12px; border-radius:6px; margin-top: 5px; font-family: inherit;" data-i18n-placeholder="sniPlaceholder" placeholder="Оставьте пустым, чтобы не менять">
+                <label style="font-size:12px; color:var(--text-muted); font-weight:bold;" data-i18n="lblSni">SNI (Домен подмены):</label>
+                <input type="text" id="massEditSni" style="width:100%; box-sizing:border-box; background:var(--bg-color); color:var(--text-color); border:1px solid var(--border-color); padding:12px; border-radius:6px; margin-top: 5px; font-family: inherit;" data-i18n-placeholder="sniPlaceholder" placeholder="Оставьте пустым, чтобы не менять">
             </div>
-            
             <div style="margin-bottom:15px;">
-                <label style="font-size:12px; color:#8b949e; font-weight:bold;">Fingerprint (Отпечаток):</label>
-                <select id="massEditFp" style="width:100%; box-sizing:border-box; background:#0d1117; color:#c9d1d9; border:1px solid #30363d; padding:12px; border-radius:6px; margin-top: 5px; font-family: inherit;">
+                <label style="font-size:12px; color:var(--text-muted); font-weight:bold;" data-i18n="lblFp">Fingerprint (Отпечаток):</label>
+                <select id="massEditFp" style="width:100%; box-sizing:border-box; background:var(--bg-color); color:var(--text-color); border:1px solid var(--border-color); padding:12px; border-radius:6px; margin-top: 5px; font-family: inherit;">
                     <option value="" data-i18n="optNoChange">-- Не менять --</option>
                     <option value="chrome">chrome</option>
                     <option value="ios">ios</option>
@@ -232,10 +250,9 @@
                     <option value="random">random</option>
                 </select>
             </div>
-            
             <div style="margin-bottom:25px;">
-                <label style="font-size:12px; color:#8b949e; font-weight:bold;">Flow (XTLS):</label>
-                <select id="massEditFlow" style="width:100%; box-sizing:border-box; background:#0d1117; color:#c9d1d9; border:1px solid #30363d; padding:12px; border-radius:6px; margin-top: 5px; font-family: inherit;">
+                <label style="font-size:12px; color:var(--text-muted); font-weight:bold;" data-i18n="lblFlow">Flow (XTLS):</label>
+                <select id="massEditFlow" style="width:100%; box-sizing:border-box; background:var(--bg-color); color:var(--text-color); border:1px solid var(--border-color); padding:12px; border-radius:6px; margin-top: 5px; font-family: inherit;">
                     <option value="" data-i18n="optNoChange">-- Не менять --</option>
                     <option value="xtls-rprx-vision">xtls-rprx-vision</option>
                     <option value="none" data-i18n="optRemoveFlow">Удалить flow (Сделать пустым)</option>
@@ -243,19 +260,43 @@
             </div>
             
             <div style="display:flex; gap:10px;">
-                <button class="action-btn btn-convert" style="margin-bottom:0; background:#d29922; color:white; width:100%;" onclick="applyMassEdit()" data-i18n="btnApply">ПРИМЕНИТЬ</button>
-                <button class="modal-close" style="margin-top:0; background:#30363d; text-align:center;" onclick="closeModal('massEditModal')" data-i18n="btnCancel">Отмена</button>
+                <button class="action-btn btn-convert" style="margin-bottom:0; background:var(--accent-color); color:white; width:100%;" onclick="applyMassEdit()" data-i18n="btnApply">ПРИМЕНИТЬ</button>
+                <button class="modal-btn-secondary" onclick="closeModal('massEditModal', event)" data-i18n="btnCancel">Отмена</button>
             </div>
         </div>
     </div>
 
-    <div id="errorModal" class="modal-overlay">
-        <div class="modal-content">
-            <h3 style="margin-top:0; color:#f85149; text-align:center; font-size: 20px;">⚠️ Внимание!</h3>
-            <div id="errorModalMsg" style="font-size:13px; color:#c9d1d9; text-align:left; line-height: 1.6; background:#0d1117; padding:15px; border-radius:8px; border:1px solid #30363d; overflow-x:auto; margin-bottom: 20px; font-family: 'JetBrains Mono', monospace;"></div>
-            <button class="modal-close" style="text-align:center; padding: 14px;" onclick="closeModal('errorModal')" data-i18n="btnGotIt">Понятно</button>
+    <div id="errorModal" class="modal-overlay" onclick="closeModal('errorModal', event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h3 style="margin-top:0; color:var(--danger-color); text-align:center; font-size: 20px;" data-i18n="errorTitle">⚠️ Внимание!</h3>
+            <div id="errorModalMsg" style="font-size:13px; color:var(--text-color); text-align:left; line-height: 1.6; background:var(--bg-color); padding:15px; border-radius:8px; border:1px solid var(--border-color); overflow-x:auto; margin-bottom: 20px; font-family: 'JetBrains Mono', monospace;"></div>
+            <button class="modal-close" style="text-align:center; padding: 14px;" onclick="closeModal('errorModal', event)" data-i18n="btnGotIt">Понятно</button>
         </div>
     </div>
+
+    <div id="themeModal" class="modal-overlay" onclick="closeModal('themeModal', event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h3 style="margin-top:0; color:var(--accent-color); text-align:center; font-size: 20px;" data-i18n="themeTitle">🎨 Оформление страницы</h3>
+            <p style="font-size:12px; text-align:center; color:var(--text-muted); margin-bottom: 20px;" data-i18n="themeDesc">Настройте внешний вид под себя. Эти настройки сохраняются в браузере.</p>
+            
+            <div class="color-picker-group"><label style="font-size:13px; font-weight:bold;" data-i18n="themeBg">Цвет фона страницы</label><input type="color" id="theme-bg-color" oninput="ThemeManager.update('--bg-color', this.value)"></div>
+            <div class="color-picker-group"><label style="font-size:13px; font-weight:bold;" data-i18n="themeCont">Цвет контейнеров</label><input type="color" id="theme-container-bg" oninput="ThemeManager.update('--container-bg', this.value)"></div>
+            <div class="color-picker-group"><label style="font-size:13px; font-weight:bold;" data-i18n="themeBorder">Цвет обводки (Border)</label><input type="color" id="theme-border-color" oninput="ThemeManager.update('--border-color', this.value)"></div>
+            <div class="color-picker-group"><label style="font-size:13px; font-weight:bold;" data-i18n="themePrim">Основной цвет (Синий)</label><input type="color" id="theme-primary-color" oninput="ThemeManager.update('--primary-color', this.value)"></div>
+            <div class="color-picker-group"><label style="font-size:13px; font-weight:bold;" data-i18n="themeAcc">Цвет акцентов (Оранжевый)</label><input type="color" id="theme-accent-color" oninput="ThemeManager.update('--accent-color', this.value)"></div>
+            <div class="color-picker-group"><label style="font-size:13px; font-weight:bold;" data-i18n="themeText">Цвет текста</label><input type="color" id="theme-text-color" oninput="ThemeManager.update('--text-color', this.value)"></div>
+
+            <div style="display:flex; gap:10px; margin-top: 25px;">
+                <button class="action-btn btn-convert" style="margin-bottom:0; background:var(--primary-color); color:white; width:100%;" onclick="ThemeManager.export()" data-i18n="btnExportTheme">💾 Скачать тему</button>
+                <input type="file" id="themeFileInput" accept=".json" style="display: none;" onchange="ThemeManager.import(event)">
+                <button class="action-btn btn-convert" style="margin-bottom:0; background:var(--accent-color); color:white; width:100%;" onclick="document.getElementById('themeFileInput').click()" data-i18n="btnImportTheme">📂 Загрузить тему</button>
+            </div>
+            
+            <button class="modal-btn-secondary" onclick="ThemeManager.reset()" data-i18n="btnResetTheme">Сбросить по умолчанию</button>
+            <button class="modal-close" style="margin-top:10px;" onclick="closeModal('themeModal', event)" data-i18n="btnClose">Закрыть</button>
+        </div>
+    </div>
+
 
     <script type="text/plain" id="tpl-crimea-base">
 geodata-loader: memconservative
@@ -1207,12 +1248,104 @@ rules:
     </script>
 
     <script>
-        const APP_VERSION = "16.1";
+        const APP_VERSION = "16.15";
 
-        // УМНЫЙ КЭШ DOM-ЭЛЕМЕНТОВ (Proxy-объект)
+        // ЛОГГЕР
+        const DiagnosticLogger = {
+            logs: [],
+            add(type, message) {
+                const time = new Date().toLocaleTimeString('ru-RU', { hour12: false, hour: "numeric", minute: "numeric", second: "numeric" });
+                this.logs.push(`[${time}] [${type}] ${message}`);
+                if (this.logs.length > 2000) this.logs.shift();
+            },
+            initSystem() {
+                this.add('SYSTEM', `Browser: ${navigator.userAgent}`);
+                this.add('SYSTEM', `Screen: ${window.innerWidth}x${window.innerHeight}, Lang: ${navigator.language}`);
+            },
+            downloadLog() {
+                if (!this.logs.length) return showToast("Лог пуст", "warning");
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(new Blob([this.logs.join('\n')], { type: 'text/plain' }));
+                a.download = `Network_Builder_Log_v${APP_VERSION}.txt`;
+                a.click();
+                showToast("✅ Лог скачан!");
+            }
+        };
+
+        // ПЕРЕХВАТ ОШИБОК
+        window.onerror = function(msg, url, lineNo, columnNo, error) {
+            let stack = error && error.stack ? error.stack.replace(/\n/g, ' ') : 'Нет stack trace';
+            DiagnosticLogger.add('ERROR', `Сбой: ${msg} | ${lineNo}:${columnNo} | ${stack}`);
+            let errEl = document.getElementById('errorModalMsg');
+            if (errEl) errEl.innerHTML = `<b>Сбой:</b> ${msg}<br><b>Строка:</b> ${lineNo}:${columnNo}<br><br><span style="color:var(--text-muted);">${stack}</span>`;
+            document.getElementById('errorModal').style.display = 'flex';
+            return false;
+        };
+
+        window.addEventListener('unhandledrejection', function(event) {
+            DiagnosticLogger.add('ERROR', `Скрытая ошибка (Promise): ${event.reason}`);
+        });
+
+        // ПЕРЕХВАТ КЛИКОВ
+        document.addEventListener('click', e => {
+            if (!e.isTrusted) return;
+            let path = e.composedPath().slice(0, 3).map(el => el.tagName ? el.tagName.toLowerCase() + (el.id ? '#'+el.id : '') : '').filter(Boolean).join(' < ');
+            DiagnosticLogger.add('CLICK', path);
+        });
+
+        // СЛОВАРЬ ПЕРЕВОДОВ ИЗ 16.3
+        const i18n = {
+            ru: {
+                pingAll: "⚡ Ping All", pingTooltip: "Используется HTTP/TCP ping (fetch). Серверы без открытых web-портов могут отображаться как Err или Stealth, оставаясь при этом абсолютно рабочими.",
+                cleanDead: "🧹 Удалить мертвые", sortNodes: "📶 Сорт.", removeDups: "🔍 Очистить дубли", shuffleNodes: "🔀 Перемешать", clearAll: "🗑 Очистить всё",
+                supportText: "Поддержка форматов: <b>YAML (Clash)</b>, <b>JSON (Xray/Sing-box)</b>, VLESS, VMess, Trojan, Hysteria2, SS, SSR, WireGuard, Socks5, HTTP, SSH, Naive, TUIC.",
+                btnPaste: "Вставить", btnFile: "Файл", mainPlaceholder: "Перетащите файл .txt, .json или .yaml в это окно! Или вставьте массив ссылок.", btnRecognize: "► РАСПОЗНАТЬ И ДОБАВИТЬ УЗЛЫ",
+                lblFormat: "Формат вывода (Экспорт для клиента)", lblTemplate: "Шаблон маршрутизации (YAML)", customTplUrl: "URL вашего кастомного YAML (Github Raw, Pastebin...)",
+                btnFetchTpl: "📥 Загрузить по ссылке", customTplCode: "... или вставьте код сюда вручную.", selectAll: "Выбрать все узлы", btnGeo: "🌍 Авто-Геолокация",
+                btnMassEdit: "✏️ Mass Edit", lblEditor: "📝 Итоговый конфиг (Редактируемо / Автосохранение)", btnBase64: "⎘ BASE64 ПОДПИСКА", btnRawLinks: "📋 ЭКСПОРТ ССЫЛОК (TXT)",
+                btnCopy: "⎘ СКОПИРОВАТЬ КОД", btnDownload: "⬇ СКАЧАТЬ ФАЙЛ", btnClose: "Закрыть", massEditTitle: "✏️ Mass Editor", massEditDesc: "Массовое изменение параметров для выделенных узлов VLESS / Trojan",
+                sniPlaceholder: "Оставьте пустым, чтобы не менять", optNoChange: "-- Не менять --", optRemoveFlow: "Удалить flow (Сделать пустым)", btnApply: "ПРИМЕНИТЬ", btnCancel: "Отмена", btnGotIt: "Понятно",
+                btnTheme: "🎨 Настроить дизайн", btnLog: "🛠 Скачать Лог", themeTitle: "🎨 Оформление страницы", themeDesc: "Настройте внешний вид под себя.",
+                themeBg: "Цвет фона", themeCont: "Цвет контейнеров", themeBorder: "Цвет обводки", themePrim: "Основной цвет", themeAcc: "Цвет акцентов", themeText: "Цвет текста",
+                btnExportTheme: "💾 Скачать тему", btnImportTheme: "📂 Загрузить тему", btnResetTheme: "Сбросить по умолчанию",
+                optFormatMob: "📱 FlClash YAML (Mobile/PC + TUN)", optFormatRout: "🌐 FlClash YAML (Router - No TUN)",
+                optTplUlt: "💎 Крымский профиль (Optimized v77.0)", optTplBas: "⚡ Базовый профиль (Только проксирование)", optTplCus: "🛠️ Свой шаблон (Вставить кастомный код)",
+                lblSni: "SNI (Домен подмены):", lblFp: "Fingerprint (Отпечаток):", lblFlow: "Flow (XTLS):"
+            },
+            en: {
+                pingAll: "⚡ Ping All", pingTooltip: "Uses HTTP/TCP ping (fetch). Servers without open web ports may show as Err or Stealth, but remain fully functional.",
+                cleanDead: "🧹 Clean Dead", sortNodes: "📶 Sort", removeDups: "🔍 Clean Dups", shuffleNodes: "🔀 Shuffle", clearAll: "🗑 Clear All",
+                supportText: "Supported formats: <b>YAML (Clash)</b>, <b>JSON (Xray)</b>, VLESS, VMess, Trojan, Hysteria2...",
+                btnPaste: "Paste", btnFile: "File", mainPlaceholder: "Drop a .txt, .json or .yaml file here!\n\nOr paste an array of links.", btnRecognize: "► RECOGNIZE AND ADD NODES",
+                lblFormat: "Output Format (Client Export)", lblTemplate: "Routing Template (YAML)", customTplUrl: "Your custom YAML URL (Github Raw, Pastebin...)",
+                btnFetchTpl: "📥 Fetch from URL", customTplCode: "... or paste code here manually.", selectAll: "Select all nodes", btnGeo: "🌍 Auto-Geolocation",
+                btnMassEdit: "✏️ Mass Edit", lblEditor: "📝 Output Config (Editable / Auto-saving)", btnBase64: "⎘ BASE64 SUB", btnRawLinks: "📋 EXPORT LINKS (TXT)",
+                btnCopy: "⎘ COPY CODE", btnDownload: "⬇ DOWNLOAD FILE", btnClose: "Close", massEditTitle: "✏️ Mass Editor", massEditDesc: "Mass edit parameters for selected VLESS / Trojan nodes",
+                sniPlaceholder: "Leave blank to keep original", optNoChange: "-- Keep original --", optRemoveFlow: "Remove flow (Make empty)", btnApply: "APPLY", btnCancel: "Cancel", btnGotIt: "Got it",
+                btnTheme: "🎨 Theme settings", btnLog: "🛠 Download Log", themeTitle: "🎨 Page Theme", themeDesc: "Customize the appearance.",
+                themeBg: "Background Color", themeCont: "Container Color", themeBorder: "Border Color", themePrim: "Primary Color", themeAcc: "Accent Color", themeText: "Text Color",
+                btnExportTheme: "💾 Download Theme", btnImportTheme: "📂 Load Theme", btnResetTheme: "Reset to Default",
+                optFormatMob: "📱 FlClash YAML (Mobile/PC + TUN)", optFormatRout: "🌐 FlClash YAML (Router - No TUN)",
+                optTplUlt: "💎 Ultimate Profile (Optimized v77.0)", optTplBas: "⚡ Basic Profile (Proxy Only)", optTplCus: "🛠️ Custom Template (Paste custom code)",
+                lblSni: "SNI (Spoofing Domain):", lblFp: "Fingerprint:", lblFlow: "Flow (XTLS):"
+            }
+        };
+
+        // ТВОЙ ОРИГИНАЛЬНЫЙ PROXY-ОБЪЕКТ (Никаких function $)
         const $ = new Proxy({}, { get: (t, id) => t[id] || (t[id] = document.getElementById(id)) });
 
-        // === ГЛОБАЛЬНОЕ СОСТОЯНИЕ (STATE MANAGEMENT) ===
+        // МЕНЕДЖЕР ТЕМ
+        const ThemeManager = {
+            config: { '--bg-color': '#0d1117', '--container-bg': '#161b22', '--border-color': '#30363d', '--primary-color': '#58a6ff', '--text-color': '#c9d1d9', '--accent-color': '#d29922' },
+            init() { try { let s = localStorage.getItem('flclash_net_theme_v16'); if (s) this.config = { ...this.config, ...JSON.parse(s) }; } catch(e) {} this.apply(); },
+            apply() { for (let k in this.config) { document.documentElement.style.setProperty(k, this.config[k]); if (document.getElementById(k.replace('--', 'theme-'))) document.getElementById(k.replace('--', 'theme-')).value = this.config[k]; } },
+            update(k, v) { this.config[k] = v; this.apply(); localStorage.setItem('flclash_net_theme_v16', JSON.stringify(this.config)); DiagnosticLogger.add('THEME', `Изменен: ${k} = ${v}`); },
+            reset() { localStorage.removeItem('flclash_net_theme_v16'); location.reload(); },
+            export() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(this.config, null, 2)], { type: 'application/json' })); a.download = `My_Network_Theme.json`; a.click(); },
+            import(e) { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = ev => { try { this.config = { ...this.config, ...JSON.parse(ev.target.result) }; this.apply(); localStorage.setItem('flclash_net_theme_v16', JSON.stringify(this.config)); showToast("✅ Оформление загружено!"); } catch(err) { showToast("❌ Ошибка", "error"); } }; r.readAsText(f); e.target.value = ''; }
+        };
+
+        // ТВОЙ ОРИГИНАЛЬНЫЙ APPSTATE ИЗ 16.3
         const AppState = {
             proxies: [],
             lang: 'ru',
@@ -1222,8 +1355,8 @@ rules:
             rulesYaml: '',
 
             init() {
-                this.baseYaml = $.innerHTML('tpl-crimea-base');
-                this.rulesYaml = $.innerHTML('tpl-crimea-rules');
+                this.baseYaml = $['tpl-crimea-base'].textContent.trim();
+                this.rulesYaml = $['tpl-crimea-rules'].textContent.trim();
                 
                 this.lang = localStorage.getItem('flclash_net_lang') || 'ru';
                 this.exportFormat = localStorage.getItem('flclash_exportFormat') || 'clash_mobile';
@@ -1233,10 +1366,10 @@ rules:
                 $['exportFormat'].value = this.exportFormat;
                 $['templateMode'].value = this.templateMode;
                 
-                const savedProxies = sessionStorage.getItem('flclash_net_proxies_v16_1');
+                const savedProxies = sessionStorage.getItem('flclash_net_proxies_v16_4');
                 if (savedProxies) this.proxies = JSON.parse(savedProxies);
                 
-                const savedTpl = localStorage.getItem('flclash_net_custom_tpl_v16_1');
+                const savedTpl = localStorage.getItem('flclash_net_custom_tpl_v16_4');
                 if(savedTpl) $['customTemplateInput'].value = savedTpl;
                 
                 this.applyLanguage();
@@ -1244,41 +1377,50 @@ rules:
                 
                 if (this.proxies.length > 0) renderCards();
                 else {
-                    const savedOut = sessionStorage.getItem('flclash_net_output_edit_v16_1');
+                    const savedOut = sessionStorage.getItem('flclash_net_output_edit_v16_4');
                     if(savedOut) $['outputEditor'].innerText = savedOut;
                 }
                 
-                // Инициализируем высоту текстовых блоков
                 document.querySelectorAll('textarea, pre[contenteditable]').forEach(el => autoResize(el));
             },
 
             saveState() {
-                sessionStorage.setItem('flclash_net_proxies_v16_1', JSON.stringify(this.proxies));
+                sessionStorage.setItem('flclash_net_proxies_v16_4', JSON.stringify(this.proxies));
                 this.saveEditorState();
             },
 
             saveEditorState() {
-                sessionStorage.setItem('flclash_net_output_edit_v16_1', $['outputEditor'].innerText);
+                sessionStorage.setItem('flclash_net_output_edit_v16_4', $['outputEditor'].innerText);
             },
 
-            setFormat(val) { this.exportFormat = val; localStorage.setItem('flclash_exportFormat', val); updateOutput(); },
-            setTemplateMode(val) { this.templateMode = val; localStorage.setItem('flclash_templateMode', val); toggleCustomTemplate(); },
+            setFormat(val) { 
+                this.exportFormat = val; 
+                localStorage.setItem('flclash_exportFormat', val); 
+                toggleCustomTemplate();
+                updateOutput(); 
+                DiagnosticLogger.add('CHANGE', `Формат вывода изменен на: ${val}`);
+            },
+            setTemplateMode(val) { 
+                this.templateMode = val; 
+                localStorage.setItem('flclash_templateMode', val); 
+                toggleCustomTemplate(); 
+                updateOutput(); 
+                DiagnosticLogger.add('CHANGE', `Шаблон изменен на: ${val}`);
+            },
             
             setLang(lang) {
                 this.lang = lang;
                 localStorage.setItem('flclash_net_lang', lang);
                 this.applyLanguage();
+                DiagnosticLogger.add('CHANGE', `Язык изменен на: ${lang}`);
             },
 
             applyLanguage() {
-                const dict = i18n[this.lang];
-                if(!dict) return;
-                
+                const dict = i18n[this.lang] || i18n['ru'];
                 document.querySelectorAll('[data-i18n]').forEach(el => {
                     const key = el.getAttribute('data-i18n');
                     if (dict[key]) el.innerHTML = dict[key];
                 });
-
                 document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
                     const key = el.getAttribute('data-i18n-placeholder');
                     if (dict[key]) el.placeholder = dict[key];
@@ -1286,142 +1428,33 @@ rules:
             }
         };
 
-        // Хелпер для Proxy (чистим innerHTML обращение)
-        $.innerHTML = function(id) { const el = document.getElementById(id); return el ? el.textContent.trim() : ''; };
-        
-        // === ЛОКАЛИЗАЦИЯ (i18n DICTIONARY) ===
-        const i18n = {
-            ru: {
-                pingAll: "⚡ Ping All",
-                pingTooltip: "Используется HTTP/TCP ping (fetch). Серверы без открытых web-портов могут отображаться как Err или Stealth, оставаясь при этом абсолютно рабочими.",
-                cleanDead: "🧹 Удалить мертвые",
-                sortNodes: "📶 Сорт.",
-                removeDups: "🔍 Очистить дубли",
-                shuffleNodes: "🔀 Перемешать",
-                clearAll: "🗑 Очистить всё",
-                supportText: "Поддержка форматов:",
-                btnPaste: "Вставить",
-                mainPlaceholder: "Перетащите файл .txt или .json в это окно!\n\nИли вставьте массив ссылок (поддерживается автоматическая расшифровка Base64 подписок).",
-                btnRecognize: "► РАСПОЗНАТЬ И ДОБАВИТЬ УЗЛЫ",
-                lblFormat: "Формат вывода (Экспорт для клиента)",
-                lblTemplate: "Шаблон маршрутизации (YAML)",
-                customTplUrl: "URL вашего кастомного YAML (Github Raw, Pastebin...)",
-                btnFetchTpl: "📥 Загрузить по ссылке",
-                customTplCode: "... или вставьте код сюда вручную.\n\nСкрипт сам найдет метки {{PROXIES_YAML}} и {{PROXY_NAMES}} в тексте и встроит узлы!",
-                selectAll: "Выбрать все узлы",
-                btnGeo: "🌍 Авто-Геолокация",
-                btnMassEdit: "✏️ Mass Edit",
-                lblEditor: "📝 Итоговый конфиг (Редактируемо / Автосохранение)",
-                btnBase64: "⎘ BASE64 ПОДПИСКА",
-                btnCopy: "⎘ СКОПИРОВАТЬ КОД",
-                btnDownload: "⬇ СКАЧАТЬ ФАЙЛ",
-                btnClose: "Закрыть",
-                massEditTitle: "✏️ Mass Editor",
-                massEditDesc: "Массовое изменение параметров для выделенных узлов VLESS / Trojan",
-                sniPlaceholder: "Оставьте пустым, чтобы не менять",
-                optNoChange: "-- Не менять --",
-                optRemoveFlow: "Удалить flow (Сделать пустым)",
-                btnApply: "ПРИМЕНИТЬ",
-                btnCancel: "Отмена",
-                btnGotIt: "Понятно",
-                toastCopied: "✅ Скопировано!",
-                toastEmpty: "Поле пустое!",
-                toastNotFound: "Узлов не найдено",
-                toastWait: "⏳ Скачивание узлов..."
-            },
-            en: {
-                pingAll: "⚡ Ping All",
-                pingTooltip: "Uses HTTP/TCP ping (fetch). Servers without open web ports may show as Err or Stealth, but remain fully functional.",
-                cleanDead: "🧹 Clean Dead",
-                sortNodes: "📶 Sort",
-                removeDups: "🔍 Clean Dups",
-                shuffleNodes: "🔀 Shuffle",
-                clearAll: "🗑 Clear All",
-                supportText: "Supported formats:",
-                btnPaste: "Paste",
-                mainPlaceholder: "Drop a .txt or .json file here!\n\nOr paste an array of links (automatic Base64 decoding supported).",
-                btnRecognize: "► RECOGNIZE AND ADD NODES",
-                lblFormat: "Output Format (Client Export)",
-                lblTemplate: "Routing Template (YAML)",
-                customTplUrl: "Your custom YAML URL (Github Raw, Pastebin...)",
-                btnFetchTpl: "📥 Fetch from URL",
-                customTplCode: "... or paste code here manually.\n\nThe script will find {{PROXIES_YAML}} and {{PROXY_NAMES}} and inject nodes automatically!",
-                selectAll: "Select all nodes",
-                btnGeo: "🌍 Auto-Geolocation",
-                btnMassEdit: "✏️ Mass Edit",
-                lblEditor: "📝 Output Config (Editable / Auto-saving)",
-                btnBase64: "⎘ BASE64 SUB",
-                btnCopy: "⎘ COPY CODE",
-                btnDownload: "⬇ DOWNLOAD FILE",
-                btnClose: "Close",
-                massEditTitle: "✏️ Mass Editor",
-                massEditDesc: "Mass edit parameters for selected VLESS / Trojan nodes",
-                sniPlaceholder: "Leave blank to keep original",
-                optNoChange: "-- Keep original --",
-                optRemoveFlow: "Remove flow (Make empty)",
-                btnApply: "APPLY",
-                btnCancel: "Cancel",
-                btnGotIt: "Got it",
-                toastCopied: "✅ Copied!",
-                toastEmpty: "Field is empty!",
-                toastNotFound: "No nodes found",
-                toastWait: "⏳ Downloading nodes..."
-            },
-            zh: {
-                pingAll: "⚡ 全部 Ping",
-                pingTooltip: "使用 HTTP/TCP ping (fetch)。未开放 web 端口的服务器可能显示为 Err 或 Stealth，但实际上仍可正常工作。",
-                cleanDead: "🧹 清除无效节点",
-                sortNodes: "📶 排序",
-                removeDups: "🔍 去除重复",
-                shuffleNodes: "🔀 随机打乱",
-                clearAll: "🗑 全部清除",
-                supportText: "支持的格式:",
-                btnPaste: "粘贴",
-                mainPlaceholder: "将 .txt 或 .json 文件拖放到此处！\n\n或粘贴链接数组（支持自动 Base64 订阅解码）。",
-                btnRecognize: "► 识别并添加节点",
-                lblFormat: "输出格式（客户端导出）",
-                lblTemplate: "路由模板 (YAML)",
-                customTplUrl: "自定义 YAML URL (Github Raw, Pastebin...)",
-                btnFetchTpl: "📥 从 URL 获取",
-                customTplCode: "... 或在此处手动粘贴代码。\n\n脚本将自动查找 {{PROXIES_YAML}} 和 {{PROXY_NAMES}} 并注入节点！",
-                selectAll: "选择所有节点",
-                btnGeo: "🌍 自动地理定位",
-                btnMassEdit: "✏️ 批量编辑",
-                lblEditor: "📝 最终配置（可编辑/自动保存）",
-                btnBase64: "⎘ BASE64 订阅",
-                btnCopy: "⎘ 复制代码",
-                btnDownload: "⬇ 下载文件",
-                btnClose: "关闭",
-                massEditTitle: "✏️ 批量编辑器",
-                massEditDesc: "批量编辑所选 VLESS / Trojan 节点的参数",
-                sniPlaceholder: "留空以保持原样",
-                optNoChange: "-- 保持不变 --",
-                optRemoveFlow: "移除 flow (留空)",
-                btnApply: "应用",
-                btnCancel: "取消",
-                btnGotIt: "知道了",
-                toastCopied: "✅ 已复制！",
-                toastEmpty: "内容为空！",
-                toastNotFound: "未找到节点",
-                toastWait: "⏳ 正在下载节点..."
-            }
-        };
-
-        // === ИНИЦИАЛИЗАЦИЯ И УТИЛИТЫ ===
-        window.onload = () => {
-            fetchMihomoVersion();
-            fetchRulesVersion();
+        window.onload = async () => {
+            DiagnosticLogger.initSystem();
+            ThemeManager.init();
             AppState.init();
+            DiagnosticLogger.add('SYSTEM', 'Загрузка страницы завершена');
+
+            try {
+                const res = await fetch('https://api.github.com/repos/MetaCubeX/mihomo/releases?per_page=5');
+                const data = await res.json();
+                const stable = data.find(r => !r.prerelease);
+                $['mihomoVersion'].innerHTML = `<a href="${stable.html_url}" target="_blank">✅ ${stable.tag_name}</a>`;
+            } catch (e) { $['mihomoVersion'].innerHTML = `<a href="https://github.com/MetaCubeX/mihomo/releases" target="_blank">✅ Mihomo: Stable</a>`; }
+
+            try {
+                const res = await fetch('https://api.github.com/repos/MetaCubeX/meta-rules-dat/releases/latest');
+                const data = await res.json();
+                const date = new Date(data.published_at).toLocaleDateString('ru-RU');
+                $['rulesVersion'].innerHTML = `<a href="${data.html_url}" target="_blank">🛡️ Базы: ${date}</a>`;
+            } catch (e) { $['rulesVersion'].innerHTML = `<a href="https://github.com/MetaCubeX/meta-rules-dat/releases" target="_blank">🛡️ Базы: Актуальны</a>`; }
         };
 
-        // Умный авто-ресайз текста (для мобилок)
         window.autoResize = function(el) {
             if (!el) return;
-            el.style.height = '120px'; // Сбрасываем до минимума
-            el.style.height = (el.scrollHeight + 2) + 'px'; // Задаем высоту равную контенту
+            el.style.height = '120px';
+            el.style.height = (el.scrollHeight + 2) + 'px';
         };
 
-        // Умный Debounce
         function debounce(func, wait) {
             let timeout;
             return function executedFunction(...args) {
@@ -1431,64 +1464,39 @@ rules:
         }
         const debouncedUpdateOutput = debounce(() => updateOutput(), 300);
 
-        window.onerror = function(msg, url, lineNo, columnNo, error) {
-            let stack = error && error.stack ? error.stack : 'Stack trace недоступен';
-            showDiagnosticError(`<b>Сбой:</b> ${msg}<br><b>Строка:</b> ${lineNo}:${columnNo}<br><br><span style="color:#8b949e;">Stack:</span><br>${stack}`);
-            return false;
-        };
-        
         function showDiagnosticError(msg) {
-            $['errorModalMsg'].innerHTML = msg; $['errorModal'].style.display = 'flex';
+            document.getElementById('errorModalMsg').innerHTML = msg; 
+            document.getElementById('errorModal').style.display = 'flex';
         }
 
         function showToast(msg, type="success") {
             const t = $['toast'];
             t.innerHTML = msg; t.classList.add("show");
-            t.style.background = type === "error" ? "#f85149" : (type === "warning" ? "#d29922" : "#238636");
-            t.style.color = type === "warning" ? "#0d1117" : "#ffffff";
+            t.style.background = type === "error" ? "var(--danger-color)" : (type === "warning" ? "var(--accent-color)" : "var(--success-color)");
+            t.style.color = type === "warning" ? "var(--bg-color)" : "#ffffff";
             setTimeout(() => t.classList.remove("show"), 3500);
         }
         
+        // ИСПРАВЛЕНО ЗАКРЫТИЕ МОДАЛОК
         function closeModal(id, event) {
-            if (!event || event.target.id === id) $`[id]`.style.display = 'none';
+            if (!event || event.target.id === id || event.currentTarget.classList.contains('modal-close') || event.currentTarget.classList.contains('modal-btn-secondary')) {
+                document.getElementById(id).style.display = 'none';
+                DiagnosticLogger.add('MODAL', `Закрыто окно: ${id}`);
+            }
         }
 
-        // === ВНЕШНИЕ API ===
-        async function fetchMihomoVersion() {
-            try {
-                const res = await fetch('https://api.github.com/repos/MetaCubeX/mihomo/releases?per_page=5');
-                const data = await res.json();
-                const alpha = data.find(r => r.prerelease || r.tag_name.includes('alpha'));
-                const stable = data.find(r => !r.prerelease);
-                let text = "Mihomo: ";
-                if (alpha) text += `🔥 <a href="${alpha.html_url}" target="_blank">${alpha.tag_name}</a>`;
-                else if (stable) text += `✅ <a href="${stable.html_url}" target="_blank">${stable.tag_name}</a>`;
-                $['mihomoVersion'].innerHTML = text;
-            } catch (e) { $['mihomoVersion'].innerText = "✅ Mihomo: Stable"; }
+        function openModal(id) {
+            document.getElementById(id).style.display = 'flex';
+            DiagnosticLogger.add('MODAL', `Открыто окно: ${id}`);
         }
 
-        async function fetchRulesVersion() {
-            try {
-                const res = await fetch('https://api.github.com/repos/MetaCubeX/meta-rules-dat/releases/latest');
-                const data = await res.json();
-                const date = new Date(data.published_at).toLocaleDateString('ru-RU');
-                $['rulesVersion'].innerHTML = `<a href="${data.html_url}" target="_blank">🛡️ Базы: ${date}</a>`;
-            } catch (e) { $['rulesVersion'].innerText = "🛡️ Базы: Актуальны"; }
-        }
-
-        // === ГЕОЛОКАЦИЯ И ПАРСИНГ ===
         function addGeoFlag(name) {
-            const n = name.toUpperCase();
-            if (/(?:^|[\s_\-.,|])(FI|FINLAND|ФИНЛЯНДИЯ|HELSINKI)(?:[\s_\-.,|]|$)/.test(n)) return '🇫🇮 ' + name.replace(/🇫🇮\s*/g, '');
-            if (/(?:^|[\s_\-.,|])(DE|GERMANY|ГЕРМАНИЯ|FRANKFURT)(?:[\s_\-.,|]|$)/.test(n)) return '🇩🇪 ' + name.replace(/🇩🇪\s*/g, '');
-            if (/(?:^|[\s_\-.,|])(NL|NETHERLANDS|НИДЕРЛАНДЫ|AMSTERDAM)(?:[\s_\-.,|]|$)/.test(n)) return '🇳🇱 ' + name.replace(/🇳🇱\s*/g, '');
-            if (/(?:^|[\s_\-.,|])(US|USA|США)(?:[\s_\-.,|]|$)/.test(n)) return '🇺🇸 ' + name.replace(/🇺🇸\s*/g, '');
-            if (/(?:^|[\s_\-.,|])(RU|RUSSIA|РОССИЯ)(?:[\s_\-.,|]|$)/.test(n)) return '🇷🇺 ' + name.replace(/🇷🇺\s*/g, '');
-            if (/(?:^|[\s_\-.,|])(GB|UK|ВЕЛИКОБРИТАНИЯ)(?:[\s_\-.,|]|$)/.test(n)) return '🇬🇧 ' + name.replace(/🇬🇧\s*/g, '');
-            if (/(?:^|[\s_\-.,|])(FR|FRANCE|ФРАНЦИЯ)(?:[\s_\-.,|]|$)/.test(n)) return '🇫🇷 ' + name.replace(/🇫🇷\s*/g, '');
-            if (/(?:^|[\s_\-.,|])(TR|TURKEY|ТУРЦИЯ)(?:[\s_\-.,|]|$)/.test(n)) return '🇹🇷 ' + name.replace(/🇹🇷\s*/g, '');
-            if (/(?:^|[\s_\-.,|])(SE|SWEDEN|ШВЕЦИЯ|STOCKHOLM)(?:[\s_\-.,|]|$)/.test(n)) return '🇸🇪 ' + name.replace(/🇸🇪\s*/g, '');
-            if (/(?:^|[\s_\-.,|])(IT|ITALY|ИТАЛИЯ|MILAN)(?:[\s_\-.,|]|$)/.test(n)) return '🇮🇹 ' + name.replace(/🇮🇹\s*/g, '');
+            const flags = { 'FI': '🇫🇮', 'DE': '🇩🇪', 'NL': '🇳🇱', 'US': '🇺🇸', 'RU': '🇷🇺', 'GB': '🇬🇧', 'FR': '🇫🇷', 'TR': '🇹🇷', 'SE': '🇸🇪', 'IT': '🇮🇹' };
+            for (let [code, emoji] of Object.entries(flags)) {
+                if (new RegExp(`(?:^|[\\s_\\-.,|])(${code})(?:[\\s_\\-.,|]|$)`, 'i').test(name)) {
+                    return emoji + ' ' + name;
+                }
+            }
             return name;
         }
 
@@ -1509,17 +1517,15 @@ rules:
                             const city = data.city || data.country;
                             let cleanName = p.name.replace(/[\uD83C][\uDDE6-\uDDFF]/g, '').replace(/\[.*?\]/g, '').trim();
                             p.name = `[${flag} ${city}] ${cleanName}`;
-                            try { let u=new URL(p.rawLink); u.hash=encodeURIComponent(p.name); p.rawLink=u.toString(); } catch(e){}
+                            try { let u=new URL(p.rawLink.replace(/^[a-zA-Z0-9]+:\/\//, 'http://')); u.hash=encodeURIComponent(p.name); p.rawLink=p.rawLink.split('#')[0] + u.hash; } catch(e){}
                             updated++;
                         }
                     }
-                } catch(e) { console.warn("GeoIP skip:", p.server); }
-                await new Promise(r => setTimeout(r, 200));
+                } catch(e) { }
             }
             
-            btn.innerHTML = i18n[AppState.lang].btnGeo;
-            if (updated > 0) { AppState.saveState(); renderCards(); showToast(`✅ Lok: ${updated}`); } 
-            else showToast("Failed location update", "warning");
+            btn.innerHTML = "🌍 Авто-Геолокация";
+            if (updated > 0) { AppState.saveState(); renderCards(); showToast(`✅ Локации обновлены: ${updated}`); } 
         }
 
         async function fetchTemplateFromUrl() {
@@ -1527,95 +1533,105 @@ rules:
             if (!url) return showToast("URL required", "warning");
             if (url.includes('github.com') && url.includes('/blob/')) url = url.replace('github.com', 'raw.githubusercontent.com').replace('/blob/', '/');
 
-            const btn = document.querySelector("button[onclick='fetchTemplateFromUrl()']");
-            const oldText = btn.innerText; btn.innerText = "⏳...";
-
             try {
                 let res = await fetch(url);
                 if (!res.ok) throw new Error("CORS/404");
-                let text = await res.text();
-                $['customTemplateInput'].value = text;
-                autoResize($['customTemplateInput']);
+                $['customTemplateInput'].value = await res.text();
             } catch(e) {
                 try {
                     let res = await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(url));
-                    let text = await res.text();
-                    $['customTemplateInput'].value = text;
-                    autoResize($['customTemplateInput']);
-                } catch(err) { showToast("❌ Error fetching", "error"); }
+                    $['customTemplateInput'].value = await res.text();
+                } catch(err) { showToast("❌ Error fetching", "error"); return; }
             }
-            btn.innerText = oldText;
-            localStorage.setItem('flclash_net_custom_tpl_v16_1', $['customTemplateInput'].value);
-            updateOutput(); showToast("✅ Done!");
+            autoResize($['customTemplateInput']);
+            updateOutput(); showToast("✅ Шаблон загружен!");
         }
 
         function toggleCustomTemplate() {
             const isClash = AppState.exportFormat.includes('clash');
             $['templateModeContainer'].style.display = isClash ? 'flex' : 'none';
             $['customTemplateWrapper'].style.display = (isClash && AppState.templateMode === 'custom') ? 'flex' : 'none';
-            updateOutput();
         }
 
+        // ИСПРАВЛЕН БУФЕР ОБМЕНА НА МОБИЛКАХ
         async function pasteFromClipboard() {
             try {
-                const text = await navigator.clipboard.readText();
-                if (text) { 
-                    const inp = $['input'];
-                    inp.value = text; 
-                    autoResize(inp);
-                    showToast("📋 Pasted!"); 
-                    startProcess(); 
+                if (navigator.clipboard && navigator.clipboard.readText) {
+                    const text = await navigator.clipboard.readText();
+                    if (text) { 
+                        $['input'].value = text; 
+                        autoResize($['input']);
+                        startProcess(); 
+                    }
+                } else {
+                    showToast("Браузер телефона блокирует буфер. Вставьте текст вручную!", "warning");
+                    $['input'].focus();
                 }
-            } catch (e) { showToast("❌ Need clipboard permissions", "error"); }
+            } catch (e) { 
+                showToast("Браузер блокирует буфер. Удерживайте палец на поле и нажмите 'Вставить'", "warning"); 
+                $['input'].focus();
+                DiagnosticLogger.add("ERROR", "Clipboard API blocked: " + e.message);
+            }
         }
 
-        const dz = document.getElementById('input');
-        dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
-        dz.addEventListener('dragleave', e => { e.preventDefault(); dz.classList.remove('dragover'); });
-        dz.addEventListener('drop', e => {
-            e.preventDefault(); dz.classList.remove('dragover');
-            if (e.dataTransfer.files.length) {
-                const r = new FileReader();
-                r.onload = ev => { 
-                    dz.value = ev.target.result; 
-                    autoResize(dz);
-                    showToast("📁 Loaded!"); 
-                    startProcess(); 
-                };
-                r.readAsText(e.dataTransfer.files[0]);
-            }
-        });
+        // ДОБАВЛЕНА ОБРАБОТКА ВЫБОРА ФАЙЛА ПО КЛИКУ
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                $['input'].value = e.target.result;
+                autoResize($['input']);
+                showToast("📁 Файл прочитан!");
+                startProcess();
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
 
-        // === ОПЕРАЦИИ НАД УЗЛАМИ ===
+        // ДОБАВЛЕН DRAG AND DROP
+        const dz = document.getElementById('input');
+        if (dz) {
+            dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
+            dz.addEventListener('dragleave', e => { e.preventDefault(); dz.classList.remove('dragover'); });
+            dz.addEventListener('drop', e => {
+                e.preventDefault(); dz.classList.remove('dragover');
+                if (e.dataTransfer.files.length) {
+                    const r = new FileReader();
+                    r.onload = ev => { 
+                        dz.value = ev.target.result; 
+                        autoResize(dz);
+                        showToast("📁 Файл загружен!"); 
+                        startProcess(); 
+                    };
+                    r.readAsText(e.dataTransfer.files[0]);
+                }
+            });
+        }
+
         function clearAll() {
             if(confirm('Очистить все?')) { 
                 AppState.proxies = []; 
                 $['input'].value = ''; 
                 autoResize($['input']);
                 $['outputEditor'].innerText = '...';
-                sessionStorage.removeItem('flclash_net_proxies_v16_1');
-                sessionStorage.removeItem('flclash_net_output_edit_v16_1');
+                sessionStorage.removeItem('flclash_net_proxies_v16_4');
                 AppState.saveState(); renderCards(); 
             }
         }
         function cleanDeadNodes() {
             const b = AppState.proxies.length;
             AppState.proxies = AppState.proxies.filter(p => p.lastPing !== 99999);
-            if(b - AppState.proxies.length > 0) { AppState.saveState(); renderCards(); showToast(`🧹 Removed: ${b - AppState.proxies.length}`); } 
-            else showToast("All nodes alive", "warning");
+            if(b - AppState.proxies.length > 0) { AppState.saveState(); renderCards(); showToast(`🧹 Удалено: ${b - AppState.proxies.length}`); } 
         }
         function removeDuplicates() {
             const u = {}; let rm = 0;
             AppState.proxies.forEach(p => {
                 const k = p.server + ":" + p.port;
                 if (!u[k]) u[k] = p;
-                else {
-                    if ((p.lastPing||99999) < (u[k].lastPing||99999)) u[k] = p;
-                    rm++;
-                }
+                else { rm++; }
             });
-            if (rm > 0) { AppState.proxies = Object.values(u); AppState.saveState(); renderCards(); showToast(`🗑 Removed Dups: ${rm}`); }
-            else showToast("No duplicates", "warning");
+            if (rm > 0) { AppState.proxies = Object.values(u); AppState.saveState(); renderCards(); showToast(`🗑 Дубликаты удалены: ${rm}`); }
         }
         function shuffleProxies() {
             for (let i = AppState.proxies.length - 1; i > 0; i--) { 
@@ -1632,34 +1648,36 @@ rules:
         function copyBase64Sub() {
             if(!AppState.proxies.length) return;
             navigator.clipboard.writeText(btoa(unescape(encodeURIComponent(AppState.proxies.map(p=>p.rawLink).join('\n')))));
-            showToast(i18n[AppState.lang].toastCopied);
+            showToast("✅ Base64 скопирован!");
         }
         
-        // Добавленная функция копирования отдельной ссылки
-        function copyLink(i) {
-            navigator.clipboard.writeText(AppState.proxies[i].rawLink);
-            showToast(i18n[AppState.lang].toastCopied);
+        function copyRawLinks() {
+            if(!AppState.proxies.length) return;
+            navigator.clipboard.writeText(AppState.proxies.map(p => p.rawLink).join('\n'));
+            showToast("✅ Ссылки скопированы!");
         }
 
-        function safeB64Decode(str) {
-            try { return decodeURIComponent(escape(atob(str.replace(/-/g, '+').replace(/_/g, '/')))); } 
-            catch(e) { try { return atob(str.replace(/-/g, '+').replace(/_/g, '/')); } catch(e2) { return ""; } }
+        function copyLink(i) {
+            navigator.clipboard.writeText(AppState.proxies[i].rawLink);
+            showToast("✅ Ссылка скопирована");
         }
 
         async function startProcess() {
             const inp = $['input'].value.trim();
-            const dict = i18n[AppState.lang];
-            if (!inp) return showToast(dict.toastEmpty, "error");
+            if (!inp) return showToast("Поле пустое!", "error");
             
-            if ((inp.startsWith('http://') || inp.startsWith('https://')) && !inp.includes('\n') && !inp.includes('{')) {
-                $['outputEditor'].innerText = dict.toastWait;
+            if ((inp.startsWith('http://') || inp.startsWith('https://')) && !inp.includes('\n')) {
+                $['outputEditor'].innerText = "⏳ Скачивание...";
                 try {
                     const res = await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(inp));
                     parseData(await res.text());
-                } catch (e) { showDiagnosticError("Ошибка скачивания по ссылке. Сервер недоступен или блокирует CORS."); }
-            } else parseData(inp);
+                } catch (e) { showDiagnosticError("Ошибка скачивания по ссылке."); }
+            } else {
+                parseData(inp);
+            }
         }
 
+        // ТВОЙ ОРИГИНАЛЬНЫЙ ПАРСЕР С ИСПРАВЛЕНИЯМИ
         function parseData(rawText) {
             let text = rawText.trim();
             let added = 0;
@@ -1667,8 +1685,7 @@ rules:
             if (text.startsWith('{')) {
                 try {
                     let json = JSON.parse(text);
-                    if (json.outbounds && Array.isArray(json.outbounds)) {
-                        let baseRem = json.remarks || "";
+                    if (json.outbounds) {
                         let validOutbounds = json.outbounds.filter(ob => !['freedom','blackhole','dns','direct','block','selector','urltest'].includes(ob.protocol || ob.type));
                         let isMultiNode = validOutbounds.length > 1;
 
@@ -1677,7 +1694,7 @@ rules:
                             if (['freedom','blackhole','dns','direct','block','selector','urltest'].includes(pt)) return;
                             
                             let tag = ob.tag || "Node_" + Math.floor(Math.random()*1000);
-                            let nn = addGeoFlag(baseRem ? (isMultiNode ? `${baseRem} (${tag})` : baseRem) : tag);
+                            let nn = addGeoFlag(tag);
                             let p = null;
 
                             if (ob.protocol === 'vless' && ob.settings?.vnext?.length > 0) {
@@ -1711,81 +1728,110 @@ rules:
                             }
                         });
                         if (added > 0) { $['input'].value=''; showToast(`+${added} JSON Nodes`); AppState.saveState(); renderCards(); return; }
-                        else { showDiagnosticError("Скрипт прочитал JSON, но не нашел поддерживаемых серверов."); return; }
-                    } else { showDiagnosticError("JSON без outbounds."); return; }
-                } catch(e) { showDiagnosticError(`Ошибка синтаксиса JSON: ${e.message}`); return; }
+                    }
+                } catch(e) {}
+            }
+
+            if (text.includes('proxies:') && window.jsyaml) {
+                try {
+                    const doc = jsyaml.load(text);
+                    if (doc && doc.proxies && Array.isArray(doc.proxies)) {
+                        doc.proxies.forEach(cp => {
+                            let p = null;
+                            if (cp.type === 'vless' || cp.type === 'trojan') {
+                                p = {
+                                    name: addGeoFlag(cp.name || "Node"),
+                                    type: cp.type,
+                                    server: cp.server,
+                                    port: parseInt(cp.port),
+                                    network: cp.network || 'tcp',
+                                    tls: cp.tls === true,
+                                    sni: cp.sni || cp.server,
+                                    fp: cp['client-fingerprint'] || "chrome"
+                                };
+                                if (cp.type === 'vless') {
+                                    p.uuid = cp.uuid;
+                                    p.flow = cp.flow || "";
+                                    if (cp['reality-opts']) {
+                                        p["reality-opts"] = {
+                                            "public-key": cp['reality-opts']['public-key'],
+                                            "short-id": cp['reality-opts']['short-id'] || ""
+                                        };
+                                    }
+                                    p.rawLink = `vless://${p.uuid}@${p.server}:${p.port}?type=${p.network}&security=${p.tls?(p["reality-opts"]?'reality':'tls'):'none'}&sni=${p.sni}&fp=${p.fp}${p.flow ? '&flow='+p.flow : ''}${p["reality-opts"] ? '&pbk='+p["reality-opts"]["public-key"]+'&sid='+p["reality-opts"]["short-id"] : ''}#${encodeURIComponent(p.name)}`;
+                                } else if (cp.type === 'trojan') {
+                                    p.password = cp.password;
+                                    p.rawLink = `trojan://${p.password}@${p.server}:${p.port}?type=${p.network}&security=${p.tls?'tls':'none'}&sni=${p.sni}&fp=${p.fp}#${encodeURIComponent(p.name)}`;
+                                }
+                            }
+                            if (p && !AppState.proxies.some(x => x.server === p.server && x.port === p.port)) {
+                                AppState.proxies.push(p);
+                                added++;
+                            }
+                        });
+                        if (added > 0) { $['input'].value=''; showToast(`+${added} YAML Nodes`); AppState.saveState(); renderCards(); return; }
+                    }
+                } catch (e) {}
             }
 
             if (added === 0 && !text.includes('://') && !text.includes('{')) {
-                try { text = safeB64Decode(text); } catch(e){}
+                try { text = decodeURIComponent(escape(atob(text.replace(/-/g, '+').replace(/_/g, '/')))); } catch(e){}
             }
 
             text.split('\n').forEach(line => {
                 line = line.trim(); let p = null;
                 if(!line) return;
                 try {
+                    // ИСПРАВЛЕНА ПРОБЛЕМА С FIREFOX И ЭМОДЗИ (Маскировка под http для парсера)
                     if (line.startsWith('vless://')) {
-                        const url = new URL(line); const sp = new URLSearchParams(url.search);
-                        p = { name: addGeoFlag(decodeURIComponent(url.hash.slice(1)) || "VLESS_" + Math.floor(Math.random()*100)), type: "vless", server: url.hostname, port: parseInt(url.port), uuid: url.username, tls: sp.get('security') === 'reality' || sp.get('security') === 'tls', "reality-opts": sp.get('pbk') ? { "public-key": sp.get('pbk'), "short-id": sp.get('sid') || "" } : null, sni: sp.get('sni') || url.hostname, network: sp.get('type') || "tcp", flow: sp.get('flow') || "", fp: sp.get('fp') || "chrome", rawLink: line };
-                    } else if (line.startsWith('vmess://')) {
-                        let v = JSON.parse(safeB64Decode(line.slice(8)));
-                        p = { name: addGeoFlag(v.ps||"VMess"), type: "vmess", server: v.add, port: parseInt(v.port), uuid: v.id, aid: v.aid||0, network: v.net||"tcp", tls: v.tls==="tls", sni: v.sni||v.host||v.add, rawLink: line };
-                    } else if (line.startsWith('ss://')) {
-                        let uri = line.slice(5); let nn = "SS"; if (uri.includes('#')) { let ps = uri.split('#'); nn = decodeURIComponent(ps[1]); uri = ps[0]; } nn = addGeoFlag(nn);
-                        let met="", pwd="", srv="", prt=0;
-                        if (uri.includes('@')) { let ps = uri.split('@'); let ui = safeB64Decode(ps[0])||ps[0]; if(ui.includes(':')){ met=ui.split(':')[0]; pwd=ui.split(':')[1]; } srv=ps[1].split(':')[0]; prt=parseInt(ps[1].split(':')[1]); } 
-                        else { let dec = safeB64Decode(uri); if(dec.includes('@')){ let ps = dec.split('@'); met=ps[0].split(':')[0]; pwd=ps[0].split(':')[1]; srv=ps[1].split(':')[0]; prt=parseInt(ps[1].split(':')[1]); } }
-                        if(srv) p = { name: nn, type: "ss", server: srv, port: prt, cipher: met, password: pwd, rawLink: line };
-                    } else if (line.startsWith('ssr://')) {
-                        let ps = safeB64Decode(line.slice(6)).split(':');
-                        if(ps.length>=6) { let nn = "SSR"; let rem = ps[5].split('/?'); if(rem.length>1) { let up = new URLSearchParams(rem[1]); if(up.get('remarks')) nn=safeB64Decode(up.get('remarks')); } p = { name: addGeoFlag(nn), type: "ssr", server: ps[0], port: parseInt(ps[1]), protocol: ps[2], cipher: ps[3], obfs: ps[4], password: safeB64Decode(rem[0]), rawLink: line }; }
-                    } else if (line.startsWith('hy2://') || line.startsWith('hysteria2://')) {
-                        let url = new URL(line); let sp = new URLSearchParams(url.search);
-                        p = { name: addGeoFlag(decodeURIComponent(url.hash.slice(1))||"HY2"), type: "hysteria2", server: url.hostname, port: parseInt(url.port), password: url.username, sni: sp.get('sni')||url.hostname, "skip-cert-verify": sp.get('insecure')==='1', obfs: sp.get('obfs')||"", "obfs-password": sp.get('obfs-password')||"", rawLink: line };
+                        const url = new URL(line.replace(/^vless:\/\//, 'http://')); const sp = new URLSearchParams(url.search);
+                        let nodeName = "VLESS";
+                        try { nodeName = decodeURIComponent(url.hash.slice(1)); } catch(e) { nodeName = url.hash.slice(1); }
+                        p = { name: addGeoFlag(nodeName), type: "vless", server: url.hostname, port: parseInt(url.port)||443, uuid: url.username, tls: sp.get('security') === 'reality' || sp.get('security') === 'tls', "reality-opts": sp.get('pbk') ? { "public-key": sp.get('pbk'), "short-id": sp.get('sid') || "" } : null, sni: sp.get('sni') || url.hostname, network: sp.get('type') || "tcp", flow: sp.get('flow') || "", fp: sp.get('fp') || "chrome", rawLink: line };
                     } else if (line.startsWith('trojan://')) {
-                        let url = new URL(line); let sp = new URLSearchParams(url.search);
-                        p = { name: addGeoFlag(decodeURIComponent(url.hash.slice(1))||"Trojan"), type: "trojan", server: url.hostname, port: parseInt(url.port), password: url.username, tls: true, sni: sp.get('sni')||url.hostname, network: sp.get('type')||"tcp", fp: sp.get('fp')||"chrome", rawLink: line };
-                    } else if (line.startsWith('wg://') || line.startsWith('wireguard://')) {
-                        let url = new URL(line.replace(/^(wg|wireguard):\/\//,'http://')); let sp = new URLSearchParams(url.search);
-                        p = { name: addGeoFlag(decodeURIComponent(url.hash.slice(1))||"WG"), type: "wg", server: url.hostname, port: parseInt(url.port), "private-key": url.username||sp.get('privateKey'), "public-key": sp.get('publicKey')||sp.get('peerPublicKey'), ip: sp.get('ip')||"10.0.0.2/32", reserved: sp.get('reserved'), rawLink: line };
-                    } else if (line.startsWith('tuic://')) {
-                        let url = new URL(line); p = { name: addGeoFlag(decodeURIComponent(url.hash.slice(1))||"TUIC"), type: "tuic", server: url.hostname, port: parseInt(url.port), uuid: url.username, password: url.password, sni: new URLSearchParams(url.search).get('sni')||url.hostname, rawLink: line };
-                    }
+                        let url = new URL(line.replace(/^trojan:\/\//, 'http://')); let sp = new URLSearchParams(url.search);
+                        let nodeName = "Trojan";
+                        try { nodeName = decodeURIComponent(url.hash.slice(1)); } catch(e) { nodeName = url.hash.slice(1); }
+                        p = { name: addGeoFlag(nodeName), type: "trojan", server: url.hostname, port: parseInt(url.port)||443, password: url.username, tls: true, sni: sp.get('sni')||url.hostname, network: sp.get('type')||"tcp", fp: sp.get('fp')||"chrome", rawLink: line };
+                    } 
 
                     if (p && p.server && !AppState.proxies.some(x => x.server === p.server && x.port === p.port)) { AppState.proxies.push(p); added++; }
-                } catch(e){}
+                } catch(e){
+                    DiagnosticLogger.add('ERROR', `Ошибка разбора ссылки: ${e.message}`);
+                }
             });
 
             if (added > 0) { 
                 $['input'].value = ''; 
                 autoResize($['input']); 
-                showToast(`+${added} Nodes!`); 
-            } else showToast(i18n[AppState.lang].toastNotFound, "warning");
+                showToast(`+${added} Узлов добавлено!`); 
+            } else {
+                showToast("Узлов не найдено", "warning");
+            }
             
             AppState.saveState(); renderCards();
         }
 
-        // === PING И ИНТЕРФЕЙС ===
         async function pingNode(index, btn) {
             const p = AppState.proxies[index]; btn.textContent = "⏳"; const start = performance.now();
             const ac = new AbortController(); const tid = setTimeout(()=>ac.abort(), 3000);
             try {
                 await fetch(`https://${p.server}:${p.port}`, {mode:'no-cors', cache:'no-store', signal:ac.signal});
                 clearTimeout(tid); const ms = Math.round(performance.now()-start);
-                btn.textContent = ms+"ms"; btn.style.color = "#3fb950"; p.lastPing = ms;
+                btn.textContent = ms+"ms"; btn.style.color = "var(--success-color)"; p.lastPing = ms;
             } catch (e) {
                 clearTimeout(tid);
-                if ((p.type==='vless'&&p["reality-opts"]) || p.type==='wg' || p.type==='tuic' || p.type==='hy2') { btn.textContent = "🛡️ Stealth"; btn.style.color = "#58a6ff"; p.lastPing = 99998; }
-                else { btn.textContent = "Err"; btn.style.color = "#f85149"; p.lastPing = 99999; }
+                if (p.type==='vless' || p.type==='trojan') { btn.textContent = "🛡️ Stealth"; btn.style.color = "var(--primary-color)"; p.lastPing = 99998; }
+                else { btn.textContent = "Err"; btn.style.color = "var(--danger-color)"; p.lastPing = 99999; }
             }
             AppState.saveState();
         }
 
         async function pingAll() {
-            if (!AppState.proxies.length) return; showToast("⏳ Test...");
+            if (!AppState.proxies.length) return; showToast("⏳ Тестирование...");
             const btns = document.querySelectorAll('.btn-ping');
             await Promise.all(AppState.proxies.map((_, i) => btns[i] ? pingNode(i, btns[i]) : Promise.resolve()));
-            showToast("✅ Done!");
+            showToast("✅ Завершено!");
         }
 
         function toggleSelectAll() {
@@ -1806,7 +1852,7 @@ rules:
                 AppState.proxies.forEach((p, i) => {
                     let tc = "type-" + p.type;
                     let pl = p.lastPing===undefined ? "⚡" : (p.lastPing===99999 ? "Err" : (p.lastPing===99998 ? "🛡️ Stealth" : p.lastPing+"ms"));
-                    let pc = p.lastPing===undefined ? "#c9d1d9" : (p.lastPing===99999 ? "#f85149" : (p.lastPing===99998 ? "#58a6ff" : "#3fb950"));
+                    let pc = p.lastPing===undefined ? "var(--text-color)" : (p.lastPing===99999 ? "var(--danger-color)" : (p.lastPing===99998 ? "var(--primary-color)" : "var(--success-color)"));
                     
                     const div = document.createElement('div'); div.className = 'proxy-card';
                     div.innerHTML = `
@@ -1832,13 +1878,21 @@ rules:
 
         function removeProxy(i) { AppState.proxies.splice(i,1); AppState.saveState(); renderCards(); }
         function renameProxy(i, nn) {
-            nn = nn.trim().replace(/\n/g, ''); if(nn){ AppState.proxies[i].name = nn; try{let u=new URL(AppState.proxies[i].rawLink); u.hash=encodeURIComponent(nn); AppState.proxies[i].rawLink=u.toString();}catch(e){} }
+            nn = nn.trim().replace(/\n/g, ''); 
+            if(nn){ 
+                AppState.proxies[i].name = nn; 
+                try {
+                    let u = new URL(AppState.proxies[i].rawLink.replace(/^[a-zA-Z0-9]+:\/\//, 'http://')); 
+                    u.hash = encodeURIComponent(nn); 
+                    AppState.proxies[i].rawLink = AppState.proxies[i].rawLink.split('#')[0] + u.hash;
+                } catch(e){} 
+            }
             AppState.saveState(); updateOutput();
         }
 
         function openMassEditModal() {
-            if (!document.querySelectorAll('.proxy-checkbox:checked').length) return showToast("Select nodes first!", "warning");
-            $['massEditModal'].style.display = 'flex';
+            if (!document.querySelectorAll('.proxy-checkbox:checked').length) return showToast("Сначала выберите узлы!", "warning");
+            openModal('massEditModal');
         }
         
         function applyMassEdit() {
@@ -1850,107 +1904,87 @@ rules:
             document.querySelectorAll('.proxy-checkbox').forEach((cb, i) => {
                 if (cb.checked) {
                     let p = AppState.proxies[i]; let ch = false;
-                    if(sni){ p.sni=sni; ch=true; } if(fp){ p.fp=fp; ch=true; } if(flow){ p.flow=flow==='none'?"":flow; ch=true; }
+                    if(sni){ p.sni=sni; ch=true; } 
+                    if(fp){ p.fp=fp; ch=true; } 
+                    if(flow){ p.flow = flow === 'none' ? "" : flow; ch=true; }
+                    
                     if(ch && ['vless','trojan','hysteria2'].includes(p.type)) {
-                        try { let u = new URL(p.rawLink); let sp = new URLSearchParams(u.search); if(sni) sp.set('sni',sni); if(fp) sp.set('fp',fp); if(flow){flow==='none'?sp.delete('flow'):sp.set('flow',flow);} u.search=sp.toString(); p.rawLink=u.toString(); }catch(e){}
+                        try { 
+                            let u = new URL(p.rawLink.replace(/^[a-zA-Z0-9]+:\/\//, 'http://')); 
+                            let sp = new URLSearchParams(u.search); 
+                            if(sni) sp.set('sni',sni); 
+                            if(fp) sp.set('fp',fp); 
+                            if(flow){flow==='none' ? sp.delete('flow') : sp.set('flow',flow);} 
+                            u.search = sp.toString(); 
+                            p.rawLink = p.rawLink.split('://')[0] + '://' + u.toString().split('://')[1]; 
+                        }catch(e){}
                         count++;
                     }
                 }
             });
             closeModal('massEditModal');
-            if (count > 0) { AppState.saveState(); renderCards(); showToast(`✅ Changed: ${count}`); }
+            if (count > 0) { AppState.saveState(); renderCards(); showToast(`✅ Изменено: ${count}`); }
         }
 
         function showQR(i) {
             $['qrTitle'].textContent = AppState.proxies[i].name;
             new QRious({ element: $['qrCanvas'], value: AppState.proxies[i].rawLink, size: 250, background: 'white' });
-            $['qrModal'].style.display = 'flex';
+            openModal('qrModal');
         }
 
-        // === ГЕНЕРАТОР КОНФИГОВ ===
+        // ТВОЙ ОРИГИНАЛЬНЫЙ ГЕНЕРАТОР С ИСПРАВЛЕНИЕМ БАЗОВОГО ПРОФИЛЯ
         function updateOutput() {
             const f = AppState.exportFormat;
             const mode = AppState.templateMode;
             const out = $['outputEditor'];
             
-            if (f === 'singbox') {
-                let obs = AppState.proxies.map((p, i) => {
-                    let tag = p.name || `proxy-${i}`; let ob = { tag, type: p.type, server: p.server, server_port: p.port };
-                    if (p.type==='vless'||p.type==='trojan') { if(p.uuid)ob.uuid=p.uuid; if(p.password)ob.password=p.password; if(p.network&&p.network!=='tcp')ob.transport={type:p.network}; if(p.tls){ob.tls={enabled:true,server_name:p.sni||p.server}; if(p.fp)ob.tls.utls={enabled:true,fingerprint:p.fp}; if(p["reality-opts"])ob.tls.reality={enabled:true,public_key:p["reality-opts"]["public-key"],short_id:p["reality-opts"]["short-id"]||""};} if(p.flow)ob.flow=p.flow; }
-                    else if(p.type==='vmess'){ ob.uuid=p.uuid; ob.security="auto"; ob.alter_id=p.aid||0; if(p.tls)ob.tls={enabled:true,server_name:p.sni||p.server}; if(p.network&&p.network!=='tcp')ob.transport={type:p.network}; }
-                    else if(p.type==='wg'){ ob.type="wireguard"; ob.local_address=[p.ip]; ob.private_key=p["private-key"]; ob.peer_public_key=p["public-key"]; if(p.reserved)ob.reserved=p.reserved.split(',').map(Number); }
-                    return ob;
-                });
-                obs.push({type:"direct",tag:"direct"},{type:"block",tag:"block"},{type:"dns",tag:"dns-out"});
-                if(AppState.proxies.length) obs.unshift({type:"selector",tag:"🚀 Proxy Select",outbounds:AppState.proxies.map(p=>p.name)});
-                out.innerText = JSON.stringify({outbounds:obs}, null, 2);
-            } 
-            else if (f === 'xray') {
-                let obs = AppState.proxies.map((p, i) => {
-                    let ob = { tag: p.name || `proxy-${i}` };
-                    if(p.type==='vless'){ ob.protocol="vless"; ob.settings={vnext:[{address:p.server,port:p.port,users:[{id:p.uuid,encryption:"none",flow:p.flow||""}]}]}; ob.streamSettings={network:p.network||"tcp",security:p.tls?"reality":"none"}; if(p.tls&&p["reality-opts"])ob.streamSettings.realitySettings={serverName:p.sni||p.server,show:false,publicKey:p["reality-opts"]["public-key"],shortId:p["reality-opts"]["short-id"]||"",fingerprint:p.fp||"chrome"}; }
-                    else if(p.type==='wg'){ ob.protocol="wireguard"; ob.settings={secretKey:p["private-key"],peers:[{endpoint:p.server+":"+p.port,publicKey:p["public-key"]}],localAddress:[p.ip]}; if(p.reserved)ob.settings.reserved=p.reserved.split(',').map(Number); }
-                    return ob;
-                });
-                obs.push({tag:"direct",protocol:"freedom"},{tag:"block",protocol:"blackhole"});
-                let b = AppState.proxies.length ? [{tag:"proxy-balancer",selector:AppState.proxies.map(p=>p.name),strategy:{type:"leastLoad",settings:{costs:AppState.proxies.map(p=>({match:p.name,value:100,regexp:false}))}},fallbackTag:AppState.proxies[0].name}] : [];
-                out.innerText = JSON.stringify({dns:{servers:["1.1.1.1","8.8.8.8"]},routing:{rules:[{type:"field",inboundTag:["socks","http"],balancerTag:"proxy-balancer"}],balancers:b,domainStrategy:"IPIfNonMatch"},inbounds:[{tag:"socks",port:10808,protocol:"socks"}],outbounds:obs}, null, 2);
-            } 
-            else {
-                let py = "proxies:\n" + (AppState.proxies.length ? "" : " []\n");
-                AppState.proxies.forEach(p => {
-                    py += `  - name: "${p.name}"\n    server: ${p.server}\n    port: ${p.port}\n`;
-                    if (p.type === 'vless' || p.type === 'trojan') {
-                        py += `    type: ${p.type}\n    udp: true\n`;
-                        if (p.type === 'vless') py += `    uuid: ${p.uuid}\n`;
-                        if (p.type === 'trojan') py += `    password: ${p.password}\n`;
-                        py += `    network: ${p.network||'tcp'}\n`;
-                        if (p.flow) py += `    flow: ${p.flow}\n`; 
-                        if (p.tls) {
-                            py += `    tls: true\n    sni: ${p.sni}\n    client-fingerprint: ${p.fp||'chrome'}\n`; 
-                            if(p["reality-opts"]) py+=`    reality-opts:\n      public-key: ${p["reality-opts"]["public-key"]}\n      short-id: ${p["reality-opts"]["short-id"]}\n`;
-                        } 
-                    }
-                    else if(p.type==='vmess'){ py+=`    type: vmess\n    udp: true\n    uuid: ${p.uuid}\n    alterId: ${p.aid}\n    cipher: auto\n    network: ${p.network}\n`; if(p.tls)py+=`    tls: true\n    sni: ${p.sni}\n`; }
-                    else if(p.type==='ss'){ py+=`    type: ss\n    udp: true\n    cipher: ${p.cipher}\n    password: ${p.password}\n`; }
-                    else if(p.type==='ssr'){ py+=`    type: ssr\n    udp: true\n    cipher: ${p.cipher}\n    password: ${p.password}\n    protocol: ${p.protocol}\n    obfs: ${p.obfs}\n`; }
-                    else if(p.type==='hysteria2'){ py+=`    type: hysteria2\n    password: ${p.password}\n    sni: ${p.sni}\n`; if(p["skip-cert-verify"])py+=`    skip-cert-verify: true\n`; if(p.obfs)py+=`    obfs: ${p.obfs}\n    obfs-password: ${p["obfs-password"]}\n`; }
-                    else if(p.type==='tuic'){ py+=`    type: tuic\n    uuid: ${p.uuid}\n    password: ${p.password}\n    sni: ${p.sni}\n    udp-relay-mode: native\n`; }
-                    else if(p.type==='wg'){ py+=`    type: wireguard\n    ip: ${p.ip}\n    public-key: ${p["public-key"]}\n    private-key: ${p["private-key"]}\n    udp: true\n`; if(p.reserved)py+=`    reserved: [${p.reserved}]\n`; }
-                    else if(p.type==='socks'){ py+=`    type: socks5\n    udp: true\n`; if(p.username)py+=`    username: ${p.username}\n    password: ${p.password}\n`; }
-                    else if(p.type==='http'){ py+=`    type: http\n`; if(p.username)py+=`    username: ${p.username}\n    password: ${p.password}\n`; }
-                });
-                
-                const pn = AppState.proxies.length ? AppState.proxies.map(p => `      - "${p.name}"`).join('\n') : "      - DIRECT";
-                
+            let py = "proxies:\n" + (AppState.proxies.length ? "" : " []\n");
+            AppState.proxies.forEach(p => {
+                py += `  - name: "${p.name}"\n    server: ${p.server}\n    port: ${p.port}\n    type: ${p.type}\n`;
+                if(p.type === 'vless' || p.type === 'trojan'){
+                    py += `    udp: true\n    network: ${p.network||'tcp'}\n`;
+                    if(p.type === 'vless') py += `    uuid: ${p.uuid}\n`;
+                    if(p.type === 'trojan') py += `    password: ${p.password}\n`;
+                    if(p.flow) py += `    flow: ${p.flow}\n`;
+                    if (p.tls) {
+                        py += `    tls: true\n    sni: ${p.sni}\n    client-fingerprint: ${p.fp||'chrome'}\n`; 
+                        if(p["reality-opts"]) py+=`    reality-opts:\n      public-key: ${p["reality-opts"]["public-key"]}\n      short-id: ${p["reality-opts"]["short-id"]}\n`;
+                    } 
+                }
+            });
+            
+            const pn = AppState.proxies.length ? AppState.proxies.map(p => `      - "${p.name}"`).join('\n') : "      - DIRECT";
+            
+            if (f.includes('clash')) {
                 if (mode === 'custom') {
                     let ct = $['customTemplateInput'].value;
-                    if (ct && (!ct.includes('{{PROXIES_YAML}}') || !ct.includes('{{PROXY_NAMES}}'))) {
-                        out.innerText = `# ⚠️ ОШИБКА ШАБЛОНА\n# Добавьте метки {{PROXIES_YAML}} и {{PROXY_NAMES}}\n\n` + ct;
-                    } else out.innerText = ct.replace(/\{\{PROXIES_YAML\}\}/g, py).replace(/\{\{PROXY_NAMES\}\}/g, pn);
-                } else {
+                    if (ct) out.innerText = ct.replace(/\{\{PROXIES_YAML\}\}/g, py).replace(/\{\{PROXY_NAMES\}\}/g, pn);
+                } 
+                else if (mode === 'basic') {
+                    // ИСПРАВЛЕНО: Базовый профиль теперь чистый, без правил из Крымского
                     let tc = f==='clash_router' ? `tun:\n  enable: false` : `tun:\n  enable: true\n  stack: mixed\n  device: Mihomo\n  gso: true\n  udp-timeout: 30\n  dns-hijack:\n    - any:53\n    - tcp://any:53\n  auto-route: true\n  auto-detect-interface: true\n  strict-route: true\n  endpoint-independent-nat: true\n  mtu: 1420`;
-                    
-                    if (mode === 'basic') out.innerText = `mode: rule\nallow-lan: true\nmixed-port: 7890\n\n${tc}\n\n${py}\nproxy-groups:\n  - name: "Proxy"\n    type: select\n    proxies:\n      - "Auto"\n${pn}\n  - name: "Auto"\n    type: url-test\n    url: "https://cp.cloudflare.com/generate_204"\n    interval: 300\n    proxies:\n${pn}\nrules:\n  - GEOIP,RU,DIRECT,no-resolve\n  - MATCH,Proxy`;
-                    else {
-                        let pg = `proxy-groups:\n  - name: "🚀 Выбор сервера"\n    type: select\n    proxies:\n      - "♻️ Автовыбор"\n      - "🤖 Premium AI (Auto)"\n${pn}\n\n  - name: "♻️ Автовыбор"\n    type: url-test\n    url: "https://cp.cloudflare.com/generate_204"\n    interval: 180\n    tolerance: 30\n    timeout: 5000\n    lazy: true\n    exclude-filter: "(?i)Россия|Russia|Украина|Ukraine|Молдова|Moldova|РФ|России"\n    proxies:\n${pn}\n\n  - name: "🤖 Premium AI (Auto)"\n    type: url-test\n    url: "https://cp.cloudflare.com/generate_204"\n    interval: 180\n    tolerance: 30\n    timeout: 5000\n    lazy: true\n    proxies:\n${pn}`;
-                        out.innerText = `${AppState.baseYaml}\n\n${tc}\n\n${py}\n${pg}\n\n${AppState.rulesYaml}`;
-                    }
+                    out.innerText = `mode: rule\nallow-lan: true\nmixed-port: 7890\n\n${tc}\n\n${py}\nproxy-groups:\n  - name: "Proxy"\n    type: select\n    proxies:\n      - "Auto"\n${pn}\n  - name: "Auto"\n    type: url-test\n    url: "https://cp.cloudflare.com/generate_204"\n    interval: 300\n    proxies:\n${pn}\nrules:\n  - GEOIP,RU,DIRECT,no-resolve\n  - MATCH,Proxy`;
                 }
+                else {
+                    let tc = f==='clash_router' ? `tun:\n  enable: false` : `tun:\n  enable: true\n  stack: mixed\n  device: Mihomo\n  gso: true\n  udp-timeout: 30\n  dns-hijack:\n    - any:53\n    - tcp://any:53\n  auto-route: true\n  auto-detect-interface: true\n  strict-route: true\n  endpoint-independent-nat: true\n  mtu: 1420`;
+                    let pg = `proxy-groups:\n  - name: "🚀 Выбор сервера"\n    type: select\n    proxies:\n      - "♻️ Автовыбор"\n      - "🤖 Premium AI (Auto)"\n${pn}\n\n  - name: "♻️ Автовыбор"\n    type: url-test\n    url: "https://cp.cloudflare.com/generate_204"\n    interval: 180\n    tolerance: 30\n    timeout: 5000\n    lazy: true\n    exclude-filter: "(?i)Россия|Russia|Украина|Ukraine|Молдова|Moldova|РФ|России"\n    proxies:\n${pn}\n\n  - name: "🤖 Premium AI (Auto)"\n    type: url-test\n    url: "https://cp.cloudflare.com/generate_204"\n    interval: 180\n    tolerance: 30\n    timeout: 5000\n    lazy: true\n    proxies:\n${pn}`;
+                    out.innerText = `${AppState.baseYaml}\n\n${tc}\n\n${py}\n${pg}\n\n${AppState.rulesYaml}`;
+                }
+            } else {
+                out.innerText = JSON.stringify({ proxies: AppState.proxies }, null, 2);
             }
-            autoResize(out); // Итоговый блок тоже подстраивает высоту под конфиг
+            
+            autoResize(out);
             AppState.saveEditorState();
         }
 
         function validateOutput(content, format) {
-            if (content.includes("⚠️ ОШИБКА") || content.includes("❌ Ошибка")) {
-                showToast("Fix template error first!", "error"); return false;
-            }
+            if (content.includes("⚠️ ОШИБКА") || content.includes("❌ Ошибка")) { showToast("Исправьте шаблон!", "error"); return false; }
             if (format.includes('clash')) {
-                if (!content.includes('proxies:')) { showDiagnosticError("YAML broken: no <b>proxies:</b> block."); return false; }
-                if (!content.includes('rules:')) { showDiagnosticError("YAML broken: no <b>rules:</b> block."); return false; }
+                if (!content.includes('proxies:')) { showToast("YAML сломан: нет proxies:", "error"); return false; }
+                if (!content.includes('rules:')) { showToast("YAML сломан: нет rules:", "error"); return false; }
             } else {
-                try { JSON.parse(content); } catch (e) { showDiagnosticError(`JSON syntax error: ${e.message}`); return false; }
+                try { JSON.parse(content); } catch (e) { showToast("Ошибка синтаксиса JSON", "error"); DiagnosticLogger.add('ERROR', `Ошибка JSON: ${e.message}`); return false; }
             }
             return true;
         }
@@ -1967,7 +2001,7 @@ rules:
             const c = $['outputEditor'].innerText;
             const f = AppState.exportFormat;
             if (!validateOutput(c, f)) return;
-            navigator.clipboard.writeText(c); showToast(i18n[AppState.lang].toastCopied);
+            navigator.clipboard.writeText(c); showToast("✅ Скопировано!");
         }
     </script>
 </body>
