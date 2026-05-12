@@ -8,13 +8,6 @@
 </p>
 
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jinxpil/flclash-converter/main/media/logo-dark.png">
-    <img alt="Network Builder" src="https://raw.githubusercontent.com/jinxpil/flclash-converter/main/media/logo-light.png" width="300">
-  </picture>
-</p>
-
-<p align="center">
   <a href="https://github.com/jinxpil/flclash-converter/releases">
     <img src="https://img.shields.io/github/v/release/jinxpil/flclash-converter.svg?style=flat-square" alt="Release">
   </a>
@@ -31,6 +24,7 @@
     <img src="https://img.shields.io/github/stars/jinxpil/flclash-converter.svg?style=flat-square" alt="Stars">
   </a>
 </p>
+
 **Network Builder** — это продвинутый 100% локальный веб-инструмент (Single-File HTML / Vanilla JS) для управления, тестирования и конвертации прокси-серверов. Предоставляет удобный интерфейс для парсинга узлов из любых источников и мгновенной генерации оптимизированных профилей маршрутизации для FlClash, Nekobox (Xray) и Sing-box.
 
 > [!IMPORTANT]
