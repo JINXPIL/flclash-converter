@@ -22,6 +22,13 @@
 
 Как мощный инструмент для работы с сетями, Network Builder обеспечивает высочайшую производительность без использования бэкенд-серверов, поддерживает более 10 протоколов и предлагает глубокую кастомизацию интерфейса.
 
+### 📸 Интерфейс
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/jinxpil/flclash-converter/main/media/JSON%20to%20YAML%20Converter.jpg" alt="JSON to YAML" width="48%">
+  <img src="https://raw.githubusercontent.com/jinxpil/flclash-converter/main/media/Yaml%20Code%20Formatter.jpg" alt="YAML Formatter" width="48%">
+</p>
+
 ## 🚀 Быстрый старт
 
 👉 **[ОТКРЫТЬ WEB-ВЕРСИЮ](https://jinxpil.github.io/flclash-converter/)** *(Работает как PWA, можно добавить на главный экран смартфона)*
