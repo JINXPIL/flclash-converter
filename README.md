@@ -8,13 +8,29 @@
 </p>
 
 <p align="center">
-  [![Release](https://img.shields.io/github/v/release/jinxpil/flclash-converter.svg?style=flat-square)](https://github.com/jinxpil/flclash-converter/releases)
-  [![Downloads](https://img.shields.io/github/downloads/jinxpil/flclash-converter/total.svg?style=flat-square)](https://github.com/jinxpil/flclash-converter/releases/latest)
-  [![Language](https://img.shields.io/github/languages/top/jinxpil/flclash-converter.svg?style=flat-square)](#)
-  [![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://opensource.org/licenses/MIT)
-  [![Stars](https://img.shields.io/github/stars/jinxpil/flclash-converter.svg?style=flat-square)](https://github.com/jinxpil/flclash-converter/stargazers)
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jinxpil/flclash-converter/main/media/logo-dark.png">
+    <img alt="Network Builder" src="https://raw.githubusercontent.com/jinxpil/flclash-converter/main/media/logo-light.png" width="300">
+  </picture>
 </p>
 
+<p align="center">
+  <a href="https://github.com/jinxpil/flclash-converter/releases">
+    <img src="https://img.shields.io/github/v/release/jinxpil/flclash-converter.svg?style=flat-square" alt="Release">
+  </a>
+  <a href="https://github.com/jinxpil/flclash-converter/releases/latest">
+    <img src="https://img.shields.io/github/downloads/jinxpil/flclash-converter/total.svg?style=flat-square" alt="Downloads">
+  </a>
+  <a href="#">
+    <img src="https://img.shields.io/github/languages/top/jinxpil/flclash-converter.svg?style=flat-square" alt="Language">
+  </a>
+  <a href="https://opensource.org/licenses/MIT">
+    <img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square" alt="License">
+  </a>
+  <a href="https://github.com/jinxpil/flclash-converter/stargazers">
+    <img src="https://img.shields.io/github/stars/jinxpil/flclash-converter.svg?style=flat-square" alt="Stars">
+  </a>
+</p>
 **Network Builder** — это продвинутый 100% локальный веб-инструмент (Single-File HTML / Vanilla JS) для управления, тестирования и конвертации прокси-серверов. Предоставляет удобный интерфейс для парсинга узлов из любых источников и мгновенной генерации оптимизированных профилей маршрутизации для FlClash, Nekobox (Xray) и Sing-box.
 
 > [!IMPORTANT]
