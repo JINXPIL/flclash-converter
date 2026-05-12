@@ -1,13 +1,6 @@
 [English](/README.en.md) | [Русский](/README.md) | [简体中文](/README.zh.md)
 
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jinxpil/flclash-converter/main/media/logo-dark.png">
-    <img alt="Network Builder" src="https://raw.githubusercontent.com/jinxpil/flclash-converter/main/media/logo-light.png" width="300">
-  </picture>
-</p>
-
-<p align="center">
   <a href="https://github.com/jinxpil/flclash-converter/releases">
     <img src="https://img.shields.io/github/v/release/jinxpil/flclash-converter.svg?style=flat-square" alt="Release">
   </a>
