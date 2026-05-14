@@ -1,6 +1,6 @@
 <p align="center">
   <a href="/README.en.md">🇺🇸 English</a> •
-  <a href="/README.md">🇷🇺 Русский</a> •
+  <a href="/README.md"><b>🇷🇺 Русский</b></a> •
   <a href="/README.zh.md">🇨🇳 简体中文</a> •
   <a href="/README.zh-TW.md">🇹🇼 繁體中文</a> •
   <a href="/README.fa.md">🇮🇷 فارسی</a> •
@@ -22,38 +22,46 @@
   </a>
 </p>
 
-<h1 align="center">🌐 Network Builder</h1>
+<h1 align="center">⚡ Network Builder v17.00 ULTRA</h1>
 
 <p align="center">
-  <b>Продвинутый 100% локальный веб-инструмент (Single-File HTML / Vanilla JS) для управления, тестирования и конвертации прокси-серверов.</b><br>
-  <i>Предоставляет удобный интерфейс для парсинга узлов из любых источников и мгновенной генерации оптимизированных профилей маршрутизации для FlClash, Nekobox (Xray) и Sing-box.</i>
+  <b>Экстремально мощный и 100% локальный веб-инструмент для управления гигантскими базами прокси-серверов.</b><br>
+  <i>Парсинг, конвертация и глубокая оптимизация конфигураций для FlClash, Nekobox, Sing-box и Clash Meta.</i>
 </p>
 
 <p align="center">
   <a href="https://jinxpil.github.io/flclash-converter/">
-    <img src="https://img.shields.io/badge/🚀_ОТКРЫТЬ_WEB--ВЕРСИЮ-0052FF?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Open Web Version">
+    <img src="https://img.shields.io/badge/🚀_ОТКРЫТЬ_ULTRA--ВЕРСИЮ-0052FF?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Open Web Version">
   </a>
 </p>
 
 > [!IMPORTANT]
-> **Только для образовательных целей.** Данный проект создан исключительно в исследовательских целях. Пожалуйста, не используйте его в незаконных целях. Автор не несет ответственности за неправомерное использование данного инструмента. Все вычисления производятся строго локально в вашем браузере (Zero-Trust).
+> **Zero-Trust & Privacy First.** Все вычисления производятся строго локально в вашем браузере. Никакие данные не покидают ваше устройство. Инструмент создан в образовательных целях для изучения сетевых протоколов.
 
 ---
 
-### 📸 Интерфейс (Адаптивный)
+### 📸 Интерфейс (ULTRA Design)
 
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jinxpil/flclash-converter/main/media/JSON%20to%20YAML%20Converter.jpg">
-    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/jinxpil/flclash-converter/main/media/JSON%20to%20YAML%20Converter.jpg">
     <img alt="JSON to YAML" src="https://raw.githubusercontent.com/jinxpil/flclash-converter/main/media/JSON%20to%20YAML%20Converter.jpg" width="48%">
   </picture>
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jinxpil/flclash-converter/main/media/Yaml%20Code%20Formatter.jpg">
-    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/jinxpil/flclash-converter/main/media/Yaml%20Code%20Formatter.jpg">
     <img alt="YAML Formatter" src="https://raw.githubusercontent.com/jinxpil/flclash-converter/main/media/Yaml%20Code%20Formatter.jpg" width="48%">
   </picture>
 </p>
+
+---
+
+### 🔥 Что нового в версии 17.00 ULTRA?
+
+- 🚀 **Extreme Parser Engine:** Полная оптимизация кода для работы с **10,000+ узлами** одновременно. Плавный интерфейс даже при гигантских объемах данных.
+- 🌍 **ULTRA Localization:** Глубокая поддержка 6 языков (RU, EN, ZH, FA, ES). Интерфейс и системные уведомления теперь полностью адаптированы.
+- 🛡️ **Система QuotaGuard:** Интеллектуальная защита от переполнения памяти браузера. Работайте с любыми объемами конфигов без риска вылета вкладки.
+- 🧠 **Smart Duplicate Filter:** Автоматическое сравнение серверов по паре IP:Port. Программа сама удалит мусор и дубликаты, оставив только уникальные узлы.
+- 🛠️ **Refined Diagnostics:** Обновленный логгер событий и исправленные ошибки синтаксиса (SyntaxError fix) для безупречной стабильности.
 
 ---
 
@@ -68,25 +76,24 @@
   <tr>
     <td align="center">🔒 <b>WireGuard</b><br>Native VPN</td>
     <td align="center">🌐 <b>SS / SSR</b><br>Shadowsocks</td>
-    <td align="center">🔌 <b>TUIC / Socks5 / HTTP</b><br>Other Protocols</td>
+    <td align="center">🔌 <b>TUIC / Socks5 / HTTP</b><br>Full Support</td>
   </tr>
 </table>
 
 ---
 
-### 📥 Рекомендуемые клиенты
+### 📥 Рекомендуемые клиенты (ULTRA Compatible)
 
 <details>
-<summary><b>🤖 Показать клиенты для Android</b></summary>
+<summary><b>🤖 Android</b></summary>
 
-- [FlClash](https://github.com/chen08209/FlClash)
-- [Karing](https://github.com/KaringX/karing)
+- [FlClash](https://github.com/chen08209/FlClash) — Основной клиент
+- [Karing](https://github.com/KaringX/karing) — Мощный GUI
 - [Clash Meta for Android](https://github.com/MetaCubeX/ClashMetaForAndroid)
-- [FlClashX](https://github.com/pluralplay/FlClashX)
 </details>
 
 <details>
-<summary><b>🍏 Показать клиенты для iOS</b></summary>
+<summary><b>🍏 iOS</b></summary>
 
 - [Karing](https://apps.apple.com/us/app/karing/id6472431552)
 - [Clash.MI](https://apps.apple.com/us/app/clash-mi/id6744321968)
@@ -94,7 +101,7 @@
 </details>
 
 <details>
-<summary><b>💻 Показать клиенты для ПК (Windows / macOS / Linux)</b></summary>
+<summary><b>💻 Desktop (Win/Mac/Linux)</b></summary>
 
 - [Karing](https://github.com/KaringX/karing)
 - [FlClash](https://github.com/chen08209/FlClash)
@@ -103,19 +110,8 @@
 
 ---
 
-### 🔥 Главные возможности
-
-- 🛡️ **Zero-Trust Security:** Никаких сторонних серверов. Данные обрабатываются в оперативной памяти и уничтожаются при закрытии вкладки.
-- 🧩 **Omni-Парсер:** Мгновенное декодирование Base64-подписок, реверс-инжиниринг JSON-конфигов и поддержка Drag & Drop.
-- 🌍 **Mass Editor & Smart GeoIP:** Пакетное изменение параметров (SNI, Flow, Fingerprint) и авто-определение геолокации узлов с добавлением флагов (🇫🇮, 🇩🇪).
-- 🐛 **Diagnostic Logger:** Встроенная система фоновой отладки, записывающая взаимодействия, ошибки и сетевые события для удобного поиска неполадок.
-- 🎨 **Theme Engine:** Полная кастомизация интерфейса с возможностью импорта/экспорта дизайна в `.json`.
-- ⚙️ **Авто-оптимизация:** Очистка дубликатов по IP/порту, удаление мертвых серверов после TCP/HTTP пинга и автоматическое восстановление битых ссылок.
-
----
-
 ### ⭐ Поддержка проекта
 
-**Если этот проект оказался полезен для вас, пожалуйста, поставьте ему звезду!** :star2:
+**Если Network Builder ULTRA помог вам, не забудьте поставить звезду! Это мотивирует развивать проект дальше.** :star2:
 
 [![Stargazers over time](https://starchart.cc/jinxpil/flclash-converter.svg?variant=adaptive)](https://starchart.cc/jinxpil/flclash-converter)
