@@ -3,7 +3,7 @@
   <a href="/README.md">🇷🇺 Русский</a> •
   <a href="/README.zh.md">🇨🇳 简体中文</a> •
   <a href="/README.zh-TW.md">🇹🇼 繁體中文</a> •
-  <a href="/README.fa.md">🇮🇷 فارسی</a> •
+  <a href="/README.fa.md"><b>🇮🇷 فارسی</b></a> •
   <a href="/README.es.md">🇪🇸 Español</a>
 </p>
 
@@ -22,71 +22,88 @@
   </a>
 </p>
 
-<h1 align="center">🌐 Network Builder</h1>
+<h1 align="center">⚡ Network Builder v17.00 ULTRA</h1>
 
 <p align="center">
-  <b>یک ابزار وب ۱۰۰٪ محلی و پیشرفته (تک‌فایل HTML / Vanilla JS) برای مدیریت، آزمایش و تبدیل سرورهای پروکسی.</b><br>
-  <i>این ابزار یک رابط کاربری مناسب برای استخراج گره‌ها از هر منبعی و تولید فوری پروفایل‌های مسیریابی بهینه‌شده برای FlClash، Nekobox (Xray) و Sing-box ارائه می‌دهد.</i>
+  <b>ابزاری حرفه‌ای، ۱۰۰٪ محلی و فوق‌العاده قدرتمند برای مدیریت، پاکسازی عمیق و تبدیل پایگاه‌های داده عظیم سرورهای پروکسی.</b><br>
+  <i>یک اکوسیستم واحد برای کار با پیکربندی‌های FlClash، Nekobox (Xray)، Sing-box و Clash Meta.</i>
 </p>
 
 <p align="center">
   <a href="https://jinxpil.github.io/flclash-converter/">
-    <img src="https://img.shields.io/badge/🚀_باز_کردن_نسخه_وب-0052FF?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Open Web Version">
+    <img src="https://img.shields.io/badge/🚀_باز_کردن_نسخه_ULTRA-0052FF?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Open Web Version">
   </a>
 </p>
 
 > [!IMPORTANT]
-> **فقط برای اهداف آموزشی.** این پروژه منحصراً برای اهداف تحقیقاتی ایجاد شده است. لطفاً از آن برای مقاصد غیرقانونی استفاده نکنید. نویسنده هیچ مسئولیتی در قبال استفاده نادرست از این ابزار ندارد. تمام محاسبات کاملاً به صورت محلی در مرورگر شما انجام می‌شود (Zero-Trust).
+> **امنیت Zero-Trust و اولویت حریم خصوصی.** این پروژه هیچگونه بخش بک‌انندی ندارد. تمام عملیات‌ها — از تجزیه (Parsing) تا تولید کدهای QR — منحصراً در حافظه رم مرورگر شما انجام می‌شود. هیچ‌یک از UUIDها، کلیدها یا آدرس‌های IP هرگز به سرورهای شخص ثالث ارسال نمی‌شوند.
 
 ---
 
-### 📸 رابط کاربری (پاسخگو)
+### 📸 رابط کاربری (طراحی ULTRA)
 
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jinxpil/flclash-converter/main/media/JSON%20to%20YAML%20Converter.jpg">
-    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/jinxpil/flclash-converter/main/media/JSON%20to%20YAML%20Converter.jpg">
     <img alt="JSON to YAML" src="https://raw.githubusercontent.com/jinxpil/flclash-converter/main/media/JSON%20to%20YAML%20Converter.jpg" width="48%">
   </picture>
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jinxpil/flclash-converter/main/media/Yaml%20Code%20Formatter.jpg">
-    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/jinxpil/flclash-converter/main/media/Yaml%20Code%20Formatter.jpg">
     <img alt="YAML Formatter" src="https://raw.githubusercontent.com/jinxpil/flclash-converter/main/media/Yaml%20Code%20Formatter.jpg" width="48%">
   </picture>
 </p>
 
 ---
 
-### 🔌 پروتکل‌های پشتیبانی‌شده
+### 🔥 چه چیز جدیدی در نسخه 17.00 ULTRA وجود دارد؟
+
+- 🚀 **موتور تجزیه فوق‌العاده (Extreme Parser):** موتور برنامه برای مدیریت همزمان **بیش از ۱۰,۰۰۰ گره** کاملاً بهینه شده است. اسکرول روان و جستجوی آنی حتی در سنگین‌ترین پایگاه‌های داده بدون کوچکترین تأخیری عمل می‌کنند.
+- 🌍 **بومی‌سازی ULTRA:** پشتیبانی کامل و عمیق از ۶ زبان (RU, EN, ZH, ZH-TW, FA, ES). رابط کاربری بصری با انطباق کامل تمام اعلان‌ها و عناصر کنترلی برای هر منطقه.
+- 🛡️ **سیستم محافظت QuotaGuard:** کنترل هوشمند حافظه مرورگر. این سیستم از کرش کردن برنامه (QuotaExceededError) هنگام وارد کردن اشتراک‌های بسیار حجیم با حجم ده‌ها مگابایت جلوگیری می‌کند.
+- 🧠 **فیلتر هوشمند موارد تکراری:** مقایسه خودکار گره‌ها بر اساس جفت IP:Port. برنامه به سرعت موارد تکراری را شناسایی و حذف کرده و فقط سرورهای منحصر به فرد را در لیست شما باقی می‌گذارد.
+- 🛠️ **پایداری بهبودیافته:** خطاهای نحوی حیاتی (SyntaxError) در پنجره‌های مودال برطرف شده و عملکرد کلیپ‌بورد برای کپی بدون نقص در دستگاه‌های موبایل بهینه شده است.
+
+---
+
+### 🔌 پروتکل‌های تحت پشتیبانی
 
 <table align="center" width="100%">
   <tr>
-    <td align="center">🛡️ <b>VLESS / VMess</b><br>Reality & Vision</td>
-    <td align="center">⚡ <b>Hysteria 2</b><br>Brutal Speed</td>
-    <td align="center">🐎 <b>Trojan</b><br>Stealth Protocol</td>
+    <td align="center">🛡️ <b>VLESS / VMess</b><br>Reality, Vision, gRPC</td>
+    <td align="center">⚡ <b>Hysteria 1/2</b><br>Brutal Speed & Port Hopping</td>
+    <td align="center">🐎 <b>Trojan</b><br>Stealth TLS & Password</td>
   </tr>
   <tr>
-    <td align="center">🔒 <b>WireGuard</b><br>Native VPN</td>
-    <td align="center">🌐 <b>SS / SSR</b><br>Shadowsocks</td>
-    <td align="center">🔌 <b>TUIC / Socks5 / HTTP</b><br>Other Protocols</td>
+    <td align="center">🔒 <b>WireGuard</b><br>Native VPN & AmneziaWG</td>
+    <td align="center">🌐 <b>Shadowsocks / RR</b><br>Classic & AEAD Ciphers</td>
+    <td align="center">🔌 <b>TUIC / Socks5 / HTTP</b><br>سازگاری کامل با تمام پروتکل‌ها</td>
   </tr>
 </table>
 
 ---
 
-### 📥 کلاینت‌های پیشنهادی
+### 🔥 قابلیت‌های اصلی
+
+- 🧩 **تجزیه‌گر Omni (همه‌جانبه):** رمزگشایی آنی اشتراک‌های Base64، استخراج لینک‌های خام مستقیم از متن و مهندسی معکوس عمیق پیکربندی‌های پیچیده JSON/YAML.
+- 🌍 **ویرایشگر انبوه (Mass Editor):** تغییر دسته‌جمعی پارامترها (SNI، Fingerprint، Flow، Public Key) برای هزاران گره انتخاب شده به طور همزمان تنها با یک کلیک.
+- 🌍 **GeoIP هوشمند:** تشخیص خودکار کشور و شهر محل استقرار سرور با افزودن خودکار پرچم‌ها (🇫🇮، 🇩🇪، 🇺🇸) به نام سرورها.
+- ⚙️ **بهینه‌سازی خودکار:** پاکسازی گره‌های «مرده» پس از تست پینگ، مخلوط کردن (Shuffle) لیست و اصلاح خودکار لینک‌های URI آسیب‌دیده.
+- 🐛 **لاگر تشخیصی (Diagnostic Logger):** سیستم داخلی نظارت بر رویدادها در زمان واقعی برای یافتن مشکلات در پیکربندی‌ها و گزارش‌های شبکه.
+
+---
+
+### 📥 کلاینت‌های پیشنهادی (سازگار با ULTRA)
 
 <details>
-<summary><b>🤖 نمایش کلاینت‌های Android</b></summary>
+<summary><b>🤖 اندروید (Android)</b></summary>
 
-- [FlClash](https://github.com/chen08209/FlClash)
-- [Karing](https://github.com/KaringX/karing)
+- [FlClash](https://github.com/chen08209/FlClash) — کلاینت پیشنهادی
+- [Karing](https://github.com/KaringX/karing) — رابط کاربری پیشرفته
 - [Clash Meta for Android](https://github.com/MetaCubeX/ClashMetaForAndroid)
-- [FlClashX](https://github.com/pluralplay/FlClashX)
 </details>
 
 <details>
-<summary><b>🍏 نمایش کلاینت‌های iOS</b></summary>
+<summary><b>🍏 آی‌او‌اس (iOS)</b></summary>
 
 - [Karing](https://apps.apple.com/us/app/karing/id6472431552)
 - [Clash.MI](https://apps.apple.com/us/app/clash-mi/id6744321968)
@@ -94,7 +111,7 @@
 </details>
 
 <details>
-<summary><b>💻 نمایش کلاینت‌های PC (Windows / macOS / Linux)</b></summary>
+<summary><b>💻 دسکتاپ (Win/Mac/Linux)</b></summary>
 
 - [Karing](https://github.com/KaringX/karing)
 - [FlClash](https://github.com/chen08209/FlClash)
@@ -103,19 +120,8 @@
 
 ---
 
-### 🔥 ویژگی‌های اصلی
-
-- 🛡️ **امنیت Zero-Trust:** هیچ سرور شخص ثالثی درگیر نیست. داده‌ها در حافظه رم پردازش شده و با بستن تب از بین می‌روند.
-- 🧩 **تجزیه‌کننده Omni:** رمزگشایی فوری اشتراک‌های Base64، مهندسی معکوس پیکربندی‌های JSON و پشتیبانی از Drag & Drop.
-- 🌍 **ویرایشگر گروهی و GeoIP هوشمند:** تغییر دسته‌ای پارامترها (SNI، Flow، Fingerprint) و تشخیص خودکار موقعیت مکانی گره‌ها با پرچم‌ها (🇫🇮، 🇩🇪).
-- 🐛 **ثبت‌کننده خطایاب:** سیستم اشکال‌زدایی پس‌زمینه داخلی که تعاملات، خطاها و رویدادهای شبکه را برای عیب‌یابی آسان ثبت می‌کند.
-- 🎨 **موتور پوسته:** شخصی‌سازی کامل رابط کاربری با قابلیت وارد/صادر کردن طراحی‌ها به `.json`.
-- ⚙️ **بهینه‌سازی خودکار:** پاک‌سازی موارد تکراری بر اساس IP/پورت، حذف سرورهای از کار افتاده پس از پینگ TCP/HTTP، و بازیابی خودکار لینک‌های خراب.
-
----
-
 ### ⭐ حمایت از پروژه
 
-**اگر این پروژه برای شما مفید بود، لطفاً به آن ستاره بدهید!** :star2:
+**اگر Network Builder ULTRA برای شما مفید بود، لطفاً به آن ستاره بدهید! این کار باعث انگیزه برای توسعه بیشتر پروژه می‌شود.** :star2:
 
 [![Stargazers over time](https://starchart.cc/jinxpil/flclash-converter.svg?variant=adaptive)](https://starchart.cc/jinxpil/flclash-converter)
