@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#0d1117">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Network Builder v16.15 Master</title>
+    <title>Network Builder v17.00 ULTRA</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
     <style>
@@ -120,16 +120,19 @@
 <body>
     <div class="container">
         <h2>
-            <div>⚡ Network Builder <span style="color:var(--text-muted); font-size:16px;">v16.15 Master</span></div>
+            <div>⚡ Network Builder <span style="color:var(--text-muted); font-size:16px;">v17.00 ULTRA</span></div>
             <div class="badges-wrapper">
                 <div class="version-badge" id="mihomoVersion" title="Версия ядра Mihomo"><a href="https://github.com/MetaCubeX/mihomo/releases" target="_blank">⏳ Core...</a></div>
                 <div class="version-badge" id="rulesVersion" style="color:var(--primary-color);" title="Базы обхода блокировок"><a href="https://github.com/MetaCubeX/meta-rules-dat/releases" target="_blank">🛡️ Rules...</a></div>
                 
                 <select id="langSwitcher" onchange="AppState.setLang(this.value)">
-                    <option value="ru">🇷🇺 RU</option>
-                    <option value="en">🇺🇸 EN</option>
-                    <option value="zh">🇨🇳 CN</option>
-                </select>
+    <option value="ru">🇷🇺 RU</option>
+    <option value="en">🇺🇸 EN</option>
+    <option value="zh">🇨🇳 CN</option>
+    <option value="zh-TW">🇹🇼 TW</option>
+    <option value="es">🇪🇸 ES</option>
+    <option value="fa">🇮🇷 FA</option>
+</select>
             </div>
             
             <div class="header-actions">
@@ -224,12 +227,17 @@
     <div id="toast">✅ Done!</div>
 
     <div id="qrModal" class="modal-overlay" onclick="closeModal('qrModal', event)">
-        <div class="modal-content" onclick="event.stopPropagation(); text-align:center;">
-            <h3 style="margin-top:0; color:var(--primary-color); text-align:center;" id="qrTitle">QR Code</h3>
-            <canvas id="qrCanvas" style="background:white; padding:10px; border-radius:8px; margin: 0 auto; display: block;"></canvas>
-            <button class="modal-close" onclick="closeModal('qrModal', event)" data-i18n="btnClose">Закрыть</button>
-        </div>
+    
+    <div class="modal-content" style="text-align: center;" onclick="event.stopPropagation()">
+        
+        <h3 id="qrTitle" style="margin-top: 0; color: var(--primary-color);">QR Code</h3>
+        
+        <canvas id="qrCanvas" style="background: white; padding: 10px; border-radius: 8px; margin: 0 auto; display: block;"></canvas>
+        
+        <button class="modal-close" onclick="closeModal('qrModal', event)" data-i18n="btnClose">Закрыть</button>
+        
     </div>
+</div>
 
     <div id="massEditModal" class="modal-overlay" onclick="closeModal('massEditModal', event)">
         <div class="modal-content" onclick="event.stopPropagation()">
@@ -1251,86 +1259,243 @@ rules:
         const APP_VERSION = "16.15";
 
         // ЛОГГЕР
-        const DiagnosticLogger = {
-            logs: [],
-            add(type, message) {
-                const time = new Date().toLocaleTimeString('ru-RU', { hour12: false, hour: "numeric", minute: "numeric", second: "numeric" });
-                this.logs.push(`[${time}] [${type}] ${message}`);
-                if (this.logs.length > 2000) this.logs.shift();
-            },
-            initSystem() {
-                this.add('SYSTEM', `Browser: ${navigator.userAgent}`);
-                this.add('SYSTEM', `Screen: ${window.innerWidth}x${window.innerHeight}, Lang: ${navigator.language}`);
-            },
-            downloadLog() {
-                if (!this.logs.length) return showToast("Лог пуст", "warning");
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(new Blob([this.logs.join('\n')], { type: 'text/plain' }));
-                a.download = `Network_Builder_Log_v${APP_VERSION}.txt`;
-                a.click();
-                showToast("✅ Лог скачан!");
-            }
-        };
+      const DiagnosticLogger = {
+    logs: [],
+    
+    add(type, message) {
+        // Защита от объектов: превращаем их в читаемую строку
+        const msgStr = typeof message === 'object' ? JSON.stringify(message, null, 2) : message;
+        
+        // Строгий 24-часовой формат времени
+        const time = new Date().toLocaleTimeString('en-GB', { hour12: false });
+        
+        this.logs.push(`[${time}] [${type}] ${msgStr}`);
+        
+        // Оптимизация очереди: удаляем 500 самых старых записей за один раз
+        if (this.logs.length > 2000) {
+            this.logs.splice(0, 500);
+        }
+    },
+    
+    initSystem() {
+        this.add('SYSTEM', `Browser: ${navigator.userAgent}`);
+        this.add('SYSTEM', `Screen: ${window.innerWidth}x${window.innerHeight}, Lang: ${navigator.language}`);
+    },
+    
+    downloadLog() {
+        if (!this.logs.length) return showToast("Лог пуст", "warning");
+        
+        const blob = new Blob([this.logs.join('\n')], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        // Защита на случай, если константа APP_VERSION где-то не загрузится
+        a.download = `Network_Builder_Log_v${typeof APP_VERSION !== 'undefined' ? APP_VERSION : 'latest'}.txt`;
+        a.click();
+        
+        // Очистка выделенной памяти (Zero-Trust подход к ресурсам)
+        setTimeout(() => {
+            URL.revokeObjectURL(url);
+            a.remove();
+        }, 1000);
+        
+        showToast("✅ Лог скачан!");
+    }
+};
 
         // ПЕРЕХВАТ ОШИБОК
-        window.onerror = function(msg, url, lineNo, columnNo, error) {
-            let stack = error && error.stack ? error.stack.replace(/\n/g, ' ') : 'Нет stack trace';
-            DiagnosticLogger.add('ERROR', `Сбой: ${msg} | ${lineNo}:${columnNo} | ${stack}`);
-            let errEl = document.getElementById('errorModalMsg');
-            if (errEl) errEl.innerHTML = `<b>Сбой:</b> ${msg}<br><b>Строка:</b> ${lineNo}:${columnNo}<br><br><span style="color:var(--text-muted);">${stack}</span>`;
-            document.getElementById('errorModal').style.display = 'flex';
-            return false;
-        };
+       // Вспомогательная функция для безопасной вставки текста в HTML
+const escapeHTML = (str) => String(str).replace(/[&<>'"]/g, tag => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+}[tag]));
 
-        window.addEventListener('unhandledrejection', function(event) {
-            DiagnosticLogger.add('ERROR', `Скрытая ошибка (Promise): ${event.reason}`);
-        });
+// Общая функция для показа ошибки, чтобы не дублировать код
+const handleSystemCrash = (msg, lineNo, columnNo, stack) => {
+    // 1. Пишем в логер (оставляем \n для удобного чтения в файле лога)
+    DiagnosticLogger.add('ERROR', `Сбой: ${msg} | ${lineNo}:${columnNo}\nStack: ${stack}`);
+
+    // 2. Безопасно выводим в модальное окно
+    const errEl = document.getElementById('errorModalMsg');
+    const modal = document.getElementById('errorModal');
+    
+    if (errEl && modal) {
+        // Форматируем стек для HTML, сохраняя структуру
+        const safeMsg = escapeHTML(msg);
+        const safeStack = escapeHTML(stack).replace(/\n/g, '<br>');
+        
+        errEl.innerHTML = `
+            <b style="color: #ff4d4f;">Сбой:</b> ${safeMsg}<br>
+            <b>Позиция:</b> ${lineNo}:${columnNo}<br><br>
+            <div style="color: var(--text-muted); font-family: monospace; font-size: 0.85em; background: rgba(0,0,0,0.1); padding: 8px; border-radius: 4px; max-height: 150px; overflow-y: auto;">
+                ${safeStack}
+            </div>
+        `;
+        modal.style.display = 'flex';
+    }
+};
+
+// Отлов классических синхронных ошибок
+window.onerror = function(msg, url, lineNo, columnNo, error) {
+    const stack = error && error.stack ? error.stack : 'Нет stack trace';
+    // Если ошибка CORS от сторонних скриптов, браузер скрывает детали
+    const finalMsg = msg === "Script error." ? "Script error. (Вероятно, проблема CORS или блокировщика рекламы)" : msg;
+    
+    handleSystemCrash(finalMsg, lineNo, columnNo, stack);
+    return false; // Разрешаем стандартный вывод в консоль браузера
+};
+
+// Отлов современных асинхронных ошибок (Promise / fetch)
+window.addEventListener('unhandledrejection', function(event) {
+    const error = event.reason;
+    const msg = error ? (error.message || error.toString()) : 'Неизвестная асинхронная ошибка';
+    const stack = error && error.stack ? error.stack : 'Нет stack trace';
+    
+    handleSystemCrash(`[Promise] ${msg}`, 'async', 'async', stack);
+});
+
+       window.addEventListener('unhandledrejection', function(event) {
+    const error = event.reason;
+    // Извлекаем понятное сообщение, даже если прилетел объект
+    const msg = error instanceof Error ? error.message : String(error);
+    const stack = error && error.stack ? ` | ${error.stack.split('\n')[1].trim()}` : '';
+    
+    DiagnosticLogger.add('PROMISE', `Скрытый сбой: ${msg}${stack}`);
+});
 
         // ПЕРЕХВАТ КЛИКОВ
-        document.addEventListener('click', e => {
-            if (!e.isTrusted) return;
-            let path = e.composedPath().slice(0, 3).map(el => el.tagName ? el.tagName.toLowerCase() + (el.id ? '#'+el.id : '') : '').filter(Boolean).join(' < ');
-            DiagnosticLogger.add('CLICK', path);
-        });
+document.addEventListener('click', e => {
+    // Игнорируем программные клики (скрипты)
+    if (!e.isTrusted) return; 
+
+    const target = e.target;
+
+    // Игнорируем клики по пустому фону
+    if (target.tagName === 'BODY' || target.tagName === 'HTML') return;
+
+    // Собираем путь, добавляя классы для точности
+    let path = e.composedPath().slice(0, 3).map(el => {
+        if (!el.tagName) return '';
+        let desc = el.tagName.toLowerCase();
+        if (el.id) desc += `#${el.id}`;
+        // Добавляем первый класс элемента, если он есть, для большей ясности
+        else if (el.classList && el.classList.length > 0) desc += `.${el.classList[0]}`;
+        return desc;
+    }).filter(Boolean).join(' < ');
+
+    // Берем первые 15 символов текста элемента (очищенные от переносов строк)
+    // Это покажет, например: "Кнопка: [СКОПИРОВАТЬ...]"
+    let textObj = target.innerText ? target.innerText.replace(/\s+/g, ' ').trim().substring(0, 15) : '';
+    let textDesc = textObj ? ` ("${textObj}...")` : '';
+
+    DiagnosticLogger.add('CLICK', `${path}${textDesc}`);
+}, { passive: true }); // passive: true немного улучшает производительность браузера при обработке событий
 
         // СЛОВАРЬ ПЕРЕВОДОВ ИЗ 16.3
         const i18n = {
-            ru: {
-                pingAll: "⚡ Ping All", pingTooltip: "Используется HTTP/TCP ping (fetch). Серверы без открытых web-портов могут отображаться как Err или Stealth, оставаясь при этом абсолютно рабочими.",
-                cleanDead: "🧹 Удалить мертвые", sortNodes: "📶 Сорт.", removeDups: "🔍 Очистить дубли", shuffleNodes: "🔀 Перемешать", clearAll: "🗑 Очистить всё",
-                supportText: "Поддержка форматов: <b>YAML (Clash)</b>, <b>JSON (Xray/Sing-box)</b>, VLESS, VMess, Trojan, Hysteria2, SS, SSR, WireGuard, Socks5, HTTP, SSH, Naive, TUIC.",
-                btnPaste: "Вставить", btnFile: "Файл", mainPlaceholder: "Перетащите файл .txt, .json или .yaml в это окно! Или вставьте массив ссылок.", btnRecognize: "► РАСПОЗНАТЬ И ДОБАВИТЬ УЗЛЫ",
-                lblFormat: "Формат вывода (Экспорт для клиента)", lblTemplate: "Шаблон маршрутизации (YAML)", customTplUrl: "URL вашего кастомного YAML (Github Raw, Pastebin...)",
-                btnFetchTpl: "📥 Загрузить по ссылке", customTplCode: "... или вставьте код сюда вручную.", selectAll: "Выбрать все узлы", btnGeo: "🌍 Авто-Геолокация",
-                btnMassEdit: "✏️ Mass Edit", lblEditor: "📝 Итоговый конфиг (Редактируемо / Автосохранение)", btnBase64: "⎘ BASE64 ПОДПИСКА", btnRawLinks: "📋 ЭКСПОРТ ССЫЛОК (TXT)",
-                btnCopy: "⎘ СКОПИРОВАТЬ КОД", btnDownload: "⬇ СКАЧАТЬ ФАЙЛ", btnClose: "Закрыть", massEditTitle: "✏️ Mass Editor", massEditDesc: "Массовое изменение параметров для выделенных узлов VLESS / Trojan",
-                sniPlaceholder: "Оставьте пустым, чтобы не менять", optNoChange: "-- Не менять --", optRemoveFlow: "Удалить flow (Сделать пустым)", btnApply: "ПРИМЕНИТЬ", btnCancel: "Отмена", btnGotIt: "Понятно",
-                btnTheme: "🎨 Настроить дизайн", btnLog: "🛠 Скачать Лог", themeTitle: "🎨 Оформление страницы", themeDesc: "Настройте внешний вид под себя.",
-                themeBg: "Цвет фона", themeCont: "Цвет контейнеров", themeBorder: "Цвет обводки", themePrim: "Основной цвет", themeAcc: "Цвет акцентов", themeText: "Цвет текста",
-                btnExportTheme: "💾 Скачать тему", btnImportTheme: "📂 Загрузить тему", btnResetTheme: "Сбросить по умолчанию",
-                optFormatMob: "📱 FlClash YAML (Mobile/PC + TUN)", optFormatRout: "🌐 FlClash YAML (Router - No TUN)",
-                optTplUlt: "💎 Крымский профиль (Optimized v77.0)", optTplBas: "⚡ Базовый профиль (Только проксирование)", optTplCus: "🛠️ Свой шаблон (Вставить кастомный код)",
-                lblSni: "SNI (Домен подмены):", lblFp: "Fingerprint (Отпечаток):", lblFlow: "Flow (XTLS):"
-            },
-            en: {
-                pingAll: "⚡ Ping All", pingTooltip: "Uses HTTP/TCP ping (fetch). Servers without open web ports may show as Err or Stealth, but remain fully functional.",
-                cleanDead: "🧹 Clean Dead", sortNodes: "📶 Sort", removeDups: "🔍 Clean Dups", shuffleNodes: "🔀 Shuffle", clearAll: "🗑 Clear All",
-                supportText: "Supported formats: <b>YAML (Clash)</b>, <b>JSON (Xray)</b>, VLESS, VMess, Trojan, Hysteria2...",
-                btnPaste: "Paste", btnFile: "File", mainPlaceholder: "Drop a .txt, .json or .yaml file here!\n\nOr paste an array of links.", btnRecognize: "► RECOGNIZE AND ADD NODES",
-                lblFormat: "Output Format (Client Export)", lblTemplate: "Routing Template (YAML)", customTplUrl: "Your custom YAML URL (Github Raw, Pastebin...)",
-                btnFetchTpl: "📥 Fetch from URL", customTplCode: "... or paste code here manually.", selectAll: "Select all nodes", btnGeo: "🌍 Auto-Geolocation",
-                btnMassEdit: "✏️ Mass Edit", lblEditor: "📝 Output Config (Editable / Auto-saving)", btnBase64: "⎘ BASE64 SUB", btnRawLinks: "📋 EXPORT LINKS (TXT)",
-                btnCopy: "⎘ COPY CODE", btnDownload: "⬇ DOWNLOAD FILE", btnClose: "Close", massEditTitle: "✏️ Mass Editor", massEditDesc: "Mass edit parameters for selected VLESS / Trojan nodes",
-                sniPlaceholder: "Leave blank to keep original", optNoChange: "-- Keep original --", optRemoveFlow: "Remove flow (Make empty)", btnApply: "APPLY", btnCancel: "Cancel", btnGotIt: "Got it",
-                btnTheme: "🎨 Theme settings", btnLog: "🛠 Download Log", themeTitle: "🎨 Page Theme", themeDesc: "Customize the appearance.",
-                themeBg: "Background Color", themeCont: "Container Color", themeBorder: "Border Color", themePrim: "Primary Color", themeAcc: "Accent Color", themeText: "Text Color",
-                btnExportTheme: "💾 Download Theme", btnImportTheme: "📂 Load Theme", btnResetTheme: "Reset to Default",
-                optFormatMob: "📱 FlClash YAML (Mobile/PC + TUN)", optFormatRout: "🌐 FlClash YAML (Router - No TUN)",
-                optTplUlt: "💎 Ultimate Profile (Optimized v77.0)", optTplBas: "⚡ Basic Profile (Proxy Only)", optTplCus: "🛠️ Custom Template (Paste custom code)",
-                lblSni: "SNI (Spoofing Domain):", lblFp: "Fingerprint:", lblFlow: "Flow (XTLS):"
-            }
-        };
-
+    ru: {
+        pingAll: "⚡ Ping All", pingTooltip: "Используется HTTP/TCP ping (fetch). Серверы без открытых web-портов могут отображаться как Err или Stealth, оставаясь при этом абсолютно рабочими.",
+        cleanDead: "🧹 Удалить мертвые", sortNodes: "📶 Сорт.", removeDups: "🔍 Очистить дубли", shuffleNodes: "🔀 Перемешать", clearAll: "🗑 Очистить всё",
+        supportText: "Поддержка форматов: <b>YAML (Clash)</b>, <b>JSON (Xray/Sing-box)</b>, VLESS, VMess, Trojan, Hysteria2, SS, SSR, WireGuard, Socks5, HTTP, SSH, Naive, TUIC.",
+        btnPaste: "Вставить", btnFile: "Файл", mainPlaceholder: "Перетащите файл .txt, .json или .yaml в это окно!\n\nИли вставьте массив ссылок.", btnRecognize: "► РАСПОЗНАТЬ И ДОБАВИТЬ УЗЛЫ",
+        lblFormat: "Формат вывода (Экспорт для клиента)", lblTemplate: "Шаблон маршрутизации (YAML)", customTplUrl: "URL вашего кастомного YAML (Github Raw, Pastebin...)",
+        btnFetchTpl: "📥 Загрузить по ссылке", customTplCode: "... или вставьте код сюда вручную.", selectAll: "Выбрать все узлы", btnGeo: "🌍 Авто-Геолокация",
+        btnMassEdit: "✏️ Mass Edit", lblEditor: "📝 Итоговый конфиг (Редактируемо / Автосохранение)", btnBase64: "⎘ BASE64 ПОДПИСКА", btnRawLinks: "📋 ЭКСПОРТ ССЫЛОК (TXT)",
+        btnCopy: "⎘ СКОПИРОВАТЬ КОД", btnDownload: "⬇ СКАЧАТЬ ФАЙЛ", btnClose: "Закрыть", massEditTitle: "✏️ Mass Editor", massEditDesc: "Массовое изменение параметров для выделенных узлов VLESS / Trojan",
+        sniPlaceholder: "Оставьте пустым, чтобы не менять", optNoChange: "-- Не менять --", optRemoveFlow: "Удалить flow (Сделать пустым)", btnApply: "ПРИМЕНИТЬ", btnCancel: "Отмена", btnGotIt: "Понятно",
+        btnTheme: "🎨 Настроить дизайн", btnLog: "🛠 Скачать Лог", themeTitle: "🎨 Оформление страницы", themeDesc: "Настройте внешний вид под себя.",
+        themeBg: "Цвет фона", themeCont: "Цвет контейнеров", themeBorder: "Цвет обводки", themePrim: "Основной цвет", themeAcc: "Цвет акцентов", themeText: "Цвет текста",
+        btnExportTheme: "💾 Скачать тему", btnImportTheme: "📂 Загрузить тему", btnResetTheme: "Сбросить по умолчанию",
+        optFormatMob: "📱 FlClash YAML (Mobile/PC + TUN)", optFormatRout: "🌐 FlClash YAML (Router - No TUN)",
+        optTplUlt: "💎 Крымский профиль (Optimized v77.0)", optTplBas: "⚡ Базовый профиль (Только проксирование)", optTplCus: "🛠️ Свой шаблон (Вставить кастомный код)",
+        lblSni: "SNI (Домен подмены):", lblFp: "Fingerprint (Отпечаток):", lblFlow: "Flow (XTLS):"
+    },
+    en: {
+        pingAll: "⚡ Ping All", pingTooltip: "Uses HTTP/TCP ping (fetch). Servers without open web ports may show as Err or Stealth, but remain fully functional.",
+        cleanDead: "🧹 Clean Dead", sortNodes: "📶 Sort", removeDups: "🔍 Clean Dups", shuffleNodes: "🔀 Shuffle", clearAll: "🗑 Clear All",
+        supportText: "Supported formats: <b>YAML (Clash)</b>, <b>JSON (Xray)</b>, VLESS, VMess, Trojan, Hysteria2...",
+        btnPaste: "Paste", btnFile: "File", mainPlaceholder: "Drop a .txt, .json or .yaml file here!\n\nOr paste an array of links.", btnRecognize: "► RECOGNIZE AND ADD NODES",
+        lblFormat: "Output Format (Client Export)", lblTemplate: "Routing Template (YAML)", customTplUrl: "Your custom YAML URL (Github Raw, Pastebin...)",
+        btnFetchTpl: "📥 Fetch from URL", customTplCode: "... or paste code here manually.", selectAll: "Select all nodes", btnGeo: "🌍 Auto-Geolocation",
+        btnMassEdit: "✏️ Mass Edit", lblEditor: "📝 Output Config (Editable / Auto-saving)", btnBase64: "⎘ BASE64 SUB", btnRawLinks: "📋 EXPORT LINKS (TXT)",
+        btnCopy: "⎘ COPY CODE", btnDownload: "⬇ DOWNLOAD FILE", btnClose: "Close", massEditTitle: "✏️ Mass Editor", massEditDesc: "Mass edit parameters for selected VLESS / Trojan nodes",
+        sniPlaceholder: "Leave blank to keep original", optNoChange: "-- Keep original --", optRemoveFlow: "Remove flow (Make empty)", btnApply: "APPLY", btnCancel: "Cancel", btnGotIt: "Got it",
+        btnTheme: "🎨 Theme settings", btnLog: "🛠 Download Log", themeTitle: "🎨 Page Theme", themeDesc: "Customize the appearance.",
+        themeBg: "Background Color", themeCont: "Container Color", themeBorder: "Border Color", themePrim: "Primary Color", themeAcc: "Accent Color", themeText: "Text Color",
+        btnExportTheme: "💾 Download Theme", btnImportTheme: "📂 Load Theme", btnResetTheme: "Reset to Default",
+        optFormatMob: "📱 FlClash YAML (Mobile/PC + TUN)", optFormatRout: "🌐 FlClash YAML (Router - No TUN)",
+        optTplUlt: "💎 Ultimate Profile (Optimized v77.0)", optTplBas: "⚡ Basic Profile (Proxy Only)", optTplCus: "🛠️ Custom Template (Paste custom code)",
+        lblSni: "SNI (Spoofing Domain):", lblFp: "Fingerprint:", lblFlow: "Flow (XTLS):"
+    },
+    zh: {
+        pingAll: "⚡ 全部 Ping", pingTooltip: "使用 HTTP/TCP ping (fetch)。未开放 web 端口的服务器可能显示为 Err 或 Stealth，但仍然完全可用。",
+        cleanDead: "🧹 清理失效", sortNodes: "📶 排序", removeDups: "🔍 清除重复", shuffleNodes: "🔀 打乱", clearAll: "🗑 全部清空",
+        supportText: "支持的格式：<b>YAML (Clash)</b>，<b>JSON (Xray)</b>，VLESS，VMess，Trojan，Hysteria2...",
+        btnPaste: "粘贴", btnFile: "文件", mainPlaceholder: "将 .txt, .json 或 .yaml 文件拖放到这里！\n\n或粘贴链接数组。", btnRecognize: "► 识别并添加节点",
+        lblFormat: "输出格式 (客户端导出)", lblTemplate: "路由模板 (YAML)", customTplUrl: "您的自定义 YAML URL (Github Raw, Pastebin...)",
+        btnFetchTpl: "📥 从 URL 获取", customTplCode: "... 或在此处手动粘贴代码。", selectAll: "选择所有节点", btnGeo: "🌍 自动定位",
+        btnMassEdit: "✏️ 批量编辑", lblEditor: "📝 输出配置 (可编辑 / 自动保存)", btnBase64: "⎘ BASE64 订阅", btnRawLinks: "📋 导出链接 (TXT)",
+        btnCopy: "⎘ 复制代码", btnDownload: "⬇ 下载文件", btnClose: "关闭", massEditTitle: "✏️ 批量编辑器", massEditDesc: "批量修改所选 VLESS / Trojan 节点的参数",
+        sniPlaceholder: "留空则保持原样", optNoChange: "-- 保持原样 --", optRemoveFlow: "移除 flow (留空)", btnApply: "应用", btnCancel: "取消", btnGotIt: "知道了",
+        btnTheme: "🎨 主题设置", btnLog: "🛠 下载日志", themeTitle: "🎨 页面主题", themeDesc: "自定义外观。",
+        themeBg: "背景颜色", themeCont: "容器颜色", themeBorder: "边框颜色", themePrim: "主要颜色", themeAcc: "强调颜色", themeText: "文本颜色",
+        btnExportTheme: "💾 下载主题", btnImportTheme: "📂 加载主题", btnResetTheme: "恢复默认",
+        optFormatMob: "📱 FlClash YAML (手机/PC + TUN)", optFormatRout: "🌐 FlClash YAML (路由器 - 无 TUN)",
+        optTplUlt: "💎 终极配置文件 (优化版 v77.0)", optTplBas: "⚡ 基础配置文件 (仅代理)", optTplCus: "🛠️ 自定义模板 (粘贴自定义代码)",
+        lblSni: "SNI (伪装域名):", lblFp: "Fingerprint (指纹):", lblFlow: "Flow (流控):"
+    },
+    "zh-TW": {
+        pingAll: "⚡ 全部 Ping", pingTooltip: "使用 HTTP/TCP ping (fetch)。未開放 web 端口的伺服器可能顯示為 Err 或 Stealth，但仍然完全可用。",
+        cleanDead: "🧹 清理失效", sortNodes: "📶 排序", removeDups: "🔍 清除重複", shuffleNodes: "🔀 打亂", clearAll: "🗑 全部清空",
+        supportText: "支援的格式：<b>YAML (Clash)</b>，<b>JSON (Xray)</b>，VLESS，VMess，Trojan，Hysteria2...",
+        btnPaste: "貼上", btnFile: "檔案", mainPlaceholder: "將 .txt, .json 或 .yaml 檔案拖放到這裡！\n\n或貼上連結陣列。", btnRecognize: "► 識別並加入節點",
+        lblFormat: "輸出格式 (客戶端匯出)", lblTemplate: "路由模板 (YAML)", customTplUrl: "您的自訂 YAML URL (Github Raw, Pastebin...)",
+        btnFetchTpl: "📥 從 URL 獲取", customTplCode: "... 或在此處手動貼上程式碼。", selectAll: "選擇所有節點", btnGeo: "🌍 自動定位",
+        btnMassEdit: "✏️ 批量編輯", lblEditor: "📝 輸出配置 (可編輯 / 自動保存)", btnBase64: "⎘ BASE64 訂閱", btnRawLinks: "📋 匯出連結 (TXT)",
+        btnCopy: "⎘ 複製程式碼", btnDownload: "⬇ 下載檔案", btnClose: "關閉", massEditTitle: "✏️ 批量編輯器", massEditDesc: "批量修改所選 VLESS / Trojan 節點的參數",
+        sniPlaceholder: "留空則保持原樣", optNoChange: "-- 保持原樣 --", optRemoveFlow: "移除 flow (留空)", btnApply: "應用", btnCancel: "取消", btnGotIt: "知道了",
+        btnTheme: "🎨 主題設定", btnLog: "🛠 下載日誌", themeTitle: "🎨 頁面主題", themeDesc: "自訂外觀。",
+        themeBg: "背景顏色", themeCont: "容器顏色", themeBorder: "邊框顏色", themePrim: "主要顏色", themeAcc: "強調顏色", themeText: "文字顏色",
+        btnExportTheme: "💾 下載主題", btnImportTheme: "📂 載入主題", btnResetTheme: "恢復預設",
+        optFormatMob: "📱 FlClash YAML (手機/PC + TUN)", optFormatRout: "🌐 FlClash YAML (路由器 - 無 TUN)",
+        optTplUlt: "💎 終極設定檔 (優化版 v77.0)", optTplBas: "⚡ 基礎設定檔 (僅代理)", optTplCus: "🛠️ 自訂模板 (貼上自訂程式碼)",
+        lblSni: "SNI (偽裝域名):", lblFp: "Fingerprint (指紋):", lblFlow: "Flow (流控):"
+    },
+    es: {
+        pingAll: "⚡ Ping All", pingTooltip: "Utiliza ping HTTP/TCP (fetch). Los servidores sin puertos web abiertos pueden mostrarse como Err o Stealth, pero siguen siendo completamente funcionales.",
+        cleanDead: "🧹 Limpiar Inactivos", sortNodes: "📶 Ordenar", removeDups: "🔍 Limpiar Duplicados", shuffleNodes: "🔀 Mezclar", clearAll: "🗑 Borrar Todo",
+        supportText: "Formatos soportados: <b>YAML (Clash)</b>, <b>JSON (Xray)</b>, VLESS, VMess, Trojan, Hysteria2...",
+        btnPaste: "Pegar", btnFile: "Archivo", mainPlaceholder: "¡Suelte un archivo .txt, .json o .yaml aquí!\n\nO pegue una matriz de enlaces.", btnRecognize: "► RECONOCER Y AÑADIR NODOS",
+        lblFormat: "Formato de salida (Exportar cliente)", lblTemplate: "Plantilla de enrutamiento (YAML)", customTplUrl: "URL de su YAML personalizado (Github Raw, Pastebin...)",
+        btnFetchTpl: "📥 Cargar desde URL", customTplCode: "... o pegue el código aquí manualmente.", selectAll: "Seleccionar todos los nodos", btnGeo: "🌍 Auto-Geolocalización",
+        btnMassEdit: "✏️ Edición Masiva", lblEditor: "📝 Configuración de salida (Editable / Autoguardado)", btnBase64: "⎘ SUSCRIPCIÓN BASE64", btnRawLinks: "📋 EXPORTAR ENLACES (TXT)",
+        btnCopy: "⎘ COPIAR CÓDIGO", btnDownload: "⬇ DESCARGAR ARCHIVO", btnClose: "Cerrar", massEditTitle: "✏️ Editor Masivo", massEditDesc: "Cambio masivo de parámetros para nodos VLESS / Trojan seleccionados",
+        sniPlaceholder: "Dejar en blanco para no cambiar", optNoChange: "-- No cambiar --", optRemoveFlow: "Eliminar flow (Dejar vacío)", btnApply: "APLICAR", btnCancel: "Cancelar", btnGotIt: "Entendido",
+        btnTheme: "🎨 Diseño", btnLog: "🛠 Descargar Log", themeTitle: "🎨 Tema de la página", themeDesc: "Personaliza la apariencia a tu gusto.",
+        themeBg: "Color de fondo", themeCont: "Color del contenedor", themeBorder: "Color del borde", themePrim: "Color principal", themeAcc: "Color de acento", themeText: "Color del texto",
+        btnExportTheme: "💾 Descargar Tema", btnImportTheme: "📂 Cargar Tema", btnResetTheme: "Restablecer por defecto",
+        optFormatMob: "📱 FlClash YAML (Móvil/PC + TUN)", optFormatRout: "🌐 FlClash YAML (Router - Sin TUN)",
+        optTplUlt: "💎 Perfil Definitivo (Optimizado v77.0)", optTplBas: "⚡ Perfil Básico (Solo proxy)", optTplCus: "🛠️ Plantilla Personalizada (Pegar código)",
+        lblSni: "SNI (Dominio de Spoofing):", lblFp: "Fingerprint (Huella):", lblFlow: "Flow (XTLS):"
+    },
+    fa: {
+        pingAll: "⚡ پینگ همه", pingTooltip: "از پینگ HTTP/TCP استفاده می‌کند. سرورهای بدون پورت وب باز ممکن است به صورت Err یا Stealth نشان داده شوند، اما کاملاً کارآمد هستند.",
+        cleanDead: "🧹 پاکسازی غیرفعال‌ها", sortNodes: "📶 مرتب‌سازی", removeDups: "🔍 حذف تکراری‌ها", shuffleNodes: "🔀 ترکیب تصادفی", clearAll: "🗑 پاک کردن همه",
+        supportText: "فرمت‌های پشتیبانی شده: <b>YAML (Clash)</b>، <b>JSON (Xray)</b>، VLESS، VMess، Trojan، Hysteria2...",
+        btnPaste: "جایگذاری", btnFile: "فایل", mainPlaceholder: "یک فایل .txt، .json یا .yaml را اینجا رها کنید!\n\nیا آرایه‌ای از لینک‌ها را جایگذاری کنید.", btnRecognize: "► شناسایی و افزودن گره‌ها",
+        lblFormat: "فرمت خروجی (صادرات کلاینت)", lblTemplate: "قالب مسیریابی (YAML)", customTplUrl: "آدرس YAML سفارشی شما (Github Raw، Pastebin...)",
+        btnFetchTpl: "📥 دریافت از URL", customTplCode: "... یا کد را به صورت دستی اینجا جایگذاری کنید.", selectAll: "انتخاب همه گره‌ها", btnGeo: "🌍 موقعیت‌یابی خودکار",
+        btnMassEdit: "✏️ ویرایش گروهی", lblEditor: "📝 کانفیگ خروجی (قابل ویرایش / ذخیره خودکار)", btnBase64: "⎘ اشتراک BASE64", btnRawLinks: "📋 صادرات لینک‌ها (TXT)",
+        btnCopy: "⎘ کپی کردن کد", btnDownload: "⬇ دانلود فایل", btnClose: "بستن", massEditTitle: "✏️ ویرایشگر گروهی", massEditDesc: "تغییر گروهی پارامترها برای گره‌های VLESS / Trojan انتخاب شده",
+        sniPlaceholder: "برای عدم تغییر خالی بگذارید", optNoChange: "-- بدون تغییر --", optRemoveFlow: "حذف flow (خالی کردن)", btnApply: "اعمال کردن", btnCancel: "لغو", btnGotIt: "متوجه شدم",
+        btnTheme: "🎨 تنظیمات قالب", btnLog: "🛠 دانلود لاگ", themeTitle: "🎨 قالب صفحه", themeDesc: "ظاهر را سفارشی کنید.",
+        themeBg: "رنگ پس‌زمینه", themeCont: "رنگ کانتینر", themeBorder: "رنگ حاشیه", themePrim: "رنگ اصلی", themeAcc: "رنگ تاکیدی", themeText: "رنگ متن",
+        btnExportTheme: "💾 دانلود قالب", btnImportTheme: "📂 بارگذاری قالب", btnResetTheme: "بازنشانی به پیش‌فرض",
+        optFormatMob: "📱 FlClash YAML (موبایل/کامپیوتر + TUN)", optFormatRout: "🌐 FlClash YAML (روتر - بدون TUN)",
+        optTplUlt: "💎 پروفایل نهایی (بهینه‌شده v77.0)", optTplBas: "⚡ پروفایل پایه (فقط پروکسی)", optTplCus: "🛠️ قالب سفارشی (جایگذاری کد)",
+        lblSni: "SNI (دامنه فریب):", lblFp: "Fingerprint (اثر انگشت):", lblFlow: "Flow (جریان XTLS):"
+    }
+};
         // ТВОЙ ОРИГИНАЛЬНЫЙ PROXY-ОБЪЕКТ (Никаких function $)
         const $ = new Proxy({}, { get: (t, id) => t[id] || (t[id] = document.getElementById(id)) });
 
@@ -1384,13 +1549,33 @@ rules:
                 document.querySelectorAll('textarea, pre[contenteditable]').forEach(el => autoResize(el));
             },
 
-            saveState() {
-                sessionStorage.setItem('flclash_net_proxies_v16_4', JSON.stringify(this.proxies));
-                this.saveEditorState();
+           saveState() {
+                try {
+                    // Пытаемся сохранить данные в память браузера
+                    sessionStorage.setItem('flclash_net_proxies_v16_4', JSON.stringify(this.proxies));
+                    this.saveEditorState();
+                } catch (e) {
+                    // Если память переполнена (ошибка квоты)
+                    if (e.name === 'QuotaExceededError' || e.message.includes('quota') || e.code === 22) {
+                        showToast("❌ Память переполнена! Загружено слишком много узлов.", "error");
+                        DiagnosticLogger.add('ERROR', `Лимит браузера (5MB) превышен при попытке сохранить ${this.proxies.length} узлов.`);
+                        
+                        // Опционально: можно принудительно обрезать массив, чтобы спасти приложение от зависания
+                        // this.proxies = this.proxies.slice(0, 300);
+                        // showToast("⚠️ Список обрезан до 300 узлов", "warning");
+                    } else {
+                        // Логируем любые другие непредвиденные ошибки
+                        DiagnosticLogger.add('ERROR', `Сбой сохранения состояния: ${e.message}`);
+                    }
+                }
             },
 
             saveEditorState() {
-                sessionStorage.setItem('flclash_net_output_edit_v16_4', $['outputEditor'].innerText);
+                try {
+                    sessionStorage.setItem('flclash_net_output_edit_v16_4', $['outputEditor'].innerText);
+                } catch (e) {
+                    DiagnosticLogger.add('ERROR', `Сбой сохранения редактора: ${e.message}`);
+                }
             },
 
             setFormat(val) { 
@@ -1678,171 +1863,272 @@ rules:
         }
 
         // ТВОЙ ОРИГИНАЛЬНЫЙ ПАРСЕР С ИСПРАВЛЕНИЯМИ
-        function parseData(rawText) {
-            let text = rawText.trim();
-            let added = 0;
+       // ====================================================================
+// УМНЫЙ ПАРСЕР (Поддержка JSON, YAML, Base64 и сырых ссылок)
+// ====================================================================
+function parseData(rawText) {
+    let text = rawText.trim();
+    let added = 0;
+    let duplicates = 0; // Теперь мы считаем дубликаты, чтобы не пугать пользователя
 
-            if (text.startsWith('{')) {
-                try {
-                    let json = JSON.parse(text);
-                    if (json.outbounds) {
-                        let validOutbounds = json.outbounds.filter(ob => !['freedom','blackhole','dns','direct','block','selector','urltest'].includes(ob.protocol || ob.type));
-                        let isMultiNode = validOutbounds.length > 1;
+    // Универсальная функция проверки и добавления узла.
+    // Если узел новый — добавляет. Если IP:PORT уже есть — считает как дубликат.
+    const addNodeIfUnique = (p) => {
+        if (!p || !p.server) return;
+        
+        const isDuplicate = AppState.proxies.some(x => x.server === p.server && x.port === p.port);
+        if (!isDuplicate) {
+            AppState.proxies.push(p);
+            added++;
+        } else {
+            duplicates++;
+        }
+    };
 
-                        json.outbounds.forEach(ob => {
-                            let pt = ob.protocol || ob.type;
-                            if (['freedom','blackhole','dns','direct','block','selector','urltest'].includes(pt)) return;
-                            
-                            let tag = ob.tag || "Node_" + Math.floor(Math.random()*1000);
-                            let nn = addGeoFlag(tag);
-                            let p = null;
+    // 1. ПАРСИНГ JSON (Xray / Sing-box конфигурации)
+    if (text.startsWith('{')) {
+        try {
+            let json = JSON.parse(text);
+            if (json.outbounds) {
+                json.outbounds.forEach(ob => {
+                    let pt = ob.protocol || ob.type;
+                    // Игнорируем системные outbounds (типа block, dns, direct)
+                    if (['freedom','blackhole','dns','direct','block','selector','urltest'].includes(pt)) return;
+                    
+                    let tag = ob.tag || "Node_" + Math.floor(Math.random() * 1000);
+                    let nn = addGeoFlag(tag);
+                    let p = null;
 
-                            if (ob.protocol === 'vless' && ob.settings?.vnext?.length > 0) {
-                                let vn = ob.settings.vnext[0]; let st = ob.streamSettings || {}; let re = st.realitySettings || {}; let tl = st.tlsSettings || {};
-                                p = { name: nn, type: "vless", server: vn.address, port: vn.port, uuid: vn.users?.[0]?.id, tls: st.security==='reality'||st.security==='tls', "reality-opts": st.security==='reality'?{"public-key":re.publicKey,"short-id":re.shortId||""}:null, sni: re.serverName||tl.serverName||vn.address, network: st.network||"tcp", flow: vn.users?.[0]?.flow||"", fp: re.fingerprint||tl.fingerprint||"chrome" };
-                            } 
-                            else if (ob.protocol === 'trojan' && ob.settings?.servers?.length > 0) {
-                                let sv = ob.settings.servers[0]; let st = ob.streamSettings || {}; let tl = st.tlsSettings || {};
-                                p = { name: nn, type: "trojan", server: sv.address, port: sv.port, password: sv.password, tls: st.security==='tls', sni: tl.serverName||sv.address, network: st.network||"tcp", fp: tl.fingerprint||"chrome" };
-                            }
-                            else if (ob.type === 'vless') {
-                                 let tl = ob.tls || {}; let re = tl.reality || {};
-                                 p = { name: nn, type: "vless", server: ob.server, port: ob.server_port, uuid: ob.uuid, tls: tl.enabled === true, "reality-opts": re.enabled?{"public-key":re.public_key,"short-id":re.short_id||""}:null, sni: tl.server_name||ob.server, network: ob.transport?.type||"tcp", flow: ob.flow||"", fp: tl.utls?.fingerprint||"chrome" };
-                            }
-                            else if (ob.type === 'trojan') {
-                                 let tl = ob.tls || {};
-                                 p = { name: nn, type: "trojan", server: ob.server, port: ob.server_port, password: ob.password, tls: tl.enabled === true, sni: tl.server_name||ob.server, network: ob.transport?.type||"tcp", fp: tl.utls?.fingerprint||"chrome" };
-                            }
-
-                            if(p) {
-                                let l = ``;
-                                if (p.type === 'vless') {
-                                    l = `vless://${p.uuid}@${p.server}:${p.port}?type=${p.network}&security=${p.tls?(p["reality-opts"]?'reality':'tls'):'none'}&sni=${p.sni}&fp=${p.fp}`;
-                                    if(p.flow) l += `&flow=${p.flow}`;
-                                    if(p["reality-opts"]) l += `&pbk=${p["reality-opts"]["public-key"]}&sid=${p["reality-opts"]["short-id"]}`;
-                                } else if (p.type === 'trojan') {
-                                    l = `trojan://${p.password}@${p.server}:${p.port}?type=${p.network}&security=${p.tls?'tls':'none'}&sni=${p.sni}&fp=${p.fp}`;
-                                }
-                                p.rawLink = l + `#${encodeURIComponent(p.name)}`;
-                                if (!AppState.proxies.some(x => x.server===p.server && x.port===p.port)) { AppState.proxies.push(p); added++; }
-                            }
-                        });
-                        if (added > 0) { $['input'].value=''; showToast(`+${added} JSON Nodes`); AppState.saveState(); renderCards(); return; }
-                    }
-                } catch(e) {}
-            }
-
-            if (text.includes('proxies:') && window.jsyaml) {
-                try {
-                    const doc = jsyaml.load(text);
-                    if (doc && doc.proxies && Array.isArray(doc.proxies)) {
-                        doc.proxies.forEach(cp => {
-                            let p = null;
-                            if (cp.type === 'vless' || cp.type === 'trojan') {
-                                p = {
-                                    name: addGeoFlag(cp.name || "Node"),
-                                    type: cp.type,
-                                    server: cp.server,
-                                    port: parseInt(cp.port),
-                                    network: cp.network || 'tcp',
-                                    tls: cp.tls === true,
-                                    sni: cp.sni || cp.server,
-                                    fp: cp['client-fingerprint'] || "chrome"
-                                };
-                                if (cp.type === 'vless') {
-                                    p.uuid = cp.uuid;
-                                    p.flow = cp.flow || "";
-                                    if (cp['reality-opts']) {
-                                        p["reality-opts"] = {
-                                            "public-key": cp['reality-opts']['public-key'],
-                                            "short-id": cp['reality-opts']['short-id'] || ""
-                                        };
-                                    }
-                                    p.rawLink = `vless://${p.uuid}@${p.server}:${p.port}?type=${p.network}&security=${p.tls?(p["reality-opts"]?'reality':'tls'):'none'}&sni=${p.sni}&fp=${p.fp}${p.flow ? '&flow='+p.flow : ''}${p["reality-opts"] ? '&pbk='+p["reality-opts"]["public-key"]+'&sid='+p["reality-opts"]["short-id"] : ''}#${encodeURIComponent(p.name)}`;
-                                } else if (cp.type === 'trojan') {
-                                    p.password = cp.password;
-                                    p.rawLink = `trojan://${p.password}@${p.server}:${p.port}?type=${p.network}&security=${p.tls?'tls':'none'}&sni=${p.sni}&fp=${p.fp}#${encodeURIComponent(p.name)}`;
-                                }
-                            }
-                            if (p && !AppState.proxies.some(x => x.server === p.server && x.port === p.port)) {
-                                AppState.proxies.push(p);
-                                added++;
-                            }
-                        });
-                        if (added > 0) { $['input'].value=''; showToast(`+${added} YAML Nodes`); AppState.saveState(); renderCards(); return; }
-                    }
-                } catch (e) {}
-            }
-
-            if (added === 0 && !text.includes('://') && !text.includes('{')) {
-                try { text = decodeURIComponent(escape(atob(text.replace(/-/g, '+').replace(/_/g, '/')))); } catch(e){}
-            }
-
-            text.split('\n').forEach(line => {
-                line = line.trim(); let p = null;
-                if(!line) return;
-                try {
-                    // ИСПРАВЛЕНА ПРОБЛЕМА С FIREFOX И ЭМОДЗИ (Маскировка под http для парсера)
-                    if (line.startsWith('vless://')) {
-                        const url = new URL(line.replace(/^vless:\/\//, 'http://')); const sp = new URLSearchParams(url.search);
-                        let nodeName = "VLESS";
-                        try { nodeName = decodeURIComponent(url.hash.slice(1)); } catch(e) { nodeName = url.hash.slice(1); }
-                        p = { name: addGeoFlag(nodeName), type: "vless", server: url.hostname, port: parseInt(url.port)||443, uuid: url.username, tls: sp.get('security') === 'reality' || sp.get('security') === 'tls', "reality-opts": sp.get('pbk') ? { "public-key": sp.get('pbk'), "short-id": sp.get('sid') || "" } : null, sni: sp.get('sni') || url.hostname, network: sp.get('type') || "tcp", flow: sp.get('flow') || "", fp: sp.get('fp') || "chrome", rawLink: line };
-                    } else if (line.startsWith('trojan://')) {
-                        let url = new URL(line.replace(/^trojan:\/\//, 'http://')); let sp = new URLSearchParams(url.search);
-                        let nodeName = "Trojan";
-                        try { nodeName = decodeURIComponent(url.hash.slice(1)); } catch(e) { nodeName = url.hash.slice(1); }
-                        p = { name: addGeoFlag(nodeName), type: "trojan", server: url.hostname, port: parseInt(url.port)||443, password: url.username, tls: true, sni: sp.get('sni')||url.hostname, network: sp.get('type')||"tcp", fp: sp.get('fp')||"chrome", rawLink: line };
+                    if (ob.protocol === 'vless' && ob.settings?.vnext?.length > 0) {
+                        let vn = ob.settings.vnext[0]; let st = ob.streamSettings || {}; let re = st.realitySettings || {}; let tl = st.tlsSettings || {};
+                        p = { name: nn, type: "vless", server: vn.address, port: vn.port, uuid: vn.users?.[0]?.id, tls: st.security==='reality'||st.security==='tls', "reality-opts": st.security==='reality'?{"public-key":re.publicKey,"short-id":re.shortId||""}:null, sni: re.serverName||tl.serverName||vn.address, network: st.network||"tcp", flow: vn.users?.[0]?.flow||"", fp: re.fingerprint||tl.fingerprint||"chrome" };
                     } 
+                    else if (ob.protocol === 'trojan' && ob.settings?.servers?.length > 0) {
+                        let sv = ob.settings.servers[0]; let st = ob.streamSettings || {}; let tl = st.tlsSettings || {};
+                        p = { name: nn, type: "trojan", server: sv.address, port: sv.port, password: sv.password, tls: st.security==='tls', sni: tl.serverName||sv.address, network: st.network||"tcp", fp: tl.fingerprint||"chrome" };
+                    }
+                    else if (ob.type === 'vless') {
+                        let tl = ob.tls || {}; let re = tl.reality || {};
+                        p = { name: nn, type: "vless", server: ob.server, port: ob.server_port, uuid: ob.uuid, tls: tl.enabled === true, "reality-opts": re.enabled?{"public-key":re.public_key,"short-id":re.short_id||""}:null, sni: tl.server_name||ob.server, network: ob.transport?.type||"tcp", flow: ob.flow||"", fp: tl.utls?.fingerprint||"chrome" };
+                    }
+                    else if (ob.type === 'trojan') {
+                        let tl = ob.tls || {};
+                        p = { name: nn, type: "trojan", server: ob.server, port: ob.server_port, password: ob.password, tls: tl.enabled === true, sni: tl.server_name||ob.server, network: ob.transport?.type||"tcp", fp: tl.utls?.fingerprint||"chrome" };
+                    }
 
-                    if (p && p.server && !AppState.proxies.some(x => x.server === p.server && x.port === p.port)) { AppState.proxies.push(p); added++; }
-                } catch(e){
-                    DiagnosticLogger.add('ERROR', `Ошибка разбора ссылки: ${e.message}`);
-                }
-            });
-
-            if (added > 0) { 
-                $['input'].value = ''; 
-                autoResize($['input']); 
-                showToast(`+${added} Узлов добавлено!`); 
-            } else {
-                showToast("Узлов не найдено", "warning");
+                    // Формируем rawLink для обратной конвертации
+                    if(p) {
+                        let l = ``;
+                        if (p.type === 'vless') {
+                            l = `vless://${p.uuid}@${p.server}:${p.port}?type=${p.network}&security=${p.tls?(p["reality-opts"]?'reality':'tls'):'none'}&sni=${p.sni}&fp=${p.fp}`;
+                            if(p.flow) l += `&flow=${p.flow}`;
+                            if(p["reality-opts"]) l += `&pbk=${p["reality-opts"]["public-key"]}&sid=${p["reality-opts"]["short-id"]}`;
+                        } else if (p.type === 'trojan') {
+                            l = `trojan://${p.password}@${p.server}:${p.port}?type=${p.network}&security=${p.tls?'tls':'none'}&sni=${p.sni}&fp=${p.fp}`;
+                        }
+                        p.rawLink = l + `#${encodeURIComponent(p.name)}`;
+                        addNodeIfUnique(p);
+                    }
+                });
             }
-            
-            AppState.saveState(); renderCards();
+        } catch(e) { DiagnosticLogger.add('ERROR', `Сбой парсинга JSON: ${e.message}`); }
+    }
+
+    // 2. ПАРСИНГ YAML (Clash конфигурации)
+    else if (text.includes('proxies:') && window.jsyaml) {
+        try {
+            const doc = jsyaml.load(text);
+            if (doc && doc.proxies && Array.isArray(doc.proxies)) {
+                doc.proxies.forEach(cp => {
+                    let p = null;
+                    if (cp.type === 'vless' || cp.type === 'trojan') {
+                        p = {
+                            name: addGeoFlag(cp.name || "Node"),
+                            type: cp.type,
+                            server: cp.server,
+                            port: parseInt(cp.port),
+                            network: cp.network || 'tcp',
+                            tls: cp.tls === true,
+                            sni: cp.sni || cp.server,
+                            fp: cp['client-fingerprint'] || "chrome"
+                        };
+                        if (cp.type === 'vless') {
+                            p.uuid = cp.uuid;
+                            p.flow = cp.flow || "";
+                            if (cp['reality-opts']) {
+                                p["reality-opts"] = { "public-key": cp['reality-opts']['public-key'], "short-id": cp['reality-opts']['short-id'] || "" };
+                            }
+                            p.rawLink = `vless://${p.uuid}@${p.server}:${p.port}?type=${p.network}&security=${p.tls?(p["reality-opts"]?'reality':'tls'):'none'}&sni=${p.sni}&fp=${p.fp}${p.flow ? '&flow='+p.flow : ''}${p["reality-opts"] ? '&pbk='+p["reality-opts"]["public-key"]+'&sid='+p["reality-opts"]["short-id"] : ''}#${encodeURIComponent(p.name)}`;
+                        } else if (cp.type === 'trojan') {
+                            p.password = cp.password;
+                            p.rawLink = `trojan://${p.password}@${p.server}:${p.port}?type=${p.network}&security=${p.tls?'tls':'none'}&sni=${p.sni}&fp=${p.fp}#${encodeURIComponent(p.name)}`;
+                        }
+                    }
+                    addNodeIfUnique(p);
+                });
+            }
+        } catch (e) { DiagnosticLogger.add('ERROR', `Сбой парсинга YAML: ${e.message}`); }
+    }
+
+    // 3. ПАРСИНГ СЫРЫХ ССЫЛОК И BASE64 (Если это не JSON и не YAML)
+    else {
+        // Улучшенная защита: Проверяем, является ли текст Base64 подпиской
+        // Если в тексте нет явных признаков ссылок (://), пытаемся декодировать
+        if (!text.includes('://')) {
+            try { 
+                let b64 = text.replace(/-/g, '+').replace(/_/g, '/');
+                while (b64.length % 4) b64 += '='; // Восстанавливаем паддинг, иначе atob падает
+                text = decodeURIComponent(escape(atob(b64))); 
+            } catch(e) {
+                // Если не получилось (возможно это просто битый текст), продолжаем парсить как есть
+                DiagnosticLogger.add('SYSTEM', 'Текст не является валидным Base64');
+            }
         }
 
-        async function pingNode(index, btn) {
-            const p = AppState.proxies[index]; btn.textContent = "⏳"; const start = performance.now();
-            const ac = new AbortController(); const tid = setTimeout(()=>ac.abort(), 3000);
+        // Разбиваем текст по строкам и ищем URI ссылки (vless://, trojan://)
+        text.split('\n').forEach(line => {
+            line = line.trim(); 
+            let p = null;
+            if (!line) return;
+            
             try {
-                await fetch(`https://${p.server}:${p.port}`, {mode:'no-cors', cache:'no-store', signal:ac.signal});
-                clearTimeout(tid); const ms = Math.round(performance.now()-start);
-                btn.textContent = ms+"ms"; btn.style.color = "var(--success-color)"; p.lastPing = ms;
+                // ИСПРАВЛЕНА ПРОБЛЕМА С FIREFOX И ЭМОДЗИ (Маскировка под http для парсера)
+                if (line.startsWith('vless://')) {
+                    const url = new URL(line.replace(/^vless:\/\//, 'http://')); 
+                    const sp = new URLSearchParams(url.search);
+                    let nodeName = "VLESS";
+                    
+                    try { nodeName = decodeURIComponent(url.hash.slice(1)) || "VLESS"; } catch(e) { nodeName = url.hash.slice(1) || "VLESS"; }
+                    
+                    p = { 
+                        name: addGeoFlag(nodeName), 
+                        type: "vless", 
+                        server: url.hostname, 
+                        port: parseInt(url.port) || 443, 
+                        uuid: url.username, 
+                        tls: sp.get('security') === 'reality' || sp.get('security') === 'tls', 
+                        "reality-opts": sp.get('pbk') ? { "public-key": sp.get('pbk'), "short-id": sp.get('sid') || "" } : null, 
+                        sni: sp.get('sni') || url.hostname, 
+                        network: sp.get('type') || "tcp", 
+                        flow: sp.get('flow') || "", 
+                        fp: sp.get('fp') || "chrome", 
+                        rawLink: line 
+                    };
+                } else if (line.startsWith('trojan://')) {
+                    let url = new URL(line.replace(/^trojan:\/\//, 'http://')); 
+                    let sp = new URLSearchParams(url.search);
+                    let nodeName = "Trojan";
+                    
+                    try { nodeName = decodeURIComponent(url.hash.slice(1)) || "Trojan"; } catch(e) { nodeName = url.hash.slice(1) || "Trojan"; }
+                    
+                    p = { 
+                        name: addGeoFlag(nodeName), 
+                        type: "trojan", 
+                        server: url.hostname, 
+                        port: parseInt(url.port) || 443, 
+                        password: url.username, 
+                        tls: true, 
+                        sni: sp.get('sni') || url.hostname, 
+                        network: sp.get('type') || "tcp", 
+                        fp: sp.get('fp') || "chrome", 
+                        rawLink: line 
+                    };
+                } 
+
+                addNodeIfUnique(p);
+            } catch(e) {
+                DiagnosticLogger.add('ERROR', `Ошибка разбора ссылки: ${e.message}`);
+            }
+        });
+    }
+
+    // 4. ФИНАЛЬНЫЙ ВЕРДИКТ И УВЕДОМЛЕНИЯ
+    if (added > 0) { 
+        $['input'].value = ''; 
+        autoResize($['input']); 
+        
+        // Если добавились новые узлы, но какие-то были отброшены как дубли
+        if (duplicates > 0) {
+            showToast(`+${added} добавлено (пропущено ${duplicates} дублей)`);
+        } else {
+            showToast(`+${added} Узлов добавлено!`);
+        }
+    } else if (duplicates > 0) {
+        // Если новых узлов 0, но дубликаты были найдены (уже есть в базе)
+        $['input'].value = ''; 
+        showToast(`Узлы уже есть в списке (дубликаты: ${duplicates})`, "warning");
+    } else {
+        // Реально ничего не найдено
+        showToast("Узлов не найдено (или неверный формат)", "error");
+    }
+    
+    // Сохраняем состояние и рендерим карточки только если что-то изменилось
+    if (added > 0) {
+        AppState.saveState(); 
+        renderCards();
+    }
+}
+
+        // ====================================================================
+        // СИСТЕМА ПИНГОВАНИЯ (Проверка доступности узлов)
+        // ====================================================================
+        async function pingNode(index, btn) {
+            const p = AppState.proxies[index]; 
+            btn.textContent = "⏳"; 
+            const start = performance.now();
+            const ac = new AbortController(); 
+            const tid = setTimeout(() => ac.abort(), 3000); // Таймаут 3 секунды
+            
+            try {
+                await fetch(`https://${p.server}:${p.port}`, { mode: 'no-cors', cache: 'no-store', signal: ac.signal });
+                clearTimeout(tid); 
+                const ms = Math.round(performance.now() - start);
+                btn.textContent = ms + "ms"; 
+                btn.style.color = "var(--success-color)"; 
+                p.lastPing = ms;
             } catch (e) {
                 clearTimeout(tid);
-                if (p.type==='vless' || p.type==='trojan') { btn.textContent = "🛡️ Stealth"; btn.style.color = "var(--primary-color)"; p.lastPing = 99998; }
-                else { btn.textContent = "Err"; btn.style.color = "var(--danger-color)"; p.lastPing = 99999; }
+                // VLESS и Trojan часто не отвечают на прямые HTTP запросы, поэтому они Stealth, а не Err
+                if (p.type === 'vless' || p.type === 'trojan') { 
+                    btn.textContent = "🛡️ Stealth"; 
+                    btn.style.color = "var(--primary-color)"; 
+                    p.lastPing = 99998; 
+                } else { 
+                    btn.textContent = "Err"; 
+                    btn.style.color = "var(--danger-color)"; 
+                    p.lastPing = 99999; 
+                }
             }
             AppState.saveState();
         }
 
         async function pingAll() {
-            if (!AppState.proxies.length) return; showToast("⏳ Тестирование...");
+            if (!AppState.proxies.length) return; 
+            showToast("⏳ Тестирование...");
             const btns = document.querySelectorAll('.btn-ping');
             await Promise.all(AppState.proxies.map((_, i) => btns[i] ? pingNode(i, btns[i]) : Promise.resolve()));
             showToast("✅ Завершено!");
         }
 
+        // ====================================================================
+        // ЛОГИКА РЕНДЕРИНГА И ВЗАИМОДЕЙСТВИЯ С КАРТОЧКАМИ УЗЛОВ
+        // ====================================================================
         function toggleSelectAll() {
             const state = $['selectAllCb'].checked;
-            document.querySelectorAll('.proxy-checkbox').forEach(cb => { cb.checked = state; handleCheckboxChange(cb); });
+            document.querySelectorAll('.proxy-checkbox').forEach(cb => { 
+                cb.checked = state; 
+                handleCheckboxChange(cb); 
+            });
         }
-        function handleCheckboxChange(cb) { cb.closest('.proxy-card').classList.toggle('selected', cb.checked); }
+        
+        function handleCheckboxChange(cb) { 
+            cb.closest('.proxy-card').classList.toggle('selected', cb.checked); 
+        }
 
         function renderCards() {
             const cnt = $['cardsContainer'];
-            cnt.innerHTML = ''; $['selectAllCb'].checked = false;
+            cnt.innerHTML = ''; 
+            $['selectAllCb'].checked = false;
 
             if (AppState.proxies.length > 0) {
                 $['cardsToolbar'].style.display = "flex";
@@ -1850,48 +2136,61 @@ rules:
                 
                 const frag = document.createDocumentFragment();
                 AppState.proxies.forEach((p, i) => {
-                    let tc = "type-" + p.type;
-                    let pl = p.lastPing===undefined ? "⚡" : (p.lastPing===99999 ? "Err" : (p.lastPing===99998 ? "🛡️ Stealth" : p.lastPing+"ms"));
-                    let pc = p.lastPing===undefined ? "var(--text-color)" : (p.lastPing===99999 ? "var(--danger-color)" : (p.lastPing===99998 ? "var(--primary-color)" : "var(--success-color)"));
+                    let typeClass = "type-" + p.type;
+                    let pingLabel = p.lastPing === undefined ? "⚡" : (p.lastPing === 99999 ? "Err" : (p.lastPing === 99998 ? "🛡️ Stealth" : p.lastPing + "ms"));
+                    let pingColor = p.lastPing === undefined ? "var(--text-color)" : (p.lastPing === 99999 ? "var(--danger-color)" : (p.lastPing === 99998 ? "var(--primary-color)" : "var(--success-color)"));
                     
-                    const div = document.createElement('div'); div.className = 'proxy-card';
+                    const div = document.createElement('div'); 
+                    div.className = 'proxy-card';
                     div.innerHTML = `
                         <input type="checkbox" class="proxy-checkbox" onchange="handleCheckboxChange(this)">
                         <div class="card-actions">
-                            <button class="btn-card btn-ping" style="color:${pc}" onclick="pingNode(${i},this)">${pl}</button>
+                            <button class="btn-card btn-ping" style="color:${pingColor}" onclick="pingNode(${i},this)">${pingLabel}</button>
                             <button class="btn-card" onclick="showQR(${i})">📱</button>
                             <button class="btn-card" onclick="copyLink(${i})">🔗</button>
                             <button class="btn-card remove" onclick="removeProxy(${i})">✖</button>
                         </div>
                         <div class="proxy-name" contenteditable="true" spellcheck="false" onblur="renameProxy(${i},this.innerText)">${p.name}</div>
-                        <div class="proxy-detail"><span class="proxy-type ${tc}">${p.type}</span> ${p.server}:${p.port}</div>
+                        <div class="proxy-detail"><span class="proxy-type ${typeClass}">${p.type}</span> ${p.server}:${p.port}</div>
                     `;
                     frag.appendChild(div);
                 });
                 cnt.appendChild(frag);
                 cnt.style.display = 'grid';
             } else {
-                cnt.style.display = 'none'; $['cardsToolbar'].style.display = "none";
+                cnt.style.display = 'none'; 
+                $['cardsToolbar'].style.display = "none";
             }
             updateOutput();
         }
 
-        function removeProxy(i) { AppState.proxies.splice(i,1); AppState.saveState(); renderCards(); }
-        function renameProxy(i, nn) {
-            nn = nn.trim().replace(/\n/g, ''); 
-            if(nn){ 
-                AppState.proxies[i].name = nn; 
+        function removeProxy(i) { 
+            AppState.proxies.splice(i, 1); 
+            AppState.saveState(); 
+            renderCards(); 
+        }
+        
+        function renameProxy(i, newName) {
+            newName = newName.trim().replace(/\n/g, ''); 
+            if(newName) { 
+                AppState.proxies[i].name = newName; 
                 try {
-                    let u = new URL(AppState.proxies[i].rawLink.replace(/^[a-zA-Z0-9]+:\/\//, 'http://')); 
-                    u.hash = encodeURIComponent(nn); 
-                    AppState.proxies[i].rawLink = AppState.proxies[i].rawLink.split('#')[0] + u.hash;
-                } catch(e){} 
+                    let urlObj = new URL(AppState.proxies[i].rawLink.replace(/^[a-zA-Z0-9]+:\/\//, 'http://')); 
+                    urlObj.hash = encodeURIComponent(newName); 
+                    AppState.proxies[i].rawLink = AppState.proxies[i].rawLink.split('#')[0] + urlObj.hash;
+                } catch(e) {} 
             }
-            AppState.saveState(); updateOutput();
+            AppState.saveState(); 
+            updateOutput();
         }
 
+        // ====================================================================
+        // МАССОВОЕ РЕДАКТИРОВАНИЕ (Mass Edit)
+        // ====================================================================
         function openMassEditModal() {
-            if (!document.querySelectorAll('.proxy-checkbox:checked').length) return showToast("Сначала выберите узлы!", "warning");
+            if (!document.querySelectorAll('.proxy-checkbox:checked').length) {
+                return showToast("Сначала выберите узлы!", "warning");
+            }
             openModal('massEditModal');
         }
         
@@ -1903,27 +2202,36 @@ rules:
 
             document.querySelectorAll('.proxy-checkbox').forEach((cb, i) => {
                 if (cb.checked) {
-                    let p = AppState.proxies[i]; let ch = false;
-                    if(sni){ p.sni=sni; ch=true; } 
-                    if(fp){ p.fp=fp; ch=true; } 
-                    if(flow){ p.flow = flow === 'none' ? "" : flow; ch=true; }
+                    let p = AppState.proxies[i]; 
+                    let isChanged = false;
                     
-                    if(ch && ['vless','trojan','hysteria2'].includes(p.type)) {
+                    if(sni) { p.sni = sni; isChanged = true; } 
+                    if(fp) { p.fp = fp; isChanged = true; } 
+                    if(flow) { p.flow = flow === 'none' ? "" : flow; isChanged = true; }
+                    
+                    if(isChanged && ['vless', 'trojan', 'hysteria2'].includes(p.type)) {
                         try { 
                             let u = new URL(p.rawLink.replace(/^[a-zA-Z0-9]+:\/\//, 'http://')); 
                             let sp = new URLSearchParams(u.search); 
-                            if(sni) sp.set('sni',sni); 
-                            if(fp) sp.set('fp',fp); 
-                            if(flow){flow==='none' ? sp.delete('flow') : sp.set('flow',flow);} 
+                            
+                            if(sni) sp.set('sni', sni); 
+                            if(fp) sp.set('fp', fp); 
+                            if(flow) { flow === 'none' ? sp.delete('flow') : sp.set('flow', flow); } 
+                            
                             u.search = sp.toString(); 
                             p.rawLink = p.rawLink.split('://')[0] + '://' + u.toString().split('://')[1]; 
-                        }catch(e){}
+                        } catch(e) {}
                         count++;
                     }
                 }
             });
+            
             closeModal('massEditModal');
-            if (count > 0) { AppState.saveState(); renderCards(); showToast(`✅ Изменено: ${count}`); }
+            if (count > 0) { 
+                AppState.saveState(); 
+                renderCards(); 
+                showToast(`✅ Изменено: ${count}`); 
+            }
         }
 
         function showQR(i) {
@@ -1932,76 +2240,138 @@ rules:
             openModal('qrModal');
         }
 
-        // ТВОЙ ОРИГИНАЛЬНЫЙ ГЕНЕРАТОР С ИСПРАВЛЕНИЕМ БАЗОВОГО ПРОФИЛЯ
+        // ====================================================================
+        // ГЕНЕРАЦИЯ ИТОГОВОГО КОНФИГА (YAML / JSON)
+        // ====================================================================
         function updateOutput() {
-            const f = AppState.exportFormat;
-            const mode = AppState.templateMode;
-            const out = $['outputEditor'];
+            const exportFormat = AppState.exportFormat;
+            const templateMode = AppState.templateMode;
+            const outputElement = $['outputEditor'];
             
-            let py = "proxies:\n" + (AppState.proxies.length ? "" : " []\n");
+            let yamlProxies = "proxies:\n" + (AppState.proxies.length ? "" : " []\n");
+            
             AppState.proxies.forEach(p => {
-                py += `  - name: "${p.name}"\n    server: ${p.server}\n    port: ${p.port}\n    type: ${p.type}\n`;
+                yamlProxies += `  - name: "${p.name}"\n    server: ${p.server}\n    port: ${p.port}\n    type: ${p.type}\n`;
                 if(p.type === 'vless' || p.type === 'trojan'){
-                    py += `    udp: true\n    network: ${p.network||'tcp'}\n`;
-                    if(p.type === 'vless') py += `    uuid: ${p.uuid}\n`;
-                    if(p.type === 'trojan') py += `    password: ${p.password}\n`;
-                    if(p.flow) py += `    flow: ${p.flow}\n`;
+                    yamlProxies += `    udp: true\n    network: ${p.network || 'tcp'}\n`;
+                    if(p.type === 'vless') yamlProxies += `    uuid: ${p.uuid}\n`;
+                    if(p.type === 'trojan') yamlProxies += `    password: ${p.password}\n`;
+                    if(p.flow) yamlProxies += `    flow: ${p.flow}\n`;
                     if (p.tls) {
-                        py += `    tls: true\n    sni: ${p.sni}\n    client-fingerprint: ${p.fp||'chrome'}\n`; 
-                        if(p["reality-opts"]) py+=`    reality-opts:\n      public-key: ${p["reality-opts"]["public-key"]}\n      short-id: ${p["reality-opts"]["short-id"]}\n`;
+                        yamlProxies += `    tls: true\n    sni: ${p.sni}\n    client-fingerprint: ${p.fp || 'chrome'}\n`; 
+                        if(p["reality-opts"]) {
+                            yamlProxies += `    reality-opts:\n      public-key: ${p["reality-opts"]["public-key"]}\n      short-id: ${p["reality-opts"]["short-id"]}\n`;
+                        }
                     } 
                 }
             });
             
-            const pn = AppState.proxies.length ? AppState.proxies.map(p => `      - "${p.name}"`).join('\n') : "      - DIRECT";
+            const proxyNames = AppState.proxies.length ? AppState.proxies.map(p => `      - "${p.name}"`).join('\n') : "      - DIRECT";
             
-            if (f.includes('clash')) {
-                if (mode === 'custom') {
-                    let ct = $['customTemplateInput'].value;
-                    if (ct) out.innerText = ct.replace(/\{\{PROXIES_YAML\}\}/g, py).replace(/\{\{PROXY_NAMES\}\}/g, pn);
+            if (exportFormat.includes('clash')) {
+                let tunConfig = exportFormat === 'clash_router' 
+                    ? `tun:\n  enable: false` 
+                    : `tun:\n  enable: true\n  stack: mixed\n  device: Mihomo\n  gso: true\n  udp-timeout: 30\n  dns-hijack:\n    - any:53\n    - tcp://any:53\n  auto-route: true\n  auto-detect-interface: true\n  strict-route: true\n  endpoint-independent-nat: true\n  mtu: 1420`;
+                
+                if (templateMode === 'custom') {
+                    let customTpl = $['customTemplateInput'].value;
+                    if (customTpl) outputElement.innerText = customTpl.replace(/\{\{PROXIES_YAML\}\}/g, yamlProxies).replace(/\{\{PROXY_NAMES\}\}/g, proxyNames);
                 } 
-                else if (mode === 'basic') {
-                    // ИСПРАВЛЕНО: Базовый профиль теперь чистый, без правил из Крымского
-                    let tc = f==='clash_router' ? `tun:\n  enable: false` : `tun:\n  enable: true\n  stack: mixed\n  device: Mihomo\n  gso: true\n  udp-timeout: 30\n  dns-hijack:\n    - any:53\n    - tcp://any:53\n  auto-route: true\n  auto-detect-interface: true\n  strict-route: true\n  endpoint-independent-nat: true\n  mtu: 1420`;
-                    out.innerText = `mode: rule\nallow-lan: true\nmixed-port: 7890\n\n${tc}\n\n${py}\nproxy-groups:\n  - name: "Proxy"\n    type: select\n    proxies:\n      - "Auto"\n${pn}\n  - name: "Auto"\n    type: url-test\n    url: "https://cp.cloudflare.com/generate_204"\n    interval: 300\n    proxies:\n${pn}\nrules:\n  - GEOIP,RU,DIRECT,no-resolve\n  - MATCH,Proxy`;
+                else if (templateMode === 'basic') {
+                    outputElement.innerText = `mode: rule\nallow-lan: true\nmixed-port: 7890\n\n${tunConfig}\n\n${yamlProxies}\nproxy-groups:\n  - name: "Proxy"\n    type: select\n    proxies:\n      - "Auto"\n${proxyNames}\n  - name: "Auto"\n    type: url-test\n    url: "https://cp.cloudflare.com/generate_204"\n    interval: 300\n    proxies:\n${proxyNames}\nrules:\n  - GEOIP,RU,DIRECT,no-resolve\n  - MATCH,Proxy`;
                 }
                 else {
-                    let tc = f==='clash_router' ? `tun:\n  enable: false` : `tun:\n  enable: true\n  stack: mixed\n  device: Mihomo\n  gso: true\n  udp-timeout: 30\n  dns-hijack:\n    - any:53\n    - tcp://any:53\n  auto-route: true\n  auto-detect-interface: true\n  strict-route: true\n  endpoint-independent-nat: true\n  mtu: 1420`;
-                    let pg = `proxy-groups:\n  - name: "🚀 Выбор сервера"\n    type: select\n    proxies:\n      - "♻️ Автовыбор"\n      - "🤖 Premium AI (Auto)"\n${pn}\n\n  - name: "♻️ Автовыбор"\n    type: url-test\n    url: "https://cp.cloudflare.com/generate_204"\n    interval: 180\n    tolerance: 30\n    timeout: 5000\n    lazy: true\n    exclude-filter: "(?i)Россия|Russia|Украина|Ukraine|Молдова|Moldova|РФ|России"\n    proxies:\n${pn}\n\n  - name: "🤖 Premium AI (Auto)"\n    type: url-test\n    url: "https://cp.cloudflare.com/generate_204"\n    interval: 180\n    tolerance: 30\n    timeout: 5000\n    lazy: true\n    proxies:\n${pn}`;
-                    out.innerText = `${AppState.baseYaml}\n\n${tc}\n\n${py}\n${pg}\n\n${AppState.rulesYaml}`;
+                    let proxyGroups = `proxy-groups:\n  - name: "🚀 Выбор сервера"\n    type: select\n    proxies:\n      - "♻️ Автовыбор"\n      - "🤖 Premium AI (Auto)"\n${proxyNames}\n\n  - name: "♻️ Автовыбор"\n    type: url-test\n    url: "https://cp.cloudflare.com/generate_204"\n    interval: 180\n    tolerance: 30\n    timeout: 5000\n    lazy: true\n    exclude-filter: "(?i)Россия|Russia|Украина|Ukraine|Молдова|Moldova|РФ|России"\n    proxies:\n${proxyNames}\n\n  - name: "🤖 Premium AI (Auto)"\n    type: url-test\n    url: "https://cp.cloudflare.com/generate_204"\n    interval: 180\n    tolerance: 30\n    timeout: 5000\n    lazy: true\n    proxies:\n${proxyNames}`;
+                    outputElement.innerText = `${AppState.baseYaml}\n\n${tunConfig}\n\n${yamlProxies}\n${proxyGroups}\n\n${AppState.rulesYaml}`;
                 }
             } else {
-                out.innerText = JSON.stringify({ proxies: AppState.proxies }, null, 2);
+                // Если выбран JSON (Sing-box/Xray)
+                outputElement.innerText = JSON.stringify({ proxies: AppState.proxies }, null, 2);
             }
             
-            autoResize(out);
+            autoResize(outputElement);
             AppState.saveEditorState();
         }
 
-        function validateOutput(content, format) {
-            if (content.includes("⚠️ ОШИБКА") || content.includes("❌ Ошибка")) { showToast("Исправьте шаблон!", "error"); return false; }
-            if (format.includes('clash')) {
-                if (!content.includes('proxies:')) { showToast("YAML сломан: нет proxies:", "error"); return false; }
-                if (!content.includes('rules:')) { showToast("YAML сломан: нет rules:", "error"); return false; }
-            } else {
-                try { JSON.parse(content); } catch (e) { showToast("Ошибка синтаксиса JSON", "error"); DiagnosticLogger.add('ERROR', `Ошибка JSON: ${e.message}`); return false; }
-            }
-            return true;
-        }
+        // ====================================================================
+        // ВАЛИДАЦИЯ И ЭКСПОРТ РЕЗУЛЬТАТОВ (С защитой от скрытых символов)
+        // ====================================================================
+     function validateOutput(content, format) {
+    // Очищаем от неразрывных пробелов, но сохраняем оригинальную длину для проверки
+    const cleanContent = content.replace(/\u00A0/g, ' ').trim();
+    
+    // 1. Разрешаем копировать пустое поле без ошибок
+    if (!cleanContent) {
+        return true; 
+    }
 
+    // 2. Проверка на системные ошибки в тексте
+    if (cleanContent.includes("⚠️ ОШИБКА") || cleanContent.includes("❌ Ошибка")) { 
+        showToast("Исправьте шаблон!", "error"); 
+        return false; 
+    }
+    
+    // 3. Строгая валидация YAML (только для Clash)
+    if (format && format.includes('clash')) {
+        if (!cleanContent.includes('proxies:')) { 
+            showToast("YAML сломан: нет proxies:", "error"); 
+            return false; 
+        }
+        if (!cleanContent.includes('rules:')) { 
+            showToast("YAML сломан: нет rules:", "error"); 
+            return false; 
+        }
+    } 
+    // 4. Умная валидация JSON 
+    // Проверяем, только если выбран формат JSON ИЛИ текст начинается со скобок { или [
+    // Это позволяет спокойно копировать обычный текст, Base64 и TXT-ссылки!
+    else if ((format && format.includes('json')) || cleanContent.startsWith('{') || cleanContent.startsWith('[')) {
+        try { 
+            JSON.parse(cleanContent); 
+        } catch (e) { 
+            showToast("Ошибка синтаксиса JSON", "error"); 
+            DiagnosticLogger.add('ERROR', `Ошибка JSON: ${e.message}`); 
+            return false; 
+        }
+    }
+    
+    // Все остальные сценарии (обычный текст, ссылки) считаются валидными
+    return true;
+}
+
+        // Используем очищенный текст для скачивания файла
         function downloadFile() {
-            const c = $['outputEditor'].innerText;
-            const f = AppState.exportFormat;
-            if (!validateOutput(c, f)) return;
-            const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([c], { type: f.includes('clash')?'text/yaml':'application/json' }));
-            a.download = `Config_v${APP_VERSION}.${f.includes('clash')?'yaml':'json'}`; a.click();
+            // textContent безопаснее innerText (не тянет лишние HTML-переносы)
+            let content = $['outputEditor'].textContent || $['outputEditor'].innerText;
+            content = content.replace(/\u00A0/g, ' '); // Финальная очистка
+            const format = AppState.exportFormat;
+            
+            if (!validateOutput(content, format)) return;
+            
+            const a = document.createElement('a'); 
+            const blob = new Blob([content], { type: format.includes('clash') ? 'text/yaml' : 'application/json' });
+            a.href = URL.createObjectURL(blob);
+            a.download = `Config_v${APP_VERSION}.${format.includes('clash') ? 'yaml' : 'json'}`; 
+            a.click();
+            
+            setTimeout(() => { URL.revokeObjectURL(a.href); }, 1000); // Предотвращение утечек памяти
         }
 
-        function copyResult() {
-            const c = $['outputEditor'].innerText;
-            const f = AppState.exportFormat;
-            if (!validateOutput(c, f)) return;
-            navigator.clipboard.writeText(c); showToast("✅ Скопировано!");
+        // Асинхронное копирование в буфер (устойчиво к блокировкам браузера)
+        async function copyResult() {
+            let content = $['outputEditor'].textContent || $['outputEditor'].innerText;
+            content = content.replace(/\u00A0/g, ' ');
+            const format = AppState.exportFormat;
+            
+            if (!validateOutput(content, format)) return;
+            
+            try {
+                await navigator.clipboard.writeText(content);
+                showToast("✅ Скопировано!");
+            } catch (error) {
+                showToast("❌ Ошибка буфера обмена", "error");
+                DiagnosticLogger.add('ERROR', `Сбой буфера: ${error.message}`);
+            }
         }
     </script>
 </body>
