@@ -1,4 +1,4 @@
-[English](/README.en.md) | [Русский](/README.md) | [简体中文](/README.zh.md)
+[🇺🇸 English](/README.en.md) | [🇷🇺 Русский](/README.md) | [🇨🇳 简体中文](/README.zh.md) | [🇹🇼 繁體中文](/README.zh-TW.md) | [🇮🇷 فارسی](/README.fa.md) | [🇪🇸 Español](/README.es.md)
 
 <p align="center">
   <a href="https://github.com/jinxpil/flclash-converter/releases">
