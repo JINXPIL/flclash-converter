@@ -44,16 +44,20 @@
 
 ### 🤖 Android
 - [FlClash](https://github.com/chen08209/FlClash)
+- [Karing](https://github.com/KaringX/karing)
 - [Clash Meta for Android](https://github.com/MetaCubeX/ClashMetaForAndroid)
 - [FlClashX](https://github.com/pluralplay/FlClashX)
 
 ### 🍏 iOS
+- [Karing](https://apps.apple.com/us/app/karing/id6472431552)
 - [Clash.MI](https://apps.apple.com/us/app/clash-mi/id6744321968)
 - [Stash](https://apps.apple.com/us/app/stash-rule-based-proxy/id1596063349)
 
 ### 💻 PC (Windows / macOS / Linux)
+- [Karing](https://github.com/KaringX/karing)
 - [FlClash](https://github.com/chen08209/FlClash)
 - [Clash Verge Rev](https://github.com/clash-verge-rev/clash-verge-rev)
+
 
 ## 🔥 核心功能
 
