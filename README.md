@@ -38,6 +38,22 @@
 
 Или скачайте последний `index.html` из раздела [Releases](https://github.com/jinxpil/flclash-converter/releases) и откройте в браузере. Работает в полном офлайне.
 
+## 📥 Рекомендуемые клиенты
+
+Для использования сгенерированных профилей и маршрутизации рекомендуем использовать следующие приложения:
+
+### 🤖 Android
+- [FlClash](https://github.com/chen08209/FlClash)
+- [Clash Meta for Android](https://github.com/MetaCubeX/ClashMetaForAndroid)
+- [FlClashX](https://github.com/pluralplay/FlClashX)
+
+### 🍏 iOS
+- [Clash.MI](https://apps.apple.com/us/app/clash-mi/id6744321968?l=ru)
+
+### 💻 ПК (Windows / macOS / Linux)
+- [FlClash](https://github.com/chen08209/FlClash)
+- [Clash Verge Rev](https://github.com/clash-verge-rev/clash-verge-rev)
+
 ## 🔥 Главные возможности
 
 - **Zero-Trust Security:** Никаких сторонних серверов. Данные обрабатываются в оперативной памяти и уничтожаются при закрытии вкладки.
