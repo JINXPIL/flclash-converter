@@ -18,12 +18,12 @@
   </a>
 </p>
 
-**Network Builder** is an advanced 100% local web tool (Single-File HTML / Vanilla JS) designed for managing, testing, and converting proxy servers. It provides a user-friendly interface to parse nodes from any source and instantly generate highly optimized routing profiles for FlClash, Nekobox (Xray), and Sing-box.
+**Network Builder** is an advanced 100% local web tool (Single-File HTML / Vanilla JS) for managing, testing, and converting proxy servers. It provides a convenient interface for parsing nodes from any source and instantly generating optimized routing profiles for FlClash, Nekobox (Xray), and Sing-box.
 
 > [!IMPORTANT]
-> **Educational Purposes Only.** This project was created exclusively for research and educational purposes. Please do not use it for illegal activities. The author assumes no responsibility for any misuse of this tool. All processing is done strictly locally in your browser (Zero-Trust).
+> **For educational purposes only.** This project was created exclusively for research purposes. Please do not use it for illegal activities. The author is not responsible for any misuse of this tool. All calculations are performed strictly locally in your browser (Zero-Trust).
 
-As a powerful networking tool, Network Builder delivers extreme performance without relying on backend servers, supports over 10 protocols, and offers deep UI customization.
+As a powerful networking tool, Network Builder delivers top performance without backend servers, supports over 10 protocols, and offers deep UI customization.
 
 ### 📸 Interface
 
@@ -34,18 +34,35 @@ As a powerful networking tool, Network Builder delivers extreme performance with
 
 ## 🚀 Quick Start
 
-👉 **[OPEN WEB VERSION](https://jinxpil.github.io/flclash-converter/)** *(Works as a PWA, can be installed to your home screen)*
+👉 **[OPEN WEB VERSION](https://jinxpil.github.io/flclash-converter/)** *(Works as a PWA, can be added to your smartphone's home screen)*
 
 Or download the latest `index.html` from the [Releases](https://github.com/jinxpil/flclash-converter/releases) section and open it in your browser. Works completely offline.
 
+## 📥 Recommended Clients
+
+To use the generated profiles and routing, we recommend the following applications:
+
+### 🤖 Android
+- [FlClash](https://github.com/chen08209/FlClash)
+- [Clash Meta for Android](https://github.com/MetaCubeX/ClashMetaForAndroid)
+- [FlClashX](https://github.com/pluralplay/FlClashX)
+
+### 🍏 iOS
+- [Clash.MI](https://apps.apple.com/us/app/clash-mi/id6744321968)
+- [Stash](https://apps.apple.com/us/app/stash-rule-based-proxy/id1596063349)
+
+### 💻 PC (Windows / macOS / Linux)
+- [FlClash](https://github.com/chen08209/FlClash)
+- [Clash Verge Rev](https://github.com/clash-verge-rev/clash-verge-rev)
+
 ## 🔥 Key Features
 
-- **Zero-Trust Security:** No third-party servers. Data is processed in your RAM and permanently wiped upon tab closure.
-- **Omni-Parser:** Instant Base64 subscription decoding, JSON config reverse-engineering, and Drag & Drop file support.
-- **Mass Editor & Smart GeoIP:** Batch edit parameters (SNI, Flow, Fingerprint) and auto-resolve node geolocations with country flags (🇫🇮, 🇩🇪).
+- **Zero-Trust Security:** No third-party servers involved. Data is processed in RAM and destroyed when the tab is closed.
+- **Omni-Parser:** Instant decoding of Base64 subscriptions, reverse engineering of JSON configs, and Drag & Drop support.
+- **Mass Editor & Smart GeoIP:** Batch modification of parameters (SNI, Flow, Fingerprint) and auto-detection of node geolocation with flags (🇫🇮, 🇩🇪).
 - **Diagnostic Logger:** Built-in background debugging system that records interactions, errors, and network events for easy troubleshooting.
-- **Theme Engine:** Full UI customization with `.json` design import/export capabilities.
-- **Auto-Optimization:** Clears IP/port duplicates, purges dead servers after TCP/HTTP ping tests, and auto-heals corrupted links.
+- **Theme Engine:** Full UI customization with the ability to import/export designs to `.json`.
+- **Auto-optimization:** Cleaning duplicates by IP/port, removing dead servers after TCP/HTTP ping, and automatically recovering broken links.
 
 ## 🔌 Supported Protocols
 
@@ -53,8 +70,8 @@ Or download the latest `index.html` from the [Releases](https://github.com/jinxp
 
 ## ⭐ Support the Project
 
-**If you find this project helpful, please consider giving it a star!** :star2:
+**If you found this project helpful, please give it a star!** :star2:
 
-## 📈 Stargazers over Time
+## 📈 Stargazers over time
 
 [![Stargazers over time](https://starchart.cc/jinxpil/flclash-converter.svg?variant=adaptive)](https://starchart.cc/jinxpil/flclash-converter)
