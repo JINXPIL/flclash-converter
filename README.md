@@ -49,6 +49,7 @@
 
 ### 🍏 iOS
 - [Clash.MI](https://apps.apple.com/us/app/clash-mi/id6744321968?l=ru)
+- [Stash](https://apps.apple.com/us/app/stash-rule-based-proxy/id1596063349?l=ru)
 
 ### 💻 ПК (Windows / macOS / Linux)
 - [FlClash](https://github.com/chen08209/FlClash)
