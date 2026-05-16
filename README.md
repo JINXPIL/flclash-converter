@@ -22,11 +22,7 @@
   </a>
 </p>
 
-<h1 align="center">⚡ Network Builder <span id="appVersionTitle">v17.00</span> ULTRA</h1>
-
-<a href="https://github.com/jinxpil/flclash-converter/releases">    
-    <img src="https://img.shields.io/github/v/release/jinxpil/flclash-converter.svg?style=for-for-the-badge&color=blue" alt="Release">  
-</a>
+<h1 align="center">⚡ Network Builder v17.00 ULTRA</h1>
 
 <p align="center">
   <b>Экстремально мощный и 100% локальный веб-инструмент для управления гигантскими базами прокси-серверов.</b><br>
