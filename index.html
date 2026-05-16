@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#0d1117">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Network Builder v17.00 ULTRA</title>
+    <title>Network Builder v17.01 ULTRA</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
     <style>
@@ -120,7 +120,7 @@
 <body>
     <div class="container">
         <h2>
-            <div>⚡ Network Builder <span style="color:var(--text-muted); font-size:16px;">v17.00 ULTRA</span></div>
+            <div>⚡ Network Builder <span style="color:var(--text-muted); font-size:16px;">v17.01 ULTRA</span></div>
             <div class="badges-wrapper">
                 <div class="version-badge" id="mihomoVersion" title="Версия ядра Mihomo"><a href="https://github.com/MetaCubeX/mihomo/releases" target="_blank">⏳ Core...</a></div>
                 <div class="version-badge" id="rulesVersion" style="color:var(--primary-color);" title="Базы обхода блокировок"><a href="https://github.com/MetaCubeX/meta-rules-dat/releases" target="_blank">🛡️ Rules...</a></div>
@@ -197,17 +197,20 @@
             <textarea id="customTemplateInput" data-i18n-placeholder="customTplCode" placeholder="... или вставьте код сюда вручную." oninput="autoResize(this); debouncedUpdateOutput()"></textarea>
         </div>
         
-        <div class="cards-toolbar" id="cardsToolbar">
-            <div style="display:flex; align-items:center; gap:10px;">
-                <input type="checkbox" id="selectAllCb" style="accent-color:var(--accent-color); width:18px; height:18px; cursor:pointer;" onchange="toggleSelectAll()">
-                <label for="selectAllCb" style="font-size:14px; font-weight:bold; color:var(--text-color); cursor:pointer;" data-i18n="selectAll">Выбрать все узлы</label>
-            </div>
-            <div style="display:flex; gap:10px; align-items:center;">
-                <span id="nodeCount" class="status-badge">0 Nodes</span>
-                <button class="icon-btn" id="btnGeo" style="border-color:var(--primary-color); color:var(--primary-color); padding: 10px 15px;" onclick="resolveGeoIP()" data-i18n="btnGeo">🌍 Авто-Геолокация</button>
-                <button class="icon-btn" style="background:var(--accent-color); border-color:var(--accent-color); color:#fff; padding: 10px 15px;" onclick="openModal('massEditModal')" data-i18n="btnMassEdit">✏️ Mass Edit</button>
-            </div>
-        </div>
+       <div class="cards-toolbar" id="cardsToolbar">
+    <div style="display:flex; align-items:center; gap:10px;">
+        <input type="checkbox" id="selectAllCb" style="accent-color:var(--accent-color); width:18px; height:18px; cursor:pointer;" onchange="toggleSelectAll()">
+        <label for="selectAllCb" style="font-size:14px; font-weight:bold; color:var(--text-color); cursor:pointer;" data-i18n="selectAll">Выбрать все узлы</label>
+    </div>
+    <div style="display:flex; gap:10px; align-items:center;">
+        <span id="nodeCount" class="status-badge">0 Nodes</span>
+        
+        <button class="icon-btn" id="btnDeleteSelected" style="background:#ff4d4f; border-color:#ff4d4f; color:#fff; padding: 10px 15px;" onclick="deleteSelectedNodes()">🗑 Удалить</button>
+        
+        <button class="icon-btn" id="btnGeo" style="border-color:var(--primary-color); color:var(--primary-color); padding: 10px 15px;" onclick="resolveGeoIP()" data-i18n="btnGeo">🌍 Авто-Геолокация</button>
+        <button class="icon-btn" style="background:var(--accent-color); border-color:var(--accent-color); color:#fff; padding: 10px 15px;" onclick="openModal('massEditModal')" data-i18n="btnMassEdit">✏️ Mass Edit</button>
+    </div>
+</div>
 
         <div id="cardsContainer" class="cards-grid"></div>
 
@@ -1258,20 +1261,51 @@ rules:
     <script>
         const APP_VERSION = "16.15";
 
-        // ЛОГГЕР
-      const DiagnosticLogger = {
+// ЛОГГЕР (Продвинутая версия)
+const DiagnosticLogger = {
     logs: [],
     
-    add(type, message) {
-        // Защита от объектов: превращаем их в читаемую строку
-        const msgStr = typeof message === 'object' ? JSON.stringify(message, null, 2) : message;
+    // Добавили третий параметр details для расширенной инфы
+    add(type, message, details = null) {
+        let msgStr = '';
+
+        // Умная обработка объектов Error (вытаскиваем суть и стек вызовов)
+        if (message instanceof Error) {
+            msgStr = `${message.name}: ${message.message}`;
+            if (message.stack) details = details ? `${details}\n${message.stack}` : message.stack;
+        } else if (typeof message === 'object') {
+            msgStr = JSON.stringify(message, null, 2);
+        } else {
+            msgStr = message;
+        }
+
+        // Если передали детали (например, объект response), клеим их к логу
+        if (details) {
+            const detailsStr = (typeof details === 'object' && !(details instanceof Error)) 
+                ? JSON.stringify(details, null, 2) 
+                : details;
+            msgStr += `\n  └─ Детали: ${detailsStr}`;
+        }
         
-        // Строгий 24-часовой формат времени
-        const time = new Date().toLocaleTimeString('en-GB', { hour12: false });
+        // Добавили миллисекунды для точного дебага сетевых запросов
+        const time = new Date().toLocaleTimeString('ru-RU', { 
+            hour12: false, 
+            hour: '2-digit', 
+            minute: '2-digit', 
+            second: '2-digit', 
+            fractionalSecondDigits: 3 
+        });
         
-        this.logs.push(`[${time}] [${type}] ${msgStr}`);
+        const finalLog = `[${time}] [${type}] ${msgStr}`;
+        this.logs.push(finalLog);
         
-        // Оптимизация очереди: удаляем 500 самых старых записей за один раз
+        // Дублируем в консоль браузера (F12) для удобства в лайве
+        if (type === 'ERROR' || type === 'GLOBAL_ERROR') {
+            console.error(finalLog);
+        } else {
+            console.log(finalLog);
+        }
+        
         if (this.logs.length > 2000) {
             this.logs.splice(0, 500);
         }
@@ -1280,6 +1314,15 @@ rules:
     initSystem() {
         this.add('SYSTEM', `Browser: ${navigator.userAgent}`);
         this.add('SYSTEM', `Screen: ${window.innerWidth}x${window.innerHeight}, Lang: ${navigator.language}`);
+        this.add('SYSTEM', `Page URL: ${window.location.href}`); // Важно знать, откуда запущен скрипт
+        
+        // Отлов скрытых ошибок браузера, которые ломают скрипт "втихую"
+        window.addEventListener('error', (event) => {
+            this.add('GLOBAL_ERROR', `Script crashed: ${event.message}`, `File: ${event.filename}:${event.lineno}`);
+        });
+        window.addEventListener('unhandledrejection', (event) => {
+            this.add('PROMISE_REJECT', 'Unhandled Promise Rejection', event.reason);
+        });
     },
     
     downloadLog() {
@@ -1290,11 +1333,9 @@ rules:
         
         const a = document.createElement('a');
         a.href = url;
-        // Защита на случай, если константа APP_VERSION где-то не загрузится
         a.download = `Network_Builder_Log_v${typeof APP_VERSION !== 'undefined' ? APP_VERSION : 'latest'}.txt`;
         a.click();
         
-        // Очистка выделенной памяти (Zero-Trust подход к ресурсам)
         setTimeout(() => {
             URL.revokeObjectURL(url);
             a.remove();
@@ -1303,7 +1344,6 @@ rules:
         showToast("✅ Лог скачан!");
     }
 };
-
         // ПЕРЕХВАТ ОШИБОК
        // Вспомогательная функция для безопасной вставки текста в HTML
 const escapeHTML = (str) => String(str).replace(/[&<>'"]/g, tag => ({
@@ -1392,10 +1432,10 @@ document.addEventListener('click', e => {
 }, { passive: true }); // passive: true немного улучшает производительность браузера при обработке событий
 
         // СЛОВАРЬ ПЕРЕВОДОВ ИЗ 16.3
-        const i18n = {
+       const i18n = {
     ru: {
         pingAll: "⚡ Ping All", pingTooltip: "Используется HTTP/TCP ping (fetch). Серверы без открытых web-портов могут отображаться как Err или Stealth, оставаясь при этом абсолютно рабочими.",
-        cleanDead: "🧹 Удалить мертвые", sortNodes: "📶 Сорт.", removeDups: "🔍 Очистить дубли", shuffleNodes: "🔀 Перемешать", clearAll: "🗑 Очистить всё",
+        cleanDead: "🧹 Удалить мертвые", sortNodes: "📶 Сорт.", removeDups: "🔍 Очистить дубли", shuffleNodes: "🔀 Перемешать", clearAll: "🗑 Очистить всё", deleteSelected: "🗑 Удалить выбранные",
         supportText: "Поддержка форматов: <b>YAML (Clash)</b>, <b>JSON (Xray/Sing-box)</b>, VLESS, VMess, Trojan, Hysteria2, SS, SSR, WireGuard, Socks5, HTTP, SSH, Naive, TUIC.",
         btnPaste: "Вставить", btnFile: "Файл", mainPlaceholder: "Перетащите файл .txt, .json или .yaml в это окно!\n\nИли вставьте массив ссылок.", btnRecognize: "► РАСПОЗНАТЬ И ДОБАВИТЬ УЗЛЫ",
         lblFormat: "Формат вывода (Экспорт для клиента)", lblTemplate: "Шаблон маршрутизации (YAML)", customTplUrl: "URL вашего кастомного YAML (Github Raw, Pastebin...)",
@@ -1412,7 +1452,7 @@ document.addEventListener('click', e => {
     },
     en: {
         pingAll: "⚡ Ping All", pingTooltip: "Uses HTTP/TCP ping (fetch). Servers without open web ports may show as Err or Stealth, but remain fully functional.",
-        cleanDead: "🧹 Clean Dead", sortNodes: "📶 Sort", removeDups: "🔍 Clean Dups", shuffleNodes: "🔀 Shuffle", clearAll: "🗑 Clear All",
+        cleanDead: "🧹 Clean Dead", sortNodes: "📶 Sort", removeDups: "🔍 Clean Dups", shuffleNodes: "🔀 Shuffle", clearAll: "🗑 Clear All", deleteSelected: "🗑 Delete Selected",
         supportText: "Supported formats: <b>YAML (Clash)</b>, <b>JSON (Xray)</b>, VLESS, VMess, Trojan, Hysteria2...",
         btnPaste: "Paste", btnFile: "File", mainPlaceholder: "Drop a .txt, .json or .yaml file here!\n\nOr paste an array of links.", btnRecognize: "► RECOGNIZE AND ADD NODES",
         lblFormat: "Output Format (Client Export)", lblTemplate: "Routing Template (YAML)", customTplUrl: "Your custom YAML URL (Github Raw, Pastebin...)",
@@ -1429,7 +1469,7 @@ document.addEventListener('click', e => {
     },
     zh: {
         pingAll: "⚡ 全部 Ping", pingTooltip: "使用 HTTP/TCP ping (fetch)。未开放 web 端口的服务器可能显示为 Err 或 Stealth，但仍然完全可用。",
-        cleanDead: "🧹 清理失效", sortNodes: "📶 排序", removeDups: "🔍 清除重复", shuffleNodes: "🔀 打乱", clearAll: "🗑 全部清空",
+        cleanDead: "🧹 清理失效", sortNodes: "📶 排序", removeDups: "🔍 清除重复", shuffleNodes: "🔀 打乱", clearAll: "🗑 全部清空", deleteSelected: "🗑 删除选中",
         supportText: "支持的格式：<b>YAML (Clash)</b>，<b>JSON (Xray)</b>，VLESS，VMess，Trojan，Hysteria2...",
         btnPaste: "粘贴", btnFile: "文件", mainPlaceholder: "将 .txt, .json 或 .yaml 文件拖放到这里！\n\n或粘贴链接数组。", btnRecognize: "► 识别并添加节点",
         lblFormat: "输出格式 (客户端导出)", lblTemplate: "路由模板 (YAML)", customTplUrl: "您的自定义 YAML URL (Github Raw, Pastebin...)",
@@ -1446,7 +1486,7 @@ document.addEventListener('click', e => {
     },
     "zh-TW": {
         pingAll: "⚡ 全部 Ping", pingTooltip: "使用 HTTP/TCP ping (fetch)。未開放 web 端口的伺服器可能顯示為 Err 或 Stealth，但仍然完全可用。",
-        cleanDead: "🧹 清理失效", sortNodes: "📶 排序", removeDups: "🔍 清除重複", shuffleNodes: "🔀 打亂", clearAll: "🗑 全部清空",
+        cleanDead: "🧹 清理失效", sortNodes: "📶 排序", removeDups: "🔍 清除重複", shuffleNodes: "🔀 打亂", clearAll: "🗑 全部清空", deleteSelected: "🗑 刪除選取",
         supportText: "支援的格式：<b>YAML (Clash)</b>，<b>JSON (Xray)</b>，VLESS，VMess，Trojan，Hysteria2...",
         btnPaste: "貼上", btnFile: "檔案", mainPlaceholder: "將 .txt, .json 或 .yaml 檔案拖放到這裡！\n\n或貼上連結陣列。", btnRecognize: "► 識別並加入節點",
         lblFormat: "輸出格式 (客戶端匯出)", lblTemplate: "路由模板 (YAML)", customTplUrl: "您的自訂 YAML URL (Github Raw, Pastebin...)",
@@ -1463,7 +1503,7 @@ document.addEventListener('click', e => {
     },
     es: {
         pingAll: "⚡ Ping All", pingTooltip: "Utiliza ping HTTP/TCP (fetch). Los servidores sin puertos web abiertos pueden mostrarse como Err o Stealth, pero siguen siendo completamente funcionales.",
-        cleanDead: "🧹 Limpiar Inactivos", sortNodes: "📶 Ordenar", removeDups: "🔍 Limpiar Duplicados", shuffleNodes: "🔀 Mezclar", clearAll: "🗑 Borrar Todo",
+        cleanDead: "🧹 Limpiar Inactivos", sortNodes: "📶 Ordenar", removeDups: "🔍 Limpiar Duplicados", shuffleNodes: "🔀 Mezclar", clearAll: "🗑 Borrar Todo", deleteSelected: "🗑 Eliminar seleccionados",
         supportText: "Formatos soportados: <b>YAML (Clash)</b>, <b>JSON (Xray)</b>, VLESS, VMess, Trojan, Hysteria2...",
         btnPaste: "Pegar", btnFile: "Archivo", mainPlaceholder: "¡Suelte un archivo .txt, .json o .yaml aquí!\n\nO pegue una matriz de enlaces.", btnRecognize: "► RECONOCER Y AÑADIR NODOS",
         lblFormat: "Formato de salida (Exportar cliente)", lblTemplate: "Plantilla de enrutamiento (YAML)", customTplUrl: "URL de su YAML personalizado (Github Raw, Pastebin...)",
@@ -1480,7 +1520,7 @@ document.addEventListener('click', e => {
     },
     fa: {
         pingAll: "⚡ پینگ همه", pingTooltip: "از پینگ HTTP/TCP استفاده می‌کند. سرورهای بدون پورت وب باز ممکن است به صورت Err یا Stealth نشان داده شوند، اما کاملاً کارآمد هستند.",
-        cleanDead: "🧹 پاکسازی غیرفعال‌ها", sortNodes: "📶 مرتب‌سازی", removeDups: "🔍 حذف تکراری‌ها", shuffleNodes: "🔀 ترکیب تصادفی", clearAll: "🗑 پاک کردن همه",
+        cleanDead: "🧹 پاکسازی غیرفعال‌ها", sortNodes: "📶 مرتب‌سازی", removeDups: "🔍 حذف تکراری‌ها", shuffleNodes: "🔀 ترکیب تصادفی", clearAll: "🗑 پاک کردن همه", deleteSelected: "🗑 حذف انتخاب‌شده‌ها",
         supportText: "فرمت‌های پشتیبانی شده: <b>YAML (Clash)</b>، <b>JSON (Xray)</b>، VLESS، VMess، Trojan، Hysteria2...",
         btnPaste: "جایگذاری", btnFile: "فایل", mainPlaceholder: "یک فایل .txt، .json یا .yaml را اینجا رها کنید!\n\nیا آرایه‌ای از لینک‌ها را جایگذاری کنید.", btnRecognize: "► شناسایی و افزودن گره‌ها",
         lblFormat: "فرمت خروجی (صادرات کلاینت)", lblTemplate: "قالب مسیریابی (YAML)", customTplUrl: "آدرس YAML سفارشی شما (Github Raw، Pastebin...)",
@@ -1794,89 +1834,223 @@ document.addEventListener('click', e => {
             });
         }
 
-        function clearAll() {
-            if(confirm('Очистить все?')) { 
-                AppState.proxies = []; 
-                $['input'].value = ''; 
-                autoResize($['input']);
-                $['outputEditor'].innerText = '...';
-                sessionStorage.removeItem('flclash_net_proxies_v16_4');
-                AppState.saveState(); renderCards(); 
-            }
-        }
-        function cleanDeadNodes() {
-            const b = AppState.proxies.length;
-            AppState.proxies = AppState.proxies.filter(p => p.lastPing !== 99999);
-            if(b - AppState.proxies.length > 0) { AppState.saveState(); renderCards(); showToast(`🧹 Удалено: ${b - AppState.proxies.length}`); } 
-        }
-        function removeDuplicates() {
-            const u = {}; let rm = 0;
-            AppState.proxies.forEach(p => {
-                const k = p.server + ":" + p.port;
-                if (!u[k]) u[k] = p;
-                else { rm++; }
-            });
-            if (rm > 0) { AppState.proxies = Object.values(u); AppState.saveState(); renderCards(); showToast(`🗑 Дубликаты удалены: ${rm}`); }
-        }
-        function shuffleProxies() {
-            for (let i = AppState.proxies.length - 1; i > 0; i--) { 
-                const j = Math.floor(Math.random()*(i+1)); 
-                [AppState.proxies[i], AppState.proxies[j]] = [AppState.proxies[j], AppState.proxies[i]]; 
-            }
-            AppState.saveState(); renderCards();
-        }
-        function sortProxies() {
-            AppState.proxies.sort((a, b) => (a.lastPing||99999) - (b.lastPing||99999));
-            AppState.saveState(); renderCards();
-        }
+// Очистка
+function clearAll() {
+    if (!AppState.proxies.length && !$['input'].value) return showToast("Уже чисто!", "warning");
+    
+    if (confirm('Точно очистить все узлы и поле ввода?')) { 
+        AppState.proxies = []; 
+        $['input'].value = ''; 
+        if (typeof autoResize === 'function') autoResize($['input']);
+        if ($['outputEditor']) $['outputEditor'].innerText = '...';
         
-        function copyBase64Sub() {
-            if(!AppState.proxies.length) return;
-            navigator.clipboard.writeText(btoa(unescape(encodeURIComponent(AppState.proxies.map(p=>p.rawLink).join('\n')))));
-            showToast("✅ Base64 скопирован!");
+        sessionStorage.removeItem('flclash_net_proxies_v16_4');
+        AppState.saveState(); 
+        renderCards(); 
+        showToast("🗑 Всё очищено");
+    }
+}
+
+// Очистка мертвых узлов
+function cleanDeadNodes() {
+    if (!AppState.proxies.length) return showToast("Список пуст", "warning");
+    
+    const initialLength = AppState.proxies.length;
+    // Удаляем те узлы, у которых lastPing равен 99999 (ошибка) или 0 (таймаут)
+    AppState.proxies = AppState.proxies.filter(p => p.lastPing !== 99999 && p.lastPing !== 0);
+    const removedCount = initialLength - AppState.proxies.length;
+    
+    if (removedCount > 0) { 
+        AppState.saveState(); 
+        renderCards(); 
+        showToast(`🧹 Удалено нерабочих узлов: ${removedCount}`); 
+    } else {
+        showToast("Нерабочих узлов не найдено", "warning");
+    }
+}
+
+// Удаление дубликатов
+function removeDuplicates() {
+    if (!AppState.proxies.length) return showToast("Список пуст", "warning");
+    
+    const uniqueMap = new Map();
+    let removed = 0;
+    
+    AppState.proxies.forEach(p => {
+        // Улучшенный ключ: учитываем тип протокола (vless/trojan/etc)
+        const key = `${p.type}:${p.server}:${p.port}`;
+        if (!uniqueMap.has(key)) {
+            uniqueMap.set(key, p);
+        } else { 
+            removed++; 
         }
+    });
+    
+    if (removed > 0) { 
+        AppState.proxies = Array.from(uniqueMap.values()); 
+        AppState.saveState(); 
+        renderCards(); 
+        showToast(`🗑 Дубликаты удалены: ${removed}`); 
+    } else {
+        showToast("Дубликатов не найдено", "warning");
+    }
+}
+
+// Перемешивание (Fisher-Yates)
+function shuffleProxies() {
+    if (AppState.proxies.length < 2) return showToast("Нечего перемешивать", "warning");
+    
+    for (let i = AppState.proxies.length - 1; i > 0; i--) { 
+        const j = Math.floor(Math.random() * (i + 1)); 
+        [AppState.proxies[i], AppState.proxies[j]] = [AppState.proxies[j], AppState.proxies[i]]; 
+    }
+    
+    AppState.saveState(); 
+    renderCards();
+    showToast("🔀 Узлы перемешаны");
+}
+
+// Сортировка по пингу
+function sortProxies() {
+    if (AppState.proxies.length < 2) return showToast("Нечего сортировать", "warning");
+    
+    // Если пинга нет (undefined), кидаем узел в самый низ (приравниваем к 99999)
+    AppState.proxies.sort((a, b) => (a.lastPing || 99999) - (b.lastPing || 99999));
+    AppState.saveState(); 
+    renderCards();
+    showToast("📶 Отсортировано по пингу");
+}
+
+// ====================================================================
+// БЕЗОПАСНЫЙ БУФЕР ОБМЕНА (РАБОТАЕТ ДАЖЕ НА HTTP И ФАЙЛАХ)
+// ====================================================================
+async function copyToClipboard(text, successMsg) {
+    try {
+        // Попытка использовать современный API (работает на HTTPS)
+        if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(text);
+            showToast(successMsg);
+        } else {
+            // Запасной план для http:// и file:///
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed"; // Чтобы страница не прыгала
+            textArea.style.opacity = "0";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            showToast(successMsg);
+        }
+    } catch (err) {
+        if (typeof DiagnosticLogger !== 'undefined') DiagnosticLogger.add('ERROR', "Сбой буфера обмена", err);
+        showToast("❌ Ошибка копирования! Проверьте разрешения браузера.", "error");
+    }
+}
+
+function copyBase64Sub() {
+    if (!AppState.proxies.length) return showToast("Список узлов пуст!", "error");
+    const rawText = AppState.proxies.map(p => p.rawLink).join('\n');
+    const b64 = btoa(unescape(encodeURIComponent(rawText)));
+    copyToClipboard(b64, "✅ Подписка (Base64) скопирована!");
+}
+
+function copyRawLinks() {
+    if (!AppState.proxies.length) return showToast("Список узлов пуст!", "error");
+    const rawText = AppState.proxies.map(p => p.rawLink).join('\n');
+    copyToClipboard(rawText, "✅ Ссылки скопированы!");
+}
+
+function copyLink(i) {
+    if (!AppState.proxies[i]) return;
+    copyToClipboard(AppState.proxies[i].rawLink, "✅ Ссылка скопирована");
+}
+
+// ====================================================================
+// ОБРАБОТКА ВВОДА (Бронебойная сеть, 100% совместимость)
+// ====================================================================
+async function startProcess() {
+    const inp = $['input'].value.trim();
+    if (!inp) {
+        if (typeof showToast === 'function') showToast("Поле пустое!", "error");
+        return;
+    }
+    
+    // Проверяем: если это чистая ссылка на файл
+    if (/^https?:\/\/\S+$/.test(inp) && !inp.includes('vless://') && !inp.includes('trojan://')) {
+        if (typeof $ !== 'undefined' && $['outputEditor']) $['outputEditor'].innerText = "⏳ Загрузка...";
         
-        function copyRawLinks() {
-            if(!AppState.proxies.length) return;
-            navigator.clipboard.writeText(AppState.proxies.map(p => p.rawLink).join('\n'));
-            showToast("✅ Ссылки скопированы!");
-        }
+        // Массив путей
+        const smartProxies = [
+            "",                                         // Прямой запрос
+            "https://api.codetabs.com/v1/proxy?quest=", // Работает в РФ
+            "https://api.allorigins.win/raw?url=",      // Классика
+            "https://corsproxy.io/?"                    // Резерв
+        ];
 
-        function copyLink(i) {
-            navigator.clipboard.writeText(AppState.proxies[i].rawLink);
-            showToast("✅ Ссылка скопирована");
-        }
+        let success = false;
+        let downloadedText = "";
 
-        async function startProcess() {
-            const inp = $['input'].value.trim();
-            if (!inp) return showToast("Поле пустое!", "error");
+        // Классический перебор (самый надежный метод без зависаний)
+        for (let i = 0; i < smartProxies.length; i++) {
+            const proxy = smartProxies[i];
+            const targetUrl = proxy ? proxy + encodeURIComponent(inp) : inp;
             
-            if ((inp.startsWith('http://') || inp.startsWith('https://')) && !inp.includes('\n')) {
-                $['outputEditor'].innerText = "⏳ Скачивание...";
-                try {
-                    const res = await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(inp));
-                    parseData(await res.text());
-                } catch (e) { showDiagnosticError("Ошибка скачивания по ссылке."); }
-            } else {
-                parseData(inp);
+            try {
+                if (typeof DiagnosticLogger !== 'undefined') {
+                    DiagnosticLogger.add('NETWORK', `Попытка ${i + 1}: ${proxy || 'прямой запрос'}`);
+                }
+                
+                // Самодельный таймаут на 4 секунды (работает везде, в отличие от AbortSignal)
+                const fetchPromise = fetch(targetUrl);
+                const timeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error("Timeout")), 4000)
+                );
+
+                // Ждем, кто победит: ответ от сервера или таймаут
+                const res = await Promise.race([fetchPromise, timeoutPromise]);
+                
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                
+                downloadedText = await res.text();
+                success = true;
+                
+                if (typeof DiagnosticLogger !== 'undefined') DiagnosticLogger.add('NETWORK', `Успешно загружено!`);
+                break; // Выходим из цикла, файл у нас
+                
+            } catch (e) {
+                if (typeof DiagnosticLogger !== 'undefined') {
+                    DiagnosticLogger.add('WARNING', `Попытка ${i + 1} сбой`, e.message);
+                }
             }
         }
 
-        // ТВОЙ ОРИГИНАЛЬНЫЙ ПАРСЕР С ИСПРАВЛЕНИЯМИ
-       // ====================================================================
-// УМНЫЙ ПАРСЕР (Поддержка JSON, YAML, Base64 и сырых ссылок)
+        if (success) {
+            parseData(downloadedText);
+        } else {
+            if (typeof showToast === 'function') showToast("❌ Все способы загрузки недоступны", "error");
+            if (typeof $ !== 'undefined' && $['outputEditor']) $['outputEditor'].innerText = "Ошибка загрузки файла";
+        }
+        
+    } else {
+        // Если это уже готовый текст (или сырые ссылки vless://)
+        parseData(inp);
+    }
+}
+
+// ====================================================================
+// УМНЫЙ ПАРСЕР (Нечеткий поиск и автораспознавание)
 // ====================================================================
 function parseData(rawText) {
     let text = rawText.trim();
     let added = 0;
-    let duplicates = 0; // Теперь мы считаем дубликаты, чтобы не пугать пользователя
+    let duplicates = 0;
 
-    // Универсальная функция проверки и добавления узла.
-    // Если узел новый — добавляет. Если IP:PORT уже есть — считает как дубликат.
+    // Универсальная функция проверки
     const addNodeIfUnique = (p) => {
         if (!p || !p.server) return;
-        
-        const isDuplicate = AppState.proxies.some(x => x.server === p.server && x.port === p.port);
+        const isDuplicate = AppState.proxies.some(x => x.type === p.type && x.server === p.server && x.port === p.port);
         if (!isDuplicate) {
             AppState.proxies.push(p);
             added++;
@@ -1885,18 +2059,17 @@ function parseData(rawText) {
         }
     };
 
-    // 1. ПАРСИНГ JSON (Xray / Sing-box конфигурации)
+    // 1. ПАРСИНГ JSON
     if (text.startsWith('{')) {
         try {
             let json = JSON.parse(text);
             if (json.outbounds) {
                 json.outbounds.forEach(ob => {
                     let pt = ob.protocol || ob.type;
-                    // Игнорируем системные outbounds (типа block, dns, direct)
                     if (['freedom','blackhole','dns','direct','block','selector','urltest'].includes(pt)) return;
                     
                     let tag = ob.tag || "Node_" + Math.floor(Math.random() * 1000);
-                    let nn = addGeoFlag(tag);
+                    let nn = typeof addGeoFlag === 'function' ? addGeoFlag(tag) : tag;
                     let p = null;
 
                     if (ob.protocol === 'vless' && ob.settings?.vnext?.length > 0) {
@@ -1916,7 +2089,6 @@ function parseData(rawText) {
                         p = { name: nn, type: "trojan", server: ob.server, port: ob.server_port, password: ob.password, tls: tl.enabled === true, sni: tl.server_name||ob.server, network: ob.transport?.type||"tcp", fp: tl.utls?.fingerprint||"chrome" };
                     }
 
-                    // Формируем rawLink для обратной конвертации
                     if(p) {
                         let l = ``;
                         if (p.type === 'vless') {
@@ -1931,10 +2103,10 @@ function parseData(rawText) {
                     }
                 });
             }
-        } catch(e) { DiagnosticLogger.add('ERROR', `Сбой парсинга JSON: ${e.message}`); }
+        } catch(e) { if (typeof DiagnosticLogger !== 'undefined') DiagnosticLogger.add('ERROR', `Сбой парсинга JSON: ${e.message}`); }
     }
 
-    // 2. ПАРСИНГ YAML (Clash конфигурации)
+    // 2. ПАРСИНГ YAML
     else if (text.includes('proxies:') && window.jsyaml) {
         try {
             const doc = jsyaml.load(text);
@@ -1942,22 +2114,12 @@ function parseData(rawText) {
                 doc.proxies.forEach(cp => {
                     let p = null;
                     if (cp.type === 'vless' || cp.type === 'trojan') {
-                        p = {
-                            name: addGeoFlag(cp.name || "Node"),
-                            type: cp.type,
-                            server: cp.server,
-                            port: parseInt(cp.port),
-                            network: cp.network || 'tcp',
-                            tls: cp.tls === true,
-                            sni: cp.sni || cp.server,
-                            fp: cp['client-fingerprint'] || "chrome"
-                        };
+                        let nn = typeof addGeoFlag === 'function' ? addGeoFlag(cp.name || "Node") : (cp.name || "Node");
+                        p = { name: nn, type: cp.type, server: cp.server, port: parseInt(cp.port), network: cp.network || 'tcp', tls: cp.tls === true, sni: cp.sni || cp.server, fp: cp['client-fingerprint'] || "chrome" };
+                        
                         if (cp.type === 'vless') {
-                            p.uuid = cp.uuid;
-                            p.flow = cp.flow || "";
-                            if (cp['reality-opts']) {
-                                p["reality-opts"] = { "public-key": cp['reality-opts']['public-key'], "short-id": cp['reality-opts']['short-id'] || "" };
-                            }
+                            p.uuid = cp.uuid; p.flow = cp.flow || "";
+                            if (cp['reality-opts']) p["reality-opts"] = { "public-key": cp['reality-opts']['public-key'], "short-id": cp['reality-opts']['short-id'] || "" };
                             p.rawLink = `vless://${p.uuid}@${p.server}:${p.port}?type=${p.network}&security=${p.tls?(p["reality-opts"]?'reality':'tls'):'none'}&sni=${p.sni}&fp=${p.fp}${p.flow ? '&flow='+p.flow : ''}${p["reality-opts"] ? '&pbk='+p["reality-opts"]["public-key"]+'&sid='+p["reality-opts"]["short-id"] : ''}#${encodeURIComponent(p.name)}`;
                         } else if (cp.type === 'trojan') {
                             p.password = cp.password;
@@ -1967,107 +2129,74 @@ function parseData(rawText) {
                     addNodeIfUnique(p);
                 });
             }
-        } catch (e) { DiagnosticLogger.add('ERROR', `Сбой парсинга YAML: ${e.message}`); }
+        } catch (e) { if (typeof DiagnosticLogger !== 'undefined') DiagnosticLogger.add('ERROR', `Сбой парсинга YAML: ${e.message}`); }
     }
 
-    // 3. ПАРСИНГ СЫРЫХ ССЫЛОК И BASE64 (Если это не JSON и не YAML)
+    // 3. УМНЫЙ ПАРСИНГ
     else {
-        // Улучшенная защита: Проверяем, является ли текст Base64 подпиской
-        // Если в тексте нет явных признаков ссылок (://), пытаемся декодировать
-        if (!text.includes('://')) {
+        if (!text.includes('vless://') && !text.includes('trojan://')) {
             try { 
-                let b64 = text.replace(/-/g, '+').replace(/_/g, '/');
-                while (b64.length % 4) b64 += '='; // Восстанавливаем паддинг, иначе atob падает
-                text = decodeURIComponent(escape(atob(b64))); 
-            } catch(e) {
-                // Если не получилось (возможно это просто битый текст), продолжаем парсить как есть
-                DiagnosticLogger.add('SYSTEM', 'Текст не является валидным Base64');
-            }
+                let b64 = text.replace(/[\s\n\r]/g, '').replace(/-/g, '+').replace(/_/g, '/');
+                while (b64.length % 4) b64 += '='; 
+                let decoded = decodeURIComponent(escape(atob(b64)));
+                if (decoded.includes('vless://') || decoded.includes('trojan://')) text = decoded; 
+            } catch(e) {}
         }
 
-        // Разбиваем текст по строкам и ищем URI ссылки (vless://, trojan://)
-        text.split('\n').forEach(line => {
-            line = line.trim(); 
+        const linkRegex = /(vless|trojan):\/\/[^\s<>'"]+/gi;
+        const matches = text.match(linkRegex) || [];
+
+        matches.forEach(line => {
             let p = null;
-            if (!line) return;
-            
             try {
-                // ИСПРАВЛЕНА ПРОБЛЕМА С FIREFOX И ЭМОДЗИ (Маскировка под http для парсера)
-                if (line.startsWith('vless://')) {
-                    const url = new URL(line.replace(/^vless:\/\//, 'http://')); 
+                if (line.toLowerCase().startsWith('vless://')) {
+                    const url = new URL(line.replace(/^vless:\/\//i, 'http://')); 
                     const sp = new URLSearchParams(url.search);
                     let nodeName = "VLESS";
-                    
                     try { nodeName = decodeURIComponent(url.hash.slice(1)) || "VLESS"; } catch(e) { nodeName = url.hash.slice(1) || "VLESS"; }
+                    let nn = typeof addGeoFlag === 'function' ? addGeoFlag(nodeName) : nodeName;
                     
-                    p = { 
-                        name: addGeoFlag(nodeName), 
-                        type: "vless", 
-                        server: url.hostname, 
-                        port: parseInt(url.port) || 443, 
-                        uuid: url.username, 
-                        tls: sp.get('security') === 'reality' || sp.get('security') === 'tls', 
-                        "reality-opts": sp.get('pbk') ? { "public-key": sp.get('pbk'), "short-id": sp.get('sid') || "" } : null, 
-                        sni: sp.get('sni') || url.hostname, 
-                        network: sp.get('type') || "tcp", 
-                        flow: sp.get('flow') || "", 
-                        fp: sp.get('fp') || "chrome", 
-                        rawLink: line 
-                    };
-                } else if (line.startsWith('trojan://')) {
-                    let url = new URL(line.replace(/^trojan:\/\//, 'http://')); 
+                    p = { name: nn, type: "vless", server: url.hostname, port: parseInt(url.port) || 443, uuid: url.username, tls: sp.get('security') === 'reality' || sp.get('security') === 'tls', "reality-opts": sp.get('pbk') ? { "public-key": sp.get('pbk'), "short-id": sp.get('sid') || "" } : null, sni: sp.get('sni') || url.hostname, network: sp.get('type') || "tcp", flow: sp.get('flow') || "", fp: sp.get('fp') || "chrome", rawLink: line };
+                } else if (line.toLowerCase().startsWith('trojan://')) {
+                    let url = new URL(line.replace(/^trojan:\/\//i, 'http://')); 
                     let sp = new URLSearchParams(url.search);
                     let nodeName = "Trojan";
-                    
                     try { nodeName = decodeURIComponent(url.hash.slice(1)) || "Trojan"; } catch(e) { nodeName = url.hash.slice(1) || "Trojan"; }
+                    let nn = typeof addGeoFlag === 'function' ? addGeoFlag(nodeName) : nodeName;
                     
-                    p = { 
-                        name: addGeoFlag(nodeName), 
-                        type: "trojan", 
-                        server: url.hostname, 
-                        port: parseInt(url.port) || 443, 
-                        password: url.username, 
-                        tls: true, 
-                        sni: sp.get('sni') || url.hostname, 
-                        network: sp.get('type') || "tcp", 
-                        fp: sp.get('fp') || "chrome", 
-                        rawLink: line 
-                    };
+                    p = { name: nn, type: "trojan", server: url.hostname, port: parseInt(url.port) || 443, password: url.username, tls: true, sni: sp.get('sni') || url.hostname, network: sp.get('type') || "tcp", fp: sp.get('fp') || "chrome", rawLink: line };
                 } 
-
                 addNodeIfUnique(p);
             } catch(e) {
-                DiagnosticLogger.add('ERROR', `Ошибка разбора ссылки: ${e.message}`);
+                if (typeof DiagnosticLogger !== 'undefined') DiagnosticLogger.add('WARNING', `Пропущена ссылка`);
             }
         });
     }
 
-    // 4. ФИНАЛЬНЫЙ ВЕРДИКТ И УВЕДОМЛЕНИЯ
-    if (added > 0) { 
-        $['input'].value = ''; 
-        autoResize($['input']); 
-        
-        // Если добавились новые узлы, но какие-то были отброшены как дубли
-        if (duplicates > 0) {
-            showToast(`+${added} добавлено (пропущено ${duplicates} дублей)`);
-        } else {
-            showToast(`+${added} Узлов добавлено!`);
+    // 4. ФИНАЛЬНЫЙ ВЕРДИКТ
+    if (added > 0 || duplicates > 0) {
+        if (typeof $ !== 'undefined' && $['input']) {
+            $['input'].value = ''; 
+            if (typeof autoResize === 'function') autoResize($['input']); 
         }
-    } else if (duplicates > 0) {
-        // Если новых узлов 0, но дубликаты были найдены (уже есть в базе)
-        $['input'].value = ''; 
-        showToast(`Узлы уже есть в списке (дубликаты: ${duplicates})`, "warning");
-    } else {
-        // Реально ничего не найдено
-        showToast("Узлов не найдено (или неверный формат)", "error");
     }
-    
-    // Сохраняем состояние и рендерим карточки только если что-то изменилось
-    if (added > 0) {
-        AppState.saveState(); 
-        renderCards();
+
+    if (added > 0) { 
+        if (typeof DiagnosticLogger !== 'undefined') DiagnosticLogger.add('SYSTEM', `Парсинг успешен. Новых: ${added}, Дублей: ${duplicates}`);
+        if (typeof showToast === 'function') {
+            if (duplicates > 0) showToast(`✅ Добавлено: ${added} (пропущено дублей: ${duplicates})`, "success");
+            else showToast(`✅ Добавлено узлов: ${added}!`, "success");
+        }
+        if (typeof AppState !== 'undefined' && typeof AppState.saveState === 'function') AppState.saveState(); 
+        if (typeof renderCards === 'function') renderCards();
+    } else if (duplicates > 0) {
+        if (typeof showToast === 'function') showToast(`⚠️ Эти узлы уже есть в списке (пропущено: ${duplicates})`, "warning");
+    } else {
+        if (typeof showToast === 'function') showToast("❌ Узлов не найдено (или неверный формат)", "error");
     }
 }
+    
+// Конец функции parseData
 
         // ====================================================================
         // СИСТЕМА ПИНГОВАНИЯ (Проверка доступности узлов)
@@ -2110,7 +2239,7 @@ function parseData(rawText) {
             showToast("✅ Завершено!");
         }
 
-        // ====================================================================
+       // ====================================================================
         // ЛОГИКА РЕНДЕРИНГА И ВЗАИМОДЕЙСТВИЯ С КАРТОЧКАМИ УЗЛОВ
         // ====================================================================
         function toggleSelectAll() {
@@ -2128,7 +2257,7 @@ function parseData(rawText) {
         function renderCards() {
             const cnt = $['cardsContainer'];
             cnt.innerHTML = ''; 
-            $['selectAllCb'].checked = false;
+            if ($['selectAllCb']) $['selectAllCb'].checked = false;
 
             if (AppState.proxies.length > 0) {
                 $['cardsToolbar'].style.display = "flex";
@@ -2168,6 +2297,33 @@ function parseData(rawText) {
             AppState.proxies.splice(i, 1); 
             AppState.saveState(); 
             renderCards(); 
+        }
+
+        // --- НОВАЯ ФУНКЦИЯ: УДАЛЕНИЕ ВЫБРАННЫХ ---
+        function deleteSelectedNodes() {
+            const checkboxes = document.querySelectorAll('.proxy-checkbox');
+            let toKeep = [];
+            let deletedCount = 0;
+
+            // Проходимся по всем чекбоксам и отбираем только те узлы, где галочка НЕ стоит
+            checkboxes.forEach((cb, i) => {
+                if (!cb.checked) {
+                    toKeep.push(AppState.proxies[i]);
+                } else {
+                    deletedCount++;
+                }
+            });
+
+            if (deletedCount === 0) {
+                return showToast("Нет выбранных узлов для удаления!", "warning");
+            }
+
+            if (confirm(`Точно удалить ${deletedCount} выбранных узлов?`)) {
+                AppState.proxies = toKeep; // Заменяем базу на очищенную
+                AppState.saveState();
+                renderCards();
+                showToast(`🗑 Удалено узлов: ${deletedCount}`);
+            }
         }
         
         function renameProxy(i, newName) {
