@@ -98,6 +98,7 @@
 - [Karing](https://apps.apple.com/us/app/karing/id6472431552)
 - [Clash.MI](https://apps.apple.com/us/app/clash-mi/id6744321968)
 - [Stash](https://apps.apple.com/us/app/stash-rule-based-proxy/id1596063349)
+- [Clash Lite](https://apps.apple.com/us/app/clash-lite/id6761357475)
 </details>
 
 <details>
