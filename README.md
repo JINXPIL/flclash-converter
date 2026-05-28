@@ -100,6 +100,7 @@
 - [Incy](https://incy.cc/) — Современный быстрый клиент с импортом в одно касание.
 - [Happ](https://www.happ.su/main) — Прокси-утилита для удобной работы со списками серверов.
 - [Exclave](https://github.com/ExclaveNetwork/Exclave) — Современный и актуальный аналог NekoBox со знакомым интерфейсом.
+- [Sing-box](https://github.com/SagerNet/sing-box) — Официальное чистое ядро для продвинутой конфигурации.
 - [Hiddify App](https://github.com/hiddify/hiddify-app) — Универсальный клиент под любые типы конфигураций.
 - [v2rayNG](https://github.com/2dust/v2rayNG) — Стабильное классическое решение для ядра Xray.
 - [Karing](https://github.com/KaringX/karing) — Функциональный графический интерфейс.
@@ -127,7 +128,6 @@
 - [Exclave](https://github.com/ExclaveNetwork/Exclave) — Лучшая современная альтернатива устаревшему NekoBox для ПК.
 - [Happ](https://www.happ.su/main) — Кроссплатформенная десктопная версия.
 - [v2rayN](https://github.com/2dust/v2rayN) — Мощный настраиваемый клиент для Windows.
-- [Sing-box](https://github.com/SagerNet/sing-box) — Официальное чистое ядро для продвинутой конфигурации.
 - [FlClash](https://github.com/chen08209/FlClash) — Минималистичный и быстрый GUI.
 - [Karing](https://github.com/KaringX/karing)
 - [Clash Verge Rev](https://github.com/clash-verge-rev/clash-verge-rev)
