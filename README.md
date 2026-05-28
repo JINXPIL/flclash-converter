@@ -5,7 +5,7 @@
   <a href="/README.zh-TW.md">🇹🇼 繁體中文</a> •
   <a href="/README.fa.md">🇮🇷 فارسی</a> •
   <a href="/README.es.md">🇪🇸 Español</a>
-</p>
+</p> network builder ultra
 
 <p align="center">
   <a href="https://github.com/jinxpil/flclash-converter/releases">
@@ -22,11 +22,11 @@
   </a>
 </p>
 
-<h1 align="center">⚡ Network Builder v17.00 ULTRA</h1>
+<h1 align="center">⚡ Network Builder v17.01 ULTRA</h1>
 
 <p align="center">
   <b>Экстремально мощный и 100% локальный веб-инструмент для управления гигантскими базами прокси-серверов.</b><br>
-  <i>Парсинг, конвертация и глубокая оптимизация конфигураций для FlClash, Nekobox, Sing-box и Clash Meta.</i>
+  <i>Парсинг, конвертация и глубокая оптимизация конфигураций для FlClash, Exclave, Sing-box и Clash Meta.</i>
 </p>
 
 <p align="center">
@@ -37,6 +37,9 @@
 
 > [!IMPORTANT]
 > **Zero-Trust & Privacy First.** Все вычисления производятся строго локально в вашем браузере. Никакие данные не покидают ваше устройство. Инструмент создан в образовательных целях для изучения сетевых протоколов.
+
+> [!WARNING]
+> **Важное примечание о YAML и тайм-аутах:** > Многие VPN-провайдеры намеренно ограничивают прямой доступ к серверам через сторонние YAML-конфигурации при экспорте подписок. В таких случаях прокси-серверы могут успешно импортироваться и отображаться в списке, но при попытке подключения большинство из них уйдет в бесконечный тайм-аут (Timeout). Это вызвано либо внутренней политикой провайдера (блокировка запросов вне официального приложения), либо точечными ограничениями протоколов со стороны РКН (ТСПУ). 
 
 ---
 
@@ -55,7 +58,7 @@
 
 ---
 
-### 🔥 Что нового в версии 17.00 ULTRA?
+### 🔥 Что нового в версии 17.01 ULTRA?
 
 - 🚀 **Extreme Parser Engine:** Полная оптимизация кода для работы с **10,000+ узлами** одновременно. Плавный интерфейс даже при гигантских объемах данных.
 - 🌍 **ULTRA Localization:** Глубокая поддержка 6 языков (RU, EN, ZH, FA, ES). Интерфейс и системные уведомления теперь полностью адаптированы.
@@ -84,31 +87,58 @@
 
 ### 📥 Рекомендуемые клиенты (ULTRA Compatible)
 
+> [!NOTE]
+> Такие популярные клиенты, как **NekoBox** и **NekoRay**, на текущий момент считаются устаревшими. Рекомендуется переходить на актуальные и оптимизированные аналоги под современные ядра **sing-box** и **Xray** (например, **Exclave**, который полностью повторяет интерфейс NekoBox, или **Incy**).
+
 <details>
 <summary><b>🤖 Android</b></summary>
 
-- [FlClash](https://github.com/chen08209/FlClash) — Основной клиент
-- [Karing](https://github.com/KaringX/karing) — Мощный GUI
+- [FlClash](https://github.com/chen08209/FlClash) — Основной кроссплатформенный клиент.
+- [Incy](https://incy.cc/) — Современный быстрый клиент с импортом в одно касание.
+- [Happ](https://www.happ.su/main) — Прокси-утилита для удобной работы со списками серверов.
+- [Exclave](https://github.com/ExclaveNetwork/Exclave) — Современный и актуальный аналог NekoBox со знакомым интерфейсом.
+- [Hiddify App](https://github.com/hiddify/hiddify-app) — Универсальный клиент под любые типы конфигураций.
+- [v2rayNG](https://github.com/2dust/v2rayNG) — Стабильное классическое решение для ядра Xray.
+- [Karing](https://github.com/KaringX/karing) — Функциональный графический интерфейс.
 - [Clash Meta for Android](https://github.com/MetaCubeX/ClashMetaForAndroid)
+- ~~[NekoBox For Android](https://github.com/MatsuriDayo/NekoBoxForAndroid)~~ *(Устарел)*
 </details>
 
 <details>
 <summary><b>🍏 iOS</b></summary>
 
+- [Incy](https://incy.cc/) — Отличный современный клиент в App Store.
+- [Happ](https://www.happ.su/main) — Комфортная утилита для прокси.
 - [Karing](https://apps.apple.com/us/app/karing/id6472431552)
 - [Clash.MI](https://apps.apple.com/us/app/clash-mi/id6744321968)
 - [Stash](https://apps.apple.com/us/app/stash-rule-based-proxy/id1596063349)
 - [Clash Lite](https://apps.apple.com/us/app/clash-lite/id6761357475)
-- [V2Lite VPN - Super VPN Proxy](https://apps.apple.com/us/app/v2lite-vpn-super-vpn-proxy/id6444585377)
+- [V2Lite VPN](https://apps.apple.com/us/app/v2lite-vpn-super-vpn-proxy/id6444585377)
 </details>
 
 <details>
 <summary><b>💻 Desktop (Win/Mac/Linux)</b></summary>
 
+- [v2RayTun](https://v2raytun.com/) — Высокоскоростной и безопасный клиент на базе ядра Xray Core.
+- [Exclave](https://github.com/ExclaveNetwork/Exclave) — Лучшая современная альтернатива устаревшему NekoBox для ПК.
+- [Happ](https://www.happ.su/main) — Кроссплатформенная десктопная версия.
+- [v2rayN](https://github.com/2dust/v2rayN) — Мощный настраиваемый клиент для Windows.
+- [Sing-box](https://github.com/SagerNet/sing-box) — Официальное чистое ядро для продвинутой конфигурации.
+- [FlClash](https://github.com/chen08209/FlClash) — Минималистичный и быстрый GUI.
 - [Karing](https://github.com/KaringX/karing)
-- [FlClash](https://github.com/chen08209/FlClash)
 - [Clash Verge Rev](https://github.com/clash-verge-rev/clash-verge-rev)
+- ~~[NekoRay](https://github.com/MatsuriDayo/nekoray)~~ *(Устарел)*
 </details>
+
+---
+
+### 🛡️ Альтернативные инструменты (DPI Bypass)
+
+*Если стандартные VPN-протоколы полностью блокируются оператором или ТСПУ, используйте локальный обход глубокого анализа пакетов:*
+
+* [Zapret](https://github.com/bol-van/zapret) — Мощнейший и самый гибкий инструмент для глубокого обхода DPI на уровне системы.
+* [Zapret-discord-youtube](https://github.com/Flowseal/zapret-discord-youtube) — Оптимизированные и настроенные готовые скрипты под конкретные популярные сервисы.
+* [ByeByeDPI](https://github.com/romanvht/ByeByeDPI) — Проверенное классическое решение для локального запуска на Windows.
 
 ---
 
