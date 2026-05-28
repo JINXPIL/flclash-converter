@@ -36,10 +36,12 @@
 </p>
 
 > [!IMPORTANT]
-> **Zero-Trust & Privacy First.** All calculations are performed strictly locally in your browser. No data leaves your device. The tool is created for educational purposes to study network protocols.
+> **Zero-Trust & Privacy First.** All calculations are performed strictly locally in your browser. No data leaves your device. The tool is created exclusively for educational purposes to study network protocols deeply.
 
 > [!WARNING]
-> **Important note on YAML and timeouts:** Many VPN providers intentionally restrict direct access to servers via third-party YAML configurations when exporting subscriptions. In such cases, proxy servers may successfully import and appear in the list, but upon attempting to connect, most of them will result in an infinite timeout. This is caused either by the provider's internal policy (blocking requests outside their official app) or by targeted protocol restrictions from censorship authorities (e.g., DPI/TSPU).
+> **Attention: Issue with YAML subscriptions and Timeouts:**
+> Many VPN providers intentionally (or due to incompetent API configuration) restrict the operation of third-party clients when exporting subscriptions. Servers may successfully load into your list, but when attempting to connect, they enter an infinite timeout.
+> 💡 **How to check who is to blame:** If you take a "raw" link to the same node (e.g., `vless://...` or JSON code), add it manually as a local profile, and **it works** — the problem is 100% on the provider's side. This means their server blocks your client's requests by `User-Agent` when attempting to update the subscription. In other cases, timeouts can be caused by targeted protocol signature blocks by censorship firewalls (DPI).
 
 ---
 
@@ -93,10 +95,12 @@
 <details>
 <summary><b>🤖 Android</b></summary>
 
+- [v2RayTun](https://v2raytun.com/) — High-speed and secure client based on Xray Core.
 - [FlClash](https://github.com/chen08209/FlClash) — Main cross-platform client.
 - [Incy](https://incy.cc/) — Modern fast client with one-touch import.
 - [Happ](https://www.happ.su/main) — Proxy utility for convenient server list management.
 - [Exclave](https://github.com/ExclaveNetwork/Exclave) — Modern and up-to-date NekoBox alternative with a familiar GUI.
+- [Sing-box](https://github.com/SagerNet/sing-box) — Official clean core for advanced configuration.
 - [Hiddify App](https://github.com/hiddify/hiddify-app) — Universal client for all configuration types.
 - [v2rayNG](https://github.com/2dust/v2rayNG) — Stable classic solution for the Xray core.
 - [Karing](https://github.com/KaringX/karing) — Feature-rich GUI.
@@ -107,6 +111,7 @@
 <details>
 <summary><b>🍏 iOS</b></summary>
 
+- [v2RayTun](https://v2raytun.com/) — High-speed and secure client based on Xray Core.
 - [Incy](https://incy.cc/) — Excellent modern client in the App Store.
 - [Happ](https://www.happ.su/main) — Comfortable proxy utility.
 - [Karing](https://apps.apple.com/us/app/karing/id6472431552)
@@ -120,10 +125,8 @@
 <summary><b>💻 Desktop (Win/Mac/Linux)</b></summary>
 
 - [v2RayTun](https://v2raytun.com/) — High-speed and secure client based on Xray Core.
-- [Exclave](https://github.com/ExclaveNetwork/Exclave) — The best modern alternative to the outdated NekoBox for PC.
 - [Happ](https://www.happ.su/main) — Cross-platform desktop version.
 - [v2rayN](https://github.com/2dust/v2rayN) — Powerful customizable client for Windows.
-- [Sing-box](https://github.com/SagerNet/sing-box) — Official clean core for advanced configuration.
 - [FlClash](https://github.com/chen08209/FlClash) — Minimalist and fast GUI.
 - [Karing](https://github.com/KaringX/karing)
 - [Clash Verge Rev](https://github.com/clash-verge-rev/clash-verge-rev)
