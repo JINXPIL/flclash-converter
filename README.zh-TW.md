@@ -22,25 +22,28 @@
   </a>
 </p>
 
-<h1 align="center">⚡ Network Builder v17.00 ULTRA</h1>
+<h1 align="center">⚡ Network Builder v17.01 ULTRA</h1>
 
 <p align="center">
-  <b>專業級 100% 在地化網頁工具，用於管理、深度清理與轉換海量代理伺服器資料庫。</b><br>
-  <i>適用於 FlClash、Nekobox (Xray)、Sing-box 與 Clash Meta 配置的一體化生態系統。</i>
+  <b>極其強大且 100% 本地化的網路工具，用於管理龐大的代理伺服器資料庫。</b><br>
+  <i>解析、轉換並深度優化 FlClash、Exclave、Sing-box 和 Clash Meta 的配置。</i>
 </p>
 
 <p align="center">
   <a href="https://jinxpil.github.io/flclash-converter/">
-    <img src="https://img.shields.io/badge/🚀_開啟_ULTRA_版本-0052FF?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Open Web Version">
+    <img src="https://img.shields.io/badge/🚀_打開_ULTRA--版本-0052FF?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Open Web Version">
   </a>
 </p>
 
 > [!IMPORTANT]
-> **零信任安全 (Zero-Trust Security)。** 本專案無後端服務。所有操作（從解析到生成二維碼）均在您的瀏覽器記憶體中執行。任何 UUID、金鑰或 IP 地址均不會上傳至第三方伺服器。
+> **零信任與隱私至上。** 所有計算均在您的瀏覽器中嚴格本地執行。任何數據都不會離開您的設備。該工具僅用於教育目的，旨在研究網路協議。
+
+> [!WARNING]
+> **關於 YAML 和超時的重要提示：** 許多 VPN 提供商在導出訂閱時，故意限制透過第三方 YAML 配置直接訪問伺服器。在這種情況下，代理伺服器可能成功導入並在列表中顯示，但在嘗試連線時，大多數將進入無限超時狀態（Timeout）。這可能是由於提供商的內部策略（阻止官方應用之外的請求）或審查機構（如 DPI/TSPU）針對協議的限制造成的。
 
 ---
 
-### 📸 介面展示 (ULTRA 設計)
+### 📸 介面 (ULTRA Design)
 
 <p align="center">
   <picture>
@@ -55,75 +58,92 @@
 
 ---
 
-### 🔥 v17.00 ULTRA 有什麼新功能？
+### 🔥 17.01 ULTRA 版本有什麼新功能？
 
-- 🚀 **極限解析引擎 (Extreme Parser Engine)：** 解析引擎經過深度優化，可同時處理 **10,000+ 個節點**。即使面對超大型資料庫，介面依然流暢，搜尋瞬時響應。
-- 🌍 **ULTRA 全球在地化：** 全面支援 6 種語言 (RU, EN, ZH, ZH-TW, FA, ES)。針對各個地區優化了使用者介面與系統通知。
-- 🛡️ **QuotaGuard 記憶體防護：** 智慧型瀏覽器記憶體控制系統。防止在導入體積巨大的訂閱檔案時發生應用程式崩潰 (QuotaExceededError)。
-- 🧠 **智慧型去重過濾：** 基於 IP:Port 對的自動節點比對。程式可瞬時識別並刪除冗餘節點，確保節點列表精簡唯一。
-- 🛠️ **極致穩定性：** 修復了彈窗介面的關鍵語法錯誤 (SyntaxError)，並優化了行動裝置的剪貼簿效能。
+- 🚀 **Extreme Parser Engine:** 極速解析引擎，程式碼全面優化，支援同時處理 **10,000+ 節點**。即使資料量巨大，介面依然流暢。
+- 🌍 **ULTRA Localization:** 深度支援 6 種語言 (RU, EN, ZH, FA, ES)。介面和系統通知現已完全適配。
+- 🛡️ **QuotaGuard 系統:** 智能防止瀏覽器記憶體溢出。處理任何大小的配置都不會導致分頁崩潰。
+- 🧠 **Smart Duplicate Filter:** 智能去重，透過 IP:端口 自動比對伺服器。程式自動清理垃圾和重複項，僅保留唯一的節點。
+- 🛠️ **Refined Diagnostics:** 更新了事件日誌並修復了語法錯誤 (SyntaxError fix)，確保完美穩定性。
 
 ---
 
-### 🔌 支援通訊協定
+### 🔌 支援的協議
 
 <table align="center" width="100%">
   <tr>
-    <td align="center">🛡️ <b>VLESS / VMess</b><br>Reality, Vision, gRPC</td>
-    <td align="center">⚡ <b>Hysteria 1/2</b><br>極速傳輸與跳港</td>
-    <td align="center">🐎 <b>Trojan</b><br>隱身 TLS 與密碼驗證</td>
+    <td align="center">🛡️ <b>VLESS / VMess</b><br>Reality & Vision</td>
+    <td align="center">⚡ <b>Hysteria 2</b><br>Brutal Speed</td>
+    <td align="center">🐎 <b>Trojan</b><br>Stealth Protocol</td>
   </tr>
   <tr>
-    <td align="center">🔒 <b>WireGuard</b><br>原生 VPN 與 AmneziaWG</td>
-    <td align="center">🌐 <b>Shadowsocks / RR</b><br>經典與 AEAD 加密</td>
-    <td align="center">🔌 <b>TUIC / Socks5 / HTTP</b><br>完整通訊協定相容性</td>
+    <td align="center">🔒 <b>WireGuard</b><br>Native VPN</td>
+    <td align="center">🌐 <b>SS / SSR</b><br>Shadowsocks</td>
+    <td align="center">🔌 <b>TUIC / Socks5 / HTTP</b><br>Full Support</td>
   </tr>
 </table>
 
 ---
 
-### 🔥 核心功能
+### 📥 推薦客戶端 (ULTRA 兼容)
 
-- 🧩 **全能解析器 (Omni-Parser)：** 瞬時 Base64 訂閱解碼，從文本中提取原始連結，以及對複雜 JSON/YAML 配置的深度逆向工程。
-- 🌍 **批量編輯器 (Mass Editor)：** 一鍵為數千個選定節點批量修改參數（如 SNI, Fingerprint, Flow, Public Key）。
-- 🌍 **智慧型 GeoIP：** 自動檢測伺服器所在的國家與城市，並自動為名稱添加對應的國旗標誌 (🇫🇮, 🇩🇪, 🇺🇸)。
-- ⚙️ **自動優化：** 測試後自動刪除「失效」節點，支援列表隨機打亂 (Shuffle)，並自動修復損壞的 URI 連結。
-- 🐛 **診斷日誌系統 (Diagnostic Logger)：** 內建即時事件監控系統，用於追蹤配置問題與網路連線狀態。
-
----
-
-### 📥 推薦用戶端 (ULTRA 相容)
+> [!NOTE]
+> 流行的客戶端如 **NekoBox** 和 **NekoRay** 目前已被視為過時。強烈建議切換到基於 **sing-box** 和 **Xray** 核心的現代優化替代品（例如，完全還原 NekoBox 介面的 **Exclave**，或者 **Incy**）。
 
 <details>
-<summary><b>🤖 Android 平台</b></summary>
+<summary><b>🤖 Android (安卓)</b></summary>
 
-- [FlClash](https://github.com/chen08209/FlClash) — 推薦用戶端
-- [Karing](https://github.com/KaringX/karing) — 進階使用者介面
+- [FlClash](https://github.com/chen08209/FlClash) — 主要的跨平台客戶端。
+- [Incy](https://incy.cc/) — 支援一鍵導入的現代快速客戶端。
+- [Happ](https://www.happ.su/main) — 便捷管理伺服器列表的代理工具。
+- [Exclave](https://github.com/ExclaveNetwork/Exclave) — 現代化且保持更新的 NekoBox 替代品，介面熟悉。
+- [Hiddify App](https://github.com/hiddify/hiddify-app) — 支援所有配置類型的通用客戶端。
+- [v2rayNG](https://github.com/2dust/v2rayNG) — 基於 Xray 核心的穩定經典解決方案。
+- [Karing](https://github.com/KaringX/karing) — 功能豐富的圖形介面。
 - [Clash Meta for Android](https://github.com/MetaCubeX/ClashMetaForAndroid)
+- ~~[NekoBox For Android](https://github.com/MatsuriDayo/NekoBoxForAndroid)~~ *(已過時)*
 </details>
 
 <details>
-<summary><b>🍏 iOS 平台</b></summary>
+<summary><b>🍏 iOS (蘋果)</b></summary>
 
+- [Incy](https://incy.cc/) — App Store 中優秀的現代客戶端。
+- [Happ](https://www.happ.su/main) — 舒適的代理工具。
 - [Karing](https://apps.apple.com/us/app/karing/id6472431552)
 - [Clash.MI](https://apps.apple.com/us/app/clash-mi/id6744321968)
 - [Stash](https://apps.apple.com/us/app/stash-rule-based-proxy/id1596063349)
 - [Clash Lite](https://apps.apple.com/us/app/clash-lite/id6761357475)
-- [V2Lite VPN - Super VPN Proxy](https://apps.apple.com/us/app/v2lite-vpn-super-vpn-proxy/id6444585377)
+- [V2Lite VPN](https://apps.apple.com/us/app/v2lite-vpn-super-vpn-proxy/id6444585377)
 </details>
 
 <details>
-<summary><b>💻 桌面端 (Win/Mac/Linux)</b></summary>
+<summary><b>💻 Desktop (電腦端 Win/Mac/Linux)</b></summary>
 
+- [v2RayTun](https://v2raytun.com/) — 基於 Xray Core 的高速安全客戶端。
+- [Exclave](https://github.com/ExclaveNetwork/Exclave) — PC 端過時 NekoBox 的最佳現代替代品。
+- [Happ](https://www.happ.su/main) — 跨平台桌面版本。
+- [v2rayN](https://github.com/2dust/v2rayN) — 強大的 Windows 可自定義客戶端。
+- [Sing-box](https://github.com/SagerNet/sing-box) — 官方純淨核心，適合高級配置。
+- [FlClash](https://github.com/chen08209/FlClash) — 極簡快速的 GUI。
 - [Karing](https://github.com/KaringX/karing)
-- [FlClash](https://github.com/chen08209/FlClash)
 - [Clash Verge Rev](https://github.com/clash-verge-rev/clash-verge-rev)
+- ~~[NekoRay](https://github.com/MatsuriDayo/nekoray)~~ *(已過時)*
 </details>
 
 ---
 
-### ⭐ 支持專案
+### 🛡️ 替代工具 (DPI 繞過 / 防火牆穿透)
 
-**如果 Network Builder ULTRA 對您有所幫助，請不要忘記給予一個 Star！這是我持續開發與改進的最大動力。** :star2:
+*如果標準 VPN 協議被您的運營商或審查防火牆完全封鎖，請使用本地的深度封包檢測 (DPI) 繞過工具：*
+
+* [Zapret](https://github.com/bol-van/zapret) — 系統級深度繞過 DPI 最強大、最靈活的工具。
+* [Zapret-discord-youtube](https://github.com/Flowseal/zapret-discord-youtube) — 針對特定熱門服務預先配置好的優化腳本。
+* [ByeByeDPI](https://github.com/romanvht/ByeByeDPI) — 在 Windows 上本地運行的成熟經典解決方案。
+
+---
+
+### ⭐ 支持項目
+
+**如果 Network Builder ULTRA 幫助了您，請不要忘記點個 Star ⭐️！這能激勵項目進一步發展。**
 
 [![Stargazers over time](https://starchart.cc/jinxpil/flclash-converter.svg?variant=adaptive)](https://starchart.cc/jinxpil/flclash-converter)
