@@ -36,10 +36,12 @@
 </p>
 
 > [!IMPORTANT]
-> **零信任与隐私至上。** 所有计算均在您的浏览器中严格本地执行。任何数据都不会离开您的设备。该工具仅用于教育目的，旨在研究网络协议。
+> **零信任与隐私至上。** 所有计算均在您的浏览器中严格本地执行。任何数据都不会离开您的设备。该工具仅用于教育目的，旨在深度研究网络协议。
 
 > [!WARNING]
-> **关于 YAML 和超时的重要提示：** 许多 VPN 提供商在导出订阅时，故意限制通过第三方 YAML 配置直接访问服务器。在这种情况下，代理服务器可能成功导入并在列表中显示，但在尝试连接时，大多数将进入无限超时状态（Timeout）。这可能是由于提供商的内部策略（阻止官方应用之外的请求）或审查机构（如 DPI/TSPU）针对协议的限制造成的。
+> **注意：YAML 订阅与连接超时 (Timeout) 问题：**
+> 许多 VPN 提供商在导出订阅时，会故意（或由于 API 配置不当）限制第三方客户端的使用。服务器可以成功加载到您的列表中，但在尝试连接时会进入无限超时状态。
+> 💡 **如何排查原因：** 如果您获取该节点的“原生”链接（例如 `vless://...` 或 JSON 代码）并将其作为本地配置文件手动添加，且**可以正常工作** —— 那么问题 100% 出在提供商端。这意味着他们的服务器在尝试更新订阅时，通过 `User-Agent` 拦截了您客户端的请求。在其他情况下，超时可能是由于审查防火墙（DPI）对协议特征实施的精准拦截造成的。
 
 ---
 
@@ -93,10 +95,12 @@
 <details>
 <summary><b>🤖 Android (安卓)</b></summary>
 
+- [v2RayTun](https://v2raytun.com/) — 基于 Xray Core 的高速安全客户端。
 - [FlClash](https://github.com/chen08209/FlClash) — 主要的跨平台客户端。
 - [Incy](https://incy.cc/) — 支持一键导入的现代快速客户端。
 - [Happ](https://www.happ.su/main) — 便捷管理服务器列表的代理工具。
 - [Exclave](https://github.com/ExclaveNetwork/Exclave) — 现代化且保持更新的 NekoBox 替代品，界面熟悉。
+- [Sing-box](https://github.com/SagerNet/sing-box) — 官方纯净内核，适合高级配置。
 - [Hiddify App](https://github.com/hiddify/hiddify-app) — 支持所有配置类型的通用客户端。
 - [v2rayNG](https://github.com/2dust/v2rayNG) — 基于 Xray 内核的稳定经典解决方案。
 - [Karing](https://github.com/KaringX/karing) — 功能丰富的图形界面。
@@ -107,6 +111,7 @@
 <details>
 <summary><b>🍏 iOS (苹果)</b></summary>
 
+- [v2RayTun](https://v2raytun.com/) — 基于 Xray Core 的高速安全客户端。
 - [Incy](https://incy.cc/) — App Store 中优秀的现代客户端。
 - [Happ](https://www.happ.su/main) — 舒适的代理工具。
 - [Karing](https://apps.apple.com/us/app/karing/id6472431552)
@@ -120,10 +125,8 @@
 <summary><b>💻 Desktop (电脑端 Win/Mac/Linux)</b></summary>
 
 - [v2RayTun](https://v2raytun.com/) — 基于 Xray Core 的高速安全客户端。
-- [Exclave](https://github.com/ExclaveNetwork/Exclave) — PC 端过时 NekoBox 的最佳现代替代品。
 - [Happ](https://www.happ.su/main) — 跨平台桌面版本。
 - [v2rayN](https://github.com/2dust/v2rayN) — 强大的 Windows 可自定义客户端。
-- [Sing-box](https://github.com/SagerNet/sing-box) — 官方纯净内核，适合高级配置。
 - [FlClash](https://github.com/chen08209/FlClash) — 极简快速的 GUI。
 - [Karing](https://github.com/KaringX/karing)
 - [Clash Verge Rev](https://github.com/clash-verge-rev/clash-verge-rev)
