@@ -36,10 +36,12 @@
 </p>
 
 > [!IMPORTANT]
-> **Zero-Trust y Privacidad ante todo.** Todos los cálculos se realizan estrictamente de forma local en su navegador. Ningún dato sale de su dispositivo. La herramienta ha sido creada con fines educativos para estudiar protocolos de red.
+> **Zero-Trust y Privacidad ante todo.** Todas las cálculos se realizan estrictamente de forma local en su navegador. Ningún dato sale de su dispositivo. La herramienta ha sido creada exclusivamente con fines educativos para el estudio profundo de los protocolos de red.
 
 > [!WARNING]
-> **Nota importante sobre YAML y tiempos de espera (timeouts):** Muchos proveedores de VPN restringen intencionalmente el acceso directo a los servidores a través de configuraciones YAML de terceros al exportar suscripciones. En tales casos, los servidores proxy pueden importarse con éxito y aparecer en la lista, pero al intentar conectarse, la mayoría de ellos entrarán en un tiempo de espera infinito. Esto se debe a la política interna del proveedor (bloqueo de solicitudes fuera de la aplicación oficial) o a restricciones de protocolo específicas impuestas por las autoridades de censura (DPI/TSPU).
+> **Atención: problema con las suscripciones YAML y tiempos de espera (Timeout):**
+> Muchos proveedores de VPN restringen intencionalmente (o debido a una configuración incompetente de la API) el funcionamiento de clientes de terceros al exportar suscripciones. Los servidores pueden cargarse correctamente en su lista, pero al intentar conectarse, entran en un tiempo de espera infinito.
+> 💡 **Cómo comprobar quién tiene la culpa:** Si toma un enlace "directo" al mismo nodo (por ejemplo, `vless://...` o código JSON), lo agrega manualmente como un perfil local y **funciona**, el problema está 100% del lado del proveedor. Esto significa que su servidor bloquea las solicitudes de su cliente por `User-Agent` al intentar actualizar la suscripción. En otros casos, la causa de los tiempos de espera puede ser el bloqueo específico de firmas de protocolo por parte de los sistemas de filtrado (DPI).
 
 ---
 
@@ -93,10 +95,12 @@
 <details>
 <summary><b>🤖 Android</b></summary>
 
+- [v2RayTun](https://v2raytun.com/) — Cliente seguro y de alta velocidad basado en Xray Core.
 - [FlClash](https://github.com/chen08209/FlClash) — Cliente principal multiplataforma.
 - [Incy](https://incy.cc/) — Cliente moderno y rápido con importación de un solo toque.
 - [Happ](https://www.happ.su/main) — Utilidad proxy para la gestión conveniente de listas de servidores.
 - [Exclave](https://github.com/ExclaveNetwork/Exclave) — Alternativa moderna y actualizada a NekoBox con una interfaz familiar.
+- [Sing-box](https://github.com/SagerNet/sing-box) — Núcleo oficial limpio para configuraciones avanzadas.
 - [Hiddify App](https://github.com/hiddify/hiddify-app) — Cliente universal para todos los tipos de configuración.
 - [v2rayNG](https://github.com/2dust/v2rayNG) — Solución clásica y estable para el núcleo Xray.
 - [Karing](https://github.com/KaringX/karing) — Interfaz gráfica rica en funciones.
@@ -107,6 +111,7 @@
 <details>
 <summary><b>🍏 iOS</b></summary>
 
+- [v2RayTun](https://v2raytun.com/) — Cliente seguro y de alta velocidad basado en Xray Core.
 - [Incy](https://incy.cc/) — Excelente cliente moderno en la App Store.
 - [Happ](https://www.happ.su/main) — Cómoda utilidad proxy.
 - [Karing](https://apps.apple.com/us/app/karing/id6472431552)
@@ -120,10 +125,8 @@
 <summary><b>💻 Desktop (Win/Mac/Linux)</b></summary>
 
 - [v2RayTun](https://v2raytun.com/) — Cliente seguro y de alta velocidad basado en Xray Core.
-- [Exclave](https://github.com/ExclaveNetwork/Exclave) — La mejor alternativa moderna al obsoleto NekoBox para PC.
 - [Happ](https://www.happ.su/main) — Versión de escritorio multiplataforma.
 - [v2rayN](https://github.com/2dust/v2rayN) — Potente cliente personalizable para Windows.
-- [Sing-box](https://github.com/SagerNet/sing-box) — Núcleo oficial limpio para configuraciones avanzadas.
 - [FlClash](https://github.com/chen08209/FlClash) — GUI minimalista y rápida.
 - [Karing](https://github.com/KaringX/karing)
 - [Clash Verge Rev](https://github.com/clash-verge-rev/clash-verge-rev)
