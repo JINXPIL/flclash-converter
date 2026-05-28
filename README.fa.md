@@ -38,15 +38,18 @@
 <div dir="rtl">
 
 > [!IMPORTANT]
-> **الگوی Zero-Trust و اولویت با حریم خصوصی.** تمام محاسبات دقیقاً به صورت محلی در مرورگر شما انجام می‌شود. هیچ داده‌ای از دستگاه شما خارج نمی‌شود. این ابزار صرفاً برای اهداف آموزشی و مطالعه پروتکل‌های شبکه ایجاد شده است.
+> **الگوی Zero-Trust و اولویت با حریم خصوصی.** تمام محاسبات دقیقاً به صورت محلی در مرورگر شما انجام می‌شود. هیچ داده‌ای از دستگاه شما خارج نمی‌شود. این ابزار صرفاً برای اهداف آموزشی و مطالعه عمیق پروتکل‌های شبکه ایجاد شده است.
 
 > [!WARNING]
-> **نکته مهم در مورد YAML و تایم‌اوت‌ها (Timeouts):** بسیاری از ارائه‌دهندگان VPN عمداً دسترسی مستقیم به سرورها را از طریق پیکربندی‌های شخص ثالث YAML هنگام استخراج اشتراک‌ها محدود می‌کنند. در چنین مواردی، سرورهای پروکسی ممکن است با موفقیت وارد شوند و در لیست نمایش داده شوند، اما در هنگام تلاش برای اتصال، اکثر آنها دچار تایم‌اوت نامحدود می‌شوند. این مشکل یا به دلیل سیاست داخلی ارائه‌دهنده (مسدود کردن درخواست‌های خارج از برنامه رسمی) یا به دلیل محدودیت‌های پروتکل هدفمند از سوی مقامات سانسور (مانند DPI/TSPU) ایجاد می‌شود.
+> **توجه: مشکل با اشتراک‌های YAML و تایم‌اوت‌ها (Timeout):**
+> بسیاری از ارائه‌دهندگان VPN عمداً (یا به دلیل پیکربندی نادرست API) عملکرد کلاینت‌های شخص ثالث را هنگام خروجی گرفتن از اشتراک‌ها محدود می‌کنند. سرورها ممکن است با موفقیت در لیست شما بارگذاری شوند، اما هنگام تلاش برای اتصال، دچار تایم‌اوت نامحدود می‌شوند.
+> 💡 **چگونه بررسی کنیم که تقصیر کیست:** اگر یک لینک «خام» به همان گره (به عنوان مثال `vless://...` یا کد JSON) را بردارید، آن را به صورت دستی به عنوان یک پروفایل محلی اضافه کنید و **کار کند** — مشکل ۱۰۰٪ از طرف ارائه‌دهنده است. این بدان معناست که سرور آن‌ها درخواست‌های کلاینت شما را بر اساس `User-Agent` هنگام تلاش برای به‌روزرسانی اشتراک مسدود می‌کند. در موارد دیگر، علت تایم‌اوت‌ها می‌تواند مسدودسازی هدفمند امضای پروتکل‌ها توسط سیستم‌های فیلترینگ (DPI) باشد.
 
 ---
 
 ### 📸 رابط کاربری (ULTRA Design)
 </div>
+
 <p align="center" dir="ltr">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jinxpil/flclash-converter/main/media/JSON%20to%20YAML%20Converter.jpg">
@@ -74,6 +77,7 @@
 
 ### 🔌 پروتکل‌های پشتیبانی‌شده
 </div>
+
 <table align="center" width="100%" dir="ltr">
   <tr>
     <td align="center">🛡️ <b>VLESS / VMess</b><br>Reality & Vision</td>
@@ -99,10 +103,12 @@
 <details dir="ltr">
 <summary><b dir="rtl">🤖 اندروید (Android)</b></summary>
 
+- [v2RayTun](https://v2raytun.com/) — کلاینت پرسرعت و ایمن مبتنی بر Xray Core.
 - [FlClash](https://github.com/chen08209/FlClash) — کلاینت اصلی کراس‌پلتفرم.
 - [Incy](https://incy.cc/) — کلاینت مدرن و سریع با وارد کردن اطلاعات با یک لمس.
 - [Happ](https://www.happ.su/main) — ابزار پروکسی برای مدیریت راحت لیست سرورها.
 - [Exclave](https://github.com/ExclaveNetwork/Exclave) — جایگزین مدرن و به‌روز NekoBox با رابط کاربری آشنا.
+- [Sing-box](https://github.com/SagerNet/sing-box) — هسته رسمی و تمیز برای پیکربندی پیشرفته.
 - [Hiddify App](https://github.com/hiddify/hiddify-app) — کلاینت جهانی برای تمامی انواع پیکربندی.
 - [v2rayNG](https://github.com/2dust/v2rayNG) — راه‌حل کلاسیک و پایدار برای هسته Xray.
 - [Karing](https://github.com/KaringX/karing) — رابط گرافیکی قدرتمند.
@@ -113,6 +119,7 @@
 <details dir="ltr">
 <summary><b dir="rtl">🍏 آی‌اواس (iOS)</b></summary>
 
+- [v2RayTun](https://v2raytun.com/) — کلاینت پرسرعت و ایمن مبتنی بر Xray Core.
 - [Incy](https://incy.cc/) — یک کلاینت مدرن عالی در App Store.
 - [Happ](https://www.happ.su/main) — ابزار راحت پروکسی.
 - [Karing](https://apps.apple.com/us/app/karing/id6472431552)
@@ -126,10 +133,8 @@
 <summary><b dir="rtl">💻 دسکتاپ (Win/Mac/Linux)</b></summary>
 
 - [v2RayTun](https://v2raytun.com/) — کلاینت پرسرعت و ایمن مبتنی بر Xray Core.
-- [Exclave](https://github.com/ExclaveNetwork/Exclave) — بهترین جایگزین مدرن برای NekoBox منسوخ شده در کامپیوتر.
 - [Happ](https://www.happ.su/main) — نسخه دسکتاپ کراس‌پلتفرم.
 - [v2rayN](https://github.com/2dust/v2rayN) — کلاینت قدرتمند و قابل تنظیم برای ویندوز.
-- [Sing-box](https://github.com/SagerNet/sing-box) — هسته رسمی و تمیز برای پیکربندی پیشرفته.
 - [FlClash](https://github.com/chen08209/FlClash) — رابط گرافیکی مینیمال و سریع.
 - [Karing](https://github.com/KaringX/karing)
 - [Clash Verge Rev](https://github.com/clash-verge-rev/clash-verge-rev)
@@ -153,6 +158,7 @@
 **اگر Network Builder ULTRA به شما کمک کرد، فراموش نکنید که یک ستاره (Star) بدهید! این موضوع انگیزه توسعه بیشتر پروژه را فراهم می‌کند.** :star2:
 
 </div>
+
 <p align="center" dir="ltr">
   <a href="https://starchart.cc/jinxpil/flclash-converter">
     <img src="https://starchart.cc/jinxpil/flclash-converter.svg?variant=adaptive" alt="Stargazers over time">
