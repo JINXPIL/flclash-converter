@@ -1,4 +1,4 @@
-<p align="center">
+<p align="center" dir="ltr">
   <a href="/README.en.md">🇺🇸 English</a> •
   <a href="/README.md">🇷🇺 Русский</a> •
   <a href="/README.zh.md">🇨🇳 简体中文</a> •
@@ -7,7 +7,7 @@
   <a href="/README.es.md">🇪🇸 Español</a>
 </p>
 
-<p align="center">
+<p align="center" dir="ltr">
   <a href="https://github.com/jinxpil/flclash-converter/releases">
     <img src="https://img.shields.io/github/v/release/jinxpil/flclash-converter.svg?style=for-the-badge&color=blue" alt="Release">
   </a>
@@ -22,27 +22,32 @@
   </a>
 </p>
 
-<h1 align="center">⚡ Network Builder v17.00 ULTRA</h1>
+<h1 align="center">⚡ Network Builder v17.01 ULTRA</h1>
 
-<p align="center">
-  <b>ابزاری حرفه‌ای، ۱۰۰٪ محلی و فوق‌العاده قدرتمند برای مدیریت، پاکسازی عمیق و تبدیل پایگاه‌های داده عظیم سرورهای پروکسی.</b><br>
-  <i>یک اکوسیستم واحد برای کار با پیکربندی‌های FlClash، Nekobox (Xray)، Sing-box و Clash Meta.</i>
+<p align="center" dir="rtl">
+  <b>ابزار تحت وب بسیار قدرتمند و ۱۰۰٪ محلی برای مدیریت پایگاه‌های داده غول‌پیکر سرورهای پروکسی.</b><br>
+  <i>تجزیه، تبدیل و بهینه‌سازی عمیق پیکربندی‌ها برای FlClash، Exclave، Sing-box و Clash Meta.</i>
 </p>
 
-<p align="center">
+<p align="center" dir="ltr">
   <a href="https://jinxpil.github.io/flclash-converter/">
-    <img src="https://img.shields.io/badge/🚀_باز_کردن_نسخه_ULTRA-0052FF?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Open Web Version">
+    <img src="https://img.shields.io/badge/🚀_OPEN_ULTRA--VERSION-0052FF?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Open Web Version">
   </a>
 </p>
 
+<div dir="rtl">
+
 > [!IMPORTANT]
-> **امنیت Zero-Trust و اولویت حریم خصوصی.** این پروژه هیچگونه بخش بک‌انندی ندارد. تمام عملیات‌ها — از تجزیه (Parsing) تا تولید کدهای QR — منحصراً در حافظه رم مرورگر شما انجام می‌شود. هیچ‌یک از UUIDها، کلیدها یا آدرس‌های IP هرگز به سرورهای شخص ثالث ارسال نمی‌شوند.
+> **الگوی Zero-Trust و اولویت با حریم خصوصی.** تمام محاسبات دقیقاً به صورت محلی در مرورگر شما انجام می‌شود. هیچ داده‌ای از دستگاه شما خارج نمی‌شود. این ابزار صرفاً برای اهداف آموزشی و مطالعه پروتکل‌های شبکه ایجاد شده است.
+
+> [!WARNING]
+> **نکته مهم در مورد YAML و تایم‌اوت‌ها (Timeouts):** بسیاری از ارائه‌دهندگان VPN عمداً دسترسی مستقیم به سرورها را از طریق پیکربندی‌های شخص ثالث YAML هنگام استخراج اشتراک‌ها محدود می‌کنند. در چنین مواردی، سرورهای پروکسی ممکن است با موفقیت وارد شوند و در لیست نمایش داده شوند، اما در هنگام تلاش برای اتصال، اکثر آنها دچار تایم‌اوت نامحدود می‌شوند. این مشکل یا به دلیل سیاست داخلی ارائه‌دهنده (مسدود کردن درخواست‌های خارج از برنامه رسمی) یا به دلیل محدودیت‌های پروتکل هدفمند از سوی مقامات سانسور (مانند DPI/TSPU) ایجاد می‌شود.
 
 ---
 
-### 📸 رابط کاربری (طراحی ULTRA)
-
-<p align="center">
+### 📸 رابط کاربری (ULTRA Design)
+</div>
+<p align="center" dir="ltr">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jinxpil/flclash-converter/main/media/JSON%20to%20YAML%20Converter.jpg">
     <img alt="JSON to YAML" src="https://raw.githubusercontent.com/jinxpil/flclash-converter/main/media/JSON%20to%20YAML%20Converter.jpg" width="48%">
@@ -53,77 +58,103 @@
   </picture>
 </p>
 
----
-
-### 🔥 چه چیز جدیدی در نسخه 17.00 ULTRA وجود دارد؟
-
-- 🚀 **موتور تجزیه فوق‌العاده (Extreme Parser):** موتور برنامه برای مدیریت همزمان **بیش از ۱۰,۰۰۰ گره** کاملاً بهینه شده است. اسکرول روان و جستجوی آنی حتی در سنگین‌ترین پایگاه‌های داده بدون کوچکترین تأخیری عمل می‌کنند.
-- 🌍 **بومی‌سازی ULTRA:** پشتیبانی کامل و عمیق از ۶ زبان (RU, EN, ZH, ZH-TW, FA, ES). رابط کاربری بصری با انطباق کامل تمام اعلان‌ها و عناصر کنترلی برای هر منطقه.
-- 🛡️ **سیستم محافظت QuotaGuard:** کنترل هوشمند حافظه مرورگر. این سیستم از کرش کردن برنامه (QuotaExceededError) هنگام وارد کردن اشتراک‌های بسیار حجیم با حجم ده‌ها مگابایت جلوگیری می‌کند.
-- 🧠 **فیلتر هوشمند موارد تکراری:** مقایسه خودکار گره‌ها بر اساس جفت IP:Port. برنامه به سرعت موارد تکراری را شناسایی و حذف کرده و فقط سرورهای منحصر به فرد را در لیست شما باقی می‌گذارد.
-- 🛠️ **پایداری بهبودیافته:** خطاهای نحوی حیاتی (SyntaxError) در پنجره‌های مودال برطرف شده و عملکرد کلیپ‌بورد برای کپی بدون نقص در دستگاه‌های موبایل بهینه شده است.
+<div dir="rtl">
 
 ---
 
-### 🔌 پروتکل‌های تحت پشتیبانی
+### 🔥 چه چیزی در نسخه 17.01 ULTRA جدید است؟
 
-<table align="center" width="100%">
+- 🚀 **Extreme Parser Engine:** بهینه‌سازی کامل کد برای مدیریت همزمان **بیش از 10,000 گره**. رابط روان حتی با حجم عظیمی از داده‌ها.
+- 🌍 **ULTRA Localization:** پشتیبانی عمیق از ۶ زبان (RU، EN، ZH، FA، ES). رابط کاربری و اعلان‌های سیستم اکنون کاملاً سازگار شده‌اند.
+- 🛡️ **سیستم QuotaGuard:** محافظت هوشمند در برابر سرریز حافظه مرورگر. با هر اندازه پیکربندی بدون خطر خرابی زبانه کار کنید.
+- 🧠 **Smart Duplicate Filter:** مقایسه خودکار سرورها با جفت IP:Port. برنامه به طور خودکار فایل‌های اضافی و تکراری را حذف کرده و فقط گره‌های منحصر به فرد را باقی می‌گذارد.
+- 🛠️ **Refined Diagnostics:** ثبت‌کننده رویدادهای به‌روزشده و رفع خطاهای نحوی (SyntaxError fix) برای پایداری بی‌نقص.
+
+---
+
+### 🔌 پروتکل‌های پشتیبانی‌شده
+</div>
+<table align="center" width="100%" dir="ltr">
   <tr>
-    <td align="center">🛡️ <b>VLESS / VMess</b><br>Reality, Vision, gRPC</td>
-    <td align="center">⚡ <b>Hysteria 1/2</b><br>Brutal Speed & Port Hopping</td>
-    <td align="center">🐎 <b>Trojan</b><br>Stealth TLS & Password</td>
+    <td align="center">🛡️ <b>VLESS / VMess</b><br>Reality & Vision</td>
+    <td align="center">⚡ <b>Hysteria 2</b><br>Brutal Speed</td>
+    <td align="center">🐎 <b>Trojan</b><br>Stealth Protocol</td>
   </tr>
   <tr>
-    <td align="center">🔒 <b>WireGuard</b><br>Native VPN & AmneziaWG</td>
-    <td align="center">🌐 <b>Shadowsocks / RR</b><br>Classic & AEAD Ciphers</td>
-    <td align="center">🔌 <b>TUIC / Socks5 / HTTP</b><br>سازگاری کامل با تمام پروتکل‌ها</td>
+    <td align="center">🔒 <b>WireGuard</b><br>Native VPN</td>
+    <td align="center">🌐 <b>SS / SSR</b><br>Shadowsocks</td>
+    <td align="center">🔌 <b>TUIC / Socks5 / HTTP</b><br>Full Support</td>
   </tr>
 </table>
 
----
-
-### 🔥 قابلیت‌های اصلی
-
-- 🧩 **تجزیه‌گر Omni (همه‌جانبه):** رمزگشایی آنی اشتراک‌های Base64، استخراج لینک‌های خام مستقیم از متن و مهندسی معکوس عمیق پیکربندی‌های پیچیده JSON/YAML.
-- 🌍 **ویرایشگر انبوه (Mass Editor):** تغییر دسته‌جمعی پارامترها (SNI، Fingerprint، Flow، Public Key) برای هزاران گره انتخاب شده به طور همزمان تنها با یک کلیک.
-- 🌍 **GeoIP هوشمند:** تشخیص خودکار کشور و شهر محل استقرار سرور با افزودن خودکار پرچم‌ها (🇫🇮، 🇩🇪، 🇺🇸) به نام سرورها.
-- ⚙️ **بهینه‌سازی خودکار:** پاکسازی گره‌های «مرده» پس از تست پینگ، مخلوط کردن (Shuffle) لیست و اصلاح خودکار لینک‌های URI آسیب‌دیده.
-- 🐛 **لاگر تشخیصی (Diagnostic Logger):** سیستم داخلی نظارت بر رویدادها در زمان واقعی برای یافتن مشکلات در پیکربندی‌ها و گزارش‌های شبکه.
+<div dir="rtl">
 
 ---
 
-### 📥 کلاینت‌های پیشنهادی (سازگار با ULTRA)
+### 📥 کلاینت‌های توصیه‌شده (سازگار با ULTRA)
 
-<details>
-<summary><b>🤖 اندروید (Android)</b></summary>
+> [!NOTE]
+> کلاینت‌های محبوبی مانند **NekoBox** و **NekoRay** در حال حاضر منسوخ شده در نظر گرفته می‌شوند. اکیداً توصیه می‌شود به جایگزین‌های مدرن و بهینه‌سازی شده‌ای که بر روی هسته‌های **sing-box** و **Xray** ساخته شده‌اند تغییر دهید (به عنوان مثال، **Exclave** که رابط کاربری NekoBox را کاملاً شبیه‌سازی می‌کند یا **Incy**).
 
-- [FlClash](https://github.com/chen08209/FlClash) — کلاینت پیشنهادی
-- [Karing](https://github.com/KaringX/karing) — رابط کاربری پیشرفته
+<details dir="ltr">
+<summary><b dir="rtl">🤖 اندروید (Android)</b></summary>
+
+- [FlClash](https://github.com/chen08209/FlClash) — کلاینت اصلی کراس‌پلتفرم.
+- [Incy](https://incy.cc/) — کلاینت مدرن و سریع با وارد کردن اطلاعات با یک لمس.
+- [Happ](https://www.happ.su/main) — ابزار پروکسی برای مدیریت راحت لیست سرورها.
+- [Exclave](https://github.com/ExclaveNetwork/Exclave) — جایگزین مدرن و به‌روز NekoBox با رابط کاربری آشنا.
+- [Hiddify App](https://github.com/hiddify/hiddify-app) — کلاینت جهانی برای تمامی انواع پیکربندی.
+- [v2rayNG](https://github.com/2dust/v2rayNG) — راه‌حل کلاسیک و پایدار برای هسته Xray.
+- [Karing](https://github.com/KaringX/karing) — رابط گرافیکی قدرتمند.
 - [Clash Meta for Android](https://github.com/MetaCubeX/ClashMetaForAndroid)
+- ~~[NekoBox For Android](https://github.com/MatsuriDayo/NekoBoxForAndroid)~~ *(منسوخ شده)*
 </details>
 
-<details>
-<summary><b>🍏 آی‌او‌اس (iOS)</b></summary>
+<details dir="ltr">
+<summary><b dir="rtl">🍏 آی‌اواس (iOS)</b></summary>
 
+- [Incy](https://incy.cc/) — یک کلاینت مدرن عالی در App Store.
+- [Happ](https://www.happ.su/main) — ابزار راحت پروکسی.
 - [Karing](https://apps.apple.com/us/app/karing/id6472431552)
 - [Clash.MI](https://apps.apple.com/us/app/clash-mi/id6744321968)
 - [Stash](https://apps.apple.com/us/app/stash-rule-based-proxy/id1596063349)
 - [Clash Lite](https://apps.apple.com/us/app/clash-lite/id6761357475)
-- [V2Lite VPN - Super VPN Proxy](https://apps.apple.com/us/app/v2lite-vpn-super-vpn-proxy/id6444585377)
+- [V2Lite VPN](https://apps.apple.com/us/app/v2lite-vpn-super-vpn-proxy/id6444585377)
 </details>
 
-<details>
-<summary><b>💻 دسکتاپ (Win/Mac/Linux)</b></summary>
+<details dir="ltr">
+<summary><b dir="rtl">💻 دسکتاپ (Win/Mac/Linux)</b></summary>
 
+- [v2RayTun](https://v2raytun.com/) — کلاینت پرسرعت و ایمن مبتنی بر Xray Core.
+- [Exclave](https://github.com/ExclaveNetwork/Exclave) — بهترین جایگزین مدرن برای NekoBox منسوخ شده در کامپیوتر.
+- [Happ](https://www.happ.su/main) — نسخه دسکتاپ کراس‌پلتفرم.
+- [v2rayN](https://github.com/2dust/v2rayN) — کلاینت قدرتمند و قابل تنظیم برای ویندوز.
+- [Sing-box](https://github.com/SagerNet/sing-box) — هسته رسمی و تمیز برای پیکربندی پیشرفته.
+- [FlClash](https://github.com/chen08209/FlClash) — رابط گرافیکی مینیمال و سریع.
 - [Karing](https://github.com/KaringX/karing)
-- [FlClash](https://github.com/chen08209/FlClash)
 - [Clash Verge Rev](https://github.com/clash-verge-rev/clash-verge-rev)
+- ~~[NekoRay](https://github.com/MatsuriDayo/nekoray)~~ *(منسوخ شده)*
 </details>
+
+---
+
+### 🛡️ ابزارهای جایگزین (دور زدن DPI)
+
+*اگر پروتکل‌های استاندارد VPN به طور کامل توسط ارائه‌دهنده اینترنت شما یا فایروال‌های سانسور مسدود شده‌اند، از ابزارهای محلی دور زدن بازرسی عمیق بسته‌ها (DPI) استفاده کنید:*
+
+* [Zapret](https://github.com/bol-van/zapret) — قدرتمندترین و انعطاف‌پذیرترین ابزار برای دور زدن عمیق DPI در سطح سیستم.
+* [Zapret-discord-youtube](https://github.com/Flowseal/zapret-discord-youtube) — اسکریپت‌های بهینه‌سازی شده و از پیش پیکربندی شده برای سرویس‌های محبوب خاص.
+* [ByeByeDPI](https://github.com/romanvht/ByeByeDPI) — راه‌حل کلاسیک اثبات‌شده برای اجرای محلی در ویندوز.
 
 ---
 
 ### ⭐ حمایت از پروژه
 
-**اگر Network Builder ULTRA برای شما مفید بود، لطفاً به آن ستاره بدهید! این کار باعث انگیزه برای توسعه بیشتر پروژه می‌شود.** :star2:
+**اگر Network Builder ULTRA به شما کمک کرد، فراموش نکنید که یک ستاره (Star) بدهید! این موضوع انگیزه توسعه بیشتر پروژه را فراهم می‌کند.** :star2:
 
-[![Stargazers over time](https://starchart.cc/jinxpil/flclash-converter.svg?variant=adaptive)](https://starchart.cc/jinxpil/flclash-converter)
+</div>
+<p align="center" dir="ltr">
+  <a href="https://starchart.cc/jinxpil/flclash-converter">
+    <img src="https://starchart.cc/jinxpil/flclash-converter.svg?variant=adaptive" alt="Stargazers over time">
+  </a>
+</p>
