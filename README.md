@@ -125,7 +125,6 @@
 <summary><b>💻 Desktop (Win/Mac/Linux)</b></summary>
 
 - [v2RayTun](https://v2raytun.com/) — Высокоскоростной и безопасный клиент на базе ядра Xray Core.
-- [Exclave](https://github.com/ExclaveNetwork/Exclave) — Лучшая современная альтернатива устаревшему NekoBox для ПК.
 - [Happ](https://www.happ.su/main) — Кроссплатформенная десктопная версия.
 - [v2rayN](https://github.com/2dust/v2rayN) — Мощный настраиваемый клиент для Windows.
 - [FlClash](https://github.com/chen08209/FlClash) — Минималистичный и быстрый GUI.
