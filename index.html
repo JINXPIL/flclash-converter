@@ -2372,7 +2372,40 @@ function copyLink(i) {
         }
 
         // ====================================================================
-        // УМНЫЙ ПАРСЕР (Нечеткий поиск и автораспознавание)
+        // ОФФЛАЙН ИИ-АНАЛИЗАТОР (Smart Fixer)
+        // ====================================================================
+        const OfflineAIFixer = {
+            healJSON: function(text) {
+                DiagnosticLogger.add('AI_FIXER', 'Пытаюсь вылечить сломанный JSON...');
+                let healed = text;
+                // 1. Убираем лишние запятые в конце объектов/массивов (частая ошибка)
+                healed = healed.replace(/,\s*([\]}])/g, '$1');
+                // 2. Оборачиваем ключи без кавычек в кавычки (например { server: "ip" } -> { "server": "ip" })
+                healed = healed.replace(/([{,]\s*)([a-zA-Z0-9_-]+)\s*:/g, '$1"$2":');
+                // 3. Убираем HTML теги, если JSON случайно скопировали с куском веб-страницы
+                healed = healed.replace(/<[^>]*>?/gm, '');
+                return healed;
+            },
+            
+            healYAML: function(text) {
+                DiagnosticLogger.add('AI_FIXER', 'Пытаюсь вылечить сломанный YAML...');
+                let healed = text;
+                // 1. Главный враг YAML - это табы (Tab). Заменяем каждый таб на 2 пробела.
+                healed = healed.replace(/\t/g, '  ');
+                // 2. Убираем невидимые спецсимволы, которые ломают парсер
+                healed = healed.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '');
+                return healed;
+            },
+            
+            healBase64: function(text) {
+                DiagnosticLogger.add('AI_FIXER', 'Очистка мусора вокруг Base64...');
+                // Удаляем всё, что не является символами Base64
+                return text.replace(/[^A-Za-z0-9+/=]/g, '');
+            }
+        };
+
+        // ====================================================================
+        // УМНЫЙ ПАРСЕР СО ВСТРОЕННЫМ ИИ-ЛЕКАРЕМ
         // ====================================================================
         function parseData(rawText) {
             let text = rawText.trim();
@@ -2404,12 +2437,29 @@ function copyLink(i) {
                 }
             };
 
-            // 1. JSON
+            // 1. АНАЛИЗ И ПАРСИНГ JSON
             if (text.startsWith('{')) {
+                let jsonParsed = false;
                 try {
                     let json = JSON.parse(text);
-                    if (json.outbounds) {
-                        json.outbounds.forEach(ob => {
+                    processJsonOutbounds(json);
+                    jsonParsed = true;
+                } catch(e) {
+                    // ЕСЛИ ОШИБКА: Вызываем Оффлайн ИИ для лечения JSON
+                    try {
+                        let healedText = OfflineAIFixer.healJSON(text);
+                        let json = JSON.parse(healedText);
+                        DiagnosticLogger.add('AI_FIXER', '✅ Успешно! JSON был восстановлен.');
+                        processJsonOutbounds(json);
+                        jsonParsed = true;
+                    } catch(err2) {
+                        DiagnosticLogger.add('ERROR', 'ИИ не смог спасти этот JSON', err2.message);
+                    }
+                }
+
+                function processJsonOutbounds(jsonObj) {
+                    if (jsonObj.outbounds) {
+                        jsonObj.outbounds.forEach(ob => {
                             let pt = ob.protocol || ob.type;
                             if (['freedom','blackhole','dns','direct','block','selector','urltest'].includes(pt)) return;
                             
@@ -2434,14 +2484,28 @@ function copyLink(i) {
                             }
                         });
                     }
-                } catch(e) {}
+                }
             }
-            // 2. YAML
+            // 2. АНАЛИЗ И ПАРСИНГ YAML
             else if (text.includes('proxies:') && window.jsyaml) {
                 try {
                     const doc = jsyaml.load(text);
-                    if (doc && doc.proxies && Array.isArray(doc.proxies)) {
-                        doc.proxies.forEach(cp => {
+                    processYamlProxies(doc);
+                } catch (e) {
+                    // ЕСЛИ ОШИБКА: Вызываем Оффлайн ИИ для лечения YAML
+                    try {
+                        let healedText = OfflineAIFixer.healYAML(text);
+                        const doc = jsyaml.load(healedText);
+                        DiagnosticLogger.add('AI_FIXER', '✅ Успешно! YAML был восстановлен.');
+                        processYamlProxies(doc);
+                    } catch (err2) {
+                        DiagnosticLogger.add('ERROR', 'ИИ не смог спасти этот YAML', err2.message);
+                    }
+                }
+
+                function processYamlProxies(docObj) {
+                    if (docObj && docObj.proxies && Array.isArray(docObj.proxies)) {
+                        docObj.proxies.forEach(cp => {
                             if (cp.type === 'vless' || cp.type === 'trojan') {
                                 let nn = typeof addGeoFlag === 'function' ? addGeoFlag(cp.name || "Node") : (cp.name || "Node");
                                 let p = { name: nn, type: cp.type, server: cp.server, port: parseInt(cp.port), network: cp.network || 'tcp', tls: cp.tls === true, sni: cp.sni || cp.server, fp: cp['client-fingerprint'] || "chrome" };
@@ -2457,10 +2521,21 @@ function copyLink(i) {
                             }
                         });
                     }
-                } catch (e) {}
+                }
             }
-            // 3. СЫРЫЕ ССЫЛКИ
+            // 3. СЫРЫЕ ССЫЛКИ (ИИ-распознавание Base64)
             else {
+                // Если текст грязный, ИИ пытается вытащить из него чистый Base64
+                if (!text.includes('vless://') && !text.includes('trojan://')) {
+                    text = OfflineAIFixer.healBase64(text);
+                    try {
+                        let decoded = decodeURIComponent(escape(atob(text)));
+                        if (decoded.includes('vless://') || decoded.includes('trojan://')) {
+                            text = decoded; 
+                        }
+                    } catch(e) {}
+                }
+
                 const linkRegex = /(vless|trojan):\/\/[^\s<>'"]+/gi;
                 const matches = text.match(linkRegex) || [];
 
@@ -2494,11 +2569,9 @@ function copyLink(i) {
             } else if (duplicates > 0) {
                 if (typeof showToast === 'function') showToast(`⚠️ Эти узлы уже есть в списке (пропущено: ${duplicates})`, "warning");
             } else {
-                if (typeof showToast === 'function') showToast("❌ Узлов не найдено", "error");
+                if (typeof showToast === 'function') showToast("❌ Узлов не найдено (Попробуйте очистить текст)", "error");
             }
         }
-    
-// Конец функции parseData
 
         // ====================================================================
         // СИСТЕМА ПИНГОВАНИЯ (Проверка доступности узлов)
