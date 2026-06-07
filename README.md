@@ -22,7 +22,7 @@
   </a>
 </p>
 
-<h1 align="center">⚡ Network Builder v17.01 ULTRA</h1>
+<h1 align="center">⚡ Network Builder v17.02 ULTRA</h1>
 
 <p align="center">
   <b>Экстремально мощный и 100% локальный веб-инструмент для управления гигантскими базами прокси-серверов.</b><br>
