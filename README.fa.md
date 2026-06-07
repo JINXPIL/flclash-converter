@@ -22,7 +22,7 @@
   </a>
 </p>
 
-<h1 align="center">⚡ Network Builder v17.01 ULTRA</h1>
+<h1 align="center">⚡ Network Builder v17.02 ULTRA</h1>
 
 <p align="center" dir="rtl">
   <b>ابزار تحت وب بسیار قدرتمند و ۱۰۰٪ محلی برای مدیریت پایگاه‌های داده غول‌پیکر سرورهای پروکسی.</b><br>
