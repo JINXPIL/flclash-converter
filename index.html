@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#0d1117">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Network Builder v17.01 ULTRA</title>
+    <title>Network Builder v17.02 ULTRA</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
     <style>
@@ -120,7 +120,7 @@
 <body>
     <div class="container">
         <h2>
-            <div>⚡ Network Builder <span style="color:var(--text-muted); font-size:16px;">v17.01 ULTRA</span></div>
+            <div>⚡ Network Builder <span style="color:var(--text-muted); font-size:16px;">v17.02 ULTRA</span></div>
             <div class="badges-wrapper">
                 <div class="version-badge" id="mihomoVersion" title="Версия ядра Mihomo"><a href="https://github.com/MetaCubeX/mihomo/releases" target="_blank">⏳ Core...</a></div>
                 <div class="version-badge" id="rulesVersion" style="color:var(--primary-color);" title="Базы обхода блокировок"><a href="https://github.com/MetaCubeX/meta-rules-dat/releases" target="_blank">🛡️ Rules...</a></div>
@@ -309,9 +309,10 @@
     </div>
 
 
-    <script type="text/plain" id="tpl-crimea-base">
+<script type="text/plain" id="tpl-crimea-base">
 geodata-loader: memconservative
-global-client-fingerprint: chrome  
+client-fingerprint: chrome  
+global-ua: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
 
 geox-url:
   geoip: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.dat"
@@ -326,17 +327,52 @@ ipv6: true
 log-level: warning
 allow-lan: false
 mixed-port: 7890
+
 tcp-concurrent: true
-keep-alive-idle: 30
-keep-alive-interval: 15
+keep-alive-idle: 600      
+keep-alive-interval: 30   
 unified-delay: true
 geodata-mode: true
 find-process-mode: strict
+
 external-controller: 127.0.0.1:9090
 profile:
   store-selected: true
   store-fake-ip: true
   tracing: true
+
+proxy-providers:
+  igareck_mobile_black:
+    type: http
+    url: "https://cdn.jsdelivr.net/gh/igareck/vpn-configs-for-russia@main/BLACK_VLESS_RUS_mobile.txt"
+    interval: 14400
+    path: ./providers/igareck_mobile_black.yaml
+    override: { client-fingerprint: chrome }
+    health-check: { enable: true, interval: 600, timeout: 4000, lazy: true, expected-status: 204, url: "http://connectivitycheck.android.com/generate_204" }
+
+  igareck_white_1:
+    type: http
+    url: "https://cdn.jsdelivr.net/gh/igareck/vpn-configs-for-russia@main/Vless-Reality-White-Lists-Rus-Mobile.txt"
+    interval: 14400
+    path: ./providers/igareck_white_1.yaml
+    override: { client-fingerprint: ios }
+    health-check: { enable: true, interval: 600, timeout: 4000, lazy: true, expected-status: 204, url: "http://www.gstatic.com/generate_204" }
+
+  zieng2_universal:
+    type: http
+    url: "https://cdn.jsdelivr.net/gh/zieng2/wl@main/vless_universal.txt"
+    interval: 14400
+    path: ./providers/zieng2_universal.yaml
+    override: { client-fingerprint: safari }
+    health-check: { enable: true, interval: 600, timeout: 4000, lazy: true, expected-status: 204, url: "http://edge-http.microsoft.com/captiveportal/generate_204" }
+
+  goida_26:
+    type: http
+    url: "https://cdn.jsdelivr.net/gh/AvenCores/goida-vpn-configs@main/githubmirror/26.txt"
+    interval: 14400
+    path: ./providers/goida_26.yaml
+    override: { client-fingerprint: firefox }
+    health-check: { enable: true, interval: 600, timeout: 4000, lazy: true, expected-status: 204, url: "http://connect.rom.miui.com/generate_204" }
 
 rule-providers:
   adblock-rules:
@@ -346,7 +382,6 @@ rule-providers:
     url: "https://cdn.jsdelivr.net/gh/DustinWin/ruleset_geodata@mihomo-ruleset/ads.mrs"
     path: ./rules/adblock.mrs
     interval: 86400
-
   hagezi-tif:
     type: http
     behavior: domain
@@ -354,7 +389,6 @@ rule-providers:
     url: "https://cdn.jsdelivr.net/gh/MiHomoer/MiHomo-Hagezi@release/HageziUltimate.mrs"
     path: ./rules/hagezi-tif.mrs
     interval: 86415
-
   sukka-phishing:
     type: http
     behavior: domain
@@ -362,21 +396,18 @@ rule-providers:
     url: "https://ruleset.skk.moe/Clash/domainset/reject_phishing.txt"
     path: ./rules/sukka-phishing.txt
     interval: 86430
-
   blockhttpdns:
     type: http
     behavior: classical
     url: "https://cdn.jsdelivr.net/gh/Accademia/Additional_Rule_For_Clash@main/BlockHttpDNSPlus/BlockHttpDNSPlus.yaml"
     path: ./rules/blockhttpdns.yaml
     interval: 86445
-
   hijacking-plus:
     type: http
     behavior: classical
     url: "https://cdn.jsdelivr.net/gh/Accademia/Additional_Rule_For_Clash@main/HijackingPlus/HijackingPlus.yaml"
     path: ./rules/hijacking.yaml
     interval: 86460
-
   apple-ai:
     type: http
     behavior: classical
@@ -393,12 +424,10 @@ dns:
   use-hosts: true
   use-system-hosts: true
   respect-rules: false
-  
   independent-cache: true  
-  prefer-h3: false         
+  prefer-h3: true         
   cache-algorithm: arc
   cache-capacity: 4096
-
   fake-ip-filter:
     - '+.stun.*.*'
     - '+.stun.*.*.*'
@@ -522,13 +551,11 @@ dns:
     - https://cloudflare-dns.com/dns-query
     - 2620:fe::fe            
     - 2606:4700:4700::1111   
-  
   proxy-server-nameserver:
     - https://1.1.1.1/dns-query
     - 8.8.8.8
     - 1.0.0.1
     - 77.88.8.8
-
   fallback:
     - https://dns.adguard-dns.com/dns-query
     - https://1.0.0.1/dns-query
@@ -546,9 +573,9 @@ dns:
       - '+.github.com'
 
   nameserver-policy:
-    '+.xbox.com': [https://xbox-dns.ru/dns-query, tls://xbox-dns.ru, 111.88.96.50, 111.88.96.51]
-    '+.xboxlive.com': [https://xbox-dns.ru/dns-query, tls://xbox-dns.ru, 111.88.96.50, 111.88.96.51]
-    '+.xbl.io': [https://xbox-dns.ru/dns-query, tls://xbox-dns.ru, 111.88.96.50, 111.88.96.51]
+    '+.xbox.com': ['https://xbox-dns.ru/dns-query', 'tls://xbox-dns.ru', '111.88.96.50', '111.88.96.51']
+    '+.xboxlive.com': ['https://xbox-dns.ru/dns-query', 'tls://xbox-dns.ru', '111.88.96.50', '111.88.96.51']
+    '+.xbl.io': ['https://xbox-dns.ru/dns-query', 'tls://xbox-dns.ru', '111.88.96.50', '111.88.96.51']
     'xbox-dns.ru': "https://dns.yandex.ru/dns-query"
     '+.googleapis.com': "https://dns.quad9.net/dns-query"
     '+.gstatic.com': "https://dns.quad9.net/dns-query"
@@ -572,66 +599,108 @@ sniffer:
   parse-pure-ip: true
   override-destination: true 
   sniff-client-payload: true
+  force-domain:
+    - "+"
   sniff:
     tls:
-      ports: [443, 8443]
+      ports: [443, 8443, 2053, 2083, 2087, 2096]
     http:
-      ports: [80, 8080-8880]
+      ports: [80, '8080-8880', 2052, 2082, 2086, 2095]
+    quic:
+      ports: [443]
+
   skip-domain:
-    - '*.msftconnecttest.com'
-    - '*.msftncsi.com'
-    - '*.xbox.com'
-    - '*.xboxlive.com'
-    - '*.xbl.io'
-    - '*.openai.com'
-    - 'openai.com'
-    - '*.chatgpt.com'
-    - 'chatgpt.com'
-    - '*.deepseek.com'
-    - '*.claude.ai'
-    - '*.anthropic.com'
-    - '*.oaistatic.com'
-    - '*.oaiusercontent.com'
-    - 'android.chat.openai.com'
-    - '*.statsigapi.net'
-    - '*.statsig.com'
-    - '*.sentry.io'
-    - '*.auth0.com'
-    - '*.livekit.cloud'
-    - '*.arkoselabs.com'
-    - '*.intercom.io'
-    - '*.intercomcdn.com'
-    - '*.workos.com'
-    - '*.featuregates.org'
-    - '*.featureassets.org'
-    - '*.push.apple.com'
-    - '*.apple.com'
+    - '+.msftconnecttest.com'
+    - '+.msftncsi.com'
+    - '+.apple.com'
+    - '+.push.apple.com'
     - 'challenges.cloudflare.com'
-    - '*.copilot.microsoft.com'
-    - '*.copilot.cloud.microsoft'
-    - '*.bing.com'
-    - '*.edge.microsoft.com'
-    - '*.oray.com'
-    - '219.151.25.183'
-    - '*.max.ru'           
-    - '*.lisaalert.org'
-    - '*.dobro.ru'
+    - '+.arkoselabs.com'
+    - '+.recaptcha.net'
+    - '+.hcaptcha.com'
+    - '+.gstatic.com'
+    - '+.xbox.com'
+    - '+.xboxlive.com'
+    - '+.xbl.io'
+    - '+.steampowered.com'
+    - '+.steamcommunity.com'
+    - '+.playstation.net'
+    - '+.openai.com'
+    - '+.chatgpt.com'
+    - '+.deepseek.com'
+    - '+.claude.ai'
+    - '+.anthropic.com'
+    - '+.oaistatic.com'
+    - '+.oaiusercontent.com'
+    - '+.copilot.microsoft.com'
+    - '+.copilot.cloud.microsoft'
+    - '+.bing.com'
+    - '+.edge.microsoft.com'
+    - '+.statsigapi.net'
+    - '+.statsig.com'
+    - '+.sentry.io'
+    - '+.auth0.com'
+    - '+.livekit.cloud'
+    - '+.intercom.io'
+    - '+.intercomcdn.com'
+    - '+.workos.com'
+    - '+.featuregates.org'
+    - '+.featureassets.org'
+    - '+.googlevideo.com'
+    - '+.youtube.com'
+    - '+.googleapis.com'
+    - '+.gosuslugi.ru'
+    - '+.mos.ru'
+    - '+.sberbank.ru'
+    - '+.tbank.ru'
+    - '+.vtb.ru'
+    - '+.yandex.ru'
+    - '+.vk.com'
+    - '+.oray.com'
+    - '+.max.ru'           
+    - '+.lisaalert.org'
+    - '+.dobro.ru'
 
   skip-src-address:
-    - fe80::/10
-    - fc00::/7
+    - 'fe80::/10'
+    - 'fc00::/7'
+    
   skip-dst-address:
-    - 149.154.160.0/20     
-    - 91.108.4.0/22
-    - 91.108.8.0/21
-    - 91.108.56.0/22
+    - '127.0.0.0/8'
+    - '10.0.0.0/8'
+    - '172.16.0.0/12'
+    - '192.168.0.0/16'
+    - '100.64.0.0/10' 
+    - '219.151.25.183/32' 
+    - '149.154.160.0/20'
+    - '91.108.4.0/22'
+    - '91.108.8.0/21'
+    - '91.108.12.0/22'
+    - '91.108.16.0/22'
+    - '91.108.56.0/22'
+    - '91.105.192.0/23'
+    - '185.76.151.0/24'
     </script>
 
-    <script type="text/plain" id="tpl-crimea-rules">
+<script type="text/plain" id="tpl-crimea-rules">
+# ─────────────────────────────────────────────
+# RULES
+# ─────────────────────────────────────────────
 rules:
+  # ================================================================
+  # 0.0 СИСТЕМНЫЕ ПРОЦЕССЫ ИБ / АНАЛИЗАТОРЫ ТРАФИКА (Сброс из TUN)
+  # ================================================================
   - PROCESS-NAME,wireshark.exe,DIRECT
   - PROCESS-NAME,nmap.exe,DIRECT
   - PROCESS-NAME,dumpcap.exe,DIRECT
+  - PROCESS-NAME,fiddler.exe,DIRECT
+  - PROCESS-NAME,charles.exe,DIRECT
+  - PROCESS-NAME,proxifier.exe,DIRECT
+
+  # ================================================================
+  # 0.1 СИСТЕМНЫЕ ПРОЦЕССЫ ОС И ПРОВЕРКИ СВЯЗИ (Captive Portals)
+  # ================================================================
+  - DOMAIN,captive.apple.com,DIRECT
   - DOMAIN-SUFFIX,push.apple.com,DIRECT
   - DOMAIN,aps.apple.com,DIRECT
   - DOMAIN-SUFFIX,ls.apple.com,DIRECT
@@ -644,6 +713,12 @@ rules:
   - DOMAIN-SUFFIX,windowsupdate.com,DIRECT
   - DOMAIN-SUFFIX,msftncsi.com,DIRECT
   - DOMAIN-SUFFIX,msftconnecttest.com,DIRECT
+  - DOMAIN,ipv6.msftconnecttest.com,REJECT 
+  - DOMAIN,connectivitycheck.gstatic.com,DIRECT
+  - DOMAIN,connectivitycheck.android.com,DIRECT
+  - DOMAIN,connect.rom.miui.com,DIRECT
+  - DOMAIN,wifi.vivo.com.cn,DIRECT
+  - DOMAIN,netcheck.vivo.com.cn,DIRECT
   - DOMAIN,vpushonrt-stsdk.vivo.com.cn,DIRECT    
   - DOMAIN,accountinfo.vivo.com.cn,DIRECT        
   - DOMAIN-SUFFIX,vivo.com.cn,DIRECT
@@ -652,8 +727,10 @@ rules:
   - DOMAIN,content-aware.vivo.com,DIRECT
   - DOMAIN-SUFFIX,com.vivo.pushservice,DIRECT
   - DOMAIN-SUFFIX,push.vivo.com.cn,DIRECT
-  - DOMAIN,wifi.vivo.com.cn,DIRECT
-  - DOMAIN,netcheck.vivo.com.cn,DIRECT
+
+  # ================================================================
+  # 0.2 БЛОКИРОВКА РЕКЛАМЫ, УГРОЗ, ХИТРЫХ DNS И ТЕЛЕМЕТРИИ
+  # ================================================================
   - RULE-SET,hijacking-plus,REJECT
   - GEOSITE,category-ads-all,REJECT 
   - RULE-SET,hagezi-tif,REJECT
@@ -668,35 +745,79 @@ rules:
   - DOMAIN,adservice.google.com.pe,REJECT
   - DOMAIN-SUFFIX,adservice.google.co.kr,REJECT
   - DOMAIN,fundingchoicesmessages.google.com,REJECT
-  - DST-PORT,7680,REJECT
+
+  # ================================================================
+  # 0.3 ЗАЩИТА TUN ОТ МУСОРНОГО ЛОКАЛЬНОГО ТРАФИКА WINDOWS
+  # ================================================================
+  - DST-PORT,137,REJECT    
+  - DST-PORT,138,REJECT    
+  - DST-PORT,139,REJECT    
+  - DST-PORT,445,REJECT    
+  - DST-PORT,1900,REJECT   
+  - DST-PORT,5353,REJECT   
+  - DST-PORT,7680,REJECT   
+  
   - GEOSITE,private,DIRECT
   - GEOIP,private,DIRECT,no-resolve
   - GEOIP,lan,DIRECT,no-resolve
+
+  # ================================================================
+  # 0.4 ПРЯМОЙ ДОСТУП PUSH ANDROID, NTP И STUN (Звонки / WebRTC)
+  # ================================================================
   - DST-PORT,5228,DIRECT  
   - DST-PORT,5229,DIRECT
   - DST-PORT,5230,DIRECT
+  - DOMAIN-KEYWORD,mtalk.google,DIRECT 
   - DOMAIN-SUFFIX,mtalk.google.com,DIRECT
-  - DST-PORT,123,DIRECT
-  - DST-PORT,3478,DIRECT
-  - DST-PORT,3479,DIRECT
+  - DST-PORT,123,DIRECT    
+  - DST-PORT,3478,DIRECT   
+  - DST-PORT,3479,DIRECT   
+  - DST-PORT,19302,DIRECT  
+
+  # ================================================================
+  # 0.5 ЗАЩИТА ОТ ТОРРЕНТОВ (Только прямые P2P соединения)
+  # ================================================================
   - PROCESS-NAME,qBittorrent.exe,DIRECT
+  - PROCESS-NAME,qBittorrent,DIRECT
   - PROCESS-NAME,uTorrent.exe,DIRECT
-  - PROCESS-NAME,qbittorrent,DIRECT
+  - PROCESS-NAME,BitTorrent.exe,DIRECT
+  - PROCESS-NAME,WebTorrent.exe,DIRECT
+  - PROCESS-NAME,tixati.exe,DIRECT
   - PROCESS-NAME,transmission-daemon,DIRECT
+  - PROCESS-NAME,Transmission,DIRECT
   - PROCESS-NAME,aria2c,DIRECT
   - PROCESS-NAME,fdm.exe,DIRECT
   - PROCESS-NAME,FreeDownloadManager.exe,DIRECT
   - GEOSITE,category-pt,DIRECT
   - GEOSITE,tracker,DIRECT
   - DOMAIN-KEYWORD,torrent,DIRECT
+  - DOMAIN-KEYWORD,announce,DIRECT 
+
+  # ================================================================
+  # 0.6 ЗАЩИТА DoH И Health Checks
+  # ================================================================
   - DOMAIN,cp.cloudflare.com,DIRECT 
   - DOMAIN-SUFFIX,cloudflare-dns.com,🚀 Выбор сервера
+
+  # ================================================================
+  # 0.7 ПРИНУДИТЕЛЬНОЕ ПРОКСИРОВАНИЕ ДЛЯ ПК (МЕССЕНДЖЕРЫ)
+  # ================================================================
   - PROCESS-NAME,Telegram.exe,🚀 Выбор сервера
+  - PROCESS-NAME,AyuGram.exe,🚀 Выбор сервера
+  - PROCESS-NAME,Nekogram.exe,🚀 Выбор сервера
+  - PROCESS-NAME,64Gram.exe,🚀 Выбор сервера
   - PROCESS-NAME,org.telegram.messenger,🚀 Выбор сервера
   - PROCESS-NAME,org.telegram.messenger.web,🚀 Выбор сервера
   - PROCESS-NAME,org.telegram.plus,🚀 Выбор сервера
   - PROCESS-NAME,org.thunderdog.challegram,🚀 Выбор сервера
+  - PROCESS-NAME,Discord.exe,🚀 Выбор сервера
+  - PROCESS-NAME,DiscordPTB.exe,🚀 Выбор сервера
+  - PROCESS-NAME,DiscordCanary.exe,🚀 Выбор сервера
   - PROCESS-NAME,com.discord,🚀 Выбор сервера
+
+  # ================================================================
+  # 1. ПРЯМЫЕ ПОДКЛЮЧЕНИЯ И БЕЛЫЕ СПИСКИ РФ И КРЫМА
+  # ================================================================
   - DOMAIN-SUFFIX,ru,DIRECT
   - DOMAIN-SUFFIX,рф,DIRECT
   - DOMAIN-SUFFIX,su,DIRECT
@@ -704,6 +825,10 @@ rules:
   - PROCESS-NAME,ru.ok.android,DIRECT
   - PROCESS-NAME,com.vivo.car.networking,DIRECT
   - PROCESS-NAME,ru.sberbankmobile,DIRECT
+  - PROCESS-NAME,ru.tinkoff.mb,DIRECT
+  - PROCESS-NAME,com.tbank.mb,DIRECT
+  - PROCESS-NAME,ru.rncb.android,DIRECT
+  - PROCESS-NAME,ru.nspk.mirpay,DIRECT
   - PROCESS-NAME,ru.nspk.sbpay,DIRECT
   - PROCESS-NAME,ru.cian.main,DIRECT
   - PROCESS-NAME,com.vk.vkvideo,DIRECT
@@ -713,6 +838,7 @@ rules:
   - PROCESS-NAME,com.avito.android,DIRECT
   - PROCESS-NAME,ru.rx_loyalty.yabloko,DIRECT
   - PROCESS-NAME,ru.rostel,DIRECT
+  - PROCESS-NAME,ru.rostel.wink,DIRECT
   - PROCESS-NAME,ru.gosuslugi.pos,DIRECT
   - PROCESS-NAME,ru.biblioonline.reader,DIRECT
   - PROCESS-NAME,com.yandex.browser,DIRECT       
@@ -810,6 +936,7 @@ rules:
   - DOMAIN-SUFFIX,alidns.com,DIRECT
   - DOMAIN-SUFFIX,copilot-voice.vivo.com.cn,DIRECT
   - DOMAIN-SUFFIX,yango.tech,DIRECT
+
   - DOMAIN-SUFFIX,apple.com,DIRECT
   - DOMAIN-SUFFIX,icloud.com,DIRECT
   - DOMAIN-SUFFIX,mzstatic.com,DIRECT
@@ -861,6 +988,9 @@ rules:
   - DOMAIN-SUFFIX,ota.huawei.com,DIRECT
   - DOMAIN-SUFFIX,cloud.huawei.com,DIRECT
   - DOMAIN-SUFFIX,harmonyos.huawei.com,DIRECT
+  - DOMAIN-SUFFIX,hihonor.com,DIRECT
+  - DOMAIN-SUFFIX,honor.com,DIRECT
+  - DOMAIN-SUFFIX,honor.cn,DIRECT
   - DOMAIN-SUFFIX,samsung.com,DIRECT
   - DOMAIN-SUFFIX,api.samsung.com,DIRECT
   - DOMAIN-SUFFIX,push.samsung.com,DIRECT
@@ -877,9 +1007,13 @@ rules:
   - DOMAIN-SUFFIX,push.sony.com,DIRECT
   - DOMAIN-SUFFIX,ota.sony.com,DIRECT
   - DOMAIN-SUFFIX,cloud.sony.com,DIRECT
+
   - DOMAIN-SUFFIX,mobile-win.ru,DIRECT
   - DOMAIN-SUFFIX,volnamobile.ru,DIRECT
   - DOMAIN-SUFFIX,miranda-media.ru,DIRECT
+  - DOMAIN-SUFFIX,sevstar.net,DIRECT
+  - DOMAIN-SUFFIX,farline.net,DIRECT
+  - DOMAIN-SUFFIX,krymtelecom.ru,DIRECT
   - DOMAIN-SUFFIX,crpt.ru,DIRECT
   - DOMAIN-SUFFIX,честныйзнак.рф,DIRECT
   - DOMAIN-SUFFIX,xn--80ajghhoc2aj1c8b.xn--p1ai,DIRECT
@@ -893,12 +1027,20 @@ rules:
   - DOMAIN-SUFFIX,crimea.gov.ru,DIRECT         
   - DOMAIN-SUFFIX,sevastopol.gov.ru,DIRECT     
   - DOMAIN-SUFFIX,rk.gov.ru,DIRECT             
+
   - DOMAIN-SUFFIX,gosuslugi.ru,DIRECT
+  - DOMAIN-SUFFIX,mos.ru,DIRECT
   - DOMAIN-SUFFIX,gu-st.ru,DIRECT
   - DOMAIN-SUFFIX,nalog.gov.ru,DIRECT
   - DOMAIN-SUFFIX,cbr.ru,DIRECT
+  - DOMAIN-SUFFIX,nspk.ru,DIRECT
+  - DOMAIN-SUFFIX,mironline.ru,DIRECT
+  - DOMAIN-SUFFIX,sbp.nspk.ru,DIRECT
   - DOMAIN-SUFFIX,vtb.ru,DIRECT
   - DOMAIN-SUFFIX,psbank.ru,DIRECT
+  - DOMAIN-SUFFIX,rncb.ru,DIRECT
+  - DOMAIN-SUFFIX,genbank.ru,DIRECT
+  - DOMAIN-SUFFIX,abr.ru,DIRECT
   - DOMAIN-SUFFIX,pochta.ru,DIRECT
   - DOMAIN-SUFFIX,vk.com,DIRECT          
   - DOMAIN-SUFFIX,vk.ru,DIRECT           
@@ -943,6 +1085,11 @@ rules:
   - DOMAIN-SUFFIX,ya.ru,DIRECT
   - DOMAIN-SUFFIX,kinopoisk.ru,DIRECT
   - DOMAIN-SUFFIX,rutube.ru,DIRECT
+  - DOMAIN-SUFFIX,wink.ru,DIRECT
+  - DOMAIN-SUFFIX,kion.ru,DIRECT
+  - DOMAIN-SUFFIX,start.ru,DIRECT
+  - DOMAIN-SUFFIX,vkplay.ru,DIRECT
+  - DOMAIN-SUFFIX,tricolor.tv,DIRECT
   - DOMAIN-SUFFIX,okko.tv,DIRECT
   - DOMAIN-SUFFIX,ivi.ru,DIRECT
   - DOMAIN-SUFFIX,dns-shop.ru,DIRECT
@@ -953,10 +1100,15 @@ rules:
   - DOMAIN-SUFFIX,bank.wildberries.ru,DIRECT  
   - DOMAIN-SUFFIX,avito.ru,DIRECT
   - DOMAIN-SUFFIX,megamarket.ru,DIRECT
+  - DOMAIN-SUFFIX,magnit.ru,DIRECT
+  - DOMAIN-SUFFIX,5ka.ru,DIRECT
+  - DOMAIN-SUFFIX,vkusvill.ru,DIRECT
   - DOMAIN-SUFFIX,yandex.com,DIRECT
   - DOMAIN-SUFFIX,passport.yandex.ru,DIRECT
   - DOMAIN-SUFFIX,esia.gosuslugi.ru,DIRECT
+  - DOMAIN-SUFFIX,sber.ru,DIRECT
   - DOMAIN-SUFFIX,sberbank.ru,DIRECT
+  - DOMAIN-SUFFIX,tbank.ru,DIRECT
   - DOMAIN-SUFFIX,tinkoff.ru,DIRECT
   - DOMAIN-SUFFIX,alfabank.ru,DIRECT
   - DOMAIN-SUFFIX,raiffeisen.ru,DIRECT
@@ -996,6 +1148,10 @@ rules:
   - DOMAIN-SUFFIX,rostec.ru,DIRECT
   - DOMAIN-SUFFIX,rosneft.ru,DIRECT
   - DOMAIN-SUFFIX,nornickel.ru,DIRECT
+
+  # ================================================================
+  # 2. ИСКЛЮЧЕНИЯ БАЗ И ПРИОРИТЕТНЫЙ ПРОКСИ-СТРИМИНГ (TIKTOK)
+  # ================================================================
   - DOMAIN,raw.githubusercontent.com,🚀 Выбор сервера
   - DOMAIN-SUFFIX,github.com,🚀 Выбор сервера
   - DOMAIN-SUFFIX,githubusercontent.com,🚀 Выбор сервера
@@ -1018,6 +1174,8 @@ rules:
   - DOMAIN-SUFFIX,media.githubusercontent.com,🚀 Выбор сервера
   - DOMAIN,ipv6.msftconnecttest.com,REJECT
   - DOMAIN,www.msftconnecttest.com,DIRECT
+
+  # TIKTOK
   - PROCESS-NAME,com.zhiliaoapp.musically,🚀 Выбор сервера
   - PROCESS-NAME,com.ss.android.ugc.trill,🚀 Выбор сервера
   - GEOSITE,tiktok,🚀 Выбор сервера
@@ -1035,12 +1193,25 @@ rules:
   - DOMAIN-SUFFIX,musically.com,🚀 Выбор сервера
   - DOMAIN-SUFFIX,musical.ly,🚀 Выбор сервера
   - DOMAIN-KEYWORD,tiktokcdn,🚀 Выбор сервера
+
+  # ================================================================
+  # 3. УМНАЯ БЛОКИРОВКА QUIC (UDP 443) ТОЛЬКО ДЛЯ ЗАБУГОРА (БЕЗ TELEGRAM)
+  # ================================================================
   - AND,((DST-PORT,443),(NETWORK,UDP),(NOT,((GEOIP,RU))),(NOT,((GEOIP,telegram)))),REJECT
+
+  # ================================================================
+  # 4. СОЦСЕТИ, ВИДЕО И APPLE INTELLIGENCE (Заблокировано в РФ)
+  # ================================================================
   - RULE-SET,apple-ai,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,guzzoni.apple.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,siri.apple.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,seed-sequoia.siri.apple.com,🚀 Выбор сервера
+
   - PROCESS-NAME,com.pinterest,🚀 Выбор сервера
   - DOMAIN-KEYWORD,pinterest,🚀 Выбор сервера
   - DOMAIN-SUFFIX,pinterest.com,🚀 Выбор сервера
   - DOMAIN-SUFFIX,pinimg.com,🚀 Выбор сервера
+
   - PROCESS-NAME,com.instagram.android,🚀 Выбор сервера
   - PROCESS-NAME,com.facebook.katana,🚀 Выбор сервера
   - DOMAIN-SUFFIX,instagram.com,🚀 Выбор сервера
@@ -1053,31 +1224,48 @@ rules:
   - DOMAIN-SUFFIX,fbsbx.com,🚀 Выбор сервера
   - DOMAIN-SUFFIX,fb.com,🚀 Выбор сервера
   - DOMAIN-SUFFIX,fb.me,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,meta.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,threads.net,🚀 Выбор сервера
+
   - GEOSITE,youtube,🚀 Выбор сервера
   - DOMAIN-SUFFIX,youtube.com,🚀 Выбор сервера
   - DOMAIN-SUFFIX,youtu.be,🚀 Выбор сервера
   - DOMAIN-SUFFIX,googlevideo.com,🚀 Выбор сервера
   - DOMAIN-SUFFIX,ytimg.com,🚀 Выбор сервера
   - DOMAIN-SUFFIX,ggpht.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,yt3.ggpht.com,🚀 Выбор сервера
   - DOMAIN-SUFFIX,youtubei.googleapis.com,🚀 Выбор сервера
   - DOMAIN-SUFFIX,jnn-pa.googleapis.com,🚀 Выбор сервера
   - DOMAIN-SUFFIX,youtube-nocookie.com,🚀 Выбор сервера
   - DOMAIN-SUFFIX,yt.be,🚀 Выбор сервера
   - DOMAIN-SUFFIX,widevine.com,🚀 Выбор сервера
   - DOMAIN-KEYWORD,youtube,🚀 Выбор сервера
+
+  # ================================================================
+  # 5. AI / ЧАТБОТЫ / НЕЙРОСЕТИ (Premium AI Auto)
+  # ================================================================
   - DOMAIN-SUFFIX,api.x.ai,🤖 Premium AI (Auto)
-  - DOMAIN-SUFFIX,deepseek.com,🤖 Premium AI (Auto)
-  - DOMAIN-SUFFIX,claude.ai,🤖 Premium AI (Auto)
-  - DOMAIN-SUFFIX,anthropic.com,🤖 Premium AI (Auto)
+  - DOMAIN-SUFFIX,grok.com,🤖 Premium AI (Auto)
+  - DOMAIN-SUFFIX,grok.x.ai,🤖 Premium AI (Auto)
+  - DOMAIN-SUFFIX,grok.x.com,🤖 Premium AI (Auto)
+  - DOMAIN-SUFFIX,x.ai,🤖 Premium AI (Auto)
+  - DOMAIN-KEYWORD,grok,🤖 Premium AI (Auto)
+  
   - DOMAIN-SUFFIX,openai.com,🤖 Premium AI (Auto)
   - DOMAIN-SUFFIX,chatgpt.com,🤖 Premium AI (Auto)
   - DOMAIN-SUFFIX,oaistatic.com,🤖 Premium AI (Auto)
   - DOMAIN-SUFFIX,oaiusercontent.com,🤖 Premium AI (Auto)
+  
+  - DOMAIN-SUFFIX,deepseek.com,🤖 Premium AI (Auto)
+  - DOMAIN-SUFFIX,claude.ai,🤖 Premium AI (Auto)
+  - DOMAIN-SUFFIX,anthropic.com,🤖 Premium AI (Auto)
+  
   - DOMAIN-SUFFIX,gemini.google.com,🤖 Premium AI (Auto)
   - DOMAIN-SUFFIX,gemini.googleapis.com,🤖 Premium AI (Auto)
   - DOMAIN-SUFFIX,generativeai.google,🤖 Premium AI (Auto)
   - DOMAIN-SUFFIX,generativelanguage.googleapis.com,🤖 Premium AI (Auto)
   - DOMAIN-SUFFIX,aistudio.google.com,🤖 Premium AI (Auto)
+  
   - DOMAIN-SUFFIX,copilot.microsoft.com,🤖 Premium AI (Auto)
   - DOMAIN-SUFFIX,copilot.cloud.microsoft,🤖 Premium AI (Auto)
   - DOMAIN-SUFFIX,sydney.bing.com,🤖 Premium AI (Auto)
@@ -1087,13 +1275,20 @@ rules:
   - DOMAIN-SUFFIX,www.bing.com,🤖 Premium AI (Auto)
   - DOMAIN-KEYWORD,copilot,🤖 Premium AI (Auto)
   - DOMAIN-SUFFIX,bing.com,🤖 Premium AI (Auto)
-  - DOMAIN-SUFFIX,grok.com,🤖 Premium AI (Auto)
-  - DOMAIN-SUFFIX,grok.x.ai,🤖 Premium AI (Auto)
-  - DOMAIN-SUFFIX,grok.x.com,🤖 Premium AI (Auto)
-  - DOMAIN-SUFFIX,x.ai,🤖 Premium AI (Auto)
-  - DOMAIN-KEYWORD,grok,🤖 Premium AI (Auto)
+
+  - DOMAIN-SUFFIX,perplexity.ai,🤖 Premium AI (Auto)
+  - DOMAIN-SUFFIX,poe.com,🤖 Premium AI (Auto)
+  - DOMAIN-SUFFIX,mistral.ai,🤖 Premium AI (Auto)
+  - DOMAIN-SUFFIX,midjourney.com,🤖 Premium AI (Auto)
+  - DOMAIN-SUFFIX,runwayml.com,🤖 Premium AI (Auto)
+  - DOMAIN-SUFFIX,suno.com,🤖 Premium AI (Auto)
+  - DOMAIN-SUFFIX,suno.ai,🤖 Premium AI (Auto)
+  - DOMAIN-SUFFIX,elevenlabs.io,🤖 Premium AI (Auto)
+  - DOMAIN-SUFFIX,character.ai,🤖 Premium AI (Auto)
+  
   - DOMAIN-SUFFIX,huggingface.co,🤖 Premium AI (Auto)
   - DOMAIN-SUFFIX,civitai.com,🤖 Premium AI (Auto)
+  
   - DOMAIN-SUFFIX,openaimerge.com,🤖 Premium AI (Auto)
   - DOMAIN-SUFFIX,statsigapi.net,🤖 Premium AI (Auto)
   - DOMAIN-SUFFIX,statsig.com,🤖 Premium AI (Auto)
@@ -1111,6 +1306,10 @@ rules:
   - DOMAIN-SUFFIX,arkoselabs.com,🤖 Premium AI (Auto)
   - DOMAIN,challenges.cloudflare.com,🤖 Premium AI (Auto)
   - DOMAIN-SUFFIX,identrust.com,🤖 Premium AI (Auto)
+
+  # ================================================================
+  # 6. DISCORD (Голосовые сервера и стриминг экрана)
+  # ================================================================
   - GEOSITE,discord,🚀 Выбор сервера
   - DOMAIN-SUFFIX,discord.com,🚀 Выбор сервера
   - DOMAIN-SUFFIX,discordapp.com,🚀 Выбор сервера
@@ -1118,36 +1317,66 @@ rules:
   - DOMAIN-SUFFIX,discord.gg,🚀 Выбор сервера
   - DOMAIN-SUFFIX,discord.media,🚀 Выбор сервера
   - DOMAIN-SUFFIX,discord.co,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,discordstatus.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,discord.app,🚀 Выбор сервера
   - DOMAIN-KEYWORD,discord,🚀 Выбор сервера
+
+  # ================================================================
+  # 7. TELEGRAM, SIGNAL, VOIP + Оптимизация no-resolve
+  # ================================================================
   - GEOSITE,telegram,🚀 Выбор сервера
   - GEOIP,telegram,🚀 Выбор сервера
+  
   - IP-CIDR,91.108.4.0/22,🚀 Выбор сервера,no-resolve
-  - IP-CIDR,91.108.8.0/21,🚀 Выбор сервера,no-resolve
+  - IP-CIDR,91.108.8.0/22,🚀 Выбор сервера,no-resolve
   - IP-CIDR,91.108.12.0/22,🚀 Выбор сервера,no-resolve
   - IP-CIDR,91.108.16.0/22,🚀 Выбор сервера,no-resolve
   - IP-CIDR,91.108.20.0/22,🚀 Выбор сервера,no-resolve
   - IP-CIDR,91.108.56.0/22,🚀 Выбор сервера,no-resolve
+  - IP-CIDR,91.105.192.0/23,🚀 Выбор сервера,no-resolve 
   - IP-CIDR,149.154.160.0/20,🚀 Выбор сервера,no-resolve
   - IP-CIDR,185.76.151.0/24,🚀 Выбор сервера,no-resolve
   - IP-CIDR6,2001:b28f::/32,🚀 Выбор сервера,no-resolve
   - IP-CIDR6,2001:67c:4e8::/48,🚀 Выбор сервера,no-resolve
-  - IP-CIDR6,2a0a:f280::/32,🚀 Выбор сервера,no-resolve
+  - IP-CIDR6,2a0a:f280::/29,🚀 Выбор сервера,no-resolve 
+  
   - DOMAIN-SUFFIX,t.me,🚀 Выбор сервера
   - DOMAIN-SUFFIX,tx.me,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,tdesktop.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,telegra.ph,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,legra.ph,🚀 Выбор сервера
   - DOMAIN-SUFFIX,telegram.me,🚀 Выбор сервера
   - DOMAIN-SUFFIX,telegram.org,🚀 Выбор сервера
   - DOMAIN-SUFFIX,telesco.pe,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,fragment.com,🚀 Выбор сервера
   - DOMAIN-KEYWORD,telegram,🚀 Выбор сервера
+
+  - DOMAIN-SUFFIX,signal.org,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,signal.me,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,signal.captcha.website,🚀 Выбор сервера
   - DOMAIN-SUFFIX,viber.com,🚀 Выбор сервера
   - DOMAIN-SUFFIX,skype.com,🚀 Выбор сервера
   - DOMAIN-SUFFIX,skypeassets.com,🚀 Выбор сервера
+
+  # ================================================================
+  # 8. РАБОТА, IT, ФИНАНСЫ, МАГАЗИНЫ И ИГРЫ (Обход Санкций)
+  # ================================================================
   - GEOSITE,category-dev,🚀 Выбор сервера
   - DOMAIN-SUFFIX,docker.com,🚀 Выбор сервера
   - DOMAIN-SUFFIX,docker.io,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,docker.com.cn,🚀 Выбор сервера
   - DOMAIN-SUFFIX,workers.dev,🚀 Выбор сервера
   - DOMAIN-SUFFIX,pages.dev,🚀 Выбор сервера
   - DOMAIN-SUFFIX,vercel.app,🚀 Выбор сервера
   - DOMAIN-SUFFIX,vercel.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,gitlab.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,bitbucket.org,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,digitalocean.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,heroku.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,npmjs.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,pypi.org,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,stackoverflow.com,🚀 Выбор сервера
+  
   - DOMAIN-SUFFIX,notion.so,🚀 Выбор сервера
   - DOMAIN-SUFFIX,notion.site,🚀 Выбор сервера
   - DOMAIN-SUFFIX,figma.com,🚀 Выбор сервера
@@ -1156,15 +1385,48 @@ rules:
   - DOMAIN-SUFFIX,atlassian.com,🚀 Выбор сервера
   - DOMAIN-SUFFIX,jira.com,🚀 Выбор сервера
   - DOMAIN-SUFFIX,miro.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,slack.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,zoom.us,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,adobe.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,adobe.io,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,adobelogin.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,topazlabs.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,capcut.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,capcutv.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,autodesk.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,unity.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,unity3d.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,jetbrains.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,vscode-cdn.net,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,visualstudio.com,🚀 Выбор сервера
+
   - DOMAIN-SUFFIX,binance.com,🚀 Выбор сервера
-  - DOMAIN-SUFFIX,stripe.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,bybit.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,okx.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,kucoin.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,htx.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,kraken.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,coinmarketcap.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,coingecko.com,🚀 Выбор сервера
   - DOMAIN-SUFFIX,tradingview.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,stripe.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,paypal.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,payoneer.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,wise.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,upwork.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,fiverr.com,🚀 Выбор сервера
+
   - DOMAIN-SUFFIX,amazon.com,🚀 Выбор сервера
   - DOMAIN-SUFFIX,ebay.com,🚀 Выбор сервера
   - DOMAIN-SUFFIX,ebaystatic.com,🚀 Выбор сервера
   - DOMAIN-SUFFIX,ebayrtm.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,iherb.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,etsy.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,asos.com,🚀 Выбор сервера
   - DOMAIN-SUFFIX,ggsel.net,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,plati.market,🚀 Выбор сервера
   - DOMAIN-KEYWORD,ggsel,🚀 Выбор сервера
+
   - DOMAIN,dash.cloudflare.com,🚀 Выбор сервера
   - DOMAIN,api.cloudflare.com,🚀 Выбор сервера
   - DOMAIN-SUFFIX,nvidia.com,🚀 Выбор сервера
@@ -1173,30 +1435,10 @@ rules:
   - DOMAIN-SUFFIX,intel.com,🚀 Выбор сервера
   - DOMAIN-SUFFIX,realtek.com,🚀 Выбор сервера
   - DOMAIN-SUFFIX,realtek.com.tw,🚀 Выбор сервера
-  - GEOSITE,supercell,🚀 Выбор сервера
-  - DOMAIN-SUFFIX,supercell.com,🚀 Выбор сервера
-  - DOMAIN-SUFFIX,brawlstars.com,🚀 Выбор сервера
-  - DOMAIN-SUFFIX,brawlstarsgame.com,🚀 Выбор сервера
-  - DOMAIN-SUFFIX,clashofclans.com,🚀 Выбор сервера
-  - DOMAIN-SUFFIX,clashroyale.com,🚀 Выбор сервера
-  - DOMAIN-SUFFIX,z8games.com,🚀 Выбор сервера
-  - DOMAIN-KEYWORD,z8games,🚀 Выбор сервера
-  - DOMAIN-KEYWORD,crossfire,🚀 Выбор сервера
-  - DOMAIN-SUFFIX,riotgames.com,🚀 Выбор сервера
-  - DOMAIN-SUFFIX,valorant.com,🚀 Выбор сервера
-  - DOMAIN-SUFFIX,playvalorant.com,🚀 Выбор сервера
-  - PROCESS-NAME,riotclient.exe,🚀 Выбор сервера
-  - PROCESS-NAME,valorant.exe,🚀 Выбор сервера
-  - DOMAIN-SUFFIX,epicgames.com,🚀 Выбор сервера
-  - DOMAIN-SUFFIX,unrealengine.com,🚀 Выбор сервера
-  - DOMAIN-SUFFIX,adobe.com,🚀 Выбор сервера
-  - DOMAIN-SUFFIX,adobe.io,🚀 Выбор сервера
-  - DOMAIN-SUFFIX,adobelogin.com,🚀 Выбор сервера
-  - DOMAIN-SUFFIX,topazlabs.com,🚀 Выбор сервера
-  - DOMAIN-SUFFIX,capcut.com,🚀 Выбор сервера
-  - DOMAIN-SUFFIX,capcutv.com,🚀 Выбор сервера
-  - DOMAIN-SUFFIX,vscode-cdn.net,🚀 Выбор сервера
-  - DOMAIN-SUFFIX,visualstudio.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,vmware.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,broadcom.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,cisco.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,oracle.com,🚀 Выбор сервера
   - DOMAIN-SUFFIX,microsoft.com,🚀 Выбор сервера
   - DOMAIN-SUFFIX,microsoftonline.com,🚀 Выбор сервера
   - DOMAIN-SUFFIX,windows.com,🚀 Выбор сервера
@@ -1204,19 +1446,76 @@ rules:
   - DOMAIN-SUFFIX,live.com,🚀 Выбор сервера
   - DOMAIN-SUFFIX,office.com,🚀 Выбор сервера
   - DOMAIN-SUFFIX,office365.com,🚀 Выбор сервера
+
+  - GEOSITE,supercell,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,supercell.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,brawlstars.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,brawlstarsgame.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,clashofclans.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,clashroyale.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,squadbusters.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,hayday.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,boombeach.com,🚀 Выбор сервера
+
+  - DOMAIN-SUFFIX,riotgames.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,valorant.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,playvalorant.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,leagueoflegends.com,🚀 Выбор сервера
+  - PROCESS-NAME,riotclient.exe,🚀 Выбор сервера
+  - PROCESS-NAME,valorant.exe,🚀 Выбор сервера
+  - PROCESS-NAME,LeagueClient.exe,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,steampowered.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,steamcommunity.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,steamstatic.com,🚀 Выбор сервера
+  - PROCESS-NAME,steam.exe,🚀 Выбор сервера
+  - PROCESS-NAME,steamwebhelper.exe,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,epicgames.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,unrealengine.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,fortnite.com,🚀 Выбор сервера
+  - PROCESS-NAME,EpicGamesLauncher.exe,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,battle.net,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,blizzard.com,🚀 Выбор сервера
+  - PROCESS-NAME,Battle.net.exe,🚀 Выбор сервера
+  - PROCESS-NAME,Agent.exe,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,ea.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,origin.com,🚀 Выбор сервера
+  - PROCESS-NAME,EADesktop.exe,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,z8games.com,🚀 Выбор сервера
+  - DOMAIN-KEYWORD,z8games,🚀 Выбор сервера
+  - DOMAIN-KEYWORD,crossfire,🚀 Выбор сервера
+
+  # ================================================================
+  # 9. СОЦСЕТИ / МЕДИЯ / ЗНАКОМСТВА / SPEEDTEST
+  # ================================================================
   - DOMAIN-SUFFIX,whatsapp.com,🚀 Выбор сервера
   - DOMAIN-SUFFIX,whatsapp.net,🚀 Выбор сервера
   - DOMAIN-SUFFIX,wa.me,🚀 Выбор сервера
   - DOMAIN-SUFFIX,reddit.com,🚀 Выбор сервера
   - DOMAIN-SUFFIX,redditmedia.com,🚀 Выбор сервера
   - DOMAIN-SUFFIX,redditstatic.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,linkedin.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,licdn.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,patreon.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,patreonusercontent.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,x.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,twitter.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,tinder.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,badoo.com,🚀 Выбор сервера
   - DOMAIN-SUFFIX,spotify.com,🚀 Выбор сервера
   - DOMAIN-SUFFIX,scdn.co,🚀 Выбор сервера
   - DOMAIN-SUFFIX,spoti.fi,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,netflix.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,nflxext.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,nflxvideo.net,🚀 Выбор сервера
   - DOMAIN-SUFFIX,speedtest.net,🚀 Выбор сервера
   - DOMAIN-SUFFIX,ookla.com,🚀 Выбор сервера
   - DOMAIN-SUFFIX,ooklaserver.net,🚀 Выбор сервера
   - DOMAIN-SUFFIX,fast.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,nperf.com,🚀 Выбор сервера
+
+  # ================================================================
+  # 10. ВЗРОСЛЫЙ КОНТЕНТ 
+  # ================================================================
   - DOMAIN-SUFFIX,pornhub.com,🚀 Выбор сервера
   - DOMAIN-SUFFIX,phncdn.com,🚀 Выбор сервера
   - DOMAIN-SUFFIX,xvideos.com,🚀 Выбор сервера
@@ -1228,6 +1527,9 @@ rules:
   - DOMAIN-SUFFIX,redgifs.com,🚀 Выбор сервера
   - DOMAIN-SUFFIX,rule34.xxx,🚀 Выбор сервера
   - DOMAIN-SUFFIX,e621.net,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,spankbang.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,eporner.com,🚀 Выбор сервера
+  - DOMAIN-SUFFIX,hqporner.com,🚀 Выбор сервера
   - DOMAIN-SUFFIX,onlyfans.com,🚀 Выбор сервера
   - DOMAIN-SUFFIX,fansly.com,🚀 Выбор сервера
   - DOMAIN-SUFFIX,manyvids.com,🚀 Выбор сервера
@@ -1254,6 +1556,10 @@ rules:
   - DOMAIN-KEYWORD,hentai,🚀 Выбор сервера
   - DOMAIN-KEYWORD,nsfw,🚀 Выбор сервера
   - DOMAIN-KEYWORD,adult,🚀 Выбор сервера
+  
+  # ================================================================
+  # 11. GEO + ФИНАЛЬНЫЙ ФОЛЛБЕК
+  # ================================================================
   - GEOIP,RU,DIRECT,no-resolve
   - MATCH,🚀 Выбор сервера
     </script>
@@ -2396,7 +2702,7 @@ function parseData(rawText) {
             openModal('qrModal');
         }
 
-        // ====================================================================
+// ====================================================================
         // ГЕНЕРАЦИЯ ИТОГОВОГО КОНФИГА (YAML / JSON)
         // ====================================================================
         function updateOutput() {
@@ -2404,7 +2710,7 @@ function parseData(rawText) {
             const templateMode = AppState.templateMode;
             const outputElement = $['outputEditor'];
             
-            let yamlProxies = "proxies:\n" + (AppState.proxies.length ? "" : " []\n");
+            let yamlProxies = AppState.proxies.length ? "proxies:\n" : "proxies: []\n";
             
             AppState.proxies.forEach(p => {
                 yamlProxies += `  - name: "${p.name}"\n    server: ${p.server}\n    port: ${p.port}\n    type: ${p.type}\n`;
@@ -2422,26 +2728,27 @@ function parseData(rawText) {
                 }
             });
             
-            const proxyNames = AppState.proxies.length ? AppState.proxies.map(p => `      - "${p.name}"`).join('\n') : "      - DIRECT";
+            const userProxies = AppState.proxies.length ? AppState.proxies.map(p => `      - "${p.name}"`).join('\n') : "";
+            const providerUse = `    use:\n      - igareck_mobile_black\n      - zieng2_universal\n      - igareck_white_1\n      - goida_26`;
             
             if (exportFormat.includes('clash')) {
                 let tunConfig = exportFormat === 'clash_router' 
                     ? `tun:\n  enable: false` 
-                    : `tun:\n  enable: true\n  stack: mixed\n  device: Mihomo\n  gso: true\n  udp-timeout: 30\n  dns-hijack:\n    - any:53\n    - tcp://any:53\n  auto-route: true\n  auto-detect-interface: true\n  strict-route: true\n  endpoint-independent-nat: true\n  mtu: 1420`;
+                    : `tun:\n  enable: true\n  stack: system\n  device: Mihomo\n  gso: true\n  udp-timeout: 300\n  dns-hijack:\n    - 'any:53'\n    - 'tcp://any:53'\n  auto-route: true\n  auto-detect-interface: true\n  strict-route: true\n  endpoint-independent-nat: true\n  mtu: 1420`;
                 
                 if (templateMode === 'custom') {
                     let customTpl = $['customTemplateInput'].value;
-                    if (customTpl) outputElement.innerText = customTpl.replace(/\{\{PROXIES_YAML\}\}/g, yamlProxies).replace(/\{\{PROXY_NAMES\}\}/g, proxyNames);
+                    if (customTpl) outputElement.innerText = customTpl.replace(/\{\{PROXIES_YAML\}\}/g, yamlProxies).replace(/\{\{PROXY_NAMES\}\}/g, userProxies || "      - DIRECT");
                 } 
                 else if (templateMode === 'basic') {
-                    outputElement.innerText = `mode: rule\nallow-lan: true\nmixed-port: 7890\n\n${tunConfig}\n\n${yamlProxies}\nproxy-groups:\n  - name: "Proxy"\n    type: select\n    proxies:\n      - "Auto"\n${proxyNames}\n  - name: "Auto"\n    type: url-test\n    url: "https://cp.cloudflare.com/generate_204"\n    interval: 300\n    proxies:\n${proxyNames}\nrules:\n  - GEOIP,RU,DIRECT,no-resolve\n  - MATCH,Proxy`;
+                    outputElement.innerText = `mode: rule\nallow-lan: true\nmixed-port: 7890\n\n${tunConfig}\n\n${yamlProxies}\nproxy-groups:\n  - name: "Proxy"\n    type: select\n${userProxies ? '    proxies:\n      - "Auto"\n' + userProxies : '    proxies:\n      - "Auto"'}\n${providerUse}\n\n  - name: "Auto"\n    type: url-test\n    url: "https://cp.cloudflare.com/generate_204"\n    interval: 300\n${userProxies ? '    proxies:\n' + userProxies : ''}\n${providerUse}\n\nrules:\n  - GEOIP,RU,DIRECT,no-resolve\n  - MATCH,Proxy`;
                 }
                 else {
-                    let proxyGroups = `proxy-groups:\n  - name: "🚀 Выбор сервера"\n    type: select\n    proxies:\n      - "♻️ Автовыбор"\n      - "🤖 Premium AI (Auto)"\n${proxyNames}\n\n  - name: "♻️ Автовыбор"\n    type: url-test\n    url: "https://cp.cloudflare.com/generate_204"\n    interval: 180\n    tolerance: 30\n    timeout: 5000\n    lazy: true\n    exclude-filter: "(?i)Россия|Russia|Украина|Ukraine|Молдова|Moldova|РФ|России"\n    proxies:\n${proxyNames}\n\n  - name: "🤖 Premium AI (Auto)"\n    type: url-test\n    url: "https://cp.cloudflare.com/generate_204"\n    interval: 180\n    tolerance: 30\n    timeout: 5000\n    lazy: true\n    proxies:\n${proxyNames}`;
+                    let proxyGroups = `proxy-groups:\n  - name: "🚀 Выбор сервера"\n    type: select\n    proxies:\n      - "♻️ Автовыбор"\n      - "🤖 Premium AI (Auto)"\n${userProxies ? userProxies + '\n' : ''}${providerUse}\n\n  - name: "♻️ Автовыбор"\n    type: url-test\n    url: "http://www.gstatic.com/generate_204"\n    interval: 180\n    tolerance: 30\n    timeout: 5000\n    lazy: true\n    exclude-filter: "(?i)Россия|Russia|Украина|Ukraine|Молдова|Moldova|РФ|России"\n${userProxies ? '    proxies:\n' + userProxies + '\n' : ''}${providerUse}\n\n  - name: "🤖 Premium AI (Auto)"\n    type: url-test\n    url: "http://www.gstatic.com/generate_204"\n    interval: 180\n    tolerance: 30\n    timeout: 5000\n    lazy: true\n${userProxies ? '    proxies:\n' + userProxies + '\n' : ''}${providerUse}`;
+                    
                     outputElement.innerText = `${AppState.baseYaml}\n\n${tunConfig}\n\n${yamlProxies}\n${proxyGroups}\n\n${AppState.rulesYaml}`;
                 }
             } else {
-                // Если выбран JSON (Sing-box/Xray)
                 outputElement.innerText = JSON.stringify({ proxies: AppState.proxies }, null, 2);
             }
             
@@ -2450,56 +2757,41 @@ function parseData(rawText) {
         }
 
         // ====================================================================
-        // ВАЛИДАЦИЯ И ЭКСПОРТ РЕЗУЛЬТАТОВ (С защитой от скрытых символов)
+        // ВАЛИДАЦИЯ И ЭКСПОРТ РЕЗУЛЬТАТОВ
         // ====================================================================
-     function validateOutput(content, format) {
-    // Очищаем от неразрывных пробелов, но сохраняем оригинальную длину для проверки
-    const cleanContent = content.replace(/\u00A0/g, ' ').trim();
-    
-    // 1. Разрешаем копировать пустое поле без ошибок
-    if (!cleanContent) {
-        return true; 
-    }
+        function validateOutput(content, format) {
+            const cleanContent = content.replace(/\u00A0/g, ' ').trim();
+            if (!cleanContent) return true; 
 
-    // 2. Проверка на системные ошибки в тексте
-    if (cleanContent.includes("⚠️ ОШИБКА") || cleanContent.includes("❌ Ошибка")) { 
-        showToast("Исправьте шаблон!", "error"); 
-        return false; 
-    }
-    
-    // 3. Строгая валидация YAML (только для Clash)
-    if (format && format.includes('clash')) {
-        if (!cleanContent.includes('proxies:')) { 
-            showToast("YAML сломан: нет proxies:", "error"); 
-            return false; 
+            if (cleanContent.includes("⚠️ ОШИБКА") || cleanContent.includes("❌ Ошибка")) { 
+                showToast("Исправьте шаблон!", "error"); 
+                return false; 
+            }
+            
+            if (format && format.includes('clash')) {
+                if (!cleanContent.includes('proxies:')) { 
+                    showToast("YAML сломан: нет proxies:", "error"); 
+                    return false; 
+                }
+                if (!cleanContent.includes('rules:')) { 
+                    showToast("YAML сломан: нет rules:", "error"); 
+                    return false; 
+                }
+            } 
+            else if ((format && format.includes('json')) || cleanContent.startsWith('{') || cleanContent.startsWith('[')) {
+                try { JSON.parse(cleanContent); } catch (e) { 
+                    showToast("Ошибка синтаксиса JSON", "error"); 
+                    DiagnosticLogger.add('ERROR', `Ошибка JSON: ${e.message}`); 
+                    return false; 
+                }
+            }
+            return true;
         }
-        if (!cleanContent.includes('rules:')) { 
-            showToast("YAML сломан: нет rules:", "error"); 
-            return false; 
-        }
-    } 
-    // 4. Умная валидация JSON 
-    // Проверяем, только если выбран формат JSON ИЛИ текст начинается со скобок { или [
-    // Это позволяет спокойно копировать обычный текст, Base64 и TXT-ссылки!
-    else if ((format && format.includes('json')) || cleanContent.startsWith('{') || cleanContent.startsWith('[')) {
-        try { 
-            JSON.parse(cleanContent); 
-        } catch (e) { 
-            showToast("Ошибка синтаксиса JSON", "error"); 
-            DiagnosticLogger.add('ERROR', `Ошибка JSON: ${e.message}`); 
-            return false; 
-        }
-    }
-    
-    // Все остальные сценарии (обычный текст, ссылки) считаются валидными
-    return true;
-}
 
-        // Используем очищенный текст для скачивания файла
         function downloadFile() {
-            // textContent безопаснее innerText (не тянет лишние HTML-переносы)
-            let content = $['outputEditor'].textContent || $['outputEditor'].innerText;
-            content = content.replace(/\u00A0/g, ' '); // Финальная очистка
+            // ВЕРНУЛ innerText: он гарантированно сохраняет переносы строк \n
+            let content = $['outputEditor'].innerText;
+            content = content.replace(/\u00A0/g, ' '); 
             const format = AppState.exportFormat;
             
             if (!validateOutput(content, format)) return;
@@ -2510,12 +2802,12 @@ function parseData(rawText) {
             a.download = `Config_v${APP_VERSION}.${format.includes('clash') ? 'yaml' : 'json'}`; 
             a.click();
             
-            setTimeout(() => { URL.revokeObjectURL(a.href); }, 1000); // Предотвращение утечек памяти
+            setTimeout(() => { URL.revokeObjectURL(a.href); }, 1000);
         }
 
-        // Асинхронное копирование в буфер (устойчиво к блокировкам браузера)
         async function copyResult() {
-            let content = $['outputEditor'].textContent || $['outputEditor'].innerText;
+            // ВЕРНУЛ innerText: он гарантированно сохраняет переносы строк \n
+            let content = $['outputEditor'].innerText;
             content = content.replace(/\u00A0/g, ' ');
             const format = AppState.exportFormat;
             
