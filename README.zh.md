@@ -22,7 +22,7 @@
   </a>
 </p>
 
-<h1 align="center">⚡ Network Builder v17.01 ULTRA</h1>
+<h1 align="center">⚡ Network Builder v17.02 ULTRA</h1>
 
 <p align="center">
   <b>极其强大且 100% 本地化的网络工具，用于管理庞大的代理服务器数据库。</b><br>
