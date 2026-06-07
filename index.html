@@ -2353,11 +2353,32 @@ function parseData(rawText) {
     let added = 0;
     let duplicates = 0;
 
-    // Универсальная функция проверки
+// Универсальная функция проверки
     const addNodeIfUnique = (p) => {
         if (!p || !p.server) return;
+        
+        // 1. Проверяем, нет ли уже точно такого же сервера (по IP и порту)
         const isDuplicate = AppState.proxies.some(x => x.type === p.type && x.server === p.server && x.port === p.port);
+        
         if (!isDuplicate) {
+            // 2. АВТО-ПЕРЕИМЕНОВАНИЕ: Проверяем, не занято ли уже такое ИМЯ
+            let originalName = p.name;
+            let counter = 1;
+            // Пока находим в списке узел с таким же именем, увеличиваем счетчик
+            while (AppState.proxies.some(x => x.name === p.name)) {
+                p.name = `${originalName} (${counter})`;
+                counter++;
+            }
+            
+            // Если имя изменилось, обновляем его и в самой ссылке (rawLink)
+            if (originalName !== p.name) {
+                try {
+                    let u = new URL(p.rawLink.replace(/^[a-zA-Z0-9]+:\/\//, 'http://')); 
+                    u.hash = encodeURIComponent(p.name); 
+                    p.rawLink = p.rawLink.split('#')[0] + u.hash;
+                } catch(e) {}
+            }
+
             AppState.proxies.push(p);
             added++;
         } else {
