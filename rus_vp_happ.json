@@ -1,5 +1,5 @@
 {
-  "Name": "RUS-VP",
+  "Name": "RUS-VIP-ULTIMATE",
   "GlobalProxy": "true",
   "RouteOrder": "block-direct-proxy",
   "RemoteDNSType": "DoH",
@@ -8,17 +8,21 @@
   "DomesticDNSType": "DoH",
   "DomesticDNSDomain": "https://dns.google/dns-query",
   "DomesticDNSIP": "8.8.8.8",
-  "Geoipurl": "https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat",
-  "Geositeurl": "https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat",
+  "Geoipurl": "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.dat",
+  "Geositeurl": "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geosite.dat",
   "LastUpdated": "1781022380",
   "DnsHosts": {
     "cloudflare-dns.com": "1.1.1.1",
-    "dns.google": "8.8.8.8"
+    "dns.google": "8.8.8.8",
+    "one.one.one.one": "1.1.1.1",
+    "dns.yandex.ru": "77.88.8.8",
+    "doh.pub": "120.53.53.53"
   },
   "DirectSites": [
     "huawei.com",
     "pool.ntp.org",
     "2gis.com",
+    "2gis.ru",
     "forpost-sevastopol.ru",
     "nts-tv.com",
     "crimea24tv.ru",
@@ -68,7 +72,6 @@
     "koronapay.com",
     "apteka.ru",
     "eapteka.ru",
-    "geosite:ru",
     "sevstar.net",
     "farline.net",
     "krymtelecom.ru",
@@ -80,11 +83,30 @@
     "apple.com",
     "icloud.com",
     "samsung.com",
-    "icloud.com",
-    "samsung.com",
     "yandex-team.ru",
     "sevsu.ru",
-    "do.sevsu.ru"
+    "do.sevsu.ru",
+    "gosuslugi.ru",
+    "mos.ru",
+    "nalog.gov.ru",
+    "sberbank.ru",
+    "tbank.ru",
+    "vtb.ru",
+    "alfabank.ru",
+    "yandex.ru",
+    "yandex.net",
+    "yastatic.net",
+    "ya.ru",
+    "dzen.ru",
+    "vk.com",
+    "vk.me",
+    "mail.ru",
+    "ozon.ru",
+    "wildberries.ru",
+    "wb.ru",
+    "avito.ru",
+    "kinopoisk.ru",
+    "rutube.ru"
   ],
   "DirectIp": [
     "127.0.0.0/8",
@@ -115,4 +137,4 @@
 
 
 
-Это уже готовая конфигурация чтобы не собирать самому и вставить в сам happ: happ://routing/onadd/eyJOYW1lIjoiUlVTLVZQIiwiR2xvYmFsUHJveHkiOiJ0cnVlIiwiUm91dGVPcmRlciI6ImJsb2NrLWRpcmVjdC1wcm94eSIsIlJlbW90ZUROU1R5cGUiOiJEb0giLCJSZW1vdGVETlNEb21haW4iOiJodHRwczovL2Nsb3VkZmxhcmUtZG5zLmNvbS9kbnMtcXVlcnkiLCJSZW1vdGVETlNJUCI6IjEuMS4xLjEiLCJEb21lc3RpY0ROU1R5cGUiOiJEb0giLCJEb21lc3RpY0ROU0RvbWFpbiI6Imh0dHBzOi8vZG5zLmdvb2dsZS9kbnMtcXVlcnkiLCJEb21lc3RpY0ROU0lQIjoiOC44LjguOCIsIkdlb2lwdXJsIjoiaHR0cHM6Ly9naXRodWIuY29tL0xveWFsc29sZGllci92MnJheS1ydWxlcy1kYXQvcmVsZWFzZXMvbGF0ZXN0L2Rvd25sb2FkL2dlb2lwLmRhdCIsIkdlb3NpdGV1cmwiOiJodHRwczovL2dpdGh1Yi5jb20vTG95YWxzb2xkaWVyL3YycmF5LXJ1bGVzLWRhdC9yZWxlYXNlcy9sYXRlc3QvZG93bmxvYWQvZ2Vvc2l0ZS5kYXQiLCJMYXN0VXBkYXRlZCI6IjE3ODEwMjIzODAiLCJEbnNIb3N0cyI6eyJjbG91ZGZsYXJlLWRucy5jb20iOiIxLjEuMS4xIiwiZG5zLmdvb2dsZSI6IjguOC44LjgifSwiRGlyZWN0U2l0ZXMiOlsiaHVhd2VpLmNvbSIsInBvb2wubnRwLm9yZyIsIjJnaXMuY29tIiwiZm9ycG9zdC1zZXZhc3RvcG9sLnJ1IiwibnRzLXR2LmNvbSIsImNyaW1lYTI0dHYucnUiLCJjcmltZWEtbmV3cy5jb20iLCJpa3JpbS5uZXQiLCJjLWluZm9ybS5pbmZvIiwic2V2a29yLnJ1IiwicnVpbmZvcm1lci5jb20iLCJ3aW4tbW9iaWxlLnJ1Iiwia3RrcnUucnUiLCJzZXZ0ZWxlY29tLnJ1IiwieW90YS5ydSIsInJ0LnJ1Iiwib3BlbmVkdS5ydSIsInN0ZXBpay5vcmciLCJjeWJlcmxlbmlua2EucnUiLCJxbmEuaGFici5jb20iLCJhbnRpcGxhZ2lhdC5ydSIsImUubGFuYm9vay5jb20iLCJ6bmFuaXVtLmNvbSIsInJ1LWJvYXJkLmNvbSIsImxpbnV4Lm9yZy5ydSIsInhha2VwLnJ1IiwicnRkbnMubmV0IiwicGljZG4ubmV0Iiwidmt1c2VybGl2ZS5jb20iLCJ2ay12aWRlby5ydSIsInZpZGVvLm1haWwucnUiLCJzbW90cmltLnJ1Iiwidmd0cmsucnUiLCIxdHYucnUiLCJudHYucnUiLCJ6YXBwLnJ1IiwibW9yZS50diIsImxlc3RhLnJ1IiwidGFua2kuc3UiLCJ2a3BsYXkucnUiLCJnYW1lcy5tYWlsLnJ1IiwidGFua3NibGl0ei5ydSIsIm1pcnBsYXkucnUiLCJ0YXJrb3YuY29tIiwiZXNjYXBlZnJvbXRhcmtvdi5jb20iLCJzYmVybWFya2V0LnJ1IiwieW9vbW9uZXkucnUiLCJxaXdpLmNvbSIsInBheS5ydSIsImtvcm9uYXBheS5jb20iLCJhcHRla2EucnUiLCJlYXB0ZWthLnJ1IiwiZ2Vvc2l0ZTpydSIsInNldnN0YXIubmV0IiwiZmFybGluZS5uZXQiLCJrcnltdGVsZWNvbS5ydSIsIm1vYmlsZS13aW4ucnUiLCJ2b2xuYW1vYmlsZS5ydSIsIm1pcmFuZGEtbWVkaWEucnUiLCJqaXZvc2l0ZS5jb20iLCJhbXBsaXR1ZGUuY29tIiwiYXBwbGUuY29tIiwiaWNsb3VkLmNvbSIsInNhbXN1bmcuY29tIiwiaWNsb3VkLmNvbSIsInNhbXN1bmcuY29tIiwieWFuZGV4LXRlYW0ucnUiLCJzZXZzdS5ydSIsImRvLnNldnN1LnJ1Il0sIkRpcmVjdElwIjpbIjEyNy4wLjAuMC84IiwiMTAuMC4wLjAvOCIsIjE3Mi4xNi4wLjAvMTIiLCIxOTIuMTY4LjAuMC8xNiIsIjEwMC42NC4wLjAvMTAiLCIxNjkuMjU0LjAuMC8xNiIsIjIyNC4wLjAuMC80IiwiMjU1LjI1NS4yNTUuMjU1IiwiMTE0LjExNC4xMTQuMTE0LzMyIiwiNDIuODEuODIuMjA5LzMyIiwiMTIwLjUzLjUzLjUzLzMyIiwiZ2VvaXA6cnUiLCJnZW9pcDpwcml2YXRlIl0sIlByb3h5U2l0ZXMiOltdLCJQcm94eUlwIjpbXSwiQmxvY2tTaXRlcyI6WyJnZW9zaXRlOmNhdGVnb3J5LWFkcy1hbGwiXSwiQmxvY2tJcCI6W10sIkRvbWFpblN0cmF0ZWd5IjoiSVBJZk5vbk1hdGNoIiwiRmFrZUROUyI6ImZhbHNlIiwiVXNlQ2h1bmtGaWxlcyI6ImZhbHNlIn0
+Это уже готовая конфигурация чтобы не собирать самому и вставить в сам happ: happ://routing/onadd/eyJOYW1lIjoiUlVTLVZJUC1VTFRJTUFURSIsIkdsb2JhbFByb3h5IjoidHJ1ZSIsIlJvdXRlT3JkZXIiOiJibG9jay1kaXJlY3QtcHJveHkiLCJSZW1vdGVETlNUeXBlIjoiRG9IIiwiUmVtb3RlRE5TRG9tYWluIjoiaHR0cHM6Ly9jbG91ZGZsYXJlLWRucy5jb20vZG5zLXF1ZXJ5IiwiUmVtb3RlRE5TSVAiOiIxLjEuMS4xIiwiRG9tZXN0aWNETlNUeXBlIjoiRG9IIiwiRG9tZXN0aWNETlNEb21haW4iOiJodHRwczovL2Rucy5nb29nbGUvZG5zLXF1ZXJ5IiwiRG9tZXN0aWNETlNJUCI6IjguOC44LjgiLCJHZW9pcHVybCI6Imh0dHBzOi8vY2RuLmpzZGVsaXZyLm5ldC9naC9NZXRhQ3ViZVgvbWV0YS1ydWxlcy1kYXRAcmVsZWFzZS9nZW9pcC5kYXQiLCJHZW9zaXRldXJsIjoiaHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL01ldGFDdWJlWC9tZXRhLXJ1bGVzLWRhdEByZWxlYXNlL2dlb3NpdGUuZGF0IiwiTGFzdFVwZGF0ZWQiOiIxNzgxMDIyMzgwIiwiRG5zSG9zdHMiOnsiY2xvdWRmbGFyZS1kbnMuY29tIjoiMS4xLjEuMSIsImRucy5nb29nbGUiOiI4LjguOC44Iiwib25lLm9uZS5vbmUub25lIjoiMS4xLjEuMSIsImRucy55YW5kZXgucnUiOiI3Ny44OC44LjgiLCJkb2gucHViIjoiMTIwLjUzLjUzLjUzIn0sIkRpcmVjdFNpdGVzIjpbImh1YXdlaS5jb20iLCJwb29sLm50cC5vcmciLCIyZ2lzLmNvbSIsIjJnaXMucnUiLCJmb3Jwb3N0LXNldmFzdG9wb2wucnUiLCJudHMtdHYuY29tIiwiY3JpbWVhMjR0di5ydSIsImNyaW1lYS1uZXdzLmNvbSIsImlrcmltLm5ldCIsImMtaW5mb3JtLmluZm8iLCJzZXZrb3IucnUiLCJydWluZm9ybWVyLmNvbSIsIndpbi1tb2JpbGUucnUiLCJrdGtydS5ydSIsInNldnRlbGVjb20ucnUiLCJ5b3RhLnJ1IiwicnQucnUiLCJvcGVuZWR1LnJ1Iiwic3RlcGlrLm9yZyIsImN5YmVybGVuaW5rYS5ydSIsInFuYS5oYWJyLmNvbSIsImFudGlwbGFnaWF0LnJ1IiwiZS5sYW5ib29rLmNvbSIsInpuYW5pdW0uY29tIiwicnUtYm9hcmQuY29tIiwibGludXgub3JnLnJ1IiwieGFrZXAucnUiLCJydGRucy5uZXQiLCJwaWNkbi5uZXQiLCJ2a3VzZXJsaXZlLmNvbSIsInZrLXZpZGVvLnJ1IiwidmlkZW8ubWFpbC5ydSIsInNtb3RyaW0ucnUiLCJ2Z3Ryay5ydSIsIjF0di5ydSIsIm50di5ydSIsInphcHAucnUiLCJtb3JlLnR2IiwibGVzdGEucnUiLCJ0YW5raS5zdSIsInZrcGxheS5ydSIsImdhbWVzLm1haWwucnUiLCJ0YW5rc2JsaXR6LnJ1IiwibWlycGxheS5ydSIsInRhcmtvdi5jb20iLCJlc2NhcGVmcm9tdGFya292LmNvbSIsInNiZXJtYXJrZXQucnUiLCJ5b29tb25leS5ydSIsInFpd2kuY29tIiwicGF5LnJ1Iiwia29yb25hcGF5LmNvbSIsImFwdGVrYS5ydSIsImVhcHRla2EucnUiLCJzZXZzdGFyLm5ldCIsImZhcmxpbmUubmV0Iiwia3J5bXRlbGVjb20ucnUiLCJtb2JpbGUtd2luLnJ1Iiwidm9sbmFtb2JpbGUucnUiLCJtaXJhbmRhLW1lZGlhLnJ1Iiwiaml2b3NpdGUuY29tIiwiYW1wbGl0dWRlLmNvbSIsImFwcGxlLmNvbSIsImljbG91ZC5jb20iLCJzYW1zdW5nLmNvbSIsInlhbmRleC10ZWFtLnJ1Iiwic2V2c3UucnUiLCJkby5zZXZzdS5ydSIsImdvc3VzbHVnaS5ydSIsIm1vcy5ydSIsIm5hbG9nLmdvdi5ydSIsInNiZXJiYW5rLnJ1IiwidGJhbmsucnUiLCJ2dGIucnUiLCJhbGZhYmFuay5ydSIsInlhbmRleC5ydSIsInlhbmRleC5uZXQiLCJ5YXN0YXRpYy5uZXQiLCJ5YS5ydSIsImR6ZW4ucnUiLCJ2ay5jb20iLCJ2ay5tZSIsIm1haWwucnUiLCJvem9uLnJ1Iiwid2lsZGJlcnJpZXMucnUiLCJ3Yi5ydSIsImF2aXRvLnJ1Iiwia2lub3BvaXNrLnJ1IiwicnV0dWJlLnJ1Il0sIkRpcmVjdElwIjpbIjEyNy4wLjAuMC84IiwiMTAuMC4wLjAvOCIsIjE3Mi4xNi4wLjAvMTIiLCIxOTIuMTY4LjAuMC8xNiIsIjEwMC42NC4wLjAvMTAiLCIxNjkuMjU0LjAuMC8xNiIsIjIyNC4wLjAuMC80IiwiMjU1LjI1NS4yNTUuMjU1IiwiMTE0LjExNC4xMTQuMTE0LzMyIiwiNDIuODEuODIuMjA5LzMyIiwiMTIwLjUzLjUzLjUzLzMyIiwiZ2VvaXA6cnUiLCJnZW9pcDpwcml2YXRlIl0sIlByb3h5U2l0ZXMiOltdLCJQcm94eUlwIjpbXSwiQmxvY2tTaXRlcyI6WyJnZW9zaXRlOmNhdGVnb3J5LWFkcy1hbGwiXSwiQmxvY2tJcCI6W10sIkRvbWFpblN0cmF0ZWd5IjoiSVBJZk5vbk1hdGNoIiwiRmFrZUROUyI6ImZhbHNlIiwiVXNlQ2h1bmtGaWxlcyI6ImZhbHNlIn0
