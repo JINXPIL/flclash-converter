@@ -44,21 +44,42 @@
 </p>
 
 > [!IMPORTANT]
-> **Zero-Trust y Privacidad Primero.** Todos los cálculos se realizan estrictamente de forma local en su navegador. Ningún dato sale de su dispositivo. La herramienta se ha creado exclusivamente con fines educativos para estudiar los protocolos de red y los principios de enrutamiento.
+> **Zero-Trust y Privacidad Primero.** Todos los cálculos se realizan estrictamente de forma local en su navegador. Ningún dato sale de su dispositivo. La herramienta se ha creado exclusivamente con fines educativos para estudiar en profundidad los protocolos de red y los principios de enrutamiento.
 
 > [!WARNING]
 > **Atención: Problema con las suscripciones YAML y los tiempos de espera (Timeout):**
 > Muchos proveedores de VPN intencionalmente (o debido a una configuración de API incompetente) restringen el funcionamiento de clientes de terceros al exportar suscripciones. Los servidores pueden cargarse correctamente en su lista, pero al intentar conectarse, entran en un tiempo de espera infinito. 
+> 💡 **Cómo comprobar quién tiene la culpa:** Si toma un enlace "en bruto" al mismo nodo (por ejemplo, `vless://...` o código JSON), lo añade manualmente como perfil local, y **funciona** — el problema es 100% del lado del proveedor. Esto significa que su servidor bloquea las peticiones de su cliente por `User-Agent` al intentar actualizar la suscripción. En otros casos, los tiempos de espera pueden estar causados por bloqueos específicos de firmas de protocolo por parte de cortafuegos de censura (DPI).
+
+---
+
+### 📸 Interfaz (ULTRA Design)
+
+<p align="center">
+  <a href="https://raw.githubusercontent.com/jinxpil/flclash-converter/main/media/Gemini_Generated_Image_w0ysv7w0ysv7w0ys.png" target="_blank">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jinxpil/flclash-converter/main/media/Gemini_Generated_Image_w0ysv7w0ysv7w0ys.png">
+      <img alt="JSON to YAML" src="https://raw.githubusercontent.com/jinxpil/flclash-converter/main/media/Gemini_Generated_Image_w0ysv7w0ysv7w0ys.png" width="48%">
+    </picture>
+  </a>
+  
+  <a href="https://raw.githubusercontent.com/jinxpil/flclash-converter/main/media/firefox_DHEZPiG4oz.png" target="_blank">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jinxpil/flclash-converter/main/media/firefox_DHEZPiG4oz.png">
+      <img alt="Converter" src="https://raw.githubusercontent.com/jinxpil/flclash-converter/main/media/firefox_DHEZPiG4oz.png" width="48%">
+    </picture>
+  </a>
+</p>
 
 ---
 
 ### 🔥 ¿Qué hay de nuevo en la versión 17.02 ULTRA?
 
-* 🚀 **Extreme Parser Engine:** Optimización completa del código para manejar **más de 10,000 nodos** simultáneamente.
-* 🌍 **Localización ULTRA:** Soporte profundo para 6 idiomas.
-* 🛡️ **Sistema QuotaGuard:** Protección inteligente contra el desbordamiento de la memoria del navegador.
-* 🧠 **Filtro Inteligente de Duplicados:** Comparación automática y eliminación de servidores duplicados por el par `IP:Port`.
-* 🛠️ **Diagnósticos Refinados:** Registro de eventos actualizado y corrección de errores de sintaxis.
+* 🚀 **Extreme Parser Engine:** Optimización completa del código para manejar **más de 10,000 nodos** simultáneamente. Interfaz fluida incluso con volúmenes de datos gigantescos.
+* 🌍 **Localización ULTRA:** Soporte profundo para 6 idiomas (RU, EN, ZH, FA, ES). La interfaz y las notificaciones del sistema están ahora totalmente adaptadas.
+* 🛡️ **Sistema QuotaGuard:** Protección inteligente contra el desbordamiento de la memoria del navegador. Trabaje con cualquier tamaño de configuración sin riesgo de que la pestaña se bloquee.
+* 🧠 **Filtro Inteligente de Duplicados:** Comparación automática de servidores por el par `IP:Port`. El programa elimina automáticamente la basura y los duplicados, dejando sólo nodos únicos.
+* 🛠️ **Diagnósticos Refinados:** Registro de eventos actualizado y corrección de errores de sintaxis para una estabilidad impecable.
 
 ---
 
@@ -84,9 +105,9 @@
 Para no saturar la página, todos los ajustes preestablecidos se han trasladado a archivos separados en el repositorio.
 
 * 🌐 **Túnel dividido para Happ** — Ajuste de reglas optimizado (Crimea, redes locales SevSU, desvío de restricciones, AdBlock). Diseñado **estrictamente** para el cliente Happ.
-    * 📄 Enlace al archivo: [`./rus_vp_happ.json`](./rus_vp_happ.json)
-* 🛠️ **Configuración YAML optimizada (Mihomo/Clash)** — v79.0 Ultimate con estrictas huellas digitales TLS y protección DPI.
-    * 📄 Enlace al archivo: [`./GL_Crimea_ipv6_yan(9.35).yml`](./GL_Crimea_ipv6_yan(9.35).yml)
+    * 📄 Enlace al archivo de configuración: [`./rus_vp_happ.json`](./rus_vp_happ.json)
+* 🛠️ **Configuración YAML optimizada (Mihomo/Clash)** — v79.0 Ultimate con estrictas huellas digitales TLS y protección contra analizadores DPI.
+    * 📄 Enlace al archivo de configuración: [`./GL_Crimea_ipv6_yan(9.35).yml`](./GL_Crimea_ipv6_yan(9.35).yml)
 
 ---
 
@@ -98,25 +119,58 @@ Para no saturar la página, todos los ajustes preestablecidos se han trasladado 
 <details>
 <summary><b>🤖 Android</b></summary>
 
-* [v2RayTun](https://v2raytun.com/)
-* [FlClash](https://github.com/chen08209/FlClash)
-* [Incy](https://incy.cc/)
-* [Happ](https://www.happ.su/main)
-* [Exclave](https://github.com/ExclaveNetwork/Exclave)
-* [Sing-box](https://github.com/SagerNet/sing-box)
+* [v2RayTun](https://v2raytun.com/) — Cliente de alta velocidad y seguro basado en Xray Core.
+* [FlClash](https://github.com/chen08209/FlClash) — Cliente principal multiplataforma.
+* [Incy](https://incy.cc/) — Cliente rápido y moderno con importación en un solo toque.
+* [Happ](https://www.happ.su/main) — Utilidad proxy para la gestión cómoda de listas de servidores.
+* [Exclave](https://github.com/ExclaveNetwork/Exclave) — Alternativa moderna a NekoBox con una interfaz familiar.
+* [Sing-box](https://github.com/SagerNet/sing-box) — Núcleo oficial limpio para configuraciones avanzadas.
+* [Hiddify App](https://github.com/hiddify/hiddify-app) — Cliente universal para todo tipo de configuraciones.
+* [v2rayNG](https://github.com/2dust/v2rayNG) — Solución clásica y estable.
+* [Karing](https://github.com/KaringX/karing) — Interfaz gráfica rica en funciones.
+* [Clash Meta for Android](https://github.com/MetaCubeX/ClashMetaForAndroid)
+* ~~[NekoBox For Android](https://github.com/MatsuriDayo/NekoBoxForAndroid)~~ *(Obsoleto)*
+</details>
+
+<details>
+<summary><b>🍏 iOS</b></summary>
+
+* [v2RayTun](https://v2raytun.com/) — Cliente de alta velocidad y seguro basado en Xray Core.
+* [Incy](https://incy.cc/) — Excelente cliente moderno en la App Store.
+* [Happ](https://www.happ.su/main) — Utilidad de proxy cómoda.
+* [Karing](https://apps.apple.com/us/app/karing/id6472431552)
+* [Clash.MI](https://apps.apple.com/us/app/clash-mi/id6744321968)
+* [Stash](https://apps.apple.com/us/app/stash-rule-based-proxy/id1596063349)
+* [Clash Lite](https://apps.apple.com/us/app/clash-lite/id6761357475)
+* [V2Lite VPN](https://apps.apple.com/us/app/v2lite-vpn-super-vpn-proxy/id6444585377)
 </details>
 
 <details>
 <summary><b>💻 Desktop (Win/Mac/Linux)</b></summary>
 
-* [v2RayTun](https://v2raytun.com/)
-* [Happ](https://www.happ.su/main)
-* [v2rayN](https://github.com/2dust/v2rayN)
-* [FlClash](https://github.com/chen08209/FlClash)
+* [v2RayTun](https://v2raytun.com/) — Cliente de alta velocidad y seguro basado en Xray Core.
+* [Happ](https://www.happ.su/main) — Versión de escritorio multiplataforma.
+* [v2rayN](https://github.com/2dust/v2rayN) — Potente cliente personalizable para Windows.
+* [FlClash](https://github.com/chen08209/FlClash) — Interfaz minimalista y rápida.
+* [Karing](https://github.com/KaringX/karing)
+* [Clash Verge Rev](https://github.com/clash-verge-rev/clash-verge-rev)
+* ~~[NekoRay](https://github.com/MatsuriDayo/nekoray)~~ *(Obsoleto)*
 </details>
 
 ---
 
+### 🛡️ Herramientas Alternativas (DPI Bypass)
+
+*Si los protocolos VPN estándar están completamente bloqueados por su proveedor o los cortafuegos de censura, utilice herramientas locales de evasión de inspección profunda de paquetes:*
+
+* [Zapret](https://github.com/bol-van/zapret) — La herramienta más potente y flexible para evitar el DPI a nivel de sistema.
+* [Zapret-discord-youtube](https://github.com/Flowseal/zapret-discord-youtube) — Scripts optimizados para servicios específicos.
+* [ByeByeDPI](https://github.com/romanvht/ByeByeDPI) — Solución clásica probada para ejecución local en Windows.
+
+---
+
 ### ⭐ Apoya el proyecto
+
+**Si Network Builder ULTRA te ha sido útil, ¡no olvides dejar una estrella (Star)! Motiva a seguir desarrollando el proyecto.** :star2:
 
 [![Stargazers over time](https://starchart.cc/jinxpil/flclash-converter.svg?variant=adaptive)](https://starchart.cc/jinxpil/flclash-converter)
