@@ -1,0 +1,76 @@
+# ================================================================
+  # 1.1 РАСШИРЕННЫЙ DIRECT ДЛЯ КРЫМА И СЕВАСТОПОЛЯ (Локальные сети)
+  # ================================================================
+  # Медиа, новости и городские порталы
+  - DOMAIN-SUFFIX,forpost-sevastopol.ru,DIRECT
+  - DOMAIN-SUFFIX,nts-tv.com,DIRECT
+  - DOMAIN-SUFFIX,crimea24tv.ru,DIRECT
+  - DOMAIN-SUFFIX,crimea-news.com,DIRECT
+  - DOMAIN-SUFFIX,ikrim.net,DIRECT
+  - DOMAIN-SUFFIX,c-inform.info,DIRECT
+  - DOMAIN-SUFFIX,sevkor.ru,DIRECT
+  - DOMAIN-SUFFIX,ruinformer.com,DIRECT
+  
+  # Провайдеры и телеком (дополнение)
+  - DOMAIN-SUFFIX,win-mobile.ru,DIRECT
+  - DOMAIN-SUFFIX,ktkru.ru,DIRECT
+  - DOMAIN-SUFFIX,sevtelecom.ru,DIRECT
+  - DOMAIN-SUFFIX,yota.ru,DIRECT
+  - DOMAIN-SUFFIX,rt.ru,DIRECT
+
+  # ================================================================
+  # 1.2 ОБРАЗОВАНИЕ, ИБ И РАЗРАБОТКА (Без проксирования)
+  # ================================================================
+  - DOMAIN-SUFFIX,openedu.ru,DIRECT
+  - DOMAIN-SUFFIX,stepik.org,DIRECT
+  - DOMAIN-SUFFIX,cyberleninka.ru,DIRECT
+  - DOMAIN-SUFFIX,qna.habr.com,DIRECT
+  - DOMAIN-SUFFIX,antiplagiat.ru,DIRECT
+  - DOMAIN-SUFFIX,e.lanbook.com,DIRECT
+  - DOMAIN-SUFFIX,znanium.com,DIRECT
+  - DOMAIN-SUFFIX,ru-board.com,DIRECT
+  - DOMAIN-SUFFIX,linux.org.ru,DIRECT
+  - DOMAIN-SUFFIX,xakep.ru,DIRECT
+
+  # ================================================================
+  # 1.3 ТЯЖЕЛЫЙ ТРАФИК И CDNs (Снижение нагрузки на VPN-ядро)
+  # ================================================================
+  # CDNs российских видеосервисов
+  - DOMAIN-SUFFIX,rtdns.net,DIRECT
+  - DOMAIN-SUFFIX,picdn.net,DIRECT
+  - DOMAIN-SUFFIX,vkuserlive.com,DIRECT
+  - DOMAIN-SUFFIX,vk-video.ru,DIRECT
+  - DOMAIN-SUFFIX,video.mail.ru,DIRECT
+  
+  # Стриминги и ТВ
+  - DOMAIN-SUFFIX,smotrim.ru,DIRECT
+  - DOMAIN-SUFFIX,vgtrk.ru,DIRECT
+  - DOMAIN-SUFFIX,1tv.ru,DIRECT
+  - DOMAIN-SUFFIX,ntv.ru,DIRECT
+  - DOMAIN-SUFFIX,zapp.ru,DIRECT
+  - DOMAIN-SUFFIX,more.tv,DIRECT
+
+  # ================================================================
+  # 1.4 ЛОКАЛЬНЫЕ ИГРЫ (Низкий пинг)
+  # ================================================================
+  - DOMAIN-SUFFIX,lesta.ru,DIRECT
+  - DOMAIN-SUFFIX,tanki.su,DIRECT
+  - DOMAIN-SUFFIX,vkplay.ru,DIRECT
+  - DOMAIN-SUFFIX,games.mail.ru,DIRECT
+  - DOMAIN-SUFFIX,tanksblitz.ru,DIRECT
+  - DOMAIN-SUFFIX,mirplay.ru,DIRECT
+  - DOMAIN-SUFFIX,tarkov.com,DIRECT
+  - DOMAIN-SUFFIX,escapefromtarkov.com,DIRECT
+
+  # ================================================================
+  # 1.5 ДОСТАВКА, МАРКЕТПЛЕЙСЫ И ФИНТЕХ (Дополнение)
+  # ================================================================
+  - DOMAIN-SUFFIX,sbermarket.ru,DIRECT
+  - DOMAIN-SUFFIX,yoomoney.ru,DIRECT
+  - DOMAIN-SUFFIX,qiwi.com,DIRECT
+  - DOMAIN-SUFFIX,pay.ru,DIRECT
+  - DOMAIN-SUFFIX,koronapay.com,DIRECT
+  - DOMAIN-SUFFIX,сбп.рф,DIRECT
+  - DOMAIN-SUFFIX,apteka.ru,DIRECT
+  - DOMAIN-SUFFIX,eapteka.ru,DIRECT
+  - DOMAIN-SUFFIX,yandex-team.ru,DIRECT
