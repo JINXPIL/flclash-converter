@@ -100,14 +100,16 @@
 
 ---
 
-### 🎯 Configuraciones y Enrutamiento (Ajustes preestablecidos)
+### 🎯 Configuraciones y Enrutamiento (Presets)
 
-Para no saturar la página, todos los ajustes preestablecidos se han trasladado a archivos separados en el repositorio.
+Para no saturar la página con bloques de código, todos los ajustes preestablecidos listos para usar se han movido a archivos separados del repositorio.
 
-* 🌐 **Túnel dividido para Happ** — Ajuste de reglas optimizado (Crimea, redes locales SevSU, desvío de restricciones, AdBlock). Diseñado **estrictamente** para el cliente Happ.
+* 🌐 **Túnel dividido para Happ** — Ajuste de reglas optimizado (Crimea, SevSU, evasión de restricciones, AdBlock), compilado a través de `routing.happ.su`. Diseñado **estrictamente** para el cliente Happ.
     * 📄 Enlace al archivo de configuración: [`./rus_vp_happ.json`](./rus_vp_happ.json)
-* 🛠️ **Configuración YAML optimizada (Mihomo/Clash)** — v79.0 Ultimate con estrictas huellas digitales TLS y protección contra analizadores DPI.
+    * 🔗 Enlace de importación para el cliente: `https://raw.githubusercontent.com/JINXPIL/flclash-converter/refs/heads/main/rus_vp_happ.json`
+* 🛠️ **Configuración YAML optimizada (Mihomo/Clash)** — v79.0 Ultimate con huellas dactilares TLS de navegador estrictas y protección contra analizadores DPI.
     * 📄 Enlace al archivo de configuración: [`./GL_Crimea_ipv6_yan(9.35).yml`](./GL_Crimea_ipv6_yan(9.35).yml)
+    * 🔗 Enlace de importación para el cliente: `https://raw.githubusercontent.com/JINXPIL/flclash-converter/refs/heads/main/GL_Crimea_ipv6_yan(9.35).yml`
 
 ---
 
