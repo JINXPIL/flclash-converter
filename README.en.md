@@ -100,14 +100,16 @@
 
 ---
 
-### 🎯 Configurations and Routing (Presets)
+### 🎯 Configurations & Routing (Presets)
 
-To avoid cluttering the page with code, ready-made configuration presets have been moved to separate repository files.
+To avoid cluttering the page with code blocks, all ready-made presets are moved to separate repository files.
 
-* 🌐 **Split Tunneling for Happ** — Optimized routing preset (Crimea, SevSU local networks, bypass restrictions, AdBlock), built via the `routing.happ.su` constructor. Designed **strictly** for the Happ utility.
-    * 📄 Config file link: [`./rus_vp_happ.json`](./rus_vp_happ.json)
-* 🛠️ **Optimized YAML config (Mihomo/Clash)** — v79.0 Ultimate with strict browser TLS fingerprints and protection against DPI analyzers.
-    * 📄 Config file link: [`./GL_Crimea_ipv6_yan(9.35).yml`](./GL_Crimea_ipv6_yan(9.35).yml)
+* 🌐 **Split Tunneling for Happ** — Optimized rule preset (Crimea, SevSU, censorship bypass, AdBlock), built via `routing.happ.su`. Designed **strictly** for the Happ client.
+    * 📄 Configuration file link: [`./rus_vp_happ.json`](./rus_vp_happ.json)
+    * 🔗 Client import link: `https://raw.githubusercontent.com/JINXPIL/flclash-converter/refs/heads/main/rus_vp_happ.json`
+* 🛠️ **Optimized YAML Config (Mihomo/Clash)** — v79.0 Ultimate with strict browser TLS fingerprints and protection against DPI analyzers.
+    * 📄 Configuration file link: [`./GL_Crimea_ipv6_yan(9.35).yml`](./GL_Crimea_ipv6_yan(9.35).yml)
+    * 🔗 Client import link: `https://raw.githubusercontent.com/JINXPIL/flclash-converter/refs/heads/main/GL_Crimea_ipv6_yan(9.35).yml`
 
 ---
 
