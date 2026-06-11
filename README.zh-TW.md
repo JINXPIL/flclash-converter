@@ -100,14 +100,16 @@
 
 ---
 
-### 🎯 配置與路由 (預設)
+### 🎯 配置與路由規則 (預設)
 
-為了避免頁面充斥程式碼，所有現成的預設配置均已移至儲存庫的獨立檔案中。
+為了不讓頁面堆滿代碼，所有現成的預設配置都已提取到獨立的倉庫檔案中。
 
-* 🌐 **Happ 分流規則** — 優化的規則預設（支援克里米亞、SevSU 區域網路、繞過限制、AdBlock），透過 `routing.happ.su` 構建。**嚴格**專用於 Happ 客戶端。
-    * 📄 設定檔連結: [`./rus_vp_happ.json`](./rus_vp_happ.json)
-* 🛠️ **優化的 YAML 配置 (Mihomo/Clash)** — v79.0 Ultimate 版，具有嚴格的瀏覽器 TLS 指紋和 DPI 防護。
-    * 📄 設定檔連結: [`./GL_Crimea_ipv6_yan(9.35).yml`](./GL_Crimea_ipv6_yan(9.35).yml)
+* 🌐 **Happ 分流規則** — 優化的規則預設（克里米亞、SevSU、繞過限制、AdBlock），透過 `routing.happ.su` 構建。**嚴格**僅供 Happ 客戶端使用。
+    * 📄 配置檔案連結：[`./rus_vp_happ.json`](./rus_vp_happ.json)
+    * 🔗 客戶端導入連結：`https://raw.githubusercontent.com/JINXPIL/flclash-converter/refs/heads/main/rus_vp_happ.json`
+* 🛠️ **Mihomo/Clash 優化配置 (YAML)** — v79.0 Ultimate，具有嚴格的瀏覽器 TLS 指紋和防 DPI 分析保護。
+    * 📄 配置檔案連結：[`./GL_Crimea_ipv6_yan(9.35).yml`](./GL_Crimea_ipv6_yan(9.35).yml)
+    * 🔗 客戶端導入連結：`https://raw.githubusercontent.com/JINXPIL/flclash-converter/refs/heads/main/GL_Crimea_ipv6_yan(9.35).yml`
 
 ---
 
