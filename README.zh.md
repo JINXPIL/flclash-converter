@@ -97,17 +97,18 @@
     <td align="center">🔌 <b>TUIC / Socks5 / HTTP</b><br>Full Support</td>
   </tr>
 </table>
-
 ---
 
-### 🎯 配置与路由 (预设)
+### 🎯 配置与路由规则 (预设)
 
-为了避免页面充斥代码，所有现成的预设配置均已移至存储库的独立文件中。
+为了不让页面堆满代码，所有现成的预设配置都已提取到独立的仓库文件中。
 
-* 🌐 **Happ 分流规则** — 优化的规则预设（支持克里米亚、SevSU 本地网络、绕过限制、AdBlock），通过 `routing.happ.su` 构建。**严格**专用于 Happ 客户端。
-    * 📄 配置文件链接: [`./rus_vp_happ.json`](./rus_vp_happ.json)
-* 🛠️ **优化的 YAML 配置 (Mihomo/Clash)** — v79.0 Ultimate 版，具有严格的浏览器 TLS 指纹和 DPI 防护。
-    * 📄 配置文件链接: [`./GL_Crimea_ipv6_yan(9.35).yml`](./GL_Crimea_ipv6_yan(9.35).yml)
+* 🌐 **Happ 分流规则** — 优化的规则预设（克里米亚、SevSU、绕过限制、AdBlock），通过 `routing.happ.su` 构建。**严格**仅供 Happ 客户端使用。
+    * 📄 配置文件链接：[`./rus_vp_happ.json`](./rus_vp_happ.json)
+    * 🔗 客户端导入链接：`https://raw.githubusercontent.com/JINXPIL/flclash-converter/refs/heads/main/rus_vp_happ.json`
+* 🛠️ **Mihomo/Clash 优化配置 (YAML)** — v79.0 Ultimate，具有严格的浏览器 TLS 指纹和防 DPI 分析保护。
+    * 📄 配置文件链接：[`./GL_Crimea_ipv6_yan(9.35).yml`](./GL_Crimea_ipv6_yan(9.35).yml)
+    * 🔗 客户端导入链接：`https://raw.githubusercontent.com/JINXPIL/flclash-converter/refs/heads/main/GL_Crimea_ipv6_yan(9.35).yml`
 
 ---
 
