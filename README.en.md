@@ -22,7 +22,7 @@
   </a>
 </p>
 
-<h1 align="center">⚡ Network Builder v17.02 ULTRA</h1>
+<h1 align="center">⚡ Network Builder v17.03 ULTRA</h1>
 
 <p align="center">
   <b>Extremely powerful and 100% local web tool for managing gigantic proxy server databases.</b><br>
