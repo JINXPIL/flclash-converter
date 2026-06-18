@@ -164,7 +164,7 @@
 
 * [Zapret](https://github.com/bol-van/zapret) — Мощнейший и самый гибкий инструмент для глубокого обхода DPI на уровне системы.
 * [Zapret-discord-youtube](https://github.com/Flowseal/zapret-discord-youtube) — Оптимизированные и настроенные готовые скрипты под конкретные популярные сервисы.
-* [ByeByeDPI](https://github.com/romanvht/ByeByeDPI) — Проверенное классическое решение для локального запуска на Windows.
+* [ByeByeDPI](https://github.com/romanvht/ByeByeDPI) — Проверенное классическое решение для локального запуска на Android.
 
 ---
 
