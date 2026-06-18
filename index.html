@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#0d1117">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Network Builder v17.02 ULTRA</title>
+    <title>Network Builder v17.03 ULTRA</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
     <style>
@@ -120,7 +120,7 @@
 <body>
     <div class="container">
         <h2>
-            <div>⚡ Network Builder <span style="color:var(--text-muted); font-size:16px;">v17.02 ULTRA</span></div>
+            <div>⚡ Network Builder <span style="color:var(--text-muted); font-size:16px;">v17.03 ULTRA</span></div>
             <div class="badges-wrapper">
                 <div class="version-badge" id="mihomoVersion" title="Версия ядра Mihomo"><a href="https://github.com/MetaCubeX/mihomo/releases" target="_blank">⏳ Core...</a></div>
                 <div class="version-badge" id="rulesVersion" style="color:var(--primary-color);" title="Базы обхода блокировок"><a href="https://github.com/MetaCubeX/meta-rules-dat/releases" target="_blank">🛡️ Rules...</a></div>
@@ -2576,42 +2576,106 @@ function copyLink(i) {
         // ====================================================================
         // СИСТЕМА ПИНГОВАНИЯ (Проверка доступности узлов)
         // ====================================================================
-        async function pingNode(index, btn) {
-            const p = AppState.proxies[index]; 
-            btn.textContent = "⏳"; 
+        
+        /**
+         * Пингует отдельный узел.
+         * @param {number} index Индекс в AppState.proxies
+         * @param {HTMLElement} btn (опционально) Кнопка для обновления. Если нет, найдет по data-index
+         * @param {boolean} autoSave Сохранять ли стейт сразу (false при массовом пинге)
+         */
+        async function pingNode(index, btn = null, autoSave = true) {
+            const p = AppState.proxies[index];
+            if (!p) return;
+
+            // Если кнопку не передали, пытаемся найти её в DOM по data-index (защита от багов сортировки)
+            const targetBtn = btn || document.querySelector(`.btn-ping[data-index="${index}"]`);
+            if (targetBtn) {
+                targetBtn.textContent = "⏳";
+                targetBtn.style.color = "var(--text-color)";
+            }
+
             const start = performance.now();
             const ac = new AbortController(); 
             const tid = setTimeout(() => ac.abort(), 3000); // Таймаут 3 секунды
             
+            let pingTime = 99999;
+            let statusText = "Err";
+            let statusColor = "var(--danger-color)";
+
             try {
-                await fetch(`https://${p.server}:${p.port}`, { mode: 'no-cors', cache: 'no-store', signal: ac.signal });
+                // Протокол: если порт 443, логично пробовать https, иначе http.
+                // (Браузеры блокируют http-запросы к другим портам, если страница открыта по https)
+                const protocol = (p.port == 443 || p.port == 8443) ? 'https' : 'http';
+                
+                await fetch(`${protocol}://${p.server}:${p.port}`, { 
+                    mode: 'no-cors', 
+                    cache: 'no-store', 
+                    signal: ac.signal 
+                });
+                
                 clearTimeout(tid); 
-                const ms = Math.round(performance.now() - start);
-                btn.textContent = ms + "ms"; 
-                btn.style.color = "var(--success-color)"; 
-                p.lastPing = ms;
+                pingTime = Math.round(performance.now() - start);
+                statusText = pingTime + "ms"; 
+                statusColor = "var(--success-color)"; 
+                
             } catch (e) {
                 clearTimeout(tid);
-                // VLESS и Trojan часто не отвечают на прямые HTTP запросы, поэтому они Stealth, а не Err
-                if (p.type === 'vless' || p.type === 'trojan') { 
-                    btn.textContent = "🛡️ Stealth"; 
-                    btn.style.color = "var(--primary-color)"; 
-                    p.lastPing = 99998; 
-                } else { 
-                    btn.textContent = "Err"; 
-                    btn.style.color = "var(--danger-color)"; 
-                    p.lastPing = 99999; 
+                
+                if (e.name === 'AbortError') {
+                    // Чистый таймаут (3 секунды прошло, ответа нет)
+                    statusText = "Timeout";
+                    pingTime = 99999;
+                } else {
+                    // Ошибка сети (CORS, отказ в соединении сервером, несоответствие сертификата).
+                    // Сервер ОТВЕТИЛ (разорвал связь), значит он ЖИВ! Замеряем время этого ответа.
+                    pingTime = Math.round(performance.now() - start);
+                    
+                    if (['vless', 'trojan', 'hysteria2', 'vmess', 'shadowsocks'].includes(p.type?.toLowerCase())) { 
+                        statusText = `🛡️ ${pingTime}ms`; // Показываем Stealth + реальный пинг!
+                        statusColor = "var(--primary-color)"; 
+                    } else { 
+                        statusText = "Err"; 
+                        pingTime = 99999; 
+                    }
                 }
             }
-            AppState.saveState();
+
+            p.lastPing = pingTime;
+            if (autoSave) AppState.saveState();
+
+            if (targetBtn) {
+                targetBtn.textContent = statusText;
+                targetBtn.style.color = statusColor;
+            }
+            
+            return pingTime;
         }
 
         async function pingAll() {
-            if (!AppState.proxies.length) return; 
-            showToast("⏳ Тестирование...");
-            const btns = document.querySelectorAll('.btn-ping');
-            await Promise.all(AppState.proxies.map((_, i) => btns[i] ? pingNode(i, btns[i]) : Promise.resolve()));
-            showToast("✅ Завершено!");
+            if (!AppState.proxies || !AppState.proxies.length) return; 
+            
+            showToast("⏳ Пингуем (пакетами по 5)...", "info");
+            
+            // Находим все кнопки пинга. Желательно, чтобы у них был data-index="${i}" в HTML.
+            // const btns = document.querySelectorAll('.btn-ping'); // Твой старый вариант
+            
+            const CONCURRENCY_LIMIT = 5; // Максимум одновременных запросов
+            const proxiesCount = AppState.proxies.length;
+
+            // Разбиваем запросы на чанки, чтобы браузер не "захлебнулся"
+            for (let i = 0; i < proxiesCount; i += CONCURRENCY_LIMIT) {
+                const chunk = [];
+                for (let j = i; j < i + CONCURRENCY_LIMIT && j < proxiesCount; j++) {
+                    // Передаем index, null (кнопка найдется сама), false (не сохранять стейт каждый раз)
+                    chunk.push(pingNode(j, null, false)); 
+                }
+                // Ждем завершения пачки из 5 запросов, прежде чем запустить следующие 5
+                await Promise.all(chunk);
+            }
+            
+            // Сохраняем состояние ОДИН раз после окончания всей проверки
+            AppState.saveState();
+            showToast("✅ Тестирование завершено!");
         }
 
        // ====================================================================
@@ -2647,9 +2711,9 @@ function copyLink(i) {
                     const div = document.createElement('div'); 
                     div.className = 'proxy-card';
                     div.innerHTML = `
-                        <input type="checkbox" class="proxy-checkbox" onchange="handleCheckboxChange(this)">
+                        <input type="checkbox" class="proxy-checkbox" data-index="${i}" onchange="handleCheckboxChange(this)">
                         <div class="card-actions">
-                            <button class="btn-card btn-ping" style="color:${pingColor}" onclick="pingNode(${i},this)">${pingLabel}</button>
+                            <button class="btn-card btn-ping" data-index="${i}" style="color:${pingColor}" onclick="pingNode(${i},this)">${pingLabel}</button>
                             <button class="btn-card" onclick="showQR(${i})">📱</button>
                             <button class="btn-card" onclick="copyLink(${i})">🔗</button>
                             <button class="btn-card remove" onclick="removeProxy(${i})">✖</button>
@@ -2715,60 +2779,141 @@ function copyLink(i) {
             updateOutput();
         }
 
-        // ====================================================================
+  // ====================================================================
         // МАССОВОЕ РЕДАКТИРОВАНИЕ (Mass Edit)
         // ====================================================================
+        
         function openMassEditModal() {
             if (!document.querySelectorAll('.proxy-checkbox:checked').length) {
                 return showToast("Сначала выберите узлы!", "warning");
             }
+            
+            // Сбрасываем поля формы перед открытием, чтобы не было старых данных
+            $['massEditSni'].value = '';
+            $['massEditFp'].value = '';
+            $['massEditFlow'].value = '';
+            
             openModal('massEditModal');
         }
         
         function applyMassEdit() {
             const sni = $['massEditSni'].value.trim();
-            const fp = $['massEditFp'].value;
+            const fp = $['massEditFp'].value.trim();
             const flow = $['massEditFlow'].value;
             let count = 0;
 
-            document.querySelectorAll('.proxy-checkbox').forEach((cb, i) => {
-                if (cb.checked) {
-                    let p = AppState.proxies[i]; 
-                    let isChanged = false;
+            document.querySelectorAll('.proxy-checkbox:checked').forEach((cb) => {
+                // ВАЖНО: Если есть сортировка/фильтрация, лучше брать индекс из data-атрибута:
+                // Например: const index = cb.dataset.index;
+                // Ниже оставлен твой вариант, предполагающий строгое совпадение порядка
+                const index = cb.dataset.index !== undefined ? cb.dataset.index : Array.from(document.querySelectorAll('.proxy-checkbox')).indexOf(cb);
+                let p = AppState.proxies[index]; 
+                
+                if (!p) return;
+
+                let isChanged = false;
+                
+                if (sni)  { p.sni = sni; isChanged = true; } 
+                if (fp)   { p.fp = fp; isChanged = true; } 
+                if (flow) { p.flow = flow === 'none' ? "" : flow; isChanged = true; }
+                
+                if (isChanged) {
+                    count++; // Увеличиваем счетчик для ЛЮБОГО измененного прокси
                     
-                    if(sni) { p.sni = sni; isChanged = true; } 
-                    if(fp) { p.fp = fp; isChanged = true; } 
-                    if(flow) { p.flow = flow === 'none' ? "" : flow; isChanged = true; }
-                    
-                    if(isChanged && ['vless', 'trojan', 'hysteria2'].includes(p.type)) {
-                        try { 
-                            let u = new URL(p.rawLink.replace(/^[a-zA-Z0-9]+:\/\//, 'http://')); 
-                            let sp = new URLSearchParams(u.search); 
-                            
-                            if(sni) sp.set('sni', sni); 
-                            if(fp) sp.set('fp', fp); 
-                            if(flow) { flow === 'none' ? sp.delete('flow') : sp.set('flow', flow); } 
-                            
-                            u.search = sp.toString(); 
-                            p.rawLink = p.rawLink.split('://')[0] + '://' + u.toString().split('://')[1]; 
-                        } catch(e) {}
-                        count++;
+                    if (['vless', 'trojan', 'hysteria2'].includes(p.type)) {
+                        p.rawLink = updateProxyLink(p.rawLink, {
+                            sni: sni || undefined,
+                            fp: fp || undefined,
+                            flow: flow ? (flow === 'none' ? null : flow) : undefined
+                        });
                     }
                 }
             });
             
             closeModal('massEditModal');
+            
             if (count > 0) { 
                 AppState.saveState(); 
                 renderCards(); 
-                showToast(`✅ Изменено: ${count}`); 
+                showToast(`✅ Изменено узлов: ${count}`, "success"); 
+            } else {
+                showToast("Нет изменений", "info");
             }
         }
 
-        function showQR(i) {
-            $['qrTitle'].textContent = AppState.proxies[i].name;
-            new QRious({ element: $['qrCanvas'], value: AppState.proxies[i].rawLink, size: 250, background: 'white' });
-            openModal('qrModal');
+        // Вспомогательная функция для безопасного обновления v2ray ссылок (без new URL)
+        function updateProxyLink(rawLink, params) {
+            try {
+                // Разбиваем ссылку на базовую часть, параметры и фрагмент (название)
+                const [baseAndQuery, hash] = rawLink.split('#');
+                const [base, query] = baseAndQuery.split('?');
+                
+                const sp = new URLSearchParams(query || '');
+                
+                for (const [key, value] of Object.entries(params)) {
+                    if (value === undefined) continue; // Пропускаем пустые поля
+                    if (value === null) {
+                        sp.delete(key); // Удаляем параметр (для flow = 'none')
+                    } else {
+                        sp.set(key, value);
+                    }
+                }
+                
+                const newQuery = sp.toString();
+                let newLink = base;
+                if (newQuery) newLink += '?' + newQuery;
+                if (hash !== undefined) newLink += '#' + hash;
+                
+                return newLink;
+            } catch (e) {
+                console.error("Ошибка обновления ссылки: ", e);
+                return rawLink;
+            }
+        }
+
+// ====================================================================
+        // ГЕНЕРАЦИЯ QR-КОДА
+        // ====================================================================
+        
+        let qrInstance = null; // Храним глобально, чтобы не пересоздавать
+        
+        function showQR(index) {
+            const proxy = AppState.proxies[index];
+            
+            // 1. Проверяем, существует ли прокси и есть ли у него ссылка
+            if (!proxy || !proxy.rawLink) {
+                return showToast("Нет ссылки для генерации QR-кода", "error");
+            }
+
+            // 2. Устанавливаем заголовок (с фоллбэком, если имя пустое)
+            $['qrTitle'].textContent = proxy.name || 'Без названия';
+            
+            try {
+                if (!qrInstance) {
+                    qrInstance = new QRious({ 
+                        element: $['qrCanvas'], 
+                        // Увеличиваем размер, так как ссылки vless/reality очень длинные, 
+                        // пиксели будут мелкими. 300px — оптимально для сканирования.
+                        size: 300, 
+                        // 'M' (Medium) или 'L' (Low). 'L' позволяет вместить больше данных
+                        // при меньшей плотности сетки. Для длинных URI это критично!
+                        level: 'L', 
+                        background: 'white',
+                        foreground: 'black'
+                    });
+                }
+                
+                // 3. Обновляем значение.
+                qrInstance.value = proxy.rawLink; 
+                
+                openModal('qrModal');
+                
+            } catch (err) {
+                // 4. Перехватываем ошибки. Если ссылка превысит лимиты QR-стандарта (около 2953 байт),
+                // скрипт не упадет, а пользователь получит уведомление.
+                console.error("Ошибка генерации QR-кода:", err);
+                showToast("Не удалось сгенерировать QR. Возможно, ссылка слишком длинная.", "error");
+            }
         }
 
 // ====================================================================
