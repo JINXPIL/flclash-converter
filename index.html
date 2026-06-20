@@ -3016,27 +3016,46 @@ function copyLink(i) {
         }
 
         // ====================================================================
-        // ГЕНЕРАЦИЯ ИТОГОВОГО КОНФИГА (YAML / JSON) - БРОНЕБОЙНАЯ ВЕРСИЯ
+        // ГЕНЕРАЦИЯ ИТОГОВОГО КОНФИГА (YAML / JSON) - БРОНЕБОЙНАЯ ВЕРСИЯ V2
         // ====================================================================
         function updateOutput() {
             const exportFormat = AppState.exportFormat;
             const templateMode = AppState.templateMode;
             const outputElement = $['outputEditor'];
             
-            // СУПЕР-ОЧИСТИТЕЛЬ
+            // СУПЕР-ОЧИСТИТЕЛЬ ТЕКСТА
             const safeYamlStr = (str) => {
                 if (str === null || str === undefined) return "";
                 let s = String(str);
-                // Убиваем вообще ВСЕ управляющие символы, табы, переносы строк (\n, \r) и спец-юникод
                 s = s.replace(/[\x00-\x1F\x7F-\x9F\u200B-\u200F\u2028\u2029\uFEFF\r\n\t]/g, '');
-                // Экранируем слэши (чтобы не сломали кавычки) и сами двойные кавычки
                 return s.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
             };
+
+            // ФИЛЬТРАЦИЯ "ТОКСИЧНЫХ" УЗЛОВ (Отбраковываем мусор)
+            const validProxies = AppState.proxies.filter(p => {
+                // 1. Проверка сервера и порта (порт должен быть числом от 1 до 65535)
+                if (!p.server || p.server.trim() === "" || p.server.includes(' ')) return false;
+                if (!p.port || isNaN(p.port) || p.port <= 0 || p.port > 65535) return false;
+                
+                // 2. Проверка шифров (допускаются только англ. буквы, цифры, дефис и подчеркивание)
+                // Если там кракозябры вроде TóBQ$Î0D - значит парсер съел фейковую ссылку. Выбрасываем!
+                const cipherRegex = /^[a-zA-Z0-9\-_]+$/;
+                if ((p.type === 'ss' || p.type === 'ssr') && (!p.cipher || !cipherRegex.test(p.cipher))) return false;
+                if (p.type === 'vmess' && p.cipher && !cipherRegex.test(p.cipher)) return false;
+                
+                // 3. Проверка плагинов SSR
+                if (p.type === 'ssr') {
+                    if (p.protocol && !/^[a-zA-Z0-9\-_.]+$/.test(p.protocol)) return false;
+                    if (p.obfs && !/^[a-zA-Z0-9\-_.]+$/.test(p.obfs)) return false;
+                }
+
+                return true; // Сервер чистый, пропускаем в конфиг!
+            });
             
-            let yamlProxies = AppState.proxies.length ? "proxies:\n" : "proxies: []\n";
+            let yamlProxies = validProxies.length ? "proxies:\n" : "proxies: []\n";
             
-            AppState.proxies.forEach(p => {
-                // Очищаем всё!
+            // Заметьте! Теперь цикл идет по validProxies, а не по всем подряд
+            validProxies.forEach(p => {
                 const safeName = safeYamlStr(p.name);
                 const safeServer = safeYamlStr(p.server);
                 const safeSni = safeYamlStr(p.sni);
@@ -3051,7 +3070,6 @@ function copyLink(i) {
                 const safeCipher = safeYamlStr(p.cipher);
                 const safeProtocol = safeYamlStr(p.protocol);
                 
-                // ВАЖНО: Теперь ВСЕ текстовые переменные строго в кавычках ("")
                 yamlProxies += `  - name: "${safeName}"\n    server: "${safeServer}"\n    port: ${p.port}\n    type: ${p.type}\n`;
                 
                 const validTypes = ['vless', 'trojan', 'vmess', 'hysteria2', 'hy2', 'ss', 'ssr'];
@@ -3087,7 +3105,8 @@ function copyLink(i) {
                 }
             });
             
-            const userProxies = AppState.proxies.length ? AppState.proxies.map(p => `      - "${safeYamlStr(p.name)}"`).join('\n') : "";
+            // В списках Proxy Groups тоже используем только отфильтрованные (чистые) узлы
+            const userProxies = validProxies.length ? validProxies.map(p => `      - "${safeYamlStr(p.name)}"`).join('\n') : "";
             const providerUse = `    use:\n      - igareck_mobile_black\n      - zieng2_universal\n      - igareck_white_1\n      - goida_26`;
             
             if (exportFormat.includes('clash')) {
@@ -3110,6 +3129,8 @@ function copyLink(i) {
             } else {
                 outputElement.innerText = JSON.stringify({ proxies: AppState.proxies }, null, 2);
             }
+
+            outputElement.innerText = outputElement.innerText.replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]/g, '');
             
             autoResize(outputElement);
             AppState.saveEditorState();
