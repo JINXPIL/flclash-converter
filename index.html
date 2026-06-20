@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#0d1117">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Network Builder v17.03 ULTRA</title>
+    <title>Network Builder v17.04 ULTRA</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
     <style>
@@ -120,7 +120,7 @@
 <body>
     <div class="container">
         <h2>
-            <div>⚡ Network Builder <span style="color:var(--text-muted); font-size:16px;">v17.03 ULTRA</span></div>
+            <div>⚡ Network Builder <span style="color:var(--text-muted); font-size:16px;">v17.04 ULTRA</span></div>
             <div class="badges-wrapper">
                 <div class="version-badge" id="mihomoVersion" title="Версия ядра Mihomo"><a href="https://github.com/MetaCubeX/mihomo/releases" target="_blank">⏳ Core...</a></div>
                 <div class="version-badge" id="rulesVersion" style="color:var(--primary-color);" title="Базы обхода блокировок"><a href="https://github.com/MetaCubeX/meta-rules-dat/releases" target="_blank">🛡️ Rules...</a></div>
@@ -2347,14 +2347,14 @@ function copyLink(i) {
                 if (!text) return;
                 let currentText = text.trim();
                 
-                // Если текст выглядит как Base64 (нет vless:// и нет { )
-                if (!currentText.startsWith('{') && !currentText.includes('vless://') && !currentText.includes('trojan://')) {
+               // Если текст выглядит как Base64 (нет известных протоколов и нет { )
+                if (!currentText.startsWith('{') && !/(vless|vmess|trojan|hysteria2|hy2|ss|ssr):\/\//i.test(currentText)) {
                     try {
                         let b64 = currentText.replace(/[\s\n\r]/g, '').replace(/-/g, '+').replace(/_/g, '/');
                         while (b64.length % 4) b64 += '=';
                         // Пытаемся раскодировать
                         let decoded = decodeURIComponent(escape(atob(b64)));
-                        if (decoded.includes('vless://') || decoded.includes('trojan://')) {
+                        if (/(vless|vmess|trojan|hysteria2|hy2|ss|ssr):\/\//i.test(decoded)) {
                             currentText = decoded; 
                         }
                     } catch(e) {}
@@ -2526,17 +2526,17 @@ function copyLink(i) {
             // 3. СЫРЫЕ ССЫЛКИ (ИИ-распознавание Base64)
             else {
                 // Если текст грязный, ИИ пытается вытащить из него чистый Base64
-                if (!text.includes('vless://') && !text.includes('trojan://')) {
+                if (!/(vless|vmess|trojan|hysteria2|hy2|ss|ssr):\/\//i.test(text)) {
                     text = OfflineAIFixer.healBase64(text);
                     try {
                         let decoded = decodeURIComponent(escape(atob(text)));
-                        if (decoded.includes('vless://') || decoded.includes('trojan://')) {
+                        if (/(vless|vmess|trojan|hysteria2|hy2|ss|ssr):\/\//i.test(decoded)) {
                             text = decoded; 
                         }
                     } catch(e) {}
                 }
 
-                const linkRegex = /(vless|trojan):\/\/[^\s<>'"]+/gi;
+                const linkRegex = /(vless|vmess|trojan|hysteria2|hy2|ss|ssr):\/\/[^\s<>'"]+/gi;
                 const matches = text.match(linkRegex) || [];
 
                 matches.forEach(line => {
@@ -2552,9 +2552,92 @@ function copyLink(i) {
                             let sp = new URLSearchParams(url.search);
                             let nodeName = decodeURIComponent(url.hash.slice(1)) || "Trojan";
                             p = { name: typeof addGeoFlag === 'function' ? addGeoFlag(nodeName) : nodeName, type: "trojan", server: url.hostname, port: parseInt(url.port) || 443, password: url.username, tls: true, sni: sp.get('sni') || url.hostname, network: sp.get('type') || "tcp", fp: sp.get('fp') || "chrome", rawLink: line };
-                        } 
+                        } else if (line.toLowerCase().startsWith('vmess://')) {
+                            let b64 = line.slice(8).split('#')[0];
+                            let config = JSON.parse(decodeURIComponent(escape(atob(b64))));
+                            let nodeName = typeof addGeoFlag === 'function' ? addGeoFlag(config.ps || "VMess") : (config.ps || "VMess");
+                            p = { name: nodeName, type: "vmess", server: config.add, port: parseInt(config.port), uuid: config.id, alterId: config.aid || 0, cipher: config.scy || "auto", network: config.net || "tcp", tls: config.tls === "tls", sni: config.sni || config.host || config.add, fp: config.fp || "chrome", rawLink: line };
+                            if(config.net === "ws") p.wsOpts = { path: config.path || "/", headers: { Host: config.host || config.sni || config.add } };
+                        } else if (line.toLowerCase().startsWith('hysteria2://') || line.toLowerCase().startsWith('hy2://')) {
+                            let url = new URL(line.replace(/^(hysteria2|hy2):\/\//i, 'http://'));
+                            let sp = new URLSearchParams(url.search);
+                            let nodeName = decodeURIComponent(url.hash.slice(1)) || "Hysteria2";
+                            p = { name: typeof addGeoFlag === 'function' ? addGeoFlag(nodeName) : nodeName, type: "hysteria2", server: url.hostname, port: parseInt(url.port) || 443, password: url.username || url.pathname.replace('//',''), sni: sp.get('sni') || url.hostname, insecure: sp.get('insecure') === '1' || sp.get('allowInsecure') === '1', obfs: sp.get('obfs') || "", "obfs-password": sp.get('obfs-password') || "", rawLink: line };
+                        } else if (line.toLowerCase().startsWith('ss://')) {
+                            let base = line.split('#')[0].slice(5);
+                            let nodeName = line.split('#')[1] ? decodeURIComponent(line.split('#')[1]) : "Shadowsocks";
+                            if(base.includes('%')) base = decodeURIComponent(base);
+                            let userInfoStr = "", hostPortStr = "", searchStr = "";
+                            if (base.includes('@')) {
+                                let parts = base.split('@'); userInfoStr = parts[0]; let rest = parts[1].split('?'); hostPortStr = rest[0]; searchStr = rest[1] || "";
+                            } else {
+                                let decodedBase = atob(base.split('?')[0]); let parts = decodedBase.split('@'); userInfoStr = parts[0]; hostPortStr = parts[1]; searchStr = base.split('?')[1] || "";
+                            }
+                            if (!userInfoStr.includes(':')) try { userInfoStr = atob(userInfoStr); } catch(e) {}
+                            let [method, password] = userInfoStr.split(':');
+                            let [server, port] = hostPortStr.split(':');
+                            let sp = new URLSearchParams(searchStr);
+                            p = { name: typeof addGeoFlag === 'function' ? addGeoFlag(nodeName) : nodeName, type: "ss", server: server, port: parseInt(port), cipher: method, password: password, network: sp.get('type') || "tcp", tls: sp.get('security') === 'tls', sni: sp.get('sni') || server, rawLink: line };
+                            if(p.network === "ws") p.wsOpts = { path: sp.get('path') || "/", headers: { Host: sp.get('host') || p.sni } };
+                        } else if (line.toLowerCase().startsWith('ssr://')) {
+                            // Отделяем саму ссылку от приписок вроде "# By EbraSha"
+                            let payload = line.slice(6).split('#')[0];
+                            let hashName = line.split('#')[1] ? decodeURIComponent(line.split('#')[1].trim()) : null;
+                            let decoded = payload;
+
+                            // Проверяем, в каком формате пришла ссылка.
+                            // Если внутри нет двоеточий, значит это формат 1 (полностью скрыт в Base64)
+                            if (!payload.includes(':')) {
+                                let b64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+                                while (b64.length % 4) b64 += '=';
+                                try { decoded = decodeURIComponent(escape(atob(b64))); } catch(e) {}
+                            }
+
+                            // Разбираем строку: host:port:protocol:cipher:obfs:password/?params
+                            let parts = decoded.split('/?');
+                            let mainParts = parts[0].split(':');
+                            
+                            if (mainParts.length >= 6) {
+                                let sp = new URLSearchParams(parts[1] || "");
+                                let nodeName = "SSR";
+                                
+                                // Достаем и декодируем название
+                                let rem = sp.get('remarks');
+                                if (rem) {
+                                    try { nodeName = decodeURIComponent(escape(atob(rem.replace(/-/g, '+').replace(/_/g, '/')))); } catch(e) {}
+                                } else if (hashName) {
+                                    nodeName = hashName;
+                                }
+
+                                // Достаем и декодируем пароль
+                                let password = mainParts[5];
+                                try { password = decodeURIComponent(escape(atob(password.replace(/-/g, '+').replace(/_/g, '/')))); } catch(e) {}
+
+                                // Достаем и декодируем параметры обфускации
+                                let obfsParam = sp.get('obfsparam') || "";
+                                if (obfsParam) try { obfsParam = decodeURIComponent(escape(atob(obfsParam.replace(/-/g, '+').replace(/_/g, '/')))); } catch(e) {}
+
+                                // Достаем и декодируем параметры протокола
+                                let protoParam = sp.get('protoparam') || "";
+                                if (protoParam) try { protoParam = decodeURIComponent(escape(atob(protoParam.replace(/-/g, '+').replace(/_/g, '/')))); } catch(e) {}
+
+                                p = { 
+                                    name: typeof addGeoFlag === 'function' ? addGeoFlag(nodeName) : nodeName, 
+                                    type: "ssr", 
+                                    server: mainParts[0], 
+                                    port: parseInt(mainParts[1]), 
+                                    protocol: mainParts[2], 
+                                    cipher: mainParts[3], 
+                                    obfs: mainParts[4], 
+                                    password: password, 
+                                    obfsParam: obfsParam, 
+                                    protoParam: protoParam, 
+                                    rawLink: line 
+                                };
+                            }
+                        }
                         addNodeIfUnique(p);
-                    } catch(e) {}
+                    } catch(e) { console.error("Parse error on line:", line, e); }
                 });
             }
 
@@ -2928,17 +3011,36 @@ function copyLink(i) {
             
             AppState.proxies.forEach(p => {
                 yamlProxies += `  - name: "${p.name}"\n    server: ${p.server}\n    port: ${p.port}\n    type: ${p.type}\n`;
-                if(p.type === 'vless' || p.type === 'trojan'){
-                    yamlProxies += `    udp: true\n    network: ${p.network || 'tcp'}\n`;
+                const validTypes = ['vless', 'trojan', 'vmess', 'hysteria2', 'hy2', 'ss', 'ssr'];
+                if(validTypes.includes(p.type)){
+                    if(p.type !== 'ss' && p.type !== 'ssr') yamlProxies += `    udp: true\n`;
+                    if(p.network && p.type !== 'ssr') yamlProxies += `    network: ${p.network}\n`;
+                    
                     if(p.type === 'vless') yamlProxies += `    uuid: ${p.uuid}\n`;
-                    if(p.type === 'trojan') yamlProxies += `    password: ${p.password}\n`;
+                    else if(p.type === 'trojan') yamlProxies += `    password: ${p.password}\n`;
+                    else if(p.type === 'vmess') yamlProxies += `    uuid: ${p.uuid}\n    alterId: ${p.alterId || 0}\n    cipher: ${p.cipher || 'auto'}\n`;
+                    else if(p.type === 'hysteria2' || p.type === 'hy2') {
+                        yamlProxies += `    password: ${p.password}\n    sni: ${p.sni || p.server}\n    skip-cert-verify: ${p.insecure ? 'true' : 'false'}\n    up: 100 Mbps\n    down: 100 Mbps\n`;
+                        if(p.obfs) yamlProxies += `    obfs: ${p.obfs}\n    obfs-password: "${p["obfs-password"]}"\n`;
+                    }
+                    else if(p.type === 'ss') yamlProxies += `    cipher: ${p.cipher}\n    password: ${p.password}\n`;
+                    else if(p.type === 'ssr') {
+                        yamlProxies += `    cipher: ${p.cipher}\n    password: ${p.password}\n    protocol: ${p.protocol}\n    obfs: ${p.obfs}\n`;
+                        if(p.obfsParam) yamlProxies += `    obfs-param: ${p.obfsParam}\n`;
+                        if(p.protoParam) yamlProxies += `    protocol-param: ${p.protoParam}\n`;
+                    }
+                    
                     if(p.flow) yamlProxies += `    flow: ${p.flow}\n`;
-                    if (p.tls) {
+                    
+                    if (p.tls && p.type !== 'hysteria2' && p.type !== 'hy2') {
                         yamlProxies += `    tls: true\n    sni: ${p.sni}\n    client-fingerprint: ${p.fp || 'chrome'}\n`; 
                         if(p["reality-opts"]) {
                             yamlProxies += `    reality-opts:\n      public-key: ${p["reality-opts"]["public-key"]}\n      short-id: ${p["reality-opts"]["short-id"]}\n`;
                         }
-                    } 
+                    }
+                    if (p.wsOpts && p.network === 'ws') {
+                        yamlProxies += `    ws-opts:\n      path: "${p.wsOpts.path}"\n      headers:\n        Host: ${p.wsOpts.headers.Host}\n`;
+                    }
                 }
             });
             
