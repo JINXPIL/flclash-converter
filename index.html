@@ -3012,7 +3012,7 @@ function copyLink(i) {
         }
 
         // ====================================================================
-        // ГЕНЕРАЦИЯ ИТОГОВОГО КОНФИГА (YAML / JSON) - БЕЗ ТАЙМ-АУТОВ
+        // ГЕНЕРАЦИЯ ИТОГОВОГО КОНФИГА (YAML / JSON) - ЛЕЧЕНИЕ ТАЙМ-АУТОВ MIHOMO
         // ====================================================================
         function updateOutput() {
             const exportFormat = AppState.exportFormat;
@@ -3075,7 +3075,7 @@ function copyLink(i) {
                 const safeObfs = safeYamlStr(p.obfs);
                 const safeObfsParam = safeYamlStr(p.obfsParam);
                 const safeProtoParam = safeYamlStr(p.protoParam);
-                const safeNetwork = safeYamlStr(p.network);
+                const safeNetwork = safeYamlStr(p.network || 'tcp');
                 const safeCipher = safeYamlStr(p.cipher);
                 const safeProtocol = safeYamlStr(p.protocol);
                 
@@ -3088,7 +3088,7 @@ function copyLink(i) {
                         yamlProxies += `    udp: true\n`;
                     }
                     
-                    if(p.network && p.type !== 'ss' && p.type !== 'ssr' && p.type !== 'hysteria2' && p.type !== 'hy2') {
+                    if(p.type !== 'ss' && p.type !== 'ssr' && p.type !== 'hysteria2' && p.type !== 'hy2') {
                         yamlProxies += `    network: "${safeNetwork}"\n`;
                     }
                     
@@ -3096,7 +3096,7 @@ function copyLink(i) {
                     else if(p.type === 'trojan') yamlProxies += `    password: "${safePassword}"\n`;
                     else if(p.type === 'vmess') yamlProxies += `    uuid: "${safeUuid}"\n    alterId: ${p.alterId || 0}\n    cipher: "${safeCipher || 'auto'}"\n`;
                     else if(p.type === 'hysteria2' || p.type === 'hy2') {
-                        yamlProxies += `    password: "${safePassword}"\n    sni: "${safeSni || safeServer}"\n    skip-cert-verify: ${p.insecure ? 'true' : 'false'}\n`;
+                        yamlProxies += `    password: "${safePassword}"\n    sni: "${safeSni || safeServer}"\n    skip-cert-verify: true\n`;
                         if(p.obfs) yamlProxies += `    obfs: "${safeObfs}"\n    obfs-password: "${safeYamlStr(p["obfs-password"])}"\n`;
                     }
                     else if(p.type === 'ss') yamlProxies += `    cipher: "${safeCipher}"\n    password: "${safePassword}"\n`;
@@ -3106,16 +3106,24 @@ function copyLink(i) {
                         if(p.protoParam) yamlProxies += `    protocol-param: "${safeProtoParam}"\n`;
                     }
                     
-                    if(p.flow && p.type === 'vless') yamlProxies += `    flow: "${safeFlow}"\n`;
+                    // ИСПРАВЛЕНИЕ 1: Добавляем flow (Vision) ТОЛЬКО если сеть TCP (Mihomo крашится, если flow стоит у WS)
+                    if(safeFlow && p.type === 'vless' && safeNetwork === 'tcp') {
+                        yamlProxies += `    flow: "${safeFlow}"\n`;
+                    }
                     
-                    // ИСПРАВЛЕНИЕ: Добавлен skip-cert-verify: true для всех TLS-узлов!
                     if (p.tls && p.type !== 'hysteria2' && p.type !== 'hy2') {
-                        yamlProxies += `    tls: true\n    sni: "${safeSni}"\n    skip-cert-verify: true\n    client-fingerprint: "${safeFp || 'chrome'}"\n`; 
+                        // ИСПРАВЛЕНИЕ 2: Обязательно указываем ALPN для стабильности соединения
+                        yamlProxies += `    tls: true\n    sni: "${safeSni || safeServer}"\n    skip-cert-verify: true\n    client-fingerprint: "${safeFp || 'chrome'}"\n    alpn:\n      - h2\n      - http/1.1\n`; 
+                        
                         if(p["reality-opts"]) {
-                            yamlProxies += `    reality-opts:\n      public-key: "${safeYamlStr(p["reality-opts"]["public-key"])}"\n      short-id: "${safeYamlStr(p["reality-opts"]["short-id"])}"\n`;
+                            yamlProxies += `    reality-opts:\n      public-key: "${safeYamlStr(p["reality-opts"]["public-key"])}"\n`;
+                            // ИСПРАВЛЕНИЕ 3: Вырезаем пустой short-id, если его нет (Mihomo не переваривает short-id: "")
+                            if (p["reality-opts"]["short-id"]) {
+                                yamlProxies += `      short-id: "${safeYamlStr(p["reality-opts"]["short-id"])}"\n`;
+                            }
                         }
                     }
-                    if (p.wsOpts && p.network === 'ws' && p.type !== 'ss') {
+                    if (p.wsOpts && safeNetwork === 'ws' && p.type !== 'ss') {
                         yamlProxies += `    ws-opts:\n      path: "${safeYamlStr(p.wsOpts.path)}"\n      headers:\n        Host: "${safeYamlStr(p.wsOpts.headers.Host)}"\n`;
                     }
                 }
@@ -3134,15 +3142,16 @@ function copyLink(i) {
                     if (customTpl) outputElement.innerText = customTpl.replace(/\{\{PROXIES_YAML\}\}/g, yamlProxies).replace(/\{\{PROXY_NAMES\}\}/g, userProxies || "      - DIRECT");
                 } 
                 else if (templateMode === 'basic') {
-                    let basicGroups = `proxy-groups:\n  - name: "Proxy"\n    type: select\n    proxies:\n      - "Auto"\n      - "DIRECT"\n${userProxies ? userProxies + '\n' : ''}\n  - name: "Auto"\n    type: url-test\n    url: "http://www.gstatic.com/generate_204"\n    interval: 300\n    tolerance: 50\n${userProxies ? '    proxies:\n' + userProxies + '\n' : '    proxies:\n      - "DIRECT"\n'}`;
+                    // Изменен URL для теста задержки на Cloudflare (gstatic иногда тупит)
+                    let basicGroups = `proxy-groups:\n  - name: "Proxy"\n    type: select\n    proxies:\n      - "Auto"\n      - "DIRECT"\n${userProxies ? userProxies + '\n' : ''}\n  - name: "Auto"\n    type: url-test\n    url: "http://cp.cloudflare.com/generate_204"\n    interval: 300\n    tolerance: 50\n${userProxies ? '    proxies:\n' + userProxies + '\n' : '    proxies:\n      - "DIRECT"\n'}`;
                     
-                    // ИСПРАВЛЕНИЕ: Добавлен движок Fake-IP DNS для Базового профиля
-                    let basicDns = `dns:\n  enable: true\n  ipv6: false\n  listen: 0.0.0.0:1053\n  enhanced-mode: fake-ip\n  fake-ip-range: 198.18.0.1/16\n  nameserver:\n    - 8.8.8.8\n    - 1.1.1.1\n    - https://dns.google/dns-query`;
+                    // ИСПРАВЛЕНИЕ 4: Добавлен default-nameserver для поиска IP адресов серверов
+                    let basicDns = `dns:\n  enable: true\n  ipv6: false\n  listen: 0.0.0.0:1053\n  enhanced-mode: fake-ip\n  fake-ip-range: 198.18.0.1/16\n  default-nameserver:\n    - 8.8.8.8\n    - 1.1.1.1\n  nameserver:\n    - 8.8.8.8\n    - 1.1.1.1\n    - https://dns.google/dns-query`;
 
                     outputElement.innerText = `mode: rule\nallow-lan: true\nmixed-port: 7890\nlog-level: info\nipv6: true\n\n${basicDns}\n\n${tunConfig}\n\n${yamlProxies}\n${basicGroups}\n\nrules:\n  - GEOIP,RU,DIRECT,no-resolve\n  - MATCH,Proxy`;
                 }
                 else {
-                    let proxyGroups = `proxy-groups:\n  - name: "🚀 Выбор сервера"\n    type: select\n    proxies:\n      - "♻️ Автовыбор"\n      - "🤖 Premium AI (Auto)"\n${userProxies ? userProxies + '\n' : ''}${providerUse}\n\n  - name: "♻️ Автовыбор"\n    type: url-test\n    url: "http://www.gstatic.com/generate_204"\n    interval: 180\n    tolerance: 30\n    timeout: 5000\n    lazy: true\n    exclude-filter: "(?i)Россия|Russia|Украина|Ukraine|Молдова|Moldova|РФ|России"\n${userProxies ? '    proxies:\n' + userProxies + '\n' : ''}${providerUse}\n\n  - name: "🤖 Premium AI (Auto)"\n    type: url-test\n    url: "http://www.gstatic.com/generate_204"\n    interval: 180\n    tolerance: 30\n    timeout: 5000\n    lazy: true\n${userProxies ? '    proxies:\n' + userProxies + '\n' : ''}${providerUse}`;
+                    let proxyGroups = `proxy-groups:\n  - name: "🚀 Выбор сервера"\n    type: select\n    proxies:\n      - "♻️ Автовыбор"\n      - "🤖 Premium AI (Auto)"\n${userProxies ? userProxies + '\n' : ''}${providerUse}\n\n  - name: "♻️ Автовыбор"\n    type: url-test\n    url: "http://cp.cloudflare.com/generate_204"\n    interval: 180\n    tolerance: 30\n    timeout: 5000\n    lazy: true\n    exclude-filter: "(?i)Россия|Russia|Украина|Ukraine|Молдова|Moldova|РФ|России"\n${userProxies ? '    proxies:\n' + userProxies + '\n' : ''}${providerUse}\n\n  - name: "🤖 Premium AI (Auto)"\n    type: url-test\n    url: "http://cp.cloudflare.com/generate_204"\n    interval: 180\n    tolerance: 30\n    timeout: 5000\n    lazy: true\n${userProxies ? '    proxies:\n' + userProxies + '\n' : ''}${providerUse}`;
                     
                     outputElement.innerText = `${AppState.baseYaml}\n\n${tunConfig}\n\n${yamlProxies}\n${proxyGroups}\n\n${AppState.rulesYaml}`;
                 }
@@ -3155,7 +3164,7 @@ function copyLink(i) {
             autoResize(outputElement);
             AppState.saveEditorState();
         }
-
+        
         // ====================================================================
         // ВАЛИДАЦИЯ И ЭКСПОРТ РЕЗУЛЬТАТОВ
         // ====================================================================
