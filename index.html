@@ -3031,25 +3031,30 @@ function copyLink(i) {
                 return s.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
             };
 
-            // ФИЛЬТРАЦИЯ "ТОКСИЧНЫХ" УЗЛОВ (Отбраковываем мусор)
+// ФИЛЬТРАЦИЯ "ТОКСИЧНЫХ" УЗЛОВ (Отбраковываем мусор)
             const validProxies = AppState.proxies.filter(p => {
-                // 1. Проверка сервера и порта (порт должен быть числом от 1 до 65535)
-                if (!p.server || p.server.trim() === "" || p.server.includes(' ')) return false;
+                if (!p.server || String(p.server).trim() === "" || String(p.server).includes(' ')) return false;
                 if (!p.port || isNaN(p.port) || p.port <= 0 || p.port > 65535) return false;
                 
-                // 2. Проверка шифров (допускаются только англ. буквы, цифры, дефис и подчеркивание)
-                // Если там кракозябры вроде TóBQ$Î0D - значит парсер съел фейковую ссылку. Выбрасываем!
                 const cipherRegex = /^[a-zA-Z0-9\-_]+$/;
-                if ((p.type === 'ss' || p.type === 'ssr') && (!p.cipher || !cipherRegex.test(p.cipher))) return false;
-                if (p.type === 'vmess' && p.cipher && !cipherRegex.test(p.cipher)) return false;
                 
-                // 3. Проверка плагинов SSR
+                if (p.type === 'ss' || p.type === 'ssr') {
+                    const c = String(p.cipher || '').trim();
+                    if (!cipherRegex.test(c)) return false;
+                }
+                if (p.type === 'vmess' && p.cipher) {
+                    const c = String(p.cipher).trim();
+                    if (!cipherRegex.test(c)) return false;
+                }
+                
                 if (p.type === 'ssr') {
-                    if (p.protocol && !/^[a-zA-Z0-9\-_.]+$/.test(p.protocol)) return false;
-                    if (p.obfs && !/^[a-zA-Z0-9\-_.]+$/.test(p.obfs)) return false;
+                    const proto = String(p.protocol || '').trim();
+                    const obfs = String(p.obfs || '').trim();
+                    if (proto && !/^[a-zA-Z0-9\-_.]+$/.test(proto)) return false;
+                    if (obfs && !/^[a-zA-Z0-9\-_.]+$/.test(obfs)) return false;
                 }
 
-                return true; // Сервер чистый, пропускаем в конфиг!
+                return true; 
             });
             
             let yamlProxies = validProxies.length ? "proxies:\n" : "proxies: []\n";
