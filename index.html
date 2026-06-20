@@ -3016,73 +3016,78 @@ function copyLink(i) {
         }
 
         // ====================================================================
-        // ГЕНЕРАЦИЯ ИТОГОВОГО КОНФИГА (YAML / JSON)
+        // ГЕНЕРАЦИЯ ИТОГОВОГО КОНФИГА (YAML / JSON) - БРОНЕБОЙНАЯ ВЕРСИЯ
         // ====================================================================
         function updateOutput() {
             const exportFormat = AppState.exportFormat;
             const templateMode = AppState.templateMode;
             const outputElement = $['outputEditor'];
             
-            // ВАЖНО: Фильтр очистки от невидимых символов и защиты кавычек
-            const sanitize = (str) => {
-                if (!str) return "";
-                // Удаляем невидимые контрольные символы ASCII (мусор из паблик-листов)
-                let clean = String(str).replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]/g, '');
-                // Экранируем двойные кавычки, чтобы они не ломали синтаксис YAML
-                return clean.replace(/"/g, '\\"');
+            // СУПЕР-ОЧИСТИТЕЛЬ
+            const safeYamlStr = (str) => {
+                if (str === null || str === undefined) return "";
+                let s = String(str);
+                // Убиваем вообще ВСЕ управляющие символы, табы, переносы строк (\n, \r) и спец-юникод
+                s = s.replace(/[\x00-\x1F\x7F-\x9F\u200B-\u200F\u2028\u2029\uFEFF\r\n\t]/g, '');
+                // Экранируем слэши (чтобы не сломали кавычки) и сами двойные кавычки
+                return s.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
             };
             
             let yamlProxies = AppState.proxies.length ? "proxies:\n" : "proxies: []\n";
             
             AppState.proxies.forEach(p => {
-                // Очищаем критичные поля перед вставкой
-                const safeName = sanitize(p.name);
-                const safeServer = sanitize(p.server);
-                const safeSni = sanitize(p.sni);
-                const safePassword = sanitize(p.password);
-                const safeUuid = sanitize(p.uuid);
-                const safeFlow = sanitize(p.flow);
-                const safeFp = sanitize(p.fp);
-                const safeObfs = sanitize(p.obfs);
-                const safeObfsParam = sanitize(p.obfsParam);
-                const safeProtoParam = sanitize(p.protoParam);
+                // Очищаем всё!
+                const safeName = safeYamlStr(p.name);
+                const safeServer = safeYamlStr(p.server);
+                const safeSni = safeYamlStr(p.sni);
+                const safePassword = safeYamlStr(p.password);
+                const safeUuid = safeYamlStr(p.uuid);
+                const safeFlow = safeYamlStr(p.flow);
+                const safeFp = safeYamlStr(p.fp);
+                const safeObfs = safeYamlStr(p.obfs);
+                const safeObfsParam = safeYamlStr(p.obfsParam);
+                const safeProtoParam = safeYamlStr(p.protoParam);
+                const safeNetwork = safeYamlStr(p.network);
+                const safeCipher = safeYamlStr(p.cipher);
+                const safeProtocol = safeYamlStr(p.protocol);
                 
-                yamlProxies += `  - name: "${safeName}"\n    server: ${safeServer}\n    port: ${p.port}\n    type: ${p.type}\n`;
+                // ВАЖНО: Теперь ВСЕ текстовые переменные строго в кавычках ("")
+                yamlProxies += `  - name: "${safeName}"\n    server: "${safeServer}"\n    port: ${p.port}\n    type: ${p.type}\n`;
                 
                 const validTypes = ['vless', 'trojan', 'vmess', 'hysteria2', 'hy2', 'ss', 'ssr'];
                 if(validTypes.includes(p.type)){
                     if(p.type !== 'ss' && p.type !== 'ssr') yamlProxies += `    udp: true\n`;
-                    if(p.network && p.type !== 'ssr') yamlProxies += `    network: ${sanitize(p.network)}\n`;
+                    if(p.network && p.type !== 'ssr') yamlProxies += `    network: "${safeNetwork}"\n`;
                     
-                    if(p.type === 'vless') yamlProxies += `    uuid: ${safeUuid}\n`;
-                    else if(p.type === 'trojan') yamlProxies += `    password: ${safePassword}\n`;
-                    else if(p.type === 'vmess') yamlProxies += `    uuid: ${safeUuid}\n    alterId: ${p.alterId || 0}\n    cipher: ${sanitize(p.cipher) || 'auto'}\n`;
+                    if(p.type === 'vless') yamlProxies += `    uuid: "${safeUuid}"\n`;
+                    else if(p.type === 'trojan') yamlProxies += `    password: "${safePassword}"\n`;
+                    else if(p.type === 'vmess') yamlProxies += `    uuid: "${safeUuid}"\n    alterId: ${p.alterId || 0}\n    cipher: "${safeCipher || 'auto'}"\n`;
                     else if(p.type === 'hysteria2' || p.type === 'hy2') {
-                        yamlProxies += `    password: ${safePassword}\n    sni: ${safeSni || safeServer}\n    skip-cert-verify: ${p.insecure ? 'true' : 'false'}\n    up: 100 Mbps\n    down: 100 Mbps\n`;
-                        if(p.obfs) yamlProxies += `    obfs: ${safeObfs}\n    obfs-password: "${sanitize(p["obfs-password"])}"\n`;
+                        yamlProxies += `    password: "${safePassword}"\n    sni: "${safeSni || safeServer}"\n    skip-cert-verify: ${p.insecure ? 'true' : 'false'}\n    up: 100 Mbps\n    down: 100 Mbps\n`;
+                        if(p.obfs) yamlProxies += `    obfs: "${safeObfs}"\n    obfs-password: "${safeYamlStr(p["obfs-password"])}"\n`;
                     }
-                    else if(p.type === 'ss') yamlProxies += `    cipher: ${sanitize(p.cipher)}\n    password: ${safePassword}\n`;
+                    else if(p.type === 'ss') yamlProxies += `    cipher: "${safeCipher}"\n    password: "${safePassword}"\n`;
                     else if(p.type === 'ssr') {
-                        yamlProxies += `    cipher: ${sanitize(p.cipher)}\n    password: ${safePassword}\n    protocol: ${sanitize(p.protocol)}\n    obfs: ${safeObfs}\n`;
-                        if(p.obfsParam) yamlProxies += `    obfs-param: ${safeObfsParam}\n`;
-                        if(p.protoParam) yamlProxies += `    protocol-param: ${safeProtoParam}\n`;
+                        yamlProxies += `    cipher: "${safeCipher}"\n    password: "${safePassword}"\n    protocol: "${safeProtocol}"\n    obfs: "${safeObfs}"\n`;
+                        if(p.obfsParam) yamlProxies += `    obfs-param: "${safeObfsParam}"\n`;
+                        if(p.protoParam) yamlProxies += `    protocol-param: "${safeProtoParam}"\n`;
                     }
                     
-                    if(p.flow) yamlProxies += `    flow: ${safeFlow}\n`;
+                    if(p.flow) yamlProxies += `    flow: "${safeFlow}"\n`;
                     
                     if (p.tls && p.type !== 'hysteria2' && p.type !== 'hy2') {
-                        yamlProxies += `    tls: true\n    sni: ${safeSni}\n    client-fingerprint: ${safeFp || 'chrome'}\n`; 
+                        yamlProxies += `    tls: true\n    sni: "${safeSni}"\n    client-fingerprint: "${safeFp || 'chrome'}"\n`; 
                         if(p["reality-opts"]) {
-                            yamlProxies += `    reality-opts:\n      public-key: ${sanitize(p["reality-opts"]["public-key"])}\n      short-id: ${sanitize(p["reality-opts"]["short-id"])}\n`;
+                            yamlProxies += `    reality-opts:\n      public-key: "${safeYamlStr(p["reality-opts"]["public-key"])}"\n      short-id: "${safeYamlStr(p["reality-opts"]["short-id"])}"\n`;
                         }
                     }
                     if (p.wsOpts && p.network === 'ws') {
-                        yamlProxies += `    ws-opts:\n      path: "${sanitize(p.wsOpts.path)}"\n      headers:\n        Host: ${sanitize(p.wsOpts.headers.Host)}\n`;
+                        yamlProxies += `    ws-opts:\n      path: "${safeYamlStr(p.wsOpts.path)}"\n      headers:\n        Host: "${safeYamlStr(p.wsOpts.headers.Host)}"\n`;
                     }
                 }
             });
             
-            const userProxies = AppState.proxies.length ? AppState.proxies.map(p => `      - "${sanitize(p.name)}"`).join('\n') : "";
+            const userProxies = AppState.proxies.length ? AppState.proxies.map(p => `      - "${safeYamlStr(p.name)}"`).join('\n') : "";
             const providerUse = `    use:\n      - igareck_mobile_black\n      - zieng2_universal\n      - igareck_white_1\n      - goida_26`;
             
             if (exportFormat.includes('clash')) {
@@ -3105,9 +3110,6 @@ function copyLink(i) {
             } else {
                 outputElement.innerText = JSON.stringify({ proxies: AppState.proxies }, null, 2);
             }
-
-            // Финальная очистка всего конфига (убивает любые оставшиеся битые байты)
-            outputElement.innerText = outputElement.innerText.replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]/g, '');
             
             autoResize(outputElement);
             AppState.saveEditorState();
