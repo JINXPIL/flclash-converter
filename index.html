@@ -3012,14 +3012,13 @@ function copyLink(i) {
         }
 
         // ====================================================================
-        // ГЕНЕРАЦИЯ ИТОГОВОГО КОНФИГА (YAML / JSON) - БРОНЕБОЙНАЯ ВЕРСИЯ V2
+        // ГЕНЕРАЦИЯ ИТОГОВОГО КОНФИГА (YAML / JSON) - БЕЗ ТАЙМ-АУТОВ
         // ====================================================================
         function updateOutput() {
             const exportFormat = AppState.exportFormat;
             const templateMode = AppState.templateMode;
             const outputElement = $['outputEditor'];
             
-            // СУПЕР-ОЧИСТИТЕЛЬ ТЕКСТА
             const safeYamlStr = (str) => {
                 if (str === null || str === undefined) return "";
                 let s = String(str);
@@ -3027,13 +3026,10 @@ function copyLink(i) {
                 return s.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
             };
 
-            // ФИЛЬТРАЦИЯ "ТОКСИЧНЫХ" УЗЛОВ (Отбраковываем мусор)
             const validProxies = AppState.proxies.filter(p => {
                 if (!p.server || String(p.server).trim() === "" || String(p.server).includes(' ')) return false;
                 if (!p.port || isNaN(p.port) || p.port <= 0 || p.port > 65535) return false;
                 
-                // --- АБСОЛЮТНО ЖЕСТКИЙ БЕЛЫЙ СПИСОК ШИФРОВ ---
-                // Если шифра нет в этом списке БУКВА В БУКВУ - сервер уничтожается.
                 const validCiphers = [
                     'aes-128-gcm', 'aes-192-gcm', 'aes-256-gcm', 
                     'aes-128-cfb', 'aes-192-cfb', 'aes-256-cfb', 
@@ -3045,11 +3041,7 @@ function copyLink(i) {
 
                 if (p.type === 'ss' || p.type === 'ssr') {
                     const c = String(p.cipher || '').trim().toLowerCase();
-                    
-                    // ЕСЛИ ШИФРА НЕТ В СПИСКЕ ВЫШЕ -> УДАЛЯЕМ
                     if (!validCiphers.includes(c)) return false;
-                    
-                    // ЕСЛИ ПАРОЛЬ ПУСТОЙ ИЛИ КОРОЧЕ 2 СИМВОЛОВ -> УДАЛЯЕМ
                     if (!p.password || p.password.trim().length < 2) return false;
                 }
                 
@@ -3065,7 +3057,6 @@ function copyLink(i) {
                     if (obfs && !/^[a-zA-Z0-9\-_.]+$/.test(obfs)) return false;
                 }
 
-                // Отсекаем фейковые сервера-заглушки (часто боты пишут IP 1.1.1.1 или 127.0.0.1)
                 if (p.server.includes('127.0.0.1') || p.server.includes('localhost')) return false;
 
                 return true; 
@@ -3073,7 +3064,6 @@ function copyLink(i) {
             
             let yamlProxies = validProxies.length ? "proxies:\n" : "proxies: []\n";
             
-            // Заметьте! Теперь цикл идет по validProxies, а не по всем подряд
             validProxies.forEach(p => {
                 const safeName = safeYamlStr(p.name);
                 const safeServer = safeYamlStr(p.server);
@@ -3094,21 +3084,18 @@ function copyLink(i) {
                 const validTypes = ['vless', 'trojan', 'vmess', 'hysteria2', 'hy2', 'ss', 'ssr'];
                 if(validTypes.includes(p.type)){
                     
-                    // UDP нужен всем, КРОМЕ Hysteria2 (она и так UDP)
                     if(p.type !== 'hysteria2' && p.type !== 'hy2') {
                         yamlProxies += `    udp: true\n`;
                     }
                     
-                    // Network (tcp/ws) нужен всем, кроме SSR и Hysteria2
                     if(p.network && p.type !== 'ss' && p.type !== 'ssr' && p.type !== 'hysteria2' && p.type !== 'hy2') {
-                         yamlProxies += `    network: "${safeNetwork}"\n`;
+                        yamlProxies += `    network: "${safeNetwork}"\n`;
                     }
                     
                     if(p.type === 'vless') yamlProxies += `    uuid: "${safeUuid}"\n`;
                     else if(p.type === 'trojan') yamlProxies += `    password: "${safePassword}"\n`;
                     else if(p.type === 'vmess') yamlProxies += `    uuid: "${safeUuid}"\n    alterId: ${p.alterId || 0}\n    cipher: "${safeCipher || 'auto'}"\n`;
                     else if(p.type === 'hysteria2' || p.type === 'hy2') {
-                        // Убрали up/down и добавили строгую структуру Hysteria2
                         yamlProxies += `    password: "${safePassword}"\n    sni: "${safeSni || safeServer}"\n    skip-cert-verify: ${p.insecure ? 'true' : 'false'}\n`;
                         if(p.obfs) yamlProxies += `    obfs: "${safeObfs}"\n    obfs-password: "${safeYamlStr(p["obfs-password"])}"\n`;
                     }
@@ -3119,11 +3106,11 @@ function copyLink(i) {
                         if(p.protoParam) yamlProxies += `    protocol-param: "${safeProtoParam}"\n`;
                     }
                     
-                    // Flow используется только во VLESS
                     if(p.flow && p.type === 'vless') yamlProxies += `    flow: "${safeFlow}"\n`;
                     
+                    // ИСПРАВЛЕНИЕ: Добавлен skip-cert-verify: true для всех TLS-узлов!
                     if (p.tls && p.type !== 'hysteria2' && p.type !== 'hy2') {
-                        yamlProxies += `    tls: true\n    sni: "${safeSni}"\n    client-fingerprint: "${safeFp || 'chrome'}"\n`; 
+                        yamlProxies += `    tls: true\n    sni: "${safeSni}"\n    skip-cert-verify: true\n    client-fingerprint: "${safeFp || 'chrome'}"\n`; 
                         if(p["reality-opts"]) {
                             yamlProxies += `    reality-opts:\n      public-key: "${safeYamlStr(p["reality-opts"]["public-key"])}"\n      short-id: "${safeYamlStr(p["reality-opts"]["short-id"])}"\n`;
                         }
@@ -3134,7 +3121,6 @@ function copyLink(i) {
                 }
             });
             
-            // В списках Proxy Groups тоже используем только отфильтрованные (чистые) узлы
             const userProxies = validProxies.length ? validProxies.map(p => `      - "${safeYamlStr(p.name)}"`).join('\n') : "";
             const providerUse = `    use:\n      - igareck_mobile_black\n      - zieng2_universal\n      - igareck_white_1\n      - goida_26`;
             
@@ -3148,10 +3134,12 @@ function copyLink(i) {
                     if (customTpl) outputElement.innerText = customTpl.replace(/\{\{PROXIES_YAML\}\}/g, yamlProxies).replace(/\{\{PROXY_NAMES\}\}/g, userProxies || "      - DIRECT");
                 } 
                 else if (templateMode === 'basic') {
-                    // Чистый базовый профиль: только загруженные узлы, без внешних провайдеров
                     let basicGroups = `proxy-groups:\n  - name: "Proxy"\n    type: select\n    proxies:\n      - "Auto"\n      - "DIRECT"\n${userProxies ? userProxies + '\n' : ''}\n  - name: "Auto"\n    type: url-test\n    url: "http://www.gstatic.com/generate_204"\n    interval: 300\n    tolerance: 50\n${userProxies ? '    proxies:\n' + userProxies + '\n' : '    proxies:\n      - "DIRECT"\n'}`;
                     
-                    outputElement.innerText = `mode: rule\nallow-lan: true\nmixed-port: 7890\nlog-level: info\nipv6: true\n\n${tunConfig}\n\n${yamlProxies}\n${basicGroups}\n\nrules:\n  - GEOIP,RU,DIRECT,no-resolve\n  - MATCH,Proxy`;
+                    // ИСПРАВЛЕНИЕ: Добавлен движок Fake-IP DNS для Базового профиля
+                    let basicDns = `dns:\n  enable: true\n  ipv6: false\n  listen: 0.0.0.0:1053\n  enhanced-mode: fake-ip\n  fake-ip-range: 198.18.0.1/16\n  nameserver:\n    - 8.8.8.8\n    - 1.1.1.1\n    - https://dns.google/dns-query`;
+
+                    outputElement.innerText = `mode: rule\nallow-lan: true\nmixed-port: 7890\nlog-level: info\nipv6: true\n\n${basicDns}\n\n${tunConfig}\n\n${yamlProxies}\n${basicGroups}\n\nrules:\n  - GEOIP,RU,DIRECT,no-resolve\n  - MATCH,Proxy`;
                 }
                 else {
                     let proxyGroups = `proxy-groups:\n  - name: "🚀 Выбор сервера"\n    type: select\n    proxies:\n      - "♻️ Автовыбор"\n      - "🤖 Premium AI (Auto)"\n${userProxies ? userProxies + '\n' : ''}${providerUse}\n\n  - name: "♻️ Автовыбор"\n    type: url-test\n    url: "http://www.gstatic.com/generate_204"\n    interval: 180\n    tolerance: 30\n    timeout: 5000\n    lazy: true\n    exclude-filter: "(?i)Россия|Russia|Украина|Ukraine|Молдова|Moldova|РФ|России"\n${userProxies ? '    proxies:\n' + userProxies + '\n' : ''}${providerUse}\n\n  - name: "🤖 Premium AI (Auto)"\n    type: url-test\n    url: "http://www.gstatic.com/generate_204"\n    interval: 180\n    tolerance: 30\n    timeout: 5000\n    lazy: true\n${userProxies ? '    proxies:\n' + userProxies + '\n' : ''}${providerUse}`;
