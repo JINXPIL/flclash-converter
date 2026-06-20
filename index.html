@@ -3091,14 +3091,23 @@ function copyLink(i) {
                 
                 const validTypes = ['vless', 'trojan', 'vmess', 'hysteria2', 'hy2', 'ss', 'ssr'];
                 if(validTypes.includes(p.type)){
-                    if(p.type !== 'ss' && p.type !== 'ssr') yamlProxies += `    udp: true\n`;
-                    if(p.network && p.type !== 'ssr') yamlProxies += `    network: "${safeNetwork}"\n`;
+                    
+                    // UDP нужен всем, КРОМЕ Hysteria2 (она и так UDP)
+                    if(p.type !== 'hysteria2' && p.type !== 'hy2') {
+                        yamlProxies += `    udp: true\n`;
+                    }
+                    
+                    // Network (tcp/ws) нужен всем, кроме SSR и Hysteria2
+                    if(p.network && p.type !== 'ssr' && p.type !== 'hysteria2' && p.type !== 'hy2') {
+                        yamlProxies += `    network: "${safeNetwork}"\n`;
+                    }
                     
                     if(p.type === 'vless') yamlProxies += `    uuid: "${safeUuid}"\n`;
                     else if(p.type === 'trojan') yamlProxies += `    password: "${safePassword}"\n`;
                     else if(p.type === 'vmess') yamlProxies += `    uuid: "${safeUuid}"\n    alterId: ${p.alterId || 0}\n    cipher: "${safeCipher || 'auto'}"\n`;
                     else if(p.type === 'hysteria2' || p.type === 'hy2') {
-                        yamlProxies += `    password: "${safePassword}"\n    sni: "${safeSni || safeServer}"\n    skip-cert-verify: ${p.insecure ? 'true' : 'false'}\n    up: 100 Mbps\n    down: 100 Mbps\n`;
+                        // Убрали up/down и добавили строгую структуру Hysteria2
+                        yamlProxies += `    password: "${safePassword}"\n    sni: "${safeSni || safeServer}"\n    skip-cert-verify: ${p.insecure ? 'true' : 'false'}\n`;
                         if(p.obfs) yamlProxies += `    obfs: "${safeObfs}"\n    obfs-password: "${safeYamlStr(p["obfs-password"])}"\n`;
                     }
                     else if(p.type === 'ss') yamlProxies += `    cipher: "${safeCipher}"\n    password: "${safePassword}"\n`;
@@ -3108,7 +3117,8 @@ function copyLink(i) {
                         if(p.protoParam) yamlProxies += `    protocol-param: "${safeProtoParam}"\n`;
                     }
                     
-                    if(p.flow) yamlProxies += `    flow: "${safeFlow}"\n`;
+                    // Flow используется только во VLESS
+                    if(p.flow && p.type === 'vless') yamlProxies += `    flow: "${safeFlow}"\n`;
                     
                     if (p.tls && p.type !== 'hysteria2' && p.type !== 'hy2') {
                         yamlProxies += `    tls: true\n    sni: "${safeSni}"\n    client-fingerprint: "${safeFp || 'chrome'}"\n`; 
