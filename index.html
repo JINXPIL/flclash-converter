@@ -2777,7 +2777,7 @@ function copyLink(i) {
             cb.closest('.proxy-card').classList.toggle('selected', cb.checked); 
         }
 
-        function renderCards() {
+       function renderCards() {
             const cnt = $['cardsContainer'];
             cnt.innerHTML = ''; 
             if ($['selectAllCb']) $['selectAllCb'].checked = false;
@@ -2787,7 +2787,12 @@ function copyLink(i) {
                 $['nodeCount'].textContent = `${AppState.proxies.length} Nodes`;
                 
                 const frag = document.createDocumentFragment();
-                AppState.proxies.forEach((p, i) => {
+                
+                // ОГРАНИЧЕНИЕ ОТРИСОВКИ: Показываем только первые 300 узлов, чтобы браузер не тормозил
+                const displayLimit = 300;
+                const proxiesToDisplay = AppState.proxies.slice(0, displayLimit);
+
+                proxiesToDisplay.forEach((p, i) => {
                     let typeClass = "type-" + p.type;
                     let pingLabel = p.lastPing === undefined ? "⚡" : (p.lastPing === 99999 ? "Err" : (p.lastPing === 99998 ? "🛡️ Stealth" : p.lastPing + "ms"));
                     let pingColor = p.lastPing === undefined ? "var(--text-color)" : (p.lastPing === 99999 ? "var(--danger-color)" : (p.lastPing === 99998 ? "var(--primary-color)" : "var(--success-color)"));
@@ -2807,7 +2812,17 @@ function copyLink(i) {
                     `;
                     frag.appendChild(div);
                 });
+                
                 cnt.appendChild(frag);
+
+                // Выводим предупреждение, если узлов больше, чем мы нарисовали
+                if (AppState.proxies.length > displayLimit) {
+                    const infoMsg = document.createElement('div');
+                    infoMsg.style = "grid-column: 1 / -1; background: #1f1a0f; border: 1px solid var(--accent-color); color: var(--accent-color); padding: 15px; border-radius: 8px; text-align: center; font-size: 13px; font-weight: bold;";
+                    infoMsg.innerHTML = `⚠️ Показаны первые ${displayLimit} карточек из ${AppState.proxies.length}, чтобы браузер не тормозил.<br><span style="color:var(--text-muted); font-size: 11px;">Не волнуйтесь: в Итоговый конфиг и при экспорте попадут АБСОЛЮТНО ВСЕ загруженные узлы!</span>`;
+                    cnt.appendChild(infoMsg);
+                }
+
                 cnt.style.display = 'grid';
             } else {
                 cnt.style.display = 'none'; 
@@ -2815,7 +2830,7 @@ function copyLink(i) {
             }
             updateOutput();
         }
-
+        
         function removeProxy(i) { 
             AppState.proxies.splice(i, 1); 
             AppState.saveState(); 
