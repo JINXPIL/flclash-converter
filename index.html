@@ -1895,22 +1895,18 @@ document.addEventListener('click', e => {
                 document.querySelectorAll('textarea, pre[contenteditable]').forEach(el => autoResize(el));
             },
 
-           saveState() {
+            saveState() {
                 try {
-                    // Пытаемся сохранить данные в память браузера
+                    // Пытаемся сохранить данные в память браузера (до 5 МБ)
                     sessionStorage.setItem('flclash_net_proxies_v16_4', JSON.stringify(this.proxies));
                     this.saveEditorState();
                 } catch (e) {
-                    // Если память переполнена (ошибка квоты)
+                    // Если память переполнена (ошибка квоты 5MB)
                     if (e.name === 'QuotaExceededError' || e.message.includes('quota') || e.code === 22) {
-                        showToast("❌ Память переполнена! Загружено слишком много узлов.", "error");
-                        DiagnosticLogger.add('ERROR', `Лимит браузера (5MB) превышен при попытке сохранить ${this.proxies.length} узлов.`);
-                        
-                        // Опционально: можно принудительно обрезать массив, чтобы спасти приложение от зависания
-                        // this.proxies = this.proxies.slice(0, 300);
-                        // showToast("⚠️ Список обрезан до 300 узлов", "warning");
+                        // Меняем красный error на желтый warning с понятным текстом
+                        showToast("⚠️ База огромная! Автосохранение отключено. Не обновляйте страницу!", "warning");
+                        DiagnosticLogger.add('WARNING', `Лимит браузера (5MB) превышен при попытке сохранить ${this.proxies.length} узлов.`);
                     } else {
-                        // Логируем любые другие непредвиденные ошибки
                         DiagnosticLogger.add('ERROR', `Сбой сохранения состояния: ${e.message}`);
                     }
                 }
@@ -3098,8 +3094,8 @@ function copyLink(i) {
                     }
                     
                     // Network (tcp/ws) нужен всем, кроме SSR и Hysteria2
-                    if(p.network && p.type !== 'ssr' && p.type !== 'hysteria2' && p.type !== 'hy2') {
-                        yamlProxies += `    network: "${safeNetwork}"\n`;
+                    if(p.network && p.type !== 'ss' && p.type !== 'ssr' && p.type !== 'hysteria2' && p.type !== 'hy2') {
+                         yamlProxies += `    network: "${safeNetwork}"\n`;
                     }
                     
                     if(p.type === 'vless') yamlProxies += `    uuid: "${safeUuid}"\n`;
@@ -3126,7 +3122,7 @@ function copyLink(i) {
                             yamlProxies += `    reality-opts:\n      public-key: "${safeYamlStr(p["reality-opts"]["public-key"])}"\n      short-id: "${safeYamlStr(p["reality-opts"]["short-id"])}"\n`;
                         }
                     }
-                    if (p.wsOpts && p.network === 'ws') {
+                    if (p.wsOpts && p.network === 'ws' && p.type !== 'ss') {
                         yamlProxies += `    ws-opts:\n      path: "${safeYamlStr(p.wsOpts.path)}"\n      headers:\n        Host: "${safeYamlStr(p.wsOpts.headers.Host)}"\n`;
                     }
                 }
