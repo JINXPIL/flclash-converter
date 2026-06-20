@@ -3027,7 +3027,7 @@ function copyLink(i) {
                 return s.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
             };
 
-// ФИЛЬТРАЦИЯ "ТОКСИЧНЫХ" УЗЛОВ (Отбраковываем мусор)
+        // ФИЛЬТРАЦИЯ "ТОКСИЧНЫХ" УЗЛОВ (Отбраковываем мусор)
             const validProxies = AppState.proxies.filter(p => {
                 if (!p.server || String(p.server).trim() === "" || String(p.server).includes(' ')) return false;
                 if (!p.port || isNaN(p.port) || p.port <= 0 || p.port > 65535) return false;
@@ -3044,7 +3044,12 @@ function copyLink(i) {
 
                 if (p.type === 'ss' || p.type === 'ssr') {
                     const c = String(p.cipher || '').trim().toLowerCase();
-                    // Если шифра нет в списке, и он даже не содержит слов 'aes' или 'chacha' - в мусорку!
+                    
+                    // НОВОЕ ПРАВИЛО: Безжалостно блокируем Shadowsocks-2022
+                    // В бесплатных базах они всегда кривые и крашат клиент
+                    if (c.includes('2022-blake3')) return false;
+
+                    // Если шифра нет в списке, и он не содержит классические корни - в мусорку
                     if (!validCiphers.includes(c) && !c.includes('aes') && !c.includes('chacha')) return false;
                     // Пустые пароли у Shadowsocks тоже в мусорку
                     if (!p.password || p.password.trim() === '') return false;
@@ -3052,6 +3057,7 @@ function copyLink(i) {
                 
                 if (p.type === 'vmess' && p.cipher) {
                     const c = String(p.cipher).trim().toLowerCase();
+                    if (c.includes('2022-blake3')) return false;
                     if (!validCiphers.includes(c) && !c.includes('aes') && !c.includes('chacha')) return false;
                 }
                 
