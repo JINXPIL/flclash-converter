@@ -2362,9 +2362,9 @@ function copyLink(i) {
                 finalCombinedText += "\n" + currentText;
             });
 
-            // 6. Передаем всё собранное в парсер
+          // 6. Передаем всё собранное в парсер
             if (finalCombinedText.trim()) {
-                parseData(finalCombinedText);
+                await parseData(finalCombinedText); // <--- ДОБАВИЛИ AWAIT
             } else {
                 if (typeof showToast === 'function') showToast("❌ Не удалось извлечь данные", "error");
                 if (typeof $ !== 'undefined' && $['outputEditor']) $['outputEditor'].innerText = "Ошибка загрузки или пустой конфиг";
@@ -2404,22 +2404,26 @@ function copyLink(i) {
             }
         };
 
+// ====================================================================
+        // УМНЫЙ ПАРСЕР (С ИИ-ЛЕКАРЕМ, ОПТИМИЗАЦИЕЙ ПАМЯТИ И ЗАЩИТОЙ ОТ ЗАВИСАНИЙ)
         // ====================================================================
-        // УМНЫЙ ПАРСЕР СО ВСТРОЕННЫМ ИИ-ЛЕКАРЕМ
-        // ====================================================================
-        function parseData(rawText) {
+        async function parseData(rawText) {
             let text = rawText.trim();
             let added = 0;
             let duplicates = 0;
 
+            // --- УСКОРЕНИЕ В 1000 РАЗ: Создаем "Словари" для мгновенной проверки дубликатов ---
+            const existingKeys = new Set(AppState.proxies.map(x => `${x.type}:${x.server}:${x.port}`));
+            const existingNames = new Set(AppState.proxies.map(x => x.name));
+
             const addNodeIfUnique = (p) => {
                 if (!p || !p.server) return;
-                const isDuplicate = AppState.proxies.some(x => x.type === p.type && x.server === p.server && x.port === p.port);
+                const key = `${p.type}:${p.server}:${p.port}`;
                 
-                if (!isDuplicate) {
+                if (!existingKeys.has(key)) {
                     let originalName = p.name;
                     let counter = 1;
-                    while (AppState.proxies.some(x => x.name === p.name)) {
+                    while (existingNames.has(p.name)) {
                         p.name = `${originalName} (${counter})`;
                         counter++;
                     }
@@ -2431,6 +2435,8 @@ function copyLink(i) {
                         } catch(e) {}
                     }
                     AppState.proxies.push(p);
+                    existingKeys.add(key);     // Добавляем в словарь мгновенного поиска
+                    existingNames.add(p.name); // Добавляем имя
                     added++;
                 } else {
                     duplicates++;
@@ -2439,19 +2445,15 @@ function copyLink(i) {
 
             // 1. АНАЛИЗ И ПАРСИНГ JSON
             if (text.startsWith('{')) {
-                let jsonParsed = false;
                 try {
                     let json = JSON.parse(text);
                     processJsonOutbounds(json);
-                    jsonParsed = true;
                 } catch(e) {
-                    // ЕСЛИ ОШИБКА: Вызываем Оффлайн ИИ для лечения JSON
                     try {
                         let healedText = OfflineAIFixer.healJSON(text);
                         let json = JSON.parse(healedText);
                         DiagnosticLogger.add('AI_FIXER', '✅ Успешно! JSON был восстановлен.');
                         processJsonOutbounds(json);
-                        jsonParsed = true;
                     } catch(err2) {
                         DiagnosticLogger.add('ERROR', 'ИИ не смог спасти этот JSON', err2.message);
                     }
@@ -2492,7 +2494,6 @@ function copyLink(i) {
                     const doc = jsyaml.load(text);
                     processYamlProxies(doc);
                 } catch (e) {
-                    // ЕСЛИ ОШИБКА: Вызываем Оффлайн ИИ для лечения YAML
                     try {
                         let healedText = OfflineAIFixer.healYAML(text);
                         const doc = jsyaml.load(healedText);
@@ -2523,9 +2524,9 @@ function copyLink(i) {
                     }
                 }
             }
-            // 3. СЫРЫЕ ССЫЛКИ (ИИ-распознавание Base64)
+            // 3. СЫРЫЕ ССЫЛКИ (МАССИВЫ ПО 10 000+ ШТУК)
             else {
-                // Если текст грязный, ИИ пытается вытащить из него чистый Base64
+                // ИИ-распознавание
                 if (!/(vless|vmess|trojan|hysteria2|hy2|ss|ssr):\/\//i.test(text)) {
                     text = OfflineAIFixer.healBase64(text);
                     try {
@@ -2539,7 +2540,19 @@ function copyLink(i) {
                 const linkRegex = /(vless|vmess|trojan|hysteria2|hy2|ss|ssr):\/\/[^\s<>'"]+/gi;
                 const matches = text.match(linkRegex) || [];
 
-                matches.forEach(line => {
+                // --- ЗАЩИТА ОТ ЗАВИСАНИЯ БРАУЗЕРА (Chunking) ---
+                for (let i = 0; i < matches.length; i++) {
+                    let line = matches[i];
+
+                    // Каждые 500 ссылок скрипт делает микро-паузу (10 миллисекунд). 
+                    // Это позволяет браузеру Firefox/Chrome перевести дух и перерисовать анимацию
+                    if (i % 500 === 0 && i > 0) {
+                        if (typeof $ !== 'undefined' && $['outputEditor']) {
+                            $['outputEditor'].innerText = `⏳ Распознавание ссылок... (${i} из ${matches.length})`;
+                        }
+                        await new Promise(resolve => setTimeout(resolve, 10));
+                    }
+
                     let p = null;
                     try {
                         if (line.toLowerCase().startsWith('vless://')) {
@@ -2580,20 +2593,16 @@ function copyLink(i) {
                             p = { name: typeof addGeoFlag === 'function' ? addGeoFlag(nodeName) : nodeName, type: "ss", server: server, port: parseInt(port), cipher: method, password: password, network: sp.get('type') || "tcp", tls: sp.get('security') === 'tls', sni: sp.get('sni') || server, rawLink: line };
                             if(p.network === "ws") p.wsOpts = { path: sp.get('path') || "/", headers: { Host: sp.get('host') || p.sni } };
                         } else if (line.toLowerCase().startsWith('ssr://')) {
-                            // Отделяем саму ссылку от приписок вроде "# By EbraSha"
                             let payload = line.slice(6).split('#')[0];
                             let hashName = line.split('#')[1] ? decodeURIComponent(line.split('#')[1].trim()) : null;
                             let decoded = payload;
 
-                            // Проверяем, в каком формате пришла ссылка.
-                            // Если внутри нет двоеточий, значит это формат 1 (полностью скрыт в Base64)
                             if (!payload.includes(':')) {
                                 let b64 = payload.replace(/-/g, '+').replace(/_/g, '/');
                                 while (b64.length % 4) b64 += '=';
                                 try { decoded = decodeURIComponent(escape(atob(b64))); } catch(e) {}
                             }
 
-                            // Разбираем строку: host:port:protocol:cipher:obfs:password/?params
                             let parts = decoded.split('/?');
                             let mainParts = parts[0].split(':');
                             
@@ -2601,7 +2610,6 @@ function copyLink(i) {
                                 let sp = new URLSearchParams(parts[1] || "");
                                 let nodeName = "SSR";
                                 
-                                // Достаем и декодируем название
                                 let rem = sp.get('remarks');
                                 if (rem) {
                                     try { nodeName = decodeURIComponent(escape(atob(rem.replace(/-/g, '+').replace(/_/g, '/')))); } catch(e) {}
@@ -2609,36 +2617,24 @@ function copyLink(i) {
                                     nodeName = hashName;
                                 }
 
-                                // Достаем и декодируем пароль
                                 let password = mainParts[5];
                                 try { password = decodeURIComponent(escape(atob(password.replace(/-/g, '+').replace(/_/g, '/')))); } catch(e) {}
 
-                                // Достаем и декодируем параметры обфускации
                                 let obfsParam = sp.get('obfsparam') || "";
                                 if (obfsParam) try { obfsParam = decodeURIComponent(escape(atob(obfsParam.replace(/-/g, '+').replace(/_/g, '/')))); } catch(e) {}
 
-                                // Достаем и декодируем параметры протокола
                                 let protoParam = sp.get('protoparam') || "";
                                 if (protoParam) try { protoParam = decodeURIComponent(escape(atob(protoParam.replace(/-/g, '+').replace(/_/g, '/')))); } catch(e) {}
 
                                 p = { 
                                     name: typeof addGeoFlag === 'function' ? addGeoFlag(nodeName) : nodeName, 
-                                    type: "ssr", 
-                                    server: mainParts[0], 
-                                    port: parseInt(mainParts[1]), 
-                                    protocol: mainParts[2], 
-                                    cipher: mainParts[3], 
-                                    obfs: mainParts[4], 
-                                    password: password, 
-                                    obfsParam: obfsParam, 
-                                    protoParam: protoParam, 
-                                    rawLink: line 
+                                    type: "ssr", server: mainParts[0], port: parseInt(mainParts[1]), protocol: mainParts[2], cipher: mainParts[3], obfs: mainParts[4], password: password, obfsParam: obfsParam, protoParam: protoParam, rawLink: line 
                                 };
                             }
                         }
                         addNodeIfUnique(p);
-                    } catch(e) { console.error("Parse error on line:", line, e); }
-                });
+                    } catch(e) { /* Игнорируем битые ссылки */ }
+                }
             }
 
             // 4. ФИНАЛЬНЫЙ ВЕРДИКТ
@@ -2647,6 +2643,11 @@ function copyLink(i) {
             }
             if (added > 0) { 
                 if (typeof showToast === 'function') showToast(duplicates > 0 ? `✅ Добавлено: ${added} (пропущено дублей: ${duplicates})` : `✅ Добавлено узлов: ${added}!`, "success");
+                
+                // Даем браузеру еще немного времени перед тяжелым рендерингом и сохранением
+                if (typeof $ !== 'undefined' && $['outputEditor']) $['outputEditor'].innerText = "⏳ Отрисовка элементов...";
+                await new Promise(resolve => setTimeout(resolve, 50));
+
                 if (typeof AppState !== 'undefined' && typeof AppState.saveState === 'function') AppState.saveState(); 
                 if (typeof renderCards === 'function') renderCards();
             } else if (duplicates > 0) {
