@@ -3137,22 +3137,21 @@ function copyLink(i) {
                 }
             });
 
-            // --------------------------------------------------------
-            // ГЕНЕРАЦИЯ PROXY-PROVIDERS (Для ссылок из рубильника)
-            // --------------------------------------------------------
             let customProvidersYaml = "";
             let customProvidersNames = [];
+            
             subProviders.forEach(p => {
                 const sName = safeYamlStr(p.name);
                 customProvidersNames.push(sName);
-               // ИСПОЛЬЗУЕМ СТРОГИЙ ФОРМАТ JSON ДЛЯ ЗАЩИТЫ ОТ ОШИБОК YAML
                 customProvidersYaml += `  ${sName}:\n    type: http\n    url: "${safeYamlStr(p.url)}"\n    interval: 14400\n    path: ./providers/${sName}.yaml\n    override: {"skip-cert-verify": true, "udp": true, "alpn": ["h2", "http/1.1"]}\n    health-check: {"enable": true, "interval": 600, "timeout": 4000, "lazy": true, "expected-status": 204, "url": "http://cp.cloudflare.com/generate_204"}\n`;
+            }); // <-- ВОТ ЭТУ СКОБКУ Я И ЗАБЫЛ В ПРОШЛЫЙ РАЗ! ИЗ-ЗА НЕЁ ВСЁ СЛОМАЛОСЬ!
+
             const userProxies = normalProxies.length ? normalProxies.map(p => `      - "${safeYamlStr(p.name)}"`).join('\n') : "";
             
             let allProvidersArray = ['igareck_mobile_black', 'zieng2_universal', 'igareck_white_1', 'goida_26'].concat(customProvidersNames);
-           const providerUse = `    use:\n` + allProvidersArray.map(name => `      - ${name}`).join('\n');
+            const providerUse = `    use:\n` + allProvidersArray.map(name => `      - ${name}`).join('\n');
             
-            let finalOutput = ""; // СОЗДАЕМ ПЕРЕМЕННУЮ ДЛЯ СБОРКИ ТЕКСТА
+            let finalOutput = ""; 
             
             if (exportFormat.includes('clash')) {
                 let tunConfig = exportFormat === 'clash_router' 
@@ -3164,7 +3163,6 @@ function copyLink(i) {
                     if (customTpl) finalOutput = customTpl.replace(/\{\{PROXIES_YAML\}\}/g, yamlProxies).replace(/\{\{PROXY_NAMES\}\}/g, userProxies || "      - DIRECT");
                 } 
                 else if (templateMode === 'basic') {
-                    // БЕЗОПАСНАЯ СБОРКА БАЗОВОГО ПРОФИЛЯ
                     let basicGroups = `proxy-groups:\n  - name: "Proxy"\n    type: select\n    proxies:\n      - "Auto"\n      - "DIRECT"\n`;
                     if (userProxies) basicGroups += userProxies + "\n";
                     if (customProvidersNames.length) basicGroups += `    use:\n${customProvidersNames.map(n => `      - ${n}`).join('\n')}\n`;
@@ -3180,7 +3178,6 @@ function copyLink(i) {
                     finalOutput = `mode: rule\nallow-lan: true\nmixed-port: 7890\nlog-level: info\nipv6: true\n\n${basicDns}\n\n${tunConfig}\n\n${basicProvidersBlock}${yamlProxies}\n${basicGroups}\n\nrules:\n  - GEOIP,RU,DIRECT,no-resolve\n  - MATCH,Proxy`;
                 }
                 else {
-                    // БЕЗОПАСНАЯ СБОРКА КРЫМСКОГО ПРОФИЛЯ
                     let proxyGroups = `proxy-groups:\n  - name: "🚀 Выбор сервера"\n    type: select\n    proxies:\n      - "♻️ Автовыбор"\n      - "🤖 Premium AI (Auto)"\n`;
                     if (userProxies) proxyGroups += userProxies + "\n"; proxyGroups += providerUse + "\n\n";
 
@@ -3199,17 +3196,16 @@ function copyLink(i) {
                 finalOutput = JSON.stringify({ proxies: AppState.proxies }, null, 2);
             }
 
-            // ИЗОЛИРОВАННОЕ СОХРАНЕНИЕ И УБИЙСТВО ТАБОВ/НЕРАЗРЫВНЫХ ПРОБЕЛОВ
             finalOutput = finalOutput.replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]/g, '');
-            finalOutput = finalOutput.replace(/\u00A0/g, ' '); // Превращаем неразрывные пробелы в обычные
-            finalOutput = finalOutput.replace(/\t/g, '  ');    // Превращаем табы (TAB) в два пробела
+            finalOutput = finalOutput.replace(/\u00A0/g, ' '); 
+            finalOutput = finalOutput.replace(/\t/g, '  ');    
             perfectConfigData = finalOutput;
             
             outputElement.innerText = finalOutput;
             autoResize(outputElement);
             AppState.saveEditorState();
         }
-        
+
         // ====================================================================
         // ВАЛИДАЦИЯ И ЭКСПОРТ РЕЗУЛЬТАТОВ
         // ====================================================================
