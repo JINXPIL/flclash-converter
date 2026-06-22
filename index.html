@@ -1607,7 +1607,8 @@ rules:
     </script>
 
     <script>
-        const APP_VERSION = "16.15";
+        const APP_VERSION = "17.05";
+        let perfectConfigData = ""; // Изолированная переменная для скачивания без поломки отступов
 
 // ЛОГГЕР (Продвинутая версия)
 const DiagnosticLogger = {
@@ -3141,22 +3142,22 @@ function copyLink(i) {
             });
 
             // --------------------------------------------------------
-            // ГЕНЕРАЦИЯ PROXY-PROVIDERS (БЕЗ ОШИБОК ОТСТУПОВ)
+            // ГЕНЕРАЦИЯ PROXY-PROVIDERS (Для ссылок из рубильника)
             // --------------------------------------------------------
             let customProvidersYaml = "";
             let customProvidersNames = [];
-            
             subProviders.forEach(p => {
                 const sName = safeYamlStr(p.name);
                 customProvidersNames.push(sName);
                 // ИСПОЛЬЗУЕМ СТРОГИЙ ОДНОСТРОЧНЫЙ ФОРМАТ { ... } ДЛЯ ЗАЩИТЫ ОТ ОШИБОК YAML
                 customProvidersYaml += `  ${sName}:\n    type: http\n    url: "${safeYamlStr(p.url)}"\n    interval: 14400\n    path: ./providers/${sName}.yaml\n    override: { skip-cert-verify: true, udp: true, alpn: ["h2", "http/1.1"] }\n    health-check: { enable: true, interval: 600, timeout: 4000, lazy: true, expected-status: 204, url: "http://cp.cloudflare.com/generate_204" }\n`;
             });
-
             const userProxies = normalProxies.length ? normalProxies.map(p => `      - "${safeYamlStr(p.name)}"`).join('\n') : "";
             
             let allProvidersArray = ['igareck_mobile_black', 'zieng2_universal', 'igareck_white_1', 'goida_26'].concat(customProvidersNames);
-            const providerUse = `    use:\n` + allProvidersArray.map(name => `      - ${name}`).join('\n');
+           const providerUse = `    use:\n` + allProvidersArray.map(name => `      - ${name}`).join('\n');
+            
+            let finalOutput = ""; // СОЗДАЕМ ПЕРЕМЕННУЮ ДЛЯ СБОРКИ ТЕКСТА
             
             if (exportFormat.includes('clash')) {
                 let tunConfig = exportFormat === 'clash_router' 
@@ -3165,51 +3166,49 @@ function copyLink(i) {
                 
                 if (templateMode === 'custom') {
                     let customTpl = $['customTemplateInput'].value;
-                    if (customTpl) outputElement.innerText = customTpl.replace(/\{\{PROXIES_YAML\}\}/g, yamlProxies).replace(/\{\{PROXY_NAMES\}\}/g, userProxies || "      - DIRECT");
+                    if (customTpl) finalOutput = customTpl.replace(/\{\{PROXIES_YAML\}\}/g, yamlProxies).replace(/\{\{PROXY_NAMES\}\}/g, userProxies || "      - DIRECT");
                 } 
                 else if (templateMode === 'basic') {
-                    // НАДЕЖНАЯ ГЕНЕРАЦИЯ ГРУПП (БЕЗ СЛОМАННЫХ ПРОБЕЛОВ)
+                    // БЕЗОПАСНАЯ СБОРКА БАЗОВОГО ПРОФИЛЯ
                     let basicGroups = `proxy-groups:\n  - name: "Proxy"\n    type: select\n    proxies:\n      - "Auto"\n      - "DIRECT"\n`;
                     if (userProxies) basicGroups += userProxies + "\n";
                     if (customProvidersNames.length) basicGroups += `    use:\n${customProvidersNames.map(n => `      - ${n}`).join('\n')}\n`;
                     
                     basicGroups += `  - name: "Auto"\n    type: url-test\n    url: "http://cp.cloudflare.com/generate_204"\n    interval: 300\n    tolerance: 50\n`;
-                    if (userProxies) basicGroups += `    proxies:\n${userProxies}\n`;
-                    else basicGroups += `    proxies:\n      - "DIRECT"\n`;
+                    if (userProxies) basicGroups += `    proxies:\n${userProxies}\n`; else basicGroups += `    proxies:\n      - "DIRECT"\n`;
                     if (customProvidersNames.length) basicGroups += `    use:\n${customProvidersNames.map(n => `      - ${n}`).join('\n')}\n`;
                     
                     let basicDns = `dns:\n  enable: true\n  ipv6: false\n  listen: 0.0.0.0:1053\n  enhanced-mode: fake-ip\n  fake-ip-range: 198.18.0.1/16\n  default-nameserver:\n    - 77.88.8.8\n    - 8.8.8.8\n  nameserver:\n    - https://dns.yandex.ru/dns-query\n    - https://1.1.1.1/dns-query`;
 
                     let basicProvidersBlock = customProvidersYaml ? `proxy-providers:\n${customProvidersYaml}\n` : "";
 
-                    outputElement.innerText = `mode: rule\nallow-lan: true\nmixed-port: 7890\nlog-level: info\nipv6: true\n\n${basicDns}\n\n${tunConfig}\n\n${basicProvidersBlock}${yamlProxies}\n${basicGroups}\n\nrules:\n  - GEOIP,RU,DIRECT,no-resolve\n  - MATCH,Proxy`;
+                    finalOutput = `mode: rule\nallow-lan: true\nmixed-port: 7890\nlog-level: info\nipv6: true\n\n${basicDns}\n\n${tunConfig}\n\n${basicProvidersBlock}${yamlProxies}\n${basicGroups}\n\nrules:\n  - GEOIP,RU,DIRECT,no-resolve\n  - MATCH,Proxy`;
                 }
                 else {
+                    // БЕЗОПАСНАЯ СБОРКА КРЫМСКОГО ПРОФИЛЯ
                     let proxyGroups = `proxy-groups:\n  - name: "🚀 Выбор сервера"\n    type: select\n    proxies:\n      - "♻️ Автовыбор"\n      - "🤖 Premium AI (Auto)"\n`;
-                    if (userProxies) proxyGroups += userProxies + "\n";
-                    proxyGroups += providerUse + "\n\n";
+                    if (userProxies) proxyGroups += userProxies + "\n"; proxyGroups += providerUse + "\n\n";
 
                     proxyGroups += `  - name: "♻️ Автовыбор"\n    type: url-test\n    url: "http://cp.cloudflare.com/generate_204"\n    interval: 180\n    tolerance: 30\n    timeout: 5000\n    lazy: true\n    exclude-filter: "(?i)Россия|Russia|Украина|Ukraine|Молдова|Moldova|РФ|России"\n`;
-                    if (userProxies) proxyGroups += `    proxies:\n${userProxies}\n`;
-                    proxyGroups += providerUse + "\n\n";
+                    if (userProxies) proxyGroups += `    proxies:\n${userProxies}\n`; proxyGroups += providerUse + "\n\n";
 
                     proxyGroups += `  - name: "🤖 Premium AI (Auto)"\n    type: url-test\n    url: "http://cp.cloudflare.com/generate_204"\n    interval: 180\n    tolerance: 30\n    timeout: 5000\n    lazy: true\n`;
-                    if (userProxies) proxyGroups += `    proxies:\n${userProxies}\n`;
-                    proxyGroups += providerUse;
+                    if (userProxies) proxyGroups += `    proxies:\n${userProxies}\n`; proxyGroups += providerUse;
                     
                     let finalBaseYaml = AppState.baseYaml;
-                    if (customProvidersYaml) {
-                        // НАДЕЖНАЯ ВСТАВКА (Защита от Windows \r\n)
-                        finalBaseYaml = finalBaseYaml.replace(/proxy-providers:\r?\n/, 'proxy-providers:\n' + customProvidersYaml);
-                    }
+                    if (customProvidersYaml) { finalBaseYaml = finalBaseYaml.replace(/proxy-providers:\r?\n/, 'proxy-providers:\n' + customProvidersYaml); }
 
-                    outputElement.innerText = `${finalBaseYaml}\n\n${tunConfig}\n\n${yamlProxies}\n${proxyGroups}\n\n${AppState.rulesYaml}`;
+                    finalOutput = `${finalBaseYaml}\n\n${tunConfig}\n\n${yamlProxies}\n${proxyGroups}\n\n${AppState.rulesYaml}`;
                 }
             } else {
-                outputElement.innerText = JSON.stringify({ proxies: AppState.proxies }, null, 2);
+                finalOutput = JSON.stringify({ proxies: AppState.proxies }, null, 2);
             }
 
-            outputElement.innerText = outputElement.innerText.replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]/g, '');
+            // ИЗОЛИРОВАННОЕ СОХРАНЕНИЕ ДЛЯ СКАЧИВАНИЯ БЕЗ УЧАСТИЯ БРАУЗЕРА!
+            finalOutput = finalOutput.replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]/g, '');
+            perfectConfigData = finalOutput;
+            
+            outputElement.innerText = finalOutput;
             autoResize(outputElement);
             AppState.saveEditorState();
         }
@@ -3247,9 +3246,8 @@ function copyLink(i) {
         }
 
         function downloadFile() {
-            // ВЕРНУЛ innerText: он гарантированно сохраняет переносы строк \n
-            let content = $['outputEditor'].innerText;
-            content = content.replace(/\u00A0/g, ' '); 
+            // ВАЖНО: БЕРЕМ ТЕКСТ ИЗ ИЗОЛИРОВАННОЙ ПЕРЕМЕННОЙ!
+            let content = perfectConfigData || $['outputEditor'].innerText;
             const format = AppState.exportFormat;
             
             if (!validateOutput(content, format)) return;
@@ -3264,9 +3262,8 @@ function copyLink(i) {
         }
 
         async function copyResult() {
-            // ВЕРНУЛ innerText: он гарантированно сохраняет переносы строк \n
-            let content = $['outputEditor'].innerText;
-            content = content.replace(/\u00A0/g, ' ');
+            // ВАЖНО: БЕРЕМ ТЕКСТ ИЗ ИЗОЛИРОВАННОЙ ПЕРЕМЕННОЙ!
+            let content = perfectConfigData || $['outputEditor'].innerText;
             const format = AppState.exportFormat;
             
             if (!validateOutput(content, format)) return;
