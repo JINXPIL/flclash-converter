@@ -6,11 +6,11 @@
     <meta name="theme-color" content="#0d1117">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Network Builder v17.04 ULTRA</title>
+    <title>Network Builder v17.05 ULTRA</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+       @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
         
         :root {
             --bg-color: #0d1117; --container-bg: #161b22; --border-color: #30363d;
@@ -19,20 +19,35 @@
             --input-bg: #010409;
         }
 
+        /* Идеальная светлая тема без конфликтов */
+        html[data-theme="light"] {
+            --bg-color: #f0f2f5; 
+            --container-bg: #ffffff; 
+            --border-color: #d0d7de;
+            --primary-color: #0969da; 
+            --text-color: #24292f; 
+            --text-muted: #57606a;
+            --accent-color: #bf8700; 
+            --input-bg: #e1e4e8; 
+            --success-color: #1a7f37;
+        }
+
         body { background: var(--bg-color); color: var(--text-color); font-family: 'JetBrains Mono', monospace; margin: 0; display: flex; justify-content: center; padding: 20px 10px; transition: background 0.3s; }
         .container { background: var(--container-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 25px; max-width: 1050px; width: 100%; box-shadow: 0 8px 32px rgba(0,0,0,0.6); transition: background 0.3s, border-color 0.3s; }
         
         h2 { margin-top: 0; color: var(--primary-color); font-size: 22px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
         .badges-wrapper { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-        .version-badge { font-size: 11px; font-weight: bold; background: #21262d; border-radius: 6px; border: 1px solid var(--border-color); color: var(--success-color); transition: 0.2s; display: flex; align-items: center; overflow: hidden; padding: 0; }
+        
+        /* ВАЖНО: Все жесткие цвета заменены на var() для авто-смены тем */
+        .version-badge { font-size: 11px; font-weight: bold; background: var(--input-bg); border-radius: 6px; border: 1px solid var(--border-color); color: var(--success-color); transition: 0.2s; display: flex; align-items: center; overflow: hidden; padding: 0; }
         .version-badge:hover { border-color: var(--primary-color); background: var(--border-color); }
         .version-badge a { color: inherit; text-decoration: none; padding: 6px 10px; display: flex; align-items: center; width: 100%; height: 100%; }
         
         .header-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; width: 100%; }
-        .icon-btn { background: #21262d; border: 1px solid var(--border-color); color: var(--text-color); padding: 8px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px; font-weight: bold; font-family: inherit; }
+        .icon-btn { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); padding: 8px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px; font-weight: bold; font-family: inherit; }
         .icon-btn:hover { background: var(--border-color); border-color: var(--text-muted); }
-        .icon-btn.primary { background: var(--success-color); border-color: #2ea043; color: white; }
-        .icon-btn.primary:hover { background: #2ea043; box-shadow: 0 0 10px rgba(46,160,67,0.4); }
+        .icon-btn.primary { background: var(--success-color); border-color: var(--success-color); color: white; }
+        .icon-btn.primary:hover { filter: brightness(1.1); box-shadow: 0 0 10px rgba(46,160,67,0.4); }
         .icon-btn.danger { background: transparent; color: var(--danger-color); border-color: var(--border-color); }
         .icon-btn.danger:hover { background: var(--danger-color); color: white; border-color: var(--danger-color); }
         
@@ -42,7 +57,7 @@
         textarea#input, textarea#customTemplateInput, pre#outputEditor { 
             flex-grow: 1; width: 100%; min-height: 120px; background: var(--input-bg); font-size: 13px; line-height: 1.5; color: var(--text-color);
             border-radius: 8px; padding: 15px; box-sizing: border-box; font-family: inherit;
-            outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none; transition: border-color 0.2s, box-shadow 0.2s, background 0.3s;
             overflow: hidden; resize: none; margin-bottom: 0;
         }
         textarea#input { border: 2px dashed var(--border-color); color: var(--success-color); }
@@ -52,8 +67,8 @@
         pre#outputEditor:focus { border-color: var(--primary-color); box-shadow: 0 0 15px rgba(88,166,255,0.15); background: var(--container-bg); }
 
         .controls-group { display: flex; flex-direction: column; gap: 10px; justify-content: stretch; min-width: 100px; }
-        .paste-btn { background: #21262d; border: 1px solid var(--border-color); border-radius: 8px; flex: 1; padding: 10px; display: flex; flex-direction: column; justify-content: center; align-items: center; color: var(--text-color); cursor: pointer; transition: 0.2s; font-weight: bold; font-size: 12px; text-align: center; margin-bottom: 0;}
-        .paste-btn:hover { background: var(--border-color); border-color: var(--primary-color); color: white; }
+        .paste-btn { background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; flex: 1; padding: 10px; display: flex; flex-direction: column; justify-content: center; align-items: center; color: var(--text-color); cursor: pointer; transition: 0.2s; font-weight: bold; font-size: 12px; text-align: center; margin-bottom: 0;}
+        .paste-btn:hover { background: var(--border-color); border-color: var(--primary-color); }
         .paste-btn span { font-size: 20px; margin-bottom: 5px; display: block; }
         
         .settings-panel { background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px 20px; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 20px; }
@@ -61,11 +76,11 @@
         .setting-item label { font-size: 11px; font-weight: bold; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
         
         select, .action-btn { border: none; padding: 14px 18px; border-radius: 6px; font-weight: bold; font-family: inherit; cursor: pointer; font-size: 13px; }
-        select { background: #21262d; color: var(--text-color); border: 1px solid var(--border-color); outline: none; width: 100%; transition: 0.2s; }
+        select { background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); outline: none; width: 100%; transition: 0.2s; }
         select:focus { border-color: var(--primary-color); }
         
         .btn-convert { background: var(--success-color); color: white; width: 100%; padding: 18px; font-size: 15px; margin-bottom: 20px; letter-spacing: 1px; transition: 0.2s; }
-        .btn-convert:hover { background: #2ea043; box-shadow: 0 0 12px rgba(46,160,67,0.4); }
+        .btn-convert:hover { filter: brightness(1.1); box-shadow: 0 0 12px rgba(46,160,67,0.4); }
         
         .status-badge { background: #1f6feb; color: white; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; }
         
@@ -74,8 +89,8 @@
         .cards-grid::-webkit-scrollbar { width: 6px; } .cards-grid::-webkit-scrollbar-track { background: var(--input-bg); border-radius: 3px; } .cards-grid::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
         
         .proxy-card { background: var(--container-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px 14px 14px 38px; position: relative; display: flex; flex-direction: column; gap: 8px; transition: 0.1s; }
-        .proxy-card:hover { border-color: var(--primary-color); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
-        .proxy-card.selected { border-color: var(--accent-color); background: #1f1a0f; }
+        .proxy-card:hover { border-color: var(--primary-color); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .proxy-card.selected { border-color: var(--accent-color); background: var(--input-bg); }
         .proxy-checkbox { position: absolute; left: 12px; top: 15px; accent-color: var(--accent-color); width: 16px; height: 16px; cursor: pointer; }
         
         .proxy-name { font-weight: bold; color: var(--primary-color); font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 90px; outline: none; border-bottom: 1px dashed transparent; cursor: text; }
@@ -83,7 +98,7 @@
         .proxy-detail { font-size: 11px; color: var(--text-muted); display: flex; align-items: center; justify-content: space-between; }
         .proxy-type { display: inline-block; color: white; padding: 3px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; text-transform: uppercase; margin-right: 5px; }
         
-        .type-vless{background:var(--success-color);} .type-hy2{background:#8957e5;} .type-trojan{background:var(--accent-color);} .type-vmess{background:#0078d7;} .type-ss{background:#3b82f6;} .type-ssr{background:#d23bb7;} .type-tuic{background:#ea4aaa;} .type-wg{background:var(--danger-color);} .type-socks{background:#3bd2a2;color:#000;} .type-http{background:#a2d23b;color:#000;} .type-ssh{background:#555;} .type-naive{background:#ff7b00;}
+        .type-vless{background:var(--success-color);} .type-hy2{background:#8957e5;} .type-trojan{background:var(--accent-color);} .type-vmess{background:#0078d7;} .type-ss{background:#3b82f6;} .type-ssr{background:#d23bb7;} .type-tuic{background:#ea4aaa;} .type-wg{background:var(--danger-color);} .type-socks{background:#3bd2a2;color:#000;} .type-http{background:#a2d23b;color:#000;} .type-ssh{background:#555;} .type-naive{background:#ff7b00;} .type-sub{background:#e83e8c;}
         
         .card-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; }
         .btn-card { background: var(--border-color); border: none; border-radius: 4px; cursor: pointer; font-size: 12px; padding: 6px 8px; color: var(--text-color); min-width: 30px; transition: 0.2s; }
@@ -106,21 +121,32 @@
         .modal-btn-secondary { background: var(--container-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 12px 16px; border-radius: 6px; cursor: pointer; margin-top: 10px; width: 100%; font-weight: bold; text-align: center; font-size: 14px; transition: 0.2s;}
         .modal-btn-secondary:hover { border-color: var(--primary-color); }
         
-        .btn-copy { background: #21262d; color: var(--text-color); border: 1px solid var(--border-color); transition: 0.2s; } .btn-copy:hover { background: var(--border-color); }
-        .btn-download { background: var(--primary-color); color: #ffffff; transition: 0.2s; } .btn-download:hover { filter: brightness(1.2); }
+        .btn-copy { background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); transition: 0.2s; } .btn-copy:hover { background: var(--border-color); }
+        .btn-download { background: var(--primary-color); color: #ffffff; transition: 0.2s; } .btn-download:hover { filter: brightness(1.1); }
         
         .tooltip { position: relative; display: inline-block; cursor: help; border-bottom: 1px dotted var(--text-muted); }
-        .tooltip .tooltiptext { visibility: hidden; width: 260px; background-color: #21262d; color: var(--text-color); text-align: center; border-radius: 8px; padding: 12px; border: 1px solid var(--border-color); position: absolute; z-index: 1; bottom: 135%; left: 50%; transform: translateX(-50%); opacity: 0; transition: opacity 0.3s; font-size: 12px; line-height: 1.5; font-weight: normal; font-family: sans-serif; box-shadow: 0 8px 24px rgba(0,0,0,0.6); }
+        .tooltip .tooltiptext { visibility: hidden; width: 260px; background-color: var(--container-bg); color: var(--text-color); text-align: center; border-radius: 8px; padding: 12px; border: 1px solid var(--border-color); position: absolute; z-index: 1; bottom: 135%; left: 50%; transform: translateX(-50%); opacity: 0; transition: opacity 0.3s; font-size: 12px; line-height: 1.5; font-weight: normal; font-family: sans-serif; box-shadow: 0 8px 24px rgba(0,0,0,0.6); }
         .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
 
         .color-picker-group { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; background: var(--input-bg); padding: 10px; border-radius: 6px; border: 1px solid var(--border-color);}
         .color-picker-group input[type="color"] { border: none; border-radius: 4px; width: 40px; height: 30px; cursor: pointer; background: transparent; padding: 0;}
+        
+        /* РУБИЛЬНИК */
+        .switch-container { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; background: var(--input-bg); padding: 10px 15px; border-radius: 8px; border: 1px solid var(--border-color); }
+        .switch { position: relative; display: inline-block; width: 42px; height: 24px; flex-shrink: 0; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border-color); transition: .3s; border-radius: 24px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 4px; bottom: 4px; background-color: white; transition: .3s; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        input:checked + .slider { background-color: var(--accent-color); }
+        input:checked + .slider:before { transform: translateX(18px); }
+
     </style>
+    
 </head>
 <body>
     <div class="container">
         <h2>
-            <div>⚡ Network Builder <span style="color:var(--text-muted); font-size:16px;">v17.04 ULTRA</span></div>
+            <div>⚡ Network Builder <span style="color:var(--text-muted); font-size:16px;">v17.05 ULTRA</span></div>
             <div class="badges-wrapper">
                 <div class="version-badge" id="mihomoVersion" title="Версия ядра Mihomo"><a href="https://github.com/MetaCubeX/mihomo/releases" target="_blank">⏳ Core...</a></div>
                 <div class="version-badge" id="rulesVersion" style="color:var(--primary-color);" title="Базы обхода блокировок"><a href="https://github.com/MetaCubeX/meta-rules-dat/releases" target="_blank">🛡️ Rules...</a></div>
@@ -146,6 +172,7 @@
                 <button class="icon-btn" onclick="shuffleProxies()" data-i18n="shuffleNodes">🔀 Перемешать</button>
                 
                 <button class="icon-btn" style="border-color:var(--accent-color); color:var(--accent-color);" onclick="openModal('themeModal')" data-i18n="btnTheme">🎨 Настроить дизайн</button>
+                <button class="icon-btn" onclick="toggleAppTheme()" title="Светлая/Темная тема">☀️ / 🌙</button>
                 <button class="icon-btn" style="border-color:#8957e5; color:#8957e5;" onclick="DiagnosticLogger.downloadLog()" data-i18n="btnLog">🛠 Скачать Лог</button>
 
                 <button class="icon-btn danger" onclick="clearAll()" data-i18n="clearAll">🗑 Очистить всё</button>
@@ -155,6 +182,17 @@
         <p><span data-i18n="supportText">Поддержка форматов:</span> <b>YAML (Clash)</b>, <b>JSON (Xray/Sing-box)</b>, VLESS, VMess, Trojan, Hysteria2, SS, SSR, WireGuard, Socks5, HTTP, SSH, Naive, TUIC.</p>
         
         <div class="input-group">
+            <!-- РУБИЛЬНИК РЕЖИМОВ -->
+        <div class="switch-container">
+            <label class="switch">
+                <input type="checkbox" id="providerModeSwitch" onchange="updateModeLabel(this.checked)">
+                <span class="slider"></span>
+            </label>
+            <span style="font-size: 13px; color: var(--text-color);">
+                <b>Режим ссылок:</b> 
+                <span id="modeLabel" style="color: var(--success-color); font-weight: bold;">Распаковка (Скачать и конвертировать)</span>
+            </span>
+        </div>
             <textarea id="input" data-i18n-placeholder="mainPlaceholder" placeholder="Перетащите файл .txt, .json или .yaml в это окно! Или вставьте массив ссылок." oninput="autoResize(this)"></textarea>
             <div class="controls-group">
                 <button class="paste-btn" onclick="pasteFromClipboard()">
@@ -1845,15 +1883,60 @@ document.addEventListener('click', e => {
         // ТВОЙ ОРИГИНАЛЬНЫЙ PROXY-ОБЪЕКТ (Никаких function $)
         const $ = new Proxy({}, { get: (t, id) => t[id] || (t[id] = document.getElementById(id)) });
 
-        // МЕНЕДЖЕР ТЕМ
+function toggleAppTheme() {
+            const html = document.documentElement;
+            const isLight = html.getAttribute('data-theme') === 'light';
+            html.setAttribute('data-theme', isLight ? 'dark' : 'light');
+            localStorage.setItem('flclash_net_apptheme', isLight ? 'dark' : 'light');
+            ThemeManager.load(); // Сразу грузим правильные цвета для темы
+        }
+
+        function updateModeLabel(isChecked) {
+            const lbl = document.getElementById('modeLabel');
+            if (isChecked) {
+                lbl.innerText = "Подписка (Сырая ссылка встраивается в конфиг)";
+                lbl.style.color = "var(--accent-color)";
+            } else {
+                lbl.innerText = "Распаковка (Скачать и вытащить серверы)";
+                lbl.style.color = "var(--success-color)";
+            }
+        }
+        
+        if (localStorage.getItem('flclash_net_apptheme') === 'light') document.documentElement.setAttribute('data-theme', 'light');
+
+        // УМНЫЙ МЕНЕДЖЕР ТЕМ (РАЗДЕЛЬНЫЕ СЕЙФЫ ДЛЯ СВЕТЛОЙ И ТЕМНОЙ)
         const ThemeManager = {
-            config: { '--bg-color': '#0d1117', '--container-bg': '#161b22', '--border-color': '#30363d', '--primary-color': '#58a6ff', '--text-color': '#c9d1d9', '--accent-color': '#d29922' },
-            init() { try { let s = localStorage.getItem('flclash_net_theme_v16'); if (s) this.config = { ...this.config, ...JSON.parse(s) }; } catch(e) {} this.apply(); },
-            apply() { for (let k in this.config) { document.documentElement.style.setProperty(k, this.config[k]); if (document.getElementById(k.replace('--', 'theme-'))) document.getElementById(k.replace('--', 'theme-')).value = this.config[k]; } },
-            update(k, v) { this.config[k] = v; this.apply(); localStorage.setItem('flclash_net_theme_v16', JSON.stringify(this.config)); DiagnosticLogger.add('THEME', `Изменен: ${k} = ${v}`); },
-            reset() { localStorage.removeItem('flclash_net_theme_v16'); location.reload(); },
-            export() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(this.config, null, 2)], { type: 'application/json' })); a.download = `My_Network_Theme.json`; a.click(); },
-            import(e) { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = ev => { try { this.config = { ...this.config, ...JSON.parse(ev.target.result) }; this.apply(); localStorage.setItem('flclash_net_theme_v16', JSON.stringify(this.config)); showToast("✅ Оформление загружено!"); } catch(err) { showToast("❌ Ошибка", "error"); } }; r.readAsText(f); e.target.value = ''; }
+            config: {},
+            getStorageKey() {
+                return document.documentElement.getAttribute('data-theme') === 'light' 
+                    ? 'flclash_theme_light_v1' 
+                    : 'flclash_theme_dark_v1';
+            },
+            init() { this.load(); },
+            load() {
+                this.config = {};
+                // Стираем старые цвета со страницы, чтобы они не пачкали новую тему
+                ['--bg-color', '--container-bg', '--border-color', '--primary-color', '--accent-color', '--text-color'].forEach(k => {
+                    document.documentElement.style.removeProperty(k);
+                });
+                try { let s = localStorage.getItem(this.getStorageKey()); if (s) this.config = JSON.parse(s); } catch(e) {} 
+                this.apply();
+            },
+            apply() { 
+                for (let k in this.config) { document.documentElement.style.setProperty(k, this.config[k]); }
+                this.syncPickers();
+            },
+            syncPickers() {
+                const root = getComputedStyle(document.documentElement);
+                ['bg-color', 'container-bg', 'border-color', 'primary-color', 'accent-color', 'text-color'].forEach(k => {
+                    let hex = this.config['--' + k] || root.getPropertyValue('--' + k).trim().slice(0, 7);
+                    if (document.getElementById('theme-' + k)) document.getElementById('theme-' + k).value = hex;
+                });
+            },
+            update(k, v) { this.config[k] = v; this.apply(); localStorage.setItem(this.getStorageKey(), JSON.stringify(this.config)); },
+            reset() { localStorage.removeItem(this.getStorageKey()); this.load(); },
+            export() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(this.config, null, 2)], { type: 'application/json' })); a.download = `Theme.json`; a.click(); },
+            import(e) { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = ev => { try { this.config = { ...this.config, ...JSON.parse(ev.target.result) }; this.apply(); localStorage.setItem(this.getStorageKey(), JSON.stringify(this.config)); showToast("✅ Оформление загружено!"); } catch(err) { showToast("❌ Ошибка", "error"); } }; r.readAsText(f); e.target.value = ''; }
         };
 
         // ТВОЙ ОРИГИНАЛЬНЫЙ APPSTATE ИЗ 16.3
@@ -2279,6 +2362,43 @@ function copyLink(i) {
                 return;
             }
 
+            // ПРОВЕРКА РУБИЛЬНИКА (Если включен - делаем подписку)
+            const switchEl = document.getElementById('providerModeSwitch');
+            if (switchEl && switchEl.checked) {
+                const urlRegex = /https?:\/\/[^\s]+/gi;
+                const urls = inp.match(urlRegex) || [];
+                if (urls.length === 0) return showToast("❌ В тексте нет ссылок", "error");
+                
+                let addedSub = 0;
+                let dupSub = 0;
+
+                urls.forEach((url) => {
+                    // ПРОВЕРКА НА ДУБЛИКАТЫ: Ищем, есть ли уже такая ссылка в базе
+                    const isDuplicate = AppState.proxies.some(p => p.type === 'sub' && p.url === url);
+                    
+                    if (!isDuplicate) {
+                        const subName = "Sub_" + new URL(url).hostname.replace(/[^a-zA-Z0-9]/g, '_') + "_" + Math.floor(Math.random()*1000);
+                        const p = { name: subName, type: "sub", server: new URL(url).hostname, port: 443, url: url, rawLink: url };
+                        AppState.proxies.push(p);
+                        addedSub++;
+                    } else {
+                        dupSub++;
+                    }
+                });
+                
+                $['input'].value = ''; 
+                if (typeof autoResize === 'function') autoResize($['input']);
+                AppState.saveState();
+                renderCards();
+                
+                if (addedSub > 0) {
+                    return showToast(dupSub > 0 ? `✅ Добавлено: ${addedSub} (пропущено дублей: ${dupSub})` : `✅ Добавлено подписок: ${addedSub}`, "success");
+                } else {
+                    return showToast(`⚠️ Эти подписки уже есть в списке (пропущено: ${dupSub})`, "warning");
+                }
+            }
+
+            // Дальше идет старый код...
             if (typeof $ !== 'undefined' && $['outputEditor']) {
                 $['outputEditor'].innerText = "⏳ Анализ данных и скачивание...";
             }
@@ -3027,6 +3147,8 @@ function copyLink(i) {
             };
 
             const validProxies = AppState.proxies.filter(p => {
+                if (p.type === 'sub') return true; // Разрешаем ссылки-провайдеры проходить фильтр
+                
                 if (!p.server || String(p.server).trim() === "" || String(p.server).includes(' ')) return false;
                 if (!p.port || isNaN(p.port) || p.port <= 0 || p.port > 65535) return false;
                 
@@ -3062,9 +3184,13 @@ function copyLink(i) {
                 return true; 
             });
             
-            let yamlProxies = validProxies.length ? "proxies:\n" : "proxies: []\n";
+            // Разделяем обычные узлы и подписки
+            let normalProxies = validProxies.filter(p => p.type !== 'sub');
+            let subProviders = validProxies.filter(p => p.type === 'sub');
+
+            let yamlProxies = normalProxies.length ? "proxies:\n" : "proxies: []\n";
             
-            validProxies.forEach(p => {
+            normalProxies.forEach(p => {
                 const safeName = safeYamlStr(p.name);
                 const safeServer = safeYamlStr(p.server);
                 const safeSni = safeYamlStr(p.sni);
@@ -3083,14 +3209,8 @@ function copyLink(i) {
                 
                 const validTypes = ['vless', 'trojan', 'vmess', 'hysteria2', 'hy2', 'ss', 'ssr'];
                 if(validTypes.includes(p.type)){
-                    
-                    if(p.type !== 'hysteria2' && p.type !== 'hy2') {
-                        yamlProxies += `    udp: true\n`;
-                    }
-                    
-                    if(p.type !== 'ss' && p.type !== 'ssr' && p.type !== 'hysteria2' && p.type !== 'hy2') {
-                        yamlProxies += `    network: "${safeNetwork}"\n`;
-                    }
+                    if(p.type !== 'hysteria2' && p.type !== 'hy2') yamlProxies += `    udp: true\n`;
+                    if(p.type !== 'ss' && p.type !== 'ssr' && p.type !== 'hysteria2' && p.type !== 'hy2') yamlProxies += `    network: "${safeNetwork}"\n`;
                     
                     if(p.type === 'vless') yamlProxies += `    uuid: "${safeUuid}"\n`;
                     else if(p.type === 'trojan') yamlProxies += `    password: "${safePassword}"\n`;
@@ -3106,19 +3226,13 @@ function copyLink(i) {
                         if(p.protoParam) yamlProxies += `    protocol-param: "${safeProtoParam}"\n`;
                     }
                     
-                    if(safeFlow && p.type === 'vless' && safeNetwork === 'tcp') {
-                        yamlProxies += `    flow: "${safeFlow}"\n`;
-                    }
+                    if(safeFlow && p.type === 'vless' && safeNetwork === 'tcp') yamlProxies += `    flow: "${safeFlow}"\n`;
                     
                     if (p.tls && p.type !== 'hysteria2' && p.type !== 'hy2') {
-                        // ИСПРАВЛЕНИЕ: Используем servername вместо sni, и добавляем ALPN!
                         yamlProxies += `    tls: true\n    servername: "${safeSni || safeServer}"\n    skip-cert-verify: true\n    client-fingerprint: "${safeFp || 'chrome'}"\n    alpn:\n      - h2\n      - http/1.1\n`; 
-                        
                         if(p["reality-opts"]) {
                             yamlProxies += `    reality-opts:\n      public-key: "${safeYamlStr(p["reality-opts"]["public-key"])}"\n`;
-                            if (p["reality-opts"]["short-id"]) {
-                                yamlProxies += `      short-id: "${safeYamlStr(p["reality-opts"]["short-id"])}"\n`;
-                            }
+                            if (p["reality-opts"]["short-id"]) yamlProxies += `      short-id: "${safeYamlStr(p["reality-opts"]["short-id"])}"\n`;
                         }
                     }
                     if (p.wsOpts && safeNetwork === 'ws' && p.type !== 'ss') {
@@ -3126,9 +3240,23 @@ function copyLink(i) {
                     }
                 }
             });
+
+            // --------------------------------------------------------
+            // ГЕНЕРАЦИЯ PROXY-PROVIDERS (Для ссылок из рубильника)
+            // --------------------------------------------------------
+            let customProvidersYaml = "";
+            let customProvidersNames = [];
+            subProviders.forEach(p => {
+                const sName = safeYamlStr(p.name);
+                customProvidersNames.push(sName);
+                customProvidersYaml += `  ${sName}:\n    type: http\n    url: "${safeYamlStr(p.url)}"\n    interval: 14400\n    path: ./providers/${sName}.yaml\n    health-check: { enable: true, interval: 600, timeout: 4000, lazy: true, expected-status: 204, url: "http://cp.cloudflare.com/generate_204" }\n`;
+            });
+
+            const userProxies = normalProxies.length ? normalProxies.map(p => `      - "${safeYamlStr(p.name)}"`).join('\n') : "";
             
-            const userProxies = validProxies.length ? validProxies.map(p => `      - "${safeYamlStr(p.name)}"`).join('\n') : "";
-            const providerUse = `    use:\n      - igareck_mobile_black\n      - zieng2_universal\n      - igareck_white_1\n      - goida_26`;
+            // Собираем дефолтные подписки + те, что вставил пользователь
+            let allProvidersArray = ['igareck_mobile_black', 'zieng2_universal', 'igareck_white_1', 'goida_26'].concat(customProvidersNames);
+            const providerUse = `    use:\n` + allProvidersArray.map(name => `      - ${name}`).join('\n');
             
             if (exportFormat.includes('clash')) {
                 let tunConfig = exportFormat === 'clash_router' 
@@ -3140,24 +3268,31 @@ function copyLink(i) {
                     if (customTpl) outputElement.innerText = customTpl.replace(/\{\{PROXIES_YAML\}\}/g, yamlProxies).replace(/\{\{PROXY_NAMES\}\}/g, userProxies || "      - DIRECT");
                 } 
                 else if (templateMode === 'basic') {
-                    let basicGroups = `proxy-groups:\n  - name: "Proxy"\n    type: select\n    proxies:\n      - "Auto"\n      - "DIRECT"\n${userProxies ? userProxies + '\n' : ''}\n  - name: "Auto"\n    type: url-test\n    url: "http://cp.cloudflare.com/generate_204"\n    interval: 300\n    tolerance: 50\n${userProxies ? '    proxies:\n' + userProxies + '\n' : '    proxies:\n      - "DIRECT"\n'}`;
+                    // В Базовом профиле создаем блок providers, если пользователь добавил ссылки
+                    let basicGroups = `proxy-groups:\n  - name: "Proxy"\n    type: select\n    proxies:\n      - "Auto"\n      - "DIRECT"\n${userProxies ? userProxies + '\n' : ''}${customProvidersNames.length ? `    use:\n${customProvidersNames.map(n => `      - ${n}`).join('\n')}\n` : ''}  - name: "Auto"\n    type: url-test\n    url: "http://cp.cloudflare.com/generate_204"\n    interval: 300\n    tolerance: 50\n${userProxies ? '    proxies:\n' + userProxies + '\n' : '    proxies:\n      - "DIRECT"\n'}${customProvidersNames.length ? `    use:\n${customProvidersNames.map(n => `      - ${n}`).join('\n')}\n` : ''}`;
                     
-                    // ИСПРАВЛЕНИЕ: Добавлен Яндекс DNS для стабильной работы в РФ
                     let basicDns = `dns:\n  enable: true\n  ipv6: false\n  listen: 0.0.0.0:1053\n  enhanced-mode: fake-ip\n  fake-ip-range: 198.18.0.1/16\n  default-nameserver:\n    - 77.88.8.8\n    - 8.8.8.8\n  nameserver:\n    - https://dns.yandex.ru/dns-query\n    - https://1.1.1.1/dns-query`;
 
-                    outputElement.innerText = `mode: rule\nallow-lan: true\nmixed-port: 7890\nlog-level: info\nipv6: true\n\n${basicDns}\n\n${tunConfig}\n\n${yamlProxies}\n${basicGroups}\n\nrules:\n  - GEOIP,RU,DIRECT,no-resolve\n  - MATCH,Proxy`;
+                    let basicProvidersBlock = customProvidersYaml ? `proxy-providers:\n${customProvidersYaml}\n` : "";
+
+                    outputElement.innerText = `mode: rule\nallow-lan: true\nmixed-port: 7890\nlog-level: info\nipv6: true\n\n${basicDns}\n\n${tunConfig}\n\n${basicProvidersBlock}${yamlProxies}\n${basicGroups}\n\nrules:\n  - GEOIP,RU,DIRECT,no-resolve\n  - MATCH,Proxy`;
                 }
                 else {
                     let proxyGroups = `proxy-groups:\n  - name: "🚀 Выбор сервера"\n    type: select\n    proxies:\n      - "♻️ Автовыбор"\n      - "🤖 Premium AI (Auto)"\n${userProxies ? userProxies + '\n' : ''}${providerUse}\n\n  - name: "♻️ Автовыбор"\n    type: url-test\n    url: "http://cp.cloudflare.com/generate_204"\n    interval: 180\n    tolerance: 30\n    timeout: 5000\n    lazy: true\n    exclude-filter: "(?i)Россия|Russia|Украина|Ukraine|Молдова|Moldova|РФ|России"\n${userProxies ? '    proxies:\n' + userProxies + '\n' : ''}${providerUse}\n\n  - name: "🤖 Premium AI (Auto)"\n    type: url-test\n    url: "http://cp.cloudflare.com/generate_204"\n    interval: 180\n    tolerance: 30\n    timeout: 5000\n    lazy: true\n${userProxies ? '    proxies:\n' + userProxies + '\n' : ''}${providerUse}`;
                     
-                    outputElement.innerText = `${AppState.baseYaml}\n\n${tunConfig}\n\n${yamlProxies}\n${proxyGroups}\n\n${AppState.rulesYaml}`;
+                    // Встраиваем новые провайдеры в Крымский профиль
+                    let finalBaseYaml = AppState.baseYaml;
+                    if (customProvidersYaml) {
+                        finalBaseYaml = finalBaseYaml.replace('proxy-providers:\n', 'proxy-providers:\n' + customProvidersYaml);
+                    }
+
+                    outputElement.innerText = `${finalBaseYaml}\n\n${tunConfig}\n\n${yamlProxies}\n${proxyGroups}\n\n${AppState.rulesYaml}`;
                 }
             } else {
                 outputElement.innerText = JSON.stringify({ proxies: AppState.proxies }, null, 2);
             }
 
             outputElement.innerText = outputElement.innerText.replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]/g, '');
-            
             autoResize(outputElement);
             AppState.saveEditorState();
         }
