@@ -25,8 +25,8 @@
 <h1 align="center">⚡ Network Builder v17.04 ULTRA</h1>
 
 <p align="center">
-  <b>Extremely powerful and 100% local web tool for managing gigantic proxy server databases.</b><br>
-  <i>Parsing, converting, and deep optimization of configurations for FlClash, Exclave, Sing-box, and Clash Meta.</i>
+  <b>An extremely powerful and 100% local web tool for managing giant proxy server databases.</b><br>
+  <i>Parsing, conversion, and deep configuration optimization for FlClash, Exclave, Sing-box, and Clash Meta.</i>
 </p>
 
 <p align="center">
@@ -39,17 +39,22 @@
 
 <p align="center">
   <a href="https://jinxpil.github.io/flclash-converter/">
-    <img src="https://img.shields.io/badge/🚀_OPEN_ULTRA--VERSION-0052FF?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Open Web Version">
+    <img src="https://img.shields.io/badge/🚀_OPEN_ULTRA_VERSION-0052FF?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Open Web Version">
   </a>
 </p>
 
+<p align="center">
+  🤖 <b>Also check out my second project:</b><br>
+  👉 <a href="https://github.com/JINXPIL/json-yaml-ai"><b>JSON-YAML-AI</b></a> 👈
+</p>
+
 > [!IMPORTANT]
-> **Zero-Trust & Privacy First.** All calculations are performed strictly locally in your browser. No data leaves your device. The tool is created exclusively for educational purposes to deeply study network protocols and routing principles.
+> **Zero-Trust & Privacy First.** All calculations are performed strictly locally in your browser. No data leaves your device. This tool was created exclusively for educational purposes to deeply study network protocols.
 
 > [!WARNING]
-> **Attention: Issue with YAML subscriptions and Timeouts:**
-> Many VPN providers intentionally (or due to incompetent API configuration) restrict the operation of third-party clients when exporting subscriptions. Servers may successfully load into your list, but when attempting to connect, they enter an infinite timeout. 
-> 💡 **How to check who is to blame:** If you take a "raw" link to the same node (e.g., `vless://...` or JSON code), add it manually as a local profile, and **it works** — the problem is 100% on the provider's side. This means their server blocks your client's requests by `User-Agent` when attempting to update the subscription. In other cases, timeouts can be caused by targeted protocol signature blocks by censorship firewalls (DPI).
+> **Attention: YAML subscription and Timeout issues:**
+> Many VPN providers intentionally (or due to incompetent API setup) restrict third-party clients from fetching subscriptions. Servers might successfully load into your list, but go into an infinite timeout upon connection attempt.
+> 💡 **How to verify who's at fault:** If you take a "raw" link to the exact same node (e.g., `vless://...` or JSON code), add it manually as a local profile, and **it works** — the issue is 100% on the provider's side. This means their server blocks requests from your client based on the `User-Agent` when trying to update the subscription. In other cases, timeouts can be caused by precise protocol signature blocking by your ISP/Firewall.
 
 ---
 
@@ -73,12 +78,12 @@
 
 ---
 
-### 🔥 What's new in version 17.02 ULTRA?
+### 🔥 What's new in version 17.04 ULTRA?
 
-* 🚀 **Extreme Parser Engine:** Full code optimization to handle **10,000+ nodes** simultaneously. Smooth interface even with gigantic data volumes.
-* 🌍 **ULTRA Localization:** Deep support for 6 languages (RU, EN, ZH, FA, ES). Interface and system notifications are now fully adapted.
-* 🛡️ **QuotaGuard System:** Intelligent protection against browser memory overflow. Work with any config size without the risk of tab crashes.
-* 🧠 **Smart Duplicate Filter:** Automatic server comparison by `IP:Port` pair. The program automatically removes junk and duplicates, leaving only unique nodes.
+* 🚀 **Extreme Parser Engine:** Fully optimized code to handle **10,000+ nodes** simultaneously. Smooth interface even with giant data volumes.
+* 🌍 **ULTRA Localization:** Deep support for 6 languages (RU, EN, ZH, FA, ES). Interface and system notifications are fully adapted.
+* 🛡️ **QuotaGuard System:** Intelligent protection against browser memory overflow. Work with any config volumes without the risk of tab crashes.
+* 🧠 **Smart Duplicate Filter:** Automatic server comparison by `IP:Port` pair. The program will automatically remove garbage and duplicates, leaving only unique nodes.
 * 🛠️ **Refined Diagnostics:** Updated event logger and fixed syntax errors (SyntaxError fix) for flawless stability.
 
 ---
@@ -102,43 +107,40 @@
 
 ### 🎯 Configurations & Routing (Presets)
 
-To avoid cluttering the page with code blocks, all ready-made presets are moved to separate repository files.
+To avoid cluttering the page with walls of code, all ready-made presets have been moved to separate repository files.
 
-* 🌐 **Split Tunneling for Happ** — Optimized rule preset (Crimea, SevSU, censorship bypass, AdBlock), built via `routing.happ.su`. Designed **strictly** for the Happ client.
-    * 📄 Configuration file link: [`./rus_vp_happ.json`](./rus_vp_happ.json)
-    * 🔗 Client import link: `https://raw.githubusercontent.com/JINXPIL/flclash-converter/refs/heads/main/rus_vp_happ.json`
-* 🛠️ **Optimized YAML Config (Mihomo/Clash)** — v79.0 Ultimate with strict browser TLS fingerprints and protection against DPI analyzers.
-    * 📄 Configuration file link: [`./GL_Crimea_ipv6_yan(9.35).yml`](./GL_Crimea_ipv6_yan(9.35).yml)
-    * 🔗 Client import link: `https://raw.githubusercontent.com/JINXPIL/flclash-converter/refs/heads/main/GL_Crimea_ipv6_yan(9.35).yml`
+* 🌐 **Split Tunneling for Happ** — Optimized rule preset (Crimea, SevSU, bypass restrictions, AdBlock), built via `routing.happ.su`. Designed **strictly** for the Happ client.
+    * 📄 Config file link: [`./rus_vp_happ.json`](./rus_vp_happ.json)
+    * 🔗 Import link for client: `https://raw.githubusercontent.com/JINXPIL/flclash-converter/refs/heads/main/rus_vp_happ.json`
+* 🛠️ **Optimized YAML-config (Mihomo/Clash)** — v79.0 Ultimate with strict TLS browser fingerprints and DPI-analyzer protection.
+    * 📄 Config file link: [`./GL_Crimea_ipv6_yan(9.35).yml`](./GL_Crimea_ipv6_yan(9.35).yml)
+    * 🔗 Import link for client: `https://raw.githubusercontent.com/JINXPIL/flclash-converter/refs/heads/main/GL_Crimea_ipv6_yan(9.35).yml`
 
 ---
-
-### 📥 Recommended Clients (ULTRA Compatible)
-
 > [!NOTE]
-> Popular clients like **NekoBox** and **NekoRay** are currently considered outdated. It is highly recommended to switch to modern and optimized alternatives built on **sing-box** and **Xray** cores (e.g., **Exclave**, which fully replicates the NekoBox interface, or **Incy**).
+> Popular clients like **NekoBox** and **NekoRay** are currently considered obsolete. It is recommended to migrate to modern and optimized alternatives based on the latest **sing-box** and **Xray** cores (e.g., **Exclave**, which fully replicates the NekoBox UI, or **Incy**).
 
 <details>
 <summary><b>🤖 Android</b></summary>
 
-* [v2RayTun](https://v2raytun.com/) — High-speed and secure client based on Xray Core.
-* [FlClash](https://github.com/chen08209/FlClash) — Main cross-platform client.
-* [Incy](https://incy.cc/) — Modern fast client with one-touch import.
+* [v2RayTun](https://v2raytun.com/) — High-speed, secure client based on Xray Core.
+* [FlClash](https://github.com/chen08209/FlClash) — The main cross-platform client.
+* [Incy](https://incy.cc/) — Modern, fast client with one-touch import.
 * [Happ](https://www.happ.su/main) — Proxy utility for convenient server list management.
-* [Exclave](https://github.com/ExclaveNetwork/Exclave) — Modern and up-to-date NekoBox alternative with a familiar GUI.
+* [Exclave](https://github.com/ExclaveNetwork/Exclave) — Modern replacement for NekoBox with a familiar UI.
 * [Sing-box](https://github.com/SagerNet/sing-box) — Official clean core for advanced configuration.
-* [Hiddify App](https://github.com/hiddify/hiddify-app) — Universal client for all configuration types.
-* [v2rayNG](https://github.com/2dust/v2rayNG) — Stable classic solution for the Xray core.
-* [Karing](https://github.com/KaringX/karing) — Feature-rich GUI.
+* [Hiddify App](https://github.com/hiddify/hiddify-app) — Universal client for any configuration type.
+* [v2rayNG](https://github.com/2dust/v2rayNG) — Stable classic solution for Xray core.
+* [Karing](https://github.com/KaringX/karing) — Feature-rich graphical interface.
 * [Clash Meta for Android](https://github.com/MetaCubeX/ClashMetaForAndroid)
-* ~~[NekoBox For Android](https://github.com/MatsuriDayo/NekoBoxForAndroid)~~ *(Outdated)*
+* ~~[NekoBox For Android](https://github.com/MatsuriDayo/NekoBoxForAndroid)~~ *(Obsolete)*
 </details>
 
 <details>
 <summary><b>🍏 iOS</b></summary>
 
-* [v2RayTun](https://v2raytun.com/) — High-speed and secure client based on Xray Core.
-* [Incy](https://incy.cc/) — Excellent modern client in the App Store.
+* [v2RayTun](https://v2raytun.com/) — High-speed, secure client based on Xray Core.
+* [Incy](https://incy.cc/) — Great modern client on the App Store.
 * [Happ](https://www.happ.su/main) — Comfortable proxy utility.
 * [Karing](https://apps.apple.com/us/app/karing/id6472431552)
 * [Clash.MI](https://apps.apple.com/us/app/clash-mi/id6744321968)
@@ -150,29 +152,29 @@ To avoid cluttering the page with code blocks, all ready-made presets are moved 
 <details>
 <summary><b>💻 Desktop (Win/Mac/Linux)</b></summary>
 
-* [v2RayTun](https://v2raytun.com/) — High-speed and secure client based on Xray Core.
+* [v2RayTun](https://v2raytun.com/) — High-speed, secure client based on Xray Core.
 * [Happ](https://www.happ.su/main) — Cross-platform desktop version.
 * [v2rayN](https://github.com/2dust/v2rayN) — Powerful customizable client for Windows.
-* [FlClash](https://github.com/chen08209/FlClash) — Minimalist and fast GUI.
+* [FlClash](https://github.com/chen08209/FlClash) — Minimalistic and fast GUI.
 * [Karing](https://github.com/KaringX/karing)
 * [Clash Verge Rev](https://github.com/clash-verge-rev/clash-verge-rev)
-* ~~[NekoRay](https://github.com/MatsuriDayo/nekoray)~~ *(Outdated)*
+* ~~[NekoRay](https://github.com/MatsuriDayo/nekoray)~~ *(Obsolete)*
 </details>
 
 ---
 
 ### 🛡️ Alternative Tools (DPI Bypass)
 
-*If standard VPN protocols are completely blocked by your ISP or censorship firewalls, use local Deep Packet Inspection bypass tools:*
+*If standard VPN protocols are completely blocked by your ISP or firewall, use local Deep Packet Inspection bypass tools:*
 
 * [Zapret](https://github.com/bol-van/zapret) — The most powerful and flexible tool for deep DPI bypass at the system level.
-* [Zapret-discord-youtube](https://github.com/Flowseal/zapret-discord-youtube) — Optimized and pre-configured scripts for specific popular services.
-* [ByeByeDPI](https://github.com/romanvht/ByeByeDPI) — Proven classic solution for local execution on Windows.
+* [Zapret-discord-youtube](https://github.com/Flowseal/zapret-discord-youtube) — Optimized, ready-to-use scripts for specific popular services.
+* [ByeByeDPI](https://github.com/romanvht/ByeByeDPI) — A proven classic solution for local execution on Android.
 
 ---
 
-### ⭐ Support the project
+### ⭐ Support the Project
 
-**If Network Builder ULTRA helped you, don't forget to leave a star! It motivates further project development.** :star2:
+**If Network Builder ULTRA helped you, please don't forget to leave a star! It motivates further development.** :star2:
 
-[![Stargazers over time](https://starchart.cc/jinxpil/flclash-converter.svg?variant=adaptive)](https://starchart.cc/jinxpil/flclash-converter)
+[![Star History Chart](https://api.star-history.com/svg?repos=jinxpil/flclash-converter&type=Date)](https://star-history.com/#jinxpil/flclash-converter&Date)
