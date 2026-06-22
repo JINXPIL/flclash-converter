@@ -22,7 +22,7 @@
   </a>
 </p>
 
-<h1 align="center">⚡ Network Builder v17.04 ULTRA</h1>
+<h1 align="center">⚡ Network Builder v17.05 ULTRA</h1>
 
 <p align="center">
   <b>Экстремально мощный и 100% локальный веб-инструмент для управления гигантскими базами прокси-серверов.</b><br>
@@ -41,6 +41,11 @@
   <a href="https://jinxpil.github.io/flclash-converter/">
     <img src="https://img.shields.io/badge/🚀_ОТКРЫТЬ_ULTRA--ВЕРСИЮ-0052FF?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Open Web Version">
   </a>
+</p>
+
+<p align="center">
+  🤖 <b>Также обратите внимание на мой второй проект:</b><br>
+  👉 <a href="https://github.com/JINXPIL/json-yaml-ai"><b>JSON-YAML-AI</b></a> 👈
 </p>
 
 > [!IMPORTANT]
@@ -73,13 +78,13 @@
 
 ---
 
-### 🔥 Что нового в версии 17.02 ULTRA?
+### 🔥 Что нового в версии 17.05 ULTRA? (The HighLoad Perfection)
 
-* 🚀 **Extreme Parser Engine:** Полная оптимизация кода для работы с **10,000+ узлами** одновременно. Плавный интерфейс даже при гигантских объемах данных.
-* 🌍 **ULTRA Localization:** Глубокая поддержка 6 языков (RU, EN, ZH, FA, ES). Интерфейс и системные уведомления теперь полностью адаптированы.
-* 🛡️ **Система QuotaGuard:** Интеллектуальная защита от переполнения памяти браузера. Работайте с любыми объемами конфигов без риска вылета вкладки.
-* 🧠 **Smart Duplicate Filter:** Автоматическое сравнение серверов по паре `IP:Port`. Программа сама удалит мусор и дубликаты, оставив только уникальные узлы.
-* 🛠️ **Refined Diagnostics:** Обновленный логгер событий и исправленные ошибки синтаксиса (SyntaxError fix) для безупречной стабильности.
+* 🌐 **Глобальное расширение протоколов:** Добавлена полная поддержка парсинга **VMess, Hysteria2 (hy2), Shadowsocks (SS) и ShadowsocksR (SSR)**.
+* 🚀 **Экстремальная производительность (HighLoad):** Внедрен асинхронный чанкинг и `Set`-словари. Виртуализация DOM позволяет загружать и очищать от дублей **250 000+ узлов** за миллисекунды без зависания браузера!
+* 🛡️ **Бронебойный санитайзер YAML:** Индустриальный Face-Control. Скрипт автоматически уничтожает мусор из паблик-листов (невидимые ASCII-символы, фейковые шифры `2022-blake3`, пустые пароли) и гарантирует 100% стабильный импорт в Mihomo.
+* ⚙️ **Победа над Тайм-аутами:** Генератор YAML переписан под строгие стандарты Mihomo (добавлен `alpn`, `skip-cert-verify: true`, `servername` и улучшенный Fake-IP DNS для РФ).
+* 🎨 **Новый UI/UX:** Раздельная светлая/темная тема с независимым сохранением цветов и **Рубильник "Режим Подписки"** для прямого встраивания RAW-ссылок (Pastebin/GitHub) в блок `proxy-providers`.
 
 ---
 
@@ -172,4 +177,4 @@
 
 **Если Network Builder ULTRA помог вам, не забудьте поставить звезду! Это мотивирует развивать проект дальше.** :star2:
 
-[![Stargazers over time](https://starchart.cc/jinxpil/flclash-converter.svg?variant=adaptive)](https://starchart.cc/jinxpil/flclash-converter)
+[![Star History Chart](https://api.star-history.com/svg?repos=jinxpil/flclash-converter&type=Date)](https://star-history.com/#jinxpil/flclash-converter&Date)
