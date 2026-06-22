@@ -379,17 +379,13 @@ profile:
   store-fake-ip: true
   tracing: true
 
-    proxy-providers:
+proxy-providers:
   igareck_mobile_black:
     type: http
     url: "https://cdn.jsdelivr.net/gh/igareck/vpn-configs-for-russia@main/BLACK_VLESS_RUS_mobile.txt"
     interval: 14400
     path: ./providers/igareck_mobile_black.yaml
-    override: 
-      skip-cert-verify: true
-      udp: true
-      alpn: [h2, http/1.1]
-      client-fingerprint: chrome
+    override: { skip-cert-verify: true, udp: true, alpn: [h2, http/1.1], client-fingerprint: chrome }
     health-check: { enable: true, interval: 600, timeout: 4000, lazy: true, expected-status: 204, url: "http://cp.cloudflare.com/generate_204" }
 
   igareck_white_1:
@@ -397,7 +393,7 @@ profile:
     url: "https://cdn.jsdelivr.net/gh/igareck/vpn-configs-for-russia@main/Vless-Reality-White-Lists-Rus-Mobile.txt"
     interval: 14400
     path: ./providers/igareck_white_1.yaml
-    override: { client-fingerprint: ios }
+    override: { skip-cert-verify: true, udp: true, alpn: [h2, http/1.1], client-fingerprint: ios }
     health-check: { enable: true, interval: 600, timeout: 4000, lazy: true, expected-status: 204, url: "http://www.gstatic.com/generate_204" }
 
   zieng2_universal:
@@ -405,7 +401,7 @@ profile:
     url: "https://cdn.jsdelivr.net/gh/zieng2/wl@main/vless_universal.txt"
     interval: 14400
     path: ./providers/zieng2_universal.yaml
-    override: { client-fingerprint: safari }
+    override: { skip-cert-verify: true, udp: true, alpn: [h2, http/1.1], client-fingerprint: safari }
     health-check: { enable: true, interval: 600, timeout: 4000, lazy: true, expected-status: 204, url: "http://edge-http.microsoft.com/captiveportal/generate_204" }
 
   goida_26:
@@ -413,9 +409,9 @@ profile:
     url: "https://cdn.jsdelivr.net/gh/AvenCores/goida-vpn-configs@main/githubmirror/26.txt"
     interval: 14400
     path: ./providers/goida_26.yaml
-    override: { client-fingerprint: firefox }
+    override: { skip-cert-verify: true, udp: true, alpn: [h2, http/1.1], client-fingerprint: firefox }
     health-check: { enable: true, interval: 600, timeout: 4000, lazy: true, expected-status: 204, url: "http://connect.rom.miui.com/generate_204" }
-
+    
 rule-providers:
   adblock-rules:
     type: http
