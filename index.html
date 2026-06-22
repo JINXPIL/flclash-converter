@@ -385,33 +385,33 @@ proxy-providers:
     url: "https://cdn.jsdelivr.net/gh/igareck/vpn-configs-for-russia@main/BLACK_VLESS_RUS_mobile.txt"
     interval: 14400
     path: ./providers/igareck_mobile_black.yaml
-    override: { skip-cert-verify: true, udp: true, alpn: [h2, http/1.1], client-fingerprint: chrome }
-    health-check: { enable: true, interval: 600, timeout: 4000, lazy: true, expected-status: 204, url: "http://cp.cloudflare.com/generate_204" }
+    override: {"skip-cert-verify": true, "udp": true, "alpn": ["h2", "http/1.1"], "client-fingerprint": "chrome"}
+    health-check: {"enable": true, "interval": 600, "timeout": 4000, "lazy": true, "expected-status": 204, "url": "http://cp.cloudflare.com/generate_204"}
 
   igareck_white_1:
     type: http
     url: "https://cdn.jsdelivr.net/gh/igareck/vpn-configs-for-russia@main/Vless-Reality-White-Lists-Rus-Mobile.txt"
     interval: 14400
     path: ./providers/igareck_white_1.yaml
-    override: { skip-cert-verify: true, udp: true, alpn: [h2, http/1.1], client-fingerprint: ios }
-    health-check: { enable: true, interval: 600, timeout: 4000, lazy: true, expected-status: 204, url: "http://www.gstatic.com/generate_204" }
+    override: {"skip-cert-verify": true, "udp": true, "alpn": ["h2", "http/1.1"], "client-fingerprint": "ios"}
+    health-check: {"enable": true, "interval": 600, "timeout": 4000, "lazy": true, "expected-status": 204, "url": "http://www.gstatic.com/generate_204"}
 
   zieng2_universal:
     type: http
     url: "https://cdn.jsdelivr.net/gh/zieng2/wl@main/vless_universal.txt"
     interval: 14400
     path: ./providers/zieng2_universal.yaml
-    override: { skip-cert-verify: true, udp: true, alpn: [h2, http/1.1], client-fingerprint: safari }
-    health-check: { enable: true, interval: 600, timeout: 4000, lazy: true, expected-status: 204, url: "http://edge-http.microsoft.com/captiveportal/generate_204" }
+    override: {"skip-cert-verify": true, "udp": true, "alpn": ["h2", "http/1.1"], "client-fingerprint": "safari"}
+    health-check: {"enable": true, "interval": 600, "timeout": 4000, "lazy": true, "expected-status": 204, "url": "http://cp.cloudflare.com/generate_204"}
 
   goida_26:
     type: http
     url: "https://cdn.jsdelivr.net/gh/AvenCores/goida-vpn-configs@main/githubmirror/26.txt"
     interval: 14400
     path: ./providers/goida_26.yaml
-    override: { skip-cert-verify: true, udp: true, alpn: [h2, http/1.1], client-fingerprint: firefox }
-    health-check: { enable: true, interval: 600, timeout: 4000, lazy: true, expected-status: 204, url: "http://connect.rom.miui.com/generate_204" }
-    
+    override: {"skip-cert-verify": true, "udp": true, "alpn": ["h2", "http/1.1"], "client-fingerprint": "firefox"}
+    health-check: {"enable": true, "interval": 600, "timeout": 4000, "lazy": true, "expected-status": 204, "url": "http://cp.cloudflare.com/generate_204"}
+
 rule-providers:
   adblock-rules:
     type: http
@@ -3145,9 +3145,8 @@ function copyLink(i) {
             subProviders.forEach(p => {
                 const sName = safeYamlStr(p.name);
                 customProvidersNames.push(sName);
-                // ИСПОЛЬЗУЕМ СТРОГИЙ ОДНОСТРОЧНЫЙ ФОРМАТ { ... } ДЛЯ ЗАЩИТЫ ОТ ОШИБОК YAML
-                customProvidersYaml += `  ${sName}:\n    type: http\n    url: "${safeYamlStr(p.url)}"\n    interval: 14400\n    path: ./providers/${sName}.yaml\n    override: { skip-cert-verify: true, udp: true, alpn: ["h2", "http/1.1"] }\n    health-check: { enable: true, interval: 600, timeout: 4000, lazy: true, expected-status: 204, url: "http://cp.cloudflare.com/generate_204" }\n`;
-            });
+               // ИСПОЛЬЗУЕМ СТРОГИЙ ФОРМАТ JSON ДЛЯ ЗАЩИТЫ ОТ ОШИБОК YAML
+                customProvidersYaml += `  ${sName}:\n    type: http\n    url: "${safeYamlStr(p.url)}"\n    interval: 14400\n    path: ./providers/${sName}.yaml\n    override: {"skip-cert-verify": true, "udp": true, "alpn": ["h2", "http/1.1"]}\n    health-check: {"enable": true, "interval": 600, "timeout": 4000, "lazy": true, "expected-status": 204, "url": "http://cp.cloudflare.com/generate_204"}\n`;
             const userProxies = normalProxies.length ? normalProxies.map(p => `      - "${safeYamlStr(p.name)}"`).join('\n') : "";
             
             let allProvidersArray = ['igareck_mobile_black', 'zieng2_universal', 'igareck_white_1', 'goida_26'].concat(customProvidersNames);
@@ -3200,15 +3199,17 @@ function copyLink(i) {
                 finalOutput = JSON.stringify({ proxies: AppState.proxies }, null, 2);
             }
 
-            // ИЗОЛИРОВАННОЕ СОХРАНЕНИЕ ДЛЯ СКАЧИВАНИЯ БЕЗ УЧАСТИЯ БРАУЗЕРА!
+            // ИЗОЛИРОВАННОЕ СОХРАНЕНИЕ И УБИЙСТВО ТАБОВ/НЕРАЗРЫВНЫХ ПРОБЕЛОВ
             finalOutput = finalOutput.replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]/g, '');
+            finalOutput = finalOutput.replace(/\u00A0/g, ' '); // Превращаем неразрывные пробелы в обычные
+            finalOutput = finalOutput.replace(/\t/g, '  ');    // Превращаем табы (TAB) в два пробела
             perfectConfigData = finalOutput;
             
             outputElement.innerText = finalOutput;
             autoResize(outputElement);
             AppState.saveEditorState();
         }
-
+        
         // ====================================================================
         // ВАЛИДАЦИЯ И ЭКСПОРТ РЕЗУЛЬТАТОВ
         // ====================================================================
