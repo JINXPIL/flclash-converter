@@ -379,14 +379,18 @@ profile:
   store-fake-ip: true
   tracing: true
 
-proxy-providers:
+    proxy-providers:
   igareck_mobile_black:
     type: http
     url: "https://cdn.jsdelivr.net/gh/igareck/vpn-configs-for-russia@main/BLACK_VLESS_RUS_mobile.txt"
     interval: 14400
     path: ./providers/igareck_mobile_black.yaml
-    override: { client-fingerprint: chrome }
-    health-check: { enable: true, interval: 600, timeout: 4000, lazy: true, expected-status: 204, url: "http://connectivitycheck.android.com/generate_204" }
+    override: 
+      skip-cert-verify: true
+      udp: true
+      alpn: [h2, http/1.1]
+      client-fingerprint: chrome
+    health-check: { enable: true, interval: 600, timeout: 4000, lazy: true, expected-status: 204, url: "http://cp.cloudflare.com/generate_204" }
 
   igareck_white_1:
     type: http
@@ -2352,38 +2356,41 @@ function copyLink(i) {
     copyToClipboard(AppState.proxies[i].rawLink, "✅ Ссылка скопирована");
 }
 
+// ====================================================================
+        // ОБРАБОТКА ВВОДА И УМНЫЙ ПАРСЕР (С КНОПКОЙ ЭКСТРЕННОГО СТОПА)
         // ====================================================================
-        // ОБРАБОТКА ВВОДА (Бронебойная сеть, загрузка массивов ссылок)
-        // ====================================================================
+        let isParsingActive = false;
+        let cancelParsingRequest = false;
+
         async function startProcess() {
+            // Если процесс УЖЕ ИДЕТ, значит пользователь нажал на СТОП
+            if (isParsingActive) {
+                cancelParsingRequest = true;
+                return;
+            }
+
             const inp = $['input'].value.trim();
             if (!inp) {
                 if (typeof showToast === 'function') showToast("Поле пустое!", "error");
                 return;
             }
 
-            // ПРОВЕРКА РУБИЛЬНИКА (Если включен - делаем подписку)
+            // ПРОВЕРКА РУБИЛЬНИКА (Если включен - делаем подписку без парсинга)
             const switchEl = document.getElementById('providerModeSwitch');
             if (switchEl && switchEl.checked) {
                 const urlRegex = /https?:\/\/[^\s]+/gi;
                 const urls = inp.match(urlRegex) || [];
                 if (urls.length === 0) return showToast("❌ В тексте нет ссылок", "error");
                 
-                let addedSub = 0;
-                let dupSub = 0;
-
+                let addedSub = 0; let dupSub = 0;
                 urls.forEach((url) => {
-                    // ПРОВЕРКА НА ДУБЛИКАТЫ: Ищем, есть ли уже такая ссылка в базе
                     const isDuplicate = AppState.proxies.some(p => p.type === 'sub' && p.url === url);
-                    
                     if (!isDuplicate) {
                         const subName = "Sub_" + new URL(url).hostname.replace(/[^a-zA-Z0-9]/g, '_') + "_" + Math.floor(Math.random()*1000);
                         const p = { name: subName, type: "sub", server: new URL(url).hostname, port: 443, url: url, rawLink: url };
                         AppState.proxies.push(p);
                         addedSub++;
-                    } else {
-                        dupSub++;
-                    }
+                    } else { dupSub++; }
                 });
                 
                 $['input'].value = ''; 
@@ -2391,175 +2398,115 @@ function copyLink(i) {
                 AppState.saveState();
                 renderCards();
                 
-                if (addedSub > 0) {
-                    return showToast(dupSub > 0 ? `✅ Добавлено: ${addedSub} (пропущено дублей: ${dupSub})` : `✅ Добавлено подписок: ${addedSub}`, "success");
+                if (addedSub > 0) return showToast(dupSub > 0 ? `✅ Добавлено: ${addedSub} (дублей: ${dupSub})` : `✅ Добавлено подписок: ${addedSub}`, "success");
+                else return showToast(`⚠️ Эти подписки уже есть (пропущено: ${dupSub})`, "warning");
+            }
+
+            // --- ВКЛЮЧАЕМ РЕЖИМ ПАРСИНГА (Меняем кнопку на СТОП) ---
+            isParsingActive = true;
+            cancelParsingRequest = false;
+            const btn = document.querySelector('.btn-convert');
+            const originalBtnText = btn.innerHTML;
+            
+            btn.innerHTML = "🛑 ОСТАНОВИТЬ РАСПОЗНАВАНИЕ";
+            btn.style.background = "var(--danger-color)";
+            btn.style.boxShadow = "0 0 15px rgba(248, 81, 73, 0.5)";
+
+            try {
+                if (typeof $ !== 'undefined' && $['outputEditor']) $['outputEditor'].innerText = "⏳ Анализ данных и скачивание...";
+
+                const isRawConfig = inp.startsWith('{') || (inp.includes('proxies:') && !inp.startsWith('http'));
+                let textsToParse = [];
+
+                if (isRawConfig) {
+                    textsToParse.push(inp);
                 } else {
-                    return showToast(`⚠️ Эти подписки уже есть в списке (пропущено: ${dupSub})`, "warning");
-                }
-            }
+                    const urlRegex = /https?:\/\/[^\s]+/gi;
+                    const urls = inp.match(urlRegex) || [];
+                    let remainingText = inp.replace(urlRegex, '').trim();
+                    textsToParse.push(remainingText);
 
-            // Дальше идет старый код...
-            if (typeof $ !== 'undefined' && $['outputEditor']) {
-                $['outputEditor'].innerText = "⏳ Анализ данных и скачивание...";
-            }
+                    const smartProxies = [ "", "https://api.allorigins.win/raw?url=", "https://api.codetabs.com/v1/proxy?quest=", "https://corsproxy.io/?" ];
 
-            // Проверяем, является ли ввод готовым конфигом (JSON или YAML)
-            const isRawConfig = inp.startsWith('{') || (inp.includes('proxies:') && !inp.startsWith('http'));
+                    if (urls.length > 0) {
+                        if (typeof showToast === 'function') showToast(`⏳ Загрузка подписок (${urls.length} шт.)...`, "warning");
 
-            let textsToParse = [];
-
-            if (isRawConfig) {
-                textsToParse.push(inp);
-            } else {
-                // 1. Ищем все http/https ссылки в тексте (подписки)
-                const urlRegex = /https?:\/\/[^\s]+/gi;
-                const urls = inp.match(urlRegex) || [];
-
-                // 2. Оставляем остальной текст (где могут быть сырые узлы vless://)
-                let remainingText = inp.replace(urlRegex, '').trim();
-                textsToParse.push(remainingText);
-
-                // 3. Массив прокси-шлюзов для обхода блокировок CORS
-                const smartProxies = [
-                    "",                                         // Прямой запрос (если сервер разрешает)
-                    "https://api.allorigins.win/raw?url=",      // Классика
-                    "https://api.codetabs.com/v1/proxy?quest=", // Альтернатива
-                    "https://corsproxy.io/?"                    // Резерв
-                ];
-
-                // 4. Скачиваем все найденные ссылки (параллельно)
-                if (urls.length > 0) {
-                    if (typeof showToast === 'function') showToast(`⏳ Загрузка подписок (${urls.length} шт.)...`, "warning");
-
-                    await Promise.all(urls.map(async (targetUrl) => {
-                        for (let i = 0; i < smartProxies.length; i++) {
-                            const proxy = smartProxies[i];
-                            const fetchUrl = proxy ? proxy + encodeURIComponent(targetUrl) : targetUrl;
-
-                            try {
-                                if (typeof DiagnosticLogger !== 'undefined') DiagnosticLogger.add('NETWORK', `Загрузка: ${targetUrl}`);
+                        await Promise.all(urls.map(async (targetUrl) => {
+                            for (let i = 0; i < smartProxies.length; i++) {
+                                // Если нажали СТОП во время скачивания - прерываем
+                                if (cancelParsingRequest) break; 
                                 
-                                const ac = new AbortController();
-                                const tid = setTimeout(() => ac.abort(), 8000); // 8 сек на попытку
-                                const res = await fetch(fetchUrl, { signal: ac.signal });
-                                clearTimeout(tid);
-
-                                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-                                const text = await res.text();
-                                textsToParse.push(text);
-                                break; // Успешно скачали, идем к следующей ссылке
-                            } catch (e) {
-                                // Ошибка, цикл перейдет к следующему прокси-серверу
+                                const proxy = smartProxies[i];
+                                const fetchUrl = proxy ? proxy + encodeURIComponent(targetUrl) : targetUrl;
+                                try {
+                                    const ac = new AbortController();
+                                    const tid = setTimeout(() => ac.abort(), 8000);
+                                    const res = await fetch(fetchUrl, { signal: ac.signal });
+                                    clearTimeout(tid);
+                                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                                    const text = await res.text();
+                                    textsToParse.push(text);
+                                    break;
+                                } catch (e) {}
                             }
-                        }
-                    }));
+                        }));
+                    }
                 }
-            }
 
-            // 5. Предварительная распаковка Base64
-            let finalCombinedText = "";
-            textsToParse.forEach(text => {
-                if (!text) return;
-                let currentText = text.trim();
-                
-               // Если текст выглядит как Base64 (нет известных протоколов и нет { )
-                if (!currentText.startsWith('{') && !/(vless|vmess|trojan|hysteria2|hy2|ss|ssr):\/\//i.test(currentText)) {
-                    try {
-                        let b64 = currentText.replace(/[\s\n\r]/g, '').replace(/-/g, '+').replace(/_/g, '/');
-                        while (b64.length % 4) b64 += '=';
-                        // Пытаемся раскодировать
-                        let decoded = decodeURIComponent(escape(atob(b64)));
-                        if (/(vless|vmess|trojan|hysteria2|hy2|ss|ssr):\/\//i.test(decoded)) {
-                            currentText = decoded; 
-                        }
-                    } catch(e) {}
+                let finalCombinedText = "";
+                textsToParse.forEach(text => {
+                    if (!text) return;
+                    let currentText = text.trim();
+                    if (!currentText.startsWith('{') && !/(vless|vmess|trojan|hysteria2|hy2|ss|ssr):\/\//i.test(currentText)) {
+                        try {
+                            let b64 = currentText.replace(/[\s\n\r]/g, '').replace(/-/g, '+').replace(/_/g, '/');
+                            while (b64.length % 4) b64 += '=';
+                            let decoded = decodeURIComponent(escape(atob(b64)));
+                            if (/(vless|vmess|trojan|hysteria2|hy2|ss|ssr):\/\//i.test(decoded)) currentText = decoded; 
+                        } catch(e) {}
+                    }
+                    finalCombinedText += "\n" + currentText;
+                });
+
+                if (finalCombinedText.trim()) {
+                    await parseData(finalCombinedText);
+                } else {
+                    if (typeof showToast === 'function') showToast("❌ Не удалось извлечь данные", "error");
+                    if (typeof $ !== 'undefined' && $['outputEditor']) $['outputEditor'].innerText = "Ошибка загрузки или пустой конфиг";
                 }
-                finalCombinedText += "\n" + currentText;
-            });
-
-          // 6. Передаем всё собранное в парсер
-            if (finalCombinedText.trim()) {
-                await parseData(finalCombinedText); // <--- ДОБАВИЛИ AWAIT
-            } else {
-                if (typeof showToast === 'function') showToast("❌ Не удалось извлечь данные", "error");
-                if (typeof $ !== 'undefined' && $['outputEditor']) $['outputEditor'].innerText = "Ошибка загрузки или пустой конфиг";
+            } finally {
+                // --- ВЫКЛЮЧАЕМ РЕЖИМ ПАРСИНГА (Возвращаем зеленую кнопку) ---
+                isParsingActive = false;
+                cancelParsingRequest = false;
+                btn.innerHTML = originalBtnText;
+                btn.style.background = "var(--success-color)";
+                btn.style.boxShadow = "none";
             }
         }
 
-        // ====================================================================
-        // ОФФЛАЙН ИИ-АНАЛИЗАТОР (Smart Fixer)
-        // ====================================================================
-        const OfflineAIFixer = {
-            healJSON: function(text) {
-                DiagnosticLogger.add('AI_FIXER', 'Пытаюсь вылечить сломанный JSON...');
-                let healed = text;
-                // 1. Убираем лишние запятые в конце объектов/массивов (частая ошибка)
-                healed = healed.replace(/,\s*([\]}])/g, '$1');
-                // 2. Оборачиваем ключи без кавычек в кавычки (например { server: "ip" } -> { "server": "ip" })
-                healed = healed.replace(/([{,]\s*)([a-zA-Z0-9_-]+)\s*:/g, '$1"$2":');
-                // 3. Убираем HTML теги, если JSON случайно скопировали с куском веб-страницы
-                healed = healed.replace(/<[^>]*>?/gm, '');
-                return healed;
-            },
-            
-            healYAML: function(text) {
-                DiagnosticLogger.add('AI_FIXER', 'Пытаюсь вылечить сломанный YAML...');
-                let healed = text;
-                // 1. Главный враг YAML - это табы (Tab). Заменяем каждый таб на 2 пробела.
-                healed = healed.replace(/\t/g, '  ');
-                // 2. Убираем невидимые спецсимволы, которые ломают парсер
-                healed = healed.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '');
-                return healed;
-            },
-            
-            healBase64: function(text) {
-                DiagnosticLogger.add('AI_FIXER', 'Очистка мусора вокруг Base64...');
-                // Удаляем всё, что не является символами Base64
-                return text.replace(/[^A-Za-z0-9+/=]/g, '');
-            }
-        };
-
-// ====================================================================
-        // УМНЫЙ ПАРСЕР (С ИИ-ЛЕКАРЕМ, ОПТИМИЗАЦИЕЙ ПАМЯТИ И ЗАЩИТОЙ ОТ ЗАВИСАНИЙ)
-        // ====================================================================
         async function parseData(rawText) {
             let text = rawText.trim();
-            let added = 0;
-            let duplicates = 0;
+            let added = 0; let duplicates = 0;
 
-            // --- УСКОРЕНИЕ В 1000 РАЗ: Создаем "Словари" для мгновенной проверки дубликатов ---
             const existingKeys = new Set(AppState.proxies.map(x => `${x.type}:${x.server}:${x.port}`));
             const existingNames = new Set(AppState.proxies.map(x => x.name));
 
             const addNodeIfUnique = (p) => {
                 if (!p || !p.server) return;
                 const key = `${p.type}:${p.server}:${p.port}`;
-                
                 if (!existingKeys.has(key)) {
                     let originalName = p.name;
                     let counter = 1;
-                    while (existingNames.has(p.name)) {
-                        p.name = `${originalName} (${counter})`;
-                        counter++;
-                    }
+                    while (existingNames.has(p.name)) { p.name = `${originalName} (${counter})`; counter++; }
                     if (originalName !== p.name) {
-                        try {
-                            let u = new URL(p.rawLink.replace(/^[a-zA-Z0-9]+:\/\//, 'http://')); 
-                            u.hash = encodeURIComponent(p.name); 
-                            p.rawLink = p.rawLink.split('#')[0] + u.hash;
-                        } catch(e) {}
+                        try { let u = new URL(p.rawLink.replace(/^[a-zA-Z0-9]+:\/\//, 'http://')); u.hash = encodeURIComponent(p.name); p.rawLink = p.rawLink.split('#')[0] + u.hash; } catch(e) {}
                     }
                     AppState.proxies.push(p);
-                    existingKeys.add(key);     // Добавляем в словарь мгновенного поиска
-                    existingNames.add(p.name); // Добавляем имя
+                    existingKeys.add(key); existingNames.add(p.name);
                     added++;
-                } else {
-                    duplicates++;
-                }
+                } else { duplicates++; }
             };
 
-            // 1. АНАЛИЗ И ПАРСИНГ JSON
             if (text.startsWith('{')) {
                 try {
                     let json = JSON.parse(text);
@@ -2604,7 +2551,6 @@ function copyLink(i) {
                     }
                 }
             }
-            // 2. АНАЛИЗ И ПАРСИНГ YAML
             else if (text.includes('proxies:') && window.jsyaml) {
                 try {
                     const doc = jsyaml.load(text);
@@ -2640,31 +2586,30 @@ function copyLink(i) {
                     }
                 }
             }
-            // 3. СЫРЫЕ ССЫЛКИ (МАССИВЫ ПО 10 000+ ШТУК)
             else {
-                // ИИ-распознавание
                 if (!/(vless|vmess|trojan|hysteria2|hy2|ss|ssr):\/\//i.test(text)) {
                     text = OfflineAIFixer.healBase64(text);
                     try {
                         let decoded = decodeURIComponent(escape(atob(text)));
-                        if (/(vless|vmess|trojan|hysteria2|hy2|ss|ssr):\/\//i.test(decoded)) {
-                            text = decoded; 
-                        }
+                        if (/(vless|vmess|trojan|hysteria2|hy2|ss|ssr):\/\//i.test(decoded)) text = decoded; 
                     } catch(e) {}
                 }
 
                 const linkRegex = /(vless|vmess|trojan|hysteria2|hy2|ss|ssr):\/\/[^\s<>'"]+/gi;
                 const matches = text.match(linkRegex) || [];
 
-                // --- ЗАЩИТА ОТ ЗАВИСАНИЯ БРАУЗЕРА (Chunking) ---
                 for (let i = 0; i < matches.length; i++) {
-                    let line = matches[i];
+                    
+                    // ЭКСТРЕННЫЙ СТОП! Если юзер нажал красную кнопку - обрываем цикл
+                    if (cancelParsingRequest) {
+                        showToast("🛑 Распознавание прервано пользователем!", "warning");
+                        break; 
+                    }
 
-                    // Каждые 500 ссылок скрипт делает микро-паузу (10 миллисекунд). 
-                    // Это позволяет браузеру Firefox/Chrome перевести дух и перерисовать анимацию
+                    let line = matches[i];
                     if (i % 500 === 0 && i > 0) {
                         if (typeof $ !== 'undefined' && $['outputEditor']) {
-                            $['outputEditor'].innerText = `⏳ Распознавание ссылок... (${i} из ${matches.length})`;
+                            $['outputEditor'].innerText = `⏳ Распознавание ссылок... (${i} из ${matches.length})\nНажмите красную кнопку СТОП, чтобы прервать процесс и использовать готовые узлы.`;
                         }
                         await new Promise(resolve => setTimeout(resolve, 10));
                     }
@@ -2672,84 +2617,42 @@ function copyLink(i) {
                     let p = null;
                     try {
                         if (line.toLowerCase().startsWith('vless://')) {
-                            const url = new URL(line.replace(/^vless:\/\//i, 'http://')); 
-                            const sp = new URLSearchParams(url.search);
-                            let nodeName = decodeURIComponent(url.hash.slice(1)) || "VLESS";
+                            const url = new URL(line.replace(/^vless:\/\//i, 'http://')); const sp = new URLSearchParams(url.search); let nodeName = decodeURIComponent(url.hash.slice(1)) || "VLESS";
                             p = { name: typeof addGeoFlag === 'function' ? addGeoFlag(nodeName) : nodeName, type: "vless", server: url.hostname, port: parseInt(url.port) || 443, uuid: url.username, tls: sp.get('security') === 'reality' || sp.get('security') === 'tls', "reality-opts": sp.get('pbk') ? { "public-key": sp.get('pbk'), "short-id": sp.get('sid') || "" } : null, sni: sp.get('sni') || url.hostname, network: sp.get('type') || "tcp", flow: sp.get('flow') || "", fp: sp.get('fp') || "chrome", rawLink: line };
                         } else if (line.toLowerCase().startsWith('trojan://')) {
-                            let url = new URL(line.replace(/^trojan:\/\//i, 'http://')); 
-                            let sp = new URLSearchParams(url.search);
-                            let nodeName = decodeURIComponent(url.hash.slice(1)) || "Trojan";
+                            let url = new URL(line.replace(/^trojan:\/\//i, 'http://')); let sp = new URLSearchParams(url.search); let nodeName = decodeURIComponent(url.hash.slice(1)) || "Trojan";
                             p = { name: typeof addGeoFlag === 'function' ? addGeoFlag(nodeName) : nodeName, type: "trojan", server: url.hostname, port: parseInt(url.port) || 443, password: url.username, tls: true, sni: sp.get('sni') || url.hostname, network: sp.get('type') || "tcp", fp: sp.get('fp') || "chrome", rawLink: line };
                         } else if (line.toLowerCase().startsWith('vmess://')) {
-                            let b64 = line.slice(8).split('#')[0];
-                            let config = JSON.parse(decodeURIComponent(escape(atob(b64))));
-                            let nodeName = typeof addGeoFlag === 'function' ? addGeoFlag(config.ps || "VMess") : (config.ps || "VMess");
+                            let b64 = line.slice(8).split('#')[0]; let config = JSON.parse(decodeURIComponent(escape(atob(b64)))); let nodeName = typeof addGeoFlag === 'function' ? addGeoFlag(config.ps || "VMess") : (config.ps || "VMess");
                             p = { name: nodeName, type: "vmess", server: config.add, port: parseInt(config.port), uuid: config.id, alterId: config.aid || 0, cipher: config.scy || "auto", network: config.net || "tcp", tls: config.tls === "tls", sni: config.sni || config.host || config.add, fp: config.fp || "chrome", rawLink: line };
                             if(config.net === "ws") p.wsOpts = { path: config.path || "/", headers: { Host: config.host || config.sni || config.add } };
                         } else if (line.toLowerCase().startsWith('hysteria2://') || line.toLowerCase().startsWith('hy2://')) {
-                            let url = new URL(line.replace(/^(hysteria2|hy2):\/\//i, 'http://'));
-                            let sp = new URLSearchParams(url.search);
-                            let nodeName = decodeURIComponent(url.hash.slice(1)) || "Hysteria2";
+                            let url = new URL(line.replace(/^(hysteria2|hy2):\/\//i, 'http://')); let sp = new URLSearchParams(url.search); let nodeName = decodeURIComponent(url.hash.slice(1)) || "Hysteria2";
                             p = { name: typeof addGeoFlag === 'function' ? addGeoFlag(nodeName) : nodeName, type: "hysteria2", server: url.hostname, port: parseInt(url.port) || 443, password: url.username || url.pathname.replace('//',''), sni: sp.get('sni') || url.hostname, insecure: sp.get('insecure') === '1' || sp.get('allowInsecure') === '1', obfs: sp.get('obfs') || "", "obfs-password": sp.get('obfs-password') || "", rawLink: line };
                         } else if (line.toLowerCase().startsWith('ss://')) {
-                            let base = line.split('#')[0].slice(5);
-                            let nodeName = line.split('#')[1] ? decodeURIComponent(line.split('#')[1]) : "Shadowsocks";
-                            if(base.includes('%')) base = decodeURIComponent(base);
+                            let base = line.split('#')[0].slice(5); let nodeName = line.split('#')[1] ? decodeURIComponent(line.split('#')[1]) : "Shadowsocks"; if(base.includes('%')) base = decodeURIComponent(base);
                             let userInfoStr = "", hostPortStr = "", searchStr = "";
-                            if (base.includes('@')) {
-                                let parts = base.split('@'); userInfoStr = parts[0]; let rest = parts[1].split('?'); hostPortStr = rest[0]; searchStr = rest[1] || "";
-                            } else {
-                                let decodedBase = atob(base.split('?')[0]); let parts = decodedBase.split('@'); userInfoStr = parts[0]; hostPortStr = parts[1]; searchStr = base.split('?')[1] || "";
-                            }
+                            if (base.includes('@')) { let parts = base.split('@'); userInfoStr = parts[0]; let rest = parts[1].split('?'); hostPortStr = rest[0]; searchStr = rest[1] || ""; } 
+                            else { let decodedBase = atob(base.split('?')[0]); let parts = decodedBase.split('@'); userInfoStr = parts[0]; hostPortStr = parts[1]; searchStr = base.split('?')[1] || ""; }
                             if (!userInfoStr.includes(':')) try { userInfoStr = atob(userInfoStr); } catch(e) {}
-                            let [method, password] = userInfoStr.split(':');
-                            let [server, port] = hostPortStr.split(':');
-                            let sp = new URLSearchParams(searchStr);
+                            let [method, password] = userInfoStr.split(':'); let [server, port] = hostPortStr.split(':'); let sp = new URLSearchParams(searchStr);
                             p = { name: typeof addGeoFlag === 'function' ? addGeoFlag(nodeName) : nodeName, type: "ss", server: server, port: parseInt(port), cipher: method, password: password, network: sp.get('type') || "tcp", tls: sp.get('security') === 'tls', sni: sp.get('sni') || server, rawLink: line };
                             if(p.network === "ws") p.wsOpts = { path: sp.get('path') || "/", headers: { Host: sp.get('host') || p.sni } };
                         } else if (line.toLowerCase().startsWith('ssr://')) {
-                            let payload = line.slice(6).split('#')[0];
-                            let hashName = line.split('#')[1] ? decodeURIComponent(line.split('#')[1].trim()) : null;
-                            let decoded = payload;
-
-                            if (!payload.includes(':')) {
-                                let b64 = payload.replace(/-/g, '+').replace(/_/g, '/');
-                                while (b64.length % 4) b64 += '=';
-                                try { decoded = decodeURIComponent(escape(atob(b64))); } catch(e) {}
-                            }
-
-                            let parts = decoded.split('/?');
-                            let mainParts = parts[0].split(':');
-                            
+                            let payload = line.slice(6).split('#')[0]; let hashName = line.split('#')[1] ? decodeURIComponent(line.split('#')[1].trim()) : null; let decoded = payload;
+                            if (!payload.includes(':')) { let b64 = payload.replace(/-/g, '+').replace(/_/g, '/'); while (b64.length % 4) b64 += '='; try { decoded = decodeURIComponent(escape(atob(b64))); } catch(e) {} }
+                            let parts = decoded.split('/?'); let mainParts = parts[0].split(':');
                             if (mainParts.length >= 6) {
-                                let sp = new URLSearchParams(parts[1] || "");
-                                let nodeName = "SSR";
-                                
-                                let rem = sp.get('remarks');
-                                if (rem) {
-                                    try { nodeName = decodeURIComponent(escape(atob(rem.replace(/-/g, '+').replace(/_/g, '/')))); } catch(e) {}
-                                } else if (hashName) {
-                                    nodeName = hashName;
-                                }
-
-                                let password = mainParts[5];
-                                try { password = decodeURIComponent(escape(atob(password.replace(/-/g, '+').replace(/_/g, '/')))); } catch(e) {}
-
-                                let obfsParam = sp.get('obfsparam') || "";
-                                if (obfsParam) try { obfsParam = decodeURIComponent(escape(atob(obfsParam.replace(/-/g, '+').replace(/_/g, '/')))); } catch(e) {}
-
-                                let protoParam = sp.get('protoparam') || "";
-                                if (protoParam) try { protoParam = decodeURIComponent(escape(atob(protoParam.replace(/-/g, '+').replace(/_/g, '/')))); } catch(e) {}
-
-                                p = { 
-                                    name: typeof addGeoFlag === 'function' ? addGeoFlag(nodeName) : nodeName, 
-                                    type: "ssr", server: mainParts[0], port: parseInt(mainParts[1]), protocol: mainParts[2], cipher: mainParts[3], obfs: mainParts[4], password: password, obfsParam: obfsParam, protoParam: protoParam, rawLink: line 
-                                };
+                                let sp = new URLSearchParams(parts[1] || ""); let nodeName = "SSR";
+                                let rem = sp.get('remarks'); if (rem) { try { nodeName = decodeURIComponent(escape(atob(rem.replace(/-/g, '+').replace(/_/g, '/')))); } catch(e) {} } else if (hashName) { nodeName = hashName; }
+                                let password = mainParts[5]; try { password = decodeURIComponent(escape(atob(password.replace(/-/g, '+').replace(/_/g, '/')))); } catch(e) {}
+                                let obfsParam = sp.get('obfsparam') || ""; if (obfsParam) try { obfsParam = decodeURIComponent(escape(atob(obfsParam.replace(/-/g, '+').replace(/_/g, '/')))); } catch(e) {}
+                                let protoParam = sp.get('protoparam') || ""; if (protoParam) try { protoParam = decodeURIComponent(escape(atob(protoParam.replace(/-/g, '+').replace(/_/g, '/')))); } catch(e) {}
+                                p = { name: typeof addGeoFlag === 'function' ? addGeoFlag(nodeName) : nodeName, type: "ssr", server: mainParts[0], port: parseInt(mainParts[1]), protocol: mainParts[2], cipher: mainParts[3], obfs: mainParts[4], password: password, obfsParam: obfsParam, protoParam: protoParam, rawLink: line };
                             }
                         }
                         addNodeIfUnique(p);
-                    } catch(e) { /* Игнорируем битые ссылки */ }
+                    } catch(e) {}
                 }
             }
 
@@ -2759,16 +2662,13 @@ function copyLink(i) {
             }
             if (added > 0) { 
                 if (typeof showToast === 'function') showToast(duplicates > 0 ? `✅ Добавлено: ${added} (пропущено дублей: ${duplicates})` : `✅ Добавлено узлов: ${added}!`, "success");
-                
-                // Даем браузеру еще немного времени перед тяжелым рендерингом и сохранением
                 if (typeof $ !== 'undefined' && $['outputEditor']) $['outputEditor'].innerText = "⏳ Отрисовка элементов...";
                 await new Promise(resolve => setTimeout(resolve, 50));
-
                 if (typeof AppState !== 'undefined' && typeof AppState.saveState === 'function') AppState.saveState(); 
                 if (typeof renderCards === 'function') renderCards();
             } else if (duplicates > 0) {
                 if (typeof showToast === 'function') showToast(`⚠️ Эти узлы уже есть в списке (пропущено: ${duplicates})`, "warning");
-            } else {
+            } else if (!cancelParsingRequest) {
                 if (typeof showToast === 'function') showToast("❌ Узлов не найдено (Попробуйте очистить текст)", "error");
             }
         }
@@ -3249,7 +3149,8 @@ function copyLink(i) {
             subProviders.forEach(p => {
                 const sName = safeYamlStr(p.name);
                 customProvidersNames.push(sName);
-                customProvidersYaml += `  ${sName}:\n    type: http\n    url: "${safeYamlStr(p.url)}"\n    interval: 14400\n    path: ./providers/${sName}.yaml\n    health-check: { enable: true, interval: 600, timeout: 4000, lazy: true, expected-status: 204, url: "http://cp.cloudflare.com/generate_204" }\n`;
+                // ВАЖНО: Мы добавили блок override! Теперь ядро само будет лечить сертификаты и ALPN у скачанных ссылок!
+                customProvidersYaml += `  ${sName}:\n    type: http\n    url: "${safeYamlStr(p.url)}"\n    interval: 14400\n    path: ./providers/${sName}.yaml\n    override:\n      skip-cert-verify: true\n      udp: true\n      alpn:\n        - h2\n        - http/1.1\n    health-check: { enable: true, interval: 600, timeout: 4000, lazy: true, expected-status: 204, url: "http://cp.cloudflare.com/generate_204" }\n`;
             });
 
             const userProxies = normalProxies.length ? normalProxies.map(p => `      - "${safeYamlStr(p.name)}"`).join('\n') : "";
