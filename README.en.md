@@ -22,7 +22,7 @@
   </a>
 </p>
 
-<h1 align="center">⚡ Network Builder v17.04 ULTRA</h1>
+<h1 align="center">⚡ Network Builder v17.05 ULTRA</h1>
 
 <p align="center">
   <b>An extremely powerful and 100% local web tool for managing giant proxy server databases.</b><br>
@@ -78,13 +78,13 @@
 
 ---
 
-### 🔥 What's new in version 17.04 ULTRA?
+### 🔥 What's new in version 17.05 ULTRA? (The HighLoad Perfection)
 
-* 🚀 **Extreme Parser Engine:** Fully optimized code to handle **10,000+ nodes** simultaneously. Smooth interface even with giant data volumes.
-* 🌍 **ULTRA Localization:** Deep support for 6 languages (RU, EN, ZH, FA, ES). Interface and system notifications are fully adapted.
-* 🛡️ **QuotaGuard System:** Intelligent protection against browser memory overflow. Work with any config volumes without the risk of tab crashes.
-* 🧠 **Smart Duplicate Filter:** Automatic server comparison by `IP:Port` pair. The program will automatically remove garbage and duplicates, leaving only unique nodes.
-* 🛠️ **Refined Diagnostics:** Updated event logger and fixed syntax errors (SyntaxError fix) for flawless stability.
+* 🌐 **Massive Protocol Expansion:** Added full parsing support for **VMess, Hysteria2 (hy2), Shadowsocks (SS), and ShadowsocksR (SSR)**.
+* 🚀 **Extreme Performance (HighLoad):** Implemented asynchronous chunking and `Set` dictionaries. DOM virtualization allows loading and deduplicating **250,000+ nodes** in milliseconds without freezing your browser!
+* 🛡️ **Bulletproof YAML Sanitizer:** Industrial-grade Face-Control. The script automatically destroys public-list garbage (invisible ASCII characters, fake `2022-blake3` ciphers, empty passwords) and guarantees 100% stable import into Mihomo.
+* ⚙️ **Defeating Timeouts:** The YAML generator has been rewritten to meet strict Mihomo standards (added `alpn`, `skip-cert-verify: true`, `servername`, and an improved Fake-IP DNS routing).
+* 🎨 **New UI/UX:** Separate Light/Dark themes with independent custom color persistence, and a **"Subscription Mode" Switch** to directly embed RAW links (Pastebin/GitHub) into the `proxy-providers` block.
 
 ---
 
