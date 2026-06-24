@@ -2670,111 +2670,139 @@ function copyLink(i) {
             }
         }
 
-        // ====================================================================
-        // СИСТЕМА ПИНГОВАНИЯ (Проверка доступности узлов)
-        // ====================================================================
+// ====================================================================
+// УМНАЯ СИСТЕМА ПИНГОВАНИЯ (Поддержка WS и умный анализ отказов)
+// ====================================================================
+
+async function pingNode(index, btn = null, autoSave = true) {
+    const p = AppState.proxies[index];
+    if (!p) return;
+
+    // Ищем кнопку
+    const targetBtn = btn || document.querySelector(`.btn-ping[data-index="${index}"]`);
+    if (targetBtn) {
+        targetBtn.textContent = "⏳";
+        targetBtn.style.color = "var(--text-color)";
+    }
+
+    let pingTime = 99999;
+    let statusText = "Err";
+    let statusColor = "var(--danger-color)";
+
+    try {
+        // 1. УМНЫЙ ПИНГ ДЛЯ WEBSOCKET
+        if (p.network === 'ws' || (p.wsOpts && p.wsOpts.path)) {
+            pingTime = await pingWebSocket(p);
+            statusText = pingTime + "ms";
+            statusColor = "var(--success-color)";
+        } 
+        // 2. УЛУЧШЕННЫЙ FETCH-ПИНГ (Для TCP, Reality, gRPC, Hysteria2)
+        else {
+            pingTime = await pingFetch(p);
+            if (pingTime < 2500) {
+                statusText = `🛡️ ${pingTime}ms`; 
+                statusColor = "var(--primary-color)";
+            } else {
+                throw new Error("Timeout");
+            }
+        }
+    } catch (e) {
+        pingTime = 99999;
+        statusText = (e.message === "Timeout") ? "Timeout" : "Err";
+    }
+
+    p.lastPing = pingTime;
+    if (autoSave) AppState.saveState();
+
+    if (targetBtn) {
+        targetBtn.textContent = statusText;
+        targetBtn.style.color = statusColor;
+    }
+    
+    return pingTime;
+}
+
+// Вспомогательная функция для WS
+function pingWebSocket(p) {
+    return new Promise((resolve, reject) => {
+        const start = performance.now();
+        const protocol = (p.tls || p.port == 443 || p.port == 8443) ? 'wss' : 'ws';
+        const path = p.wsOpts?.path || '/';
+        const host = p.server; 
         
-        /**
-         * Пингует отдельный узел.
-         * @param {number} index Индекс в AppState.proxies
-         * @param {HTMLElement} btn (опционально) Кнопка для обновления. Если нет, найдет по data-index
-         * @param {boolean} autoSave Сохранять ли стейт сразу (false при массовом пинге)
-         */
-        async function pingNode(index, btn = null, autoSave = true) {
-            const p = AppState.proxies[index];
-            if (!p) return;
-
-            // Если кнопку не передали, пытаемся найти её в DOM по data-index (защита от багов сортировки)
-            const targetBtn = btn || document.querySelector(`.btn-ping[data-index="${index}"]`);
-            if (targetBtn) {
-                targetBtn.textContent = "⏳";
-                targetBtn.style.color = "var(--text-color)";
-            }
-
-            const start = performance.now();
-            const ac = new AbortController(); 
-            const tid = setTimeout(() => ac.abort(), 3000); // Таймаут 3 секунды
+        try {
+            const ws = new WebSocket(`${protocol}://${host}:${p.port}${path}`);
             
-            let pingTime = 99999;
-            let statusText = "Err";
-            let statusColor = "var(--danger-color)";
+            const timeout = setTimeout(() => {
+                ws.close();
+                reject(new Error("Timeout"));
+            }, 3000);
 
-            try {
-                // Протокол: если порт 443, логично пробовать https, иначе http.
-                // (Браузеры блокируют http-запросы к другим портам, если страница открыта по https)
-                const protocol = (p.port == 443 || p.port == 8443) ? 'https' : 'http';
-                
-                await fetch(`${protocol}://${p.server}:${p.port}`, { 
-                    mode: 'no-cors', 
-                    cache: 'no-store', 
-                    signal: ac.signal 
-                });
-                
-                clearTimeout(tid); 
-                pingTime = Math.round(performance.now() - start);
-                statusText = pingTime + "ms"; 
-                statusColor = "var(--success-color)"; 
-                
-            } catch (e) {
-                clearTimeout(tid);
-                
-                if (e.name === 'AbortError') {
-                    // Чистый таймаут (3 секунды прошло, ответа нет)
-                    statusText = "Timeout";
-                    pingTime = 99999;
-                } else {
-                    // Ошибка сети (CORS, отказ в соединении сервером, несоответствие сертификата).
-                    // Сервер ОТВЕТИЛ (разорвал связь), значит он ЖИВ! Замеряем время этого ответа.
-                    pingTime = Math.round(performance.now() - start);
-                    
-                    if (['vless', 'trojan', 'hysteria2', 'vmess', 'shadowsocks'].includes(p.type?.toLowerCase())) { 
-                        statusText = `🛡️ ${pingTime}ms`; // Показываем Stealth + реальный пинг!
-                        statusColor = "var(--primary-color)"; 
-                    } else { 
-                        statusText = "Err"; 
-                        pingTime = 99999; 
-                    }
-                }
-            }
+            ws.onopen = () => {
+                clearTimeout(timeout);
+                ws.close();
+                resolve(Math.round(performance.now() - start));
+            };
 
-            p.lastPing = pingTime;
-            if (autoSave) AppState.saveState();
-
-            if (targetBtn) {
-                targetBtn.textContent = statusText;
-                targetBtn.style.color = statusColor;
-            }
-            
-            return pingTime;
+            ws.onerror = () => {
+                clearTimeout(timeout);
+                const time = Math.round(performance.now() - start);
+                if (time < 2500) resolve(time);
+                else reject(new Error("Err"));
+            };
+        } catch(e) {
+            reject(e);
         }
+    });
+}
 
-        async function pingAll() {
-            if (!AppState.proxies || !AppState.proxies.length) return; 
-            
-            showToast("⏳ Пингуем (пакетами по 5)...", "info");
-            
-            // Находим все кнопки пинга. Желательно, чтобы у них был data-index="${i}" в HTML.
-            // const btns = document.querySelectorAll('.btn-ping'); // Твой старый вариант
-            
-            const CONCURRENCY_LIMIT = 5; // Максимум одновременных запросов
-            const proxiesCount = AppState.proxies.length;
+// Вспомогательная функция для TCP
+function pingFetch(p) {
+    return new Promise((resolve, reject) => {
+        const start = performance.now();
+        const protocol = (p.tls || p.port == 443 || p.port == 8443) ? 'https' : 'http';
+        const ac = new AbortController();
+        const timeout = setTimeout(() => ac.abort(), 2500); 
 
-            // Разбиваем запросы на чанки, чтобы браузер не "захлебнулся"
-            for (let i = 0; i < proxiesCount; i += CONCURRENCY_LIMIT) {
-                const chunk = [];
-                for (let j = i; j < i + CONCURRENCY_LIMIT && j < proxiesCount; j++) {
-                    // Передаем index, null (кнопка найдется сама), false (не сохранять стейт каждый раз)
-                    chunk.push(pingNode(j, null, false)); 
-                }
-                // Ждем завершения пачки из 5 запросов, прежде чем запустить следующие 5
-                await Promise.all(chunk);
+        fetch(`${protocol}://${p.server}:${p.port}`, { 
+            mode: 'no-cors', 
+            cache: 'no-store', 
+            signal: ac.signal 
+        }).then(() => {
+            clearTimeout(timeout);
+            resolve(Math.round(performance.now() - start));
+        }).catch(e => {
+            clearTimeout(timeout);
+            if (e.name === 'AbortError') {
+                reject(new Error("Timeout"));
+            } else {
+                const time = Math.round(performance.now() - start);
+                resolve(time); 
             }
-            
-            // Сохраняем состояние ОДИН раз после окончания всей проверки
-            AppState.saveState();
-            showToast("✅ Тестирование завершено!");
-        }
+        });
+    });
+}
 
+// ВОТ ЭТА ФУНКЦИЯ БЫЛА УТЕРЯНА (Она пингует все узлы списком)
+async function pingAll() {
+    if (!AppState.proxies || !AppState.proxies.length) return; 
+    
+    showToast("⏳ Пингуем (пакетами по 5)...", "info");
+    
+    const CONCURRENCY_LIMIT = 5; // Максимум одновременных запросов
+    const proxiesCount = AppState.proxies.length;
+
+    for (let i = 0; i < proxiesCount; i += CONCURRENCY_LIMIT) {
+        const chunk = [];
+        for (let j = i; j < i + CONCURRENCY_LIMIT && j < proxiesCount; j++) {
+            chunk.push(pingNode(j, null, false)); 
+        }
+        await Promise.all(chunk);
+    }
+    
+    AppState.saveState();
+    showToast("✅ Тестирование завершено!");
+}
        // ====================================================================
         // ЛОГИКА РЕНДЕРИНГА И ВЗАИМОДЕЙСТВИЯ С КАРТОЧКАМИ УЗЛОВ
         // ====================================================================
