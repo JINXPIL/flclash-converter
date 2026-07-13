@@ -232,4 +232,4 @@
 
 **Если Network Builder ULTRA помог вам, не забудьте поставить звезду! Это мотивирует развивать проект дальше.** :star2:
 
-[![Star History Chart](https://starchart.cc/JINXPIL/flclash-converter.svg?variant=adaptive)](https://starchart.cc/JINXPIL/flclash-converter)
+[![Star History Chart](https://api.star-history.com/svg?repos=JINXPIL/flclash-converter&type=Date)](https://star-history.com/#JINXPIL/flclash-converter&Date)
