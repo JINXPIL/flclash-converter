@@ -4,20 +4,17 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     
-    <!-- 🛡️ ULTIMATE SECURITY: Блокировка iFrame, подмены форм и ограничение источников (Strict CSP) -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'none'; connect-src https://raw.githubusercontent.com https://cdn.jsdelivr.net; style-src 'unsafe-inline'; script-src 'unsafe-inline'; frame-ancestors 'none'; base-uri 'none'; form-action 'none';">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta name="referrer" content="no-referrer">
 
-    <!-- 🚀 MULTI-CDN OPTIMIZATION: Предзагрузка DNS для основного сервера и запасного балансировщика -->
     <link rel="preconnect" href="https://raw.githubusercontent.com" crossorigin>
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 
     <title>Установка конфигурации Happ...</title>
     <style>
         body {
-            background-color: #0d1117;
-            color: #c9d1d9;
+            background-color: #0d1117; color: #c9d1d9;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             height: 100vh; margin: 0; text-align: center; padding: 0 20px; overflow: hidden;
@@ -51,7 +48,6 @@
     <div class="error" id="ui-error">❌ Ошибка сети. Проверьте интернет или отключите VPN/AdBlock.</div>
 
     <script>
-        // DOM Caching
         const UI = {
             spinner: document.getElementById('ui-spinner'),
             title: document.getElementById('ui-title'),
@@ -60,21 +56,19 @@
             error: document.getElementById('ui-error')
         };
 
-        // 🛡️ SECURITY: Строгая Regex-проверка Payload'а (Только base64, никаких спецсимволов)
         const safeRegex = /^happ:\/\/routing\/onadd\/[A-Za-z0-9+/=]+$/;
 
-        // 🚀 HIGH AVAILABILITY: Основной источник + Запасной CDN
+        // ИСПРАВЛЕННЫЕ ПУТИ: теперь файлы берутся из папки HAPP
         const sources = [
-            `https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/configuration/HAPP_INSTALL.DEEPLINK?t=${Date.now()}`,
-            `https://cdn.jsdelivr.net/gh/JINXPIL/flclash-converter@main/configuration/HAPP_INSTALL.DEEPLINK`
+            `https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/HAPP/DEFAULT.DEEPLINK?t=${Date.now()}`,
+            `https://cdn.jsdelivr.net/gh/JINXPIL/flclash-converter@main/HAPP/DEFAULT.DEEPLINK`
         ];
 
-        // Асинхронный балансировщик запросов
         async function fetchSecureDeepLink() {
             for (let i = 0; i < sources.length; i++) {
                 try {
                     const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 3500); // Тайм-аут 3.5 секунды на каждый CDN
+                    const timeoutId = setTimeout(() => controller.abort(), 3500);
 
                     const response = await fetch(sources[i], { cache: 'no-store', signal: controller.signal });
                     clearTimeout(timeoutId);
@@ -82,17 +76,15 @@
                     if (response.ok) {
                         const text = (await response.text()).trim();
                         if (safeRegex.test(text)) return text;
-                        throw new Error('Payload Validation Failed'); // Защита от инъекций
+                        throw new Error('Payload Validation Failed');
                     }
                 } catch (err) {
                     console.warn(`[CDN ${i} Failed]:`, err);
-                    // Если ошибка - скрипт автоматически пробует следующий URL из массива
                 }
             }
             throw new Error('All CDN sources failed');
         }
 
-        // Запуск
         fetchSecureDeepLink()
             .then(deepLink => {
                 UI.spinner.style.display = 'none';
@@ -102,7 +94,6 @@
                 UI.btn.href = deepLink;
                 UI.btn.style.display = 'inline-block';
 
-                // 🚀 UX FIX: location.replace предотвращает застревание в "Back-Button Loop"
                 requestAnimationFrame(() => {
                     setTimeout(() => { window.location.replace(deepLink); }, 300);
                 });
