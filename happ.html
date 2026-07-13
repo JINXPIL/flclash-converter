@@ -4,41 +4,28 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     
-    <!-- 🛡️ SECURITY: Content Security Policy (Разрешаем запросы ТОЛЬКО к GitHub) -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; connect-src https://raw.githubusercontent.com; style-src 'unsafe-inline'; script-src 'unsafe-inline';">
+    <!-- 🛡️ ULTIMATE SECURITY: Блокировка iFrame, подмены форм и ограничение источников (Strict CSP) -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; connect-src https://raw.githubusercontent.com https://cdn.jsdelivr.net; style-src 'unsafe-inline'; script-src 'unsafe-inline'; frame-ancestors 'none'; base-uri 'none'; form-action 'none';">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta name="referrer" content="no-referrer">
 
-    <!-- 🚀 OPTIMIZATION: Предварительное подключение к серверам GitHub (ускоряет fetch на 30-40%) -->
+    <!-- 🚀 MULTI-CDN OPTIMIZATION: Предзагрузка DNS для основного сервера и запасного балансировщика -->
     <link rel="preconnect" href="https://raw.githubusercontent.com" crossorigin>
-    <link rel="dns-prefetch" href="https://raw.githubusercontent.com">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 
     <title>Установка конфигурации Happ...</title>
     <style>
-        /* Оптимизированный CSS без лишних перерисовок (Reflow) */
         body {
             background-color: #0d1117;
             color: #c9d1d9;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            text-align: center;
-            padding: 0 20px;
-            overflow: hidden; /* Отключаем скролл */
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            height: 100vh; margin: 0; text-align: center; padding: 0 20px; overflow: hidden;
         }
         .loader {
-            border: 4px solid #161b22;
-            border-top: 4px solid #58a6ff;
-            border-radius: 50%;
-            width: 48px;
-            height: 48px;
-            animation: spin 1s linear infinite;
-            margin-bottom: 25px;
-            /* Hardware acceleration для плавной анимации на слабых телефонах */
-            transform: translateZ(0); 
+            border: 4px solid #161b22; border-top: 4px solid #58a6ff; border-radius: 50%;
+            width: 48px; height: 48px; margin-bottom: 25px;
+            animation: spin 1s linear infinite; transform: translateZ(0); 
         }
         @keyframes spin { 100% { transform: rotate(360deg); } }
         
@@ -46,19 +33,13 @@
         p { color: #8b949e; line-height: 1.5; max-width: 450px; font-size: 15px; }
         
         .btn {
-            display: none;
-            margin-top: 30px;
-            padding: 14px 28px;
-            background-color: #238636;
-            color: #ffffff;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 16px;
+            display: none; margin-top: 30px; padding: 14px 28px;
+            background-color: #238636; color: #ffffff; text-decoration: none;
+            border-radius: 8px; font-weight: 600; font-size: 16px;
             transition: background-color 0.2s, transform 0.1s;
         }
         .btn:active { transform: scale(0.97); }
-        .error { color: #ff7b72; display: none; margin-top: 20px; padding: 15px; border-radius: 8px; border: 1px solid rgba(255,123,114,0.4); }
+        .error { color: #ff7b72; display: none; margin-top: 20px; padding: 15px; border-radius: 8px; background: rgba(255,123,114,0.1); border: 1px solid rgba(255,123,114,0.4); }
     </style>
 </head>
 <body>
@@ -67,10 +48,10 @@
     <p id="ui-desc">Безопасное соединение. Загружаем актуальные правила маршрутизации.</p>
 
     <a href="#" class="btn" id="ui-btn" rel="noopener noreferrer">🚀 Открыть в приложении Happ</a>
-    <div class="error" id="ui-error">❌ Ошибка сети. Проверьте интернет или отключите VPN/AdBlock для скачивания.</div>
+    <div class="error" id="ui-error">❌ Ошибка сети. Проверьте интернет или отключите VPN/AdBlock.</div>
 
     <script>
-        // 🚀 OPTIMIZATION: DOM Caching (находим элементы 1 раз, чтобы не грузить процессор телефона)
+        // DOM Caching
         const UI = {
             spinner: document.getElementById('ui-spinner'),
             title: document.getElementById('ui-title'),
@@ -79,27 +60,41 @@
             error: document.getElementById('ui-error')
         };
 
-        const targetUrl = 'https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/configuration/HAPP_INSTALL.DEEPLINK';
-        
-        // 🛡️ SECURITY & OPTIMIZATION: AbortController для прерывания зависших запросов (Timeout 5 секунд)
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        // 🛡️ SECURITY: Строгая Regex-проверка Payload'а (Только base64, никаких спецсимволов)
+        const safeRegex = /^happ:\/\/routing\/onadd\/[A-Za-z0-9+/=]+$/;
 
-        fetch(targetUrl + '?t=' + Date.now(), { 
-            cache: 'no-store', // Жесткий обход кэша
-            signal: controller.signal 
-        })
-        .then(response => {
-            clearTimeout(timeoutId);
-            if (!response.ok) throw new Error('HTTP ' + response.status);
-            return response.text();
-        })
-        .then(text => {
-            const deepLink = text.trim();
-            
-            // 🛡️ SECURITY: Строгая валидация протокола
-            if (deepLink.startsWith('happ://')) {
-                // Обновляем UI
+        // 🚀 HIGH AVAILABILITY: Основной источник + Запасной CDN
+        const sources = [
+            `https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/configuration/HAPP_INSTALL.DEEPLINK?t=${Date.now()}`,
+            `https://cdn.jsdelivr.net/gh/JINXPIL/flclash-converter@main/configuration/HAPP_INSTALL.DEEPLINK`
+        ];
+
+        // Асинхронный балансировщик запросов
+        async function fetchSecureDeepLink() {
+            for (let i = 0; i < sources.length; i++) {
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 3500); // Тайм-аут 3.5 секунды на каждый CDN
+
+                    const response = await fetch(sources[i], { cache: 'no-store', signal: controller.signal });
+                    clearTimeout(timeoutId);
+
+                    if (response.ok) {
+                        const text = (await response.text()).trim();
+                        if (safeRegex.test(text)) return text;
+                        throw new Error('Payload Validation Failed'); // Защита от инъекций
+                    }
+                } catch (err) {
+                    console.warn(`[CDN ${i} Failed]:`, err);
+                    // Если ошибка - скрипт автоматически пробует следующий URL из массива
+                }
+            }
+            throw new Error('All CDN sources failed');
+        }
+
+        // Запуск
+        fetchSecureDeepLink()
+            .then(deepLink => {
                 UI.spinner.style.display = 'none';
                 UI.title.textContent = '✅ Конфигурация готова!';
                 UI.desc.textContent = 'Если приложение не открылось автоматически, нажмите зеленую кнопку ниже.';
@@ -107,22 +102,17 @@
                 UI.btn.href = deepLink;
                 UI.btn.style.display = 'inline-block';
 
-                // Мягкий редирект (обход блокировок popup-окон в iOS/Safari)
+                // 🚀 UX FIX: location.replace предотвращает застревание в "Back-Button Loop"
                 requestAnimationFrame(() => {
-                    setTimeout(() => { window.location.href = deepLink; }, 300);
+                    setTimeout(() => { window.location.replace(deepLink); }, 300);
                 });
-            } else {
-                throw new Error('Invalid Protocol');
-            }
-        })
-        .catch(err => {
-            clearTimeout(timeoutId);
-            UI.spinner.style.display = 'none';
-            UI.title.textContent = 'Ошибка загрузки';
-            UI.desc.style.display = 'none';
-            UI.error.style.display = 'block';
-            console.error('Core Error:', err);
-        });
+            })
+            .catch(() => {
+                UI.spinner.style.display = 'none';
+                UI.title.textContent = 'Системная ошибка';
+                UI.desc.style.display = 'none';
+                UI.error.style.display = 'block';
+            });
     </script>
 </body>
 </html>
