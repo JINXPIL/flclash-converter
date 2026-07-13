@@ -1,14 +1,12 @@
 name: ⚡ Network Builder - Auto-Deploy
 
 on:
-  # Позволяет запускать скрипт вручную с кнопки на GitHub
   workflow_dispatch: 
   push:
     branches:
       - main
     paths:
-      # Скрипт следит только за файлом в новой папке
-      - 'configuration/rus_vp_happ.json' 
+      - 'HAPP/DEFAULT.json' # Теперь бот следит за файлом в папке HAPP
 
 permissions:
   contents: write
@@ -20,49 +18,46 @@ jobs:
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
 
-      - name: ⚙️ Validate, Update Timestamp and Generate Deeplink
+      - name: ⚙️ Build Happ & Incy Configs and Deeplinks
         shell: bash
         run: |
-          # Включаем строгий режим (как у PRO-разработчиков): 
-          # Скрипт немедленно остановится, если где-то произойдет ошибка
           set -euo pipefail
           
-          # Получаем текущее время в формате UNIX (секунды)
+          # Получаем текущее время
           NOW_EPOCH="$(date -u +%s)"
           
-          echo "Текущее время: $NOW_EPOCH"
-          
-          # 1. Берем твой JSON, через утилиту `jq` обновляем в нем параметр LastUpdated 
-          # на текущее время. Если в коде была ошибка (забыл запятую), jq это поймает и остановит скрипт.
+          # 1. Обновляем время в исходном файле HAPP/DEFAULT.json
           tmp="$(mktemp)"
-          jq --arg ts "$NOW_EPOCH" '.LastUpdated = $ts' configuration/rus_vp_happ.json > "$tmp"
-          mv "$tmp" configuration/rus_vp_happ.json
+          jq --arg ts "$NOW_EPOCH" '.LastUpdated = $ts' HAPP/DEFAULT.json > "$tmp"
+          mv "$tmp" HAPP/DEFAULT.json
           
-          # 2. Сжимаем JSON в одну строку (убираем пробелы) и кодируем в Base64. 
-          # Это делает диплинк короче и надежнее!
-          BASE64=$(jq -c . configuration/rus_vp_happ.json | base64 -w 0)
+          # 2. Создаем папку INCY и копируем туда актуальный JSON
+          # (чтобы у пользователей INCY был свой файл для скачивания)
+          mkdir -p INCY
+          cp HAPP/DEFAULT.json INCY/DEFAULT.json
           
-          # 3. Сохраняем в файл диплинка
-          printf 'happ://routing/onadd/%s\n' "$BASE64" > configuration/HAPP_INSTALL.DEEPLINK
+          # 3. Сжимаем JSON и кодируем в Base64
+          BASE64=$(jq -c . HAPP/DEFAULT.json | base64 -w 0)
+          
+          # 4. Создаем магические ссылки (диплинки) для обоих клиентов!
+          printf 'happ://routing/onadd/%s\n' "$BASE64" > HAPP/DEFAULT.DEEPLINK
+          printf 'incy://routing/onadd/%s\n' "$BASE64" > INCY/DEFAULT.DEEPLINK
 
       - name: 🚀 Commit and push changes
         shell: bash
         run: |
           set -euo pipefail
           
-          # Представляемся системным ботом GitHub
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
-          # Добавляем измененные файлы
-          git add configuration/rus_vp_happ.json configuration/HAPP_INSTALL.DEEPLINK
+          # Добавляем папки HAPP и INCY целиком
+          git add HAPP/ INCY/
           
-          # Проверяем, есть ли реальные изменения. Если нет - просто завершаем без ошибки.
           if git diff --cached --quiet; then
             echo "No changes to commit."
             exit 0
           fi
           
-          # Красивый коммит с датой
-          git commit -m "⚡ Auto-update config & Deeplink [$(date -u +%Y-%m-%d %H:%M)]"
+          git commit -m "⚡ Auto-update Happ & Incy configs [$(date -u +%Y-%m-%d %H:%M)]"
           git push
