@@ -11,7 +11,9 @@
         @keyframes spin { 100% { transform: rotate(360deg); } }
         h2 { color: #ffffff; margin-bottom: 12px; }
         p { color: #8b949e; line-height: 1.5; max-width: 450px; }
-        .btn { display: none; margin-top: 30px; padding: 14px 28px; background-color: #238636; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; }
+        .btn { display: none; margin-top: 25px; padding: 14px 28px; background-color: #238636; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; width: 250px; box-sizing: border-box; }
+        .btn-copy { background-color: #21262d; border: 1px solid #30363d; margin-top: 12px; cursor: pointer; }
+        .btn-copy:hover { background-color: #30363d; }
         .error { color: #ff7b72; display: none; margin-top: 20px; padding: 15px; border-radius: 8px; background: rgba(255,123,114,0.1); border: 1px solid rgba(255,123,114,0.4); }
     </style>
 </head>
@@ -19,7 +21,10 @@
     <div class="loader" id="ui-spinner"></div>
     <h2 id="ui-title">Подготовка конфигурации...</h2>
     <p id="ui-desc">Безопасное соединение. Загружаем актуальные правила маршрутизации.</p>
+    
     <a href="#" class="btn" id="ui-btn">🚀 Открыть в приложении Happ</a>
+    <button class="btn btn-copy" id="ui-copy">📋 Скопировать ссылку</button>
+    
     <div class="error" id="ui-error"></div>
 
     <script>
@@ -46,10 +51,28 @@
         fetchLink().then(link => {
             document.getElementById('ui-spinner').style.display = 'none';
             document.getElementById('ui-title').textContent = '✅ Конфигурация готова!';
-            document.getElementById('ui-desc').textContent = 'Если приложение не открылось автоматически, нажмите зеленую кнопку.';
+            document.getElementById('ui-desc').innerHTML = 'На телефоне приложение откроется само.<br><b>На ПК:</b> нажмите "Скопировать" и вставьте в приложение.';
+            
+            // Зеленая кнопка для телефонов
             document.getElementById('ui-btn').href = link;
-            document.getElementById('ui-btn').style.display = 'inline-block';
+            document.getElementById('ui-btn').style.display = 'block';
+            
+            // Кнопка копирования для ПК
+            const copyBtn = document.getElementById('ui-copy');
+            copyBtn.style.display = 'block';
+            copyBtn.onclick = function() {
+                navigator.clipboard.writeText(link).then(() => {
+                    copyBtn.textContent = '✅ Скопировано!';
+                    copyBtn.style.backgroundColor = '#238636';
+                    copyBtn.style.borderColor = '#238636';
+                }).catch(err => {
+                    alert('Не удалось скопировать. Выделите ссылку вручную.');
+                });
+            };
+
+            // Пытаемся открыть автоматически (сработает на смартфонах)
             setTimeout(() => window.location.replace(link), 300);
+
         }).catch(err => {
             document.getElementById('ui-spinner').style.display = 'none';
             document.getElementById('ui-title').textContent = 'Ошибка загрузки';
