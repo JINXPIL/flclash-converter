@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Установка Happ Конфигурации...</title>
+</head>
+<body style="background: #121212; color: #ffffff; font-family: sans-serif; text-align: center; padding-top: 20%;">
+    <h2>⏳ Запускаем Happ...</h2>
+    <p>Если приложение не открылось автоматически, проверьте, что оно установлено.</p>
+    
+    <script>
+        // Берем твою ссылку из папки configuration и редиректим на неё
+        fetch('https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/configuration/HAPP_INSTALL.DEEPLINK')
+            .then(response => response.text())
+            .then(text => {
+                window.location.href = text.trim();
+            })
+            .catch(err => {
+                document.body.innerHTML = '<h2 style="color: #ff5252;">❌ Ошибка загрузки</h2>';
+            });
+    </script>
+</body>
+</html>
