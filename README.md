@@ -8,17 +8,17 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/jinxpil/flclash-converter/releases">
-    <img src="https://img.shields.io/github/v/release/jinxpil/flclash-converter?style=for-the-badge&logo=github&color=181717" alt="Release">
+  <a href="https://github.com/JINXPIL/flclash-converter/releases">
+    <img src="https://img.shields.io/github/v/release/JINXPIL/flclash-converter?style=for-the-badge&logo=github&color=181717" alt="Release">
   </a>
-  <a href="https://github.com/jinxpil/flclash-converter/releases/latest">
-    <img src="https://img.shields.io/github/downloads/jinxpil/flclash-converter/total?style=for-the-badge&color=brightgreen" alt="Downloads">
+  <a href="https://github.com/JINXPIL/flclash-converter/releases/latest">
+    <img src="https://img.shields.io/github/downloads/JINXPIL/flclash-converter/total?style=for-the-badge&color=brightgreen" alt="Downloads">
   </a>
   <a href="https://opensource.org/licenses/MIT">
     <img src="https://img.shields.io/badge/license-MIT-blue.svg?style=for-the-badge&logo=opensourceinitiative&logoColor=white" alt="License">
   </a>
-  <a href="https://github.com/jinxpil/flclash-converter/stargazers">
-    <img src="https://img.shields.io/github/stars/jinxpil/flclash-converter?style=for-the-badge&color=yellow" alt="Stars">
+  <a href="https://github.com/JINXPIL/flclash-converter/stargazers">
+    <img src="https://img.shields.io/github/stars/JINXPIL/flclash-converter?style=for-the-badge&color=yellow" alt="Stars">
   </a>
 </p>
 
@@ -105,16 +105,71 @@
 
 ---
 
-### 🎯 Конфигурации и маршрутизация (Пресеты)
+### 🎯 Готовые пресеты
 
 Чтобы не засорять страницу портянками кода, все готовые пресеты вынесены в отдельные файлы репозитория.
 
-* 🌐 **Раздельное туннелирование для Happ** — Оптимизированный пресет правил (Крым, СевГУ, обход ограничений, AdBlock), собранный через конструктор `routing.happ.su`. Предназначен **строго** для клиента Happ.
-    * 📄 Ссылка на файл конфигурации: [`./rus_vp_happ.json`](./rus_vp_happ.json)
-    * 🔗 Ссылка для импорта в клиент: `https://raw.githubusercontent.com/JINXPIL/flclash-converter/refs/heads/main/rus_vp_happ.json`
-* 🛠️ **Оптимизированный YAML-конфиг (Mihomo/Clash)** — v79.0 Ultimate со строгими TLS-отпечатками браузера и защитой от DPI-анализаторов.
-    * 📄 Ссылка на файл конфигурации: [`./GL_Crimea_ipv6_yan(9.35).yml`](./GL_Crimea_ipv6_yan(9.35).yml)
-    * 🔗 Ссылка для импорта в клиент: `https://raw.githubusercontent.com/JINXPIL/flclash-converter/refs/heads/main/GL_Crimea_ipv6_yan(9.35).yml`
+<table width="100%">
+<thead><tr><th align="left">Платформа</th><th align="left">Конфигурация</th><th align="left">Ссылка для импорта</th></tr></thead>
+<tbody>
+<tr>
+  <td><b>Happ (Routing)</b></td>
+  <td>Оптимизировано для Крыма, СевГУ, вшит AdBlock</td>
+  <td>
+    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/refs/heads/main/HAPP_INSTALL.DEEPLINK">🔗 Быстрая установка (Deeplink)</a><br>
+    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/refs/heads/main/rus_vp_happ.json">📄 Просмотр кода (JSON)</a>
+  </td>
+</tr>
+<tr>
+  <td><b>Mihomo / Clash</b></td>
+  <td>v79.0 Ultimate (Защита от DPI-анализаторов, строгий TLS)</td>
+  <td><a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/refs/heads/main/GL_Crimea_ipv6_yan(9.35).yml">🔗 Импорт YML Конфига</a></td>
+</tr>
+</tbody>
+</table>
+
+---
+
+### 🚦 Что внутри маршрутизации (Правила)
+
+Надежный "хирургический" сплит-туннелинг, чтобы нужные ресурсы летали без задержек, а заблокированные — открывались.
+
+<table width="100%">
+<tbody>
+<tr>
+  <td>🔴 <b>BLOCK (Блокировка)</b></td>
+  <td>Реклама, трекеры, телеметрия (экономим трафик сервера и батарею устройства)</td>
+</tr>
+<tr>
+  <td>🟢 <b>DIRECT (Напрямую)</b></td>
+  <td>Крымские провайдеры, СевГУ, Банки РФ, Госуслуги (идеально низкий пинг, нет блокировок от банков за подозрительные IP)</td>
+</tr>
+<tr>
+  <td>🔵 <b>PROXY (Через VPN)</b></td>
+  <td>YouTube, Instagram, ChatGPT, зарубежные CDN и весь остальной заблокированный трафик</td>
+</tr>
+</tbody>
+</table>
+
+---
+
+### 🛡️ Настройки DNS
+
+<table width="100%">
+<thead><tr><th align="center">Назначение</th><th align="left">Сервер</th><th align="left">Зачем</th></tr></thead>
+<tbody>
+<tr>
+  <td align="center">🏠 <b>DIRECT (РФ/Крым)</b></td>
+  <td><a href="https://dns.yandex.ru/">Яндекс DNS</a> <code>77.88.8.8</code></td>
+  <td>Быстрый резолв внутренних ресурсов, низкий пинг в РФ, работает без включенного VPN.</td>
+</tr>
+<tr>
+  <td align="center">🌍 <b>PROXY (За рубеж)</b></td>
+  <td><a href="https://developers.cloudflare.com/1.1.1.1/">Cloudflare</a> / <a href="https://developers.google.com/speed/public-dns/">Google</a></td>
+  <td>Надежный резолвинг для проксируемого трафика, защита от подмены DNS ответов от местных провайдеров.</td>
+</tr>
+</tbody>
+</table>
 
 ---
 > [!NOTE]
@@ -177,4 +232,4 @@
 
 **Если Network Builder ULTRA помог вам, не забудьте поставить звезду! Это мотивирует развивать проект дальше.** :star2:
 
-[![Star History Chart](https://api.star-history.com/svg?repos=jinxpil/flclash-converter&type=Date)](https://star-history.com/#jinxpil/flclash-converter&Date)
+[![Star History Chart](https://starchart.cc/JINXPIL/flclash-converter.svg?variant=adaptive)](https://starchart.cc/JINXPIL/flclash-converter)
