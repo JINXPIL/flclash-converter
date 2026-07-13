@@ -116,8 +116,8 @@
   <td><b>Happ (Routing)</b></td>
   <td>Оптимизировано для Крыма, СевГУ, вшит AdBlock</td>
   <td>
-    <a href="https://github.com/JINXPIL/flclash-converter/blob/main/configuration/HAPP_INSTALL.DEEPLINK">🔗 Получить Deeplink-ссылку</a><br>
-    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/configuration/rus_vp_happ.json">📄 Просмотр кода (JSON)</a>
+    <a href="https://jinxpil.github.io/flclash-converter/happ.html">⚡ Быстрая установка (1 клик)</a><br>
+    <a href="https://github.com/JINXPIL/flclash-converter/blob/main/configuration/HAPP_INSTALL.DEEPLINK">🔗 Диплинк (Текст)</a>
   </td>
 </tr>
 <tr>
