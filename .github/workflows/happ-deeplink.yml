@@ -1,0 +1,32 @@
+name: Generate Happ Deeplink
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'rus_vp_happ.json' # Экшен запустится только если ты обновил этот файл
+
+jobs:
+  generate-deeplink:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Даем права боту на коммит
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Convert JSON to Base64 and create Deeplink
+        run: |
+          # Кодируем твой JSON в base64 без переносов строк (-w 0)
+          BASE64=$(cat rus_vp_happ.json | base64 -w 0)
+          # Создаем файл с магической ссылкой, onadd значит "Добавить и сразу включить"
+          echo -n "happ://routing/onadd/$BASE64" > HAPP_INSTALL.DEEPLINK
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add HAPP_INSTALL.DEEPLINK
+          git commit -m "⚡ Auto-generate Happ Deeplink" || echo "No changes to commit"
+          git push
