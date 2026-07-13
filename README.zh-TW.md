@@ -8,25 +8,25 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/jinxpil/flclash-converter/releases">
-    <img src="https://img.shields.io/github/v/release/jinxpil/flclash-converter?style=for-the-badge&logo=github&color=181717" alt="Release">
+  <a href="https://github.com/JINXPIL/flclash-converter/releases">
+    <img src="https://img.shields.io/github/v/release/JINXPIL/flclash-converter?style=for-the-badge&logo=github&color=181717" alt="Release">
   </a>
-  <a href="https://github.com/jinxpil/flclash-converter/releases/latest">
-    <img src="https://img.shields.io/github/downloads/jinxpil/flclash-converter/total?style=for-the-badge&color=brightgreen" alt="Downloads">
+  <a href="https://github.com/JINXPIL/flclash-converter/releases/latest">
+    <img src="https://img.shields.io/github/downloads/JINXPIL/flclash-converter/total?style=for-the-badge&color=brightgreen" alt="Downloads">
   </a>
   <a href="https://opensource.org/licenses/MIT">
     <img src="https://img.shields.io/badge/license-MIT-blue.svg?style=for-the-badge&logo=opensourceinitiative&logoColor=white" alt="License">
   </a>
-  <a href="https://github.com/jinxpil/flclash-converter/stargazers">
-    <img src="https://img.shields.io/github/stars/jinxpil/flclash-converter?style=for-the-badge&color=yellow" alt="Stars">
+  <a href="https://github.com/JINXPIL/flclash-converter/stargazers">
+    <img src="https://img.shields.io/github/stars/JINXPIL/flclash-converter?style=for-the-badge&color=yellow" alt="Stars">
   </a>
 </p>
 
 <h1 align="center">⚡ Network Builder v17.05 ULTRA</h1>
 
 <p align="center">
-  <b>一款極其強大且 100% 本地運行的 Web 工具，用於管理海量代理伺服器資料庫。</b><br>
-  <i>為 FlClash、Exclave、Sing-box 和 Clash Meta 提供解析、轉換和深度優化的配置。</i>
+  <b>極其強大的 100% 本地 Web 工具，用於管理海量代理伺服器資料庫。</b><br>
+  <i>為 FlClash、Exclave、Sing-box 和 Clash Meta 提供配置解析、轉換和深度優化。</i>
 </p>
 
 <p align="center">
@@ -44,21 +44,21 @@
 </p>
 
 <p align="center">
-  🤖 <b>也請關注我的第二個專案：</b><br>
+  🤖 <b>另請關注我的第二個專案：</b><br>
   👉 <a href="https://github.com/JINXPIL/json-yaml-ai"><b>JSON-YAML-AI</b></a> 👈
 </p>
 
 > [!IMPORTANT]
-> **零信任與隱私優先。** 所有運算均在您的瀏覽器中嚴格本地執行。沒有任何數據會離開您的裝置。本工具僅為教育目的而創建，用於深入研究網路協議。
+> **零信任與隱私至上。** 所有計算嚴格在您的瀏覽器本地進行。沒有任何資料會離開您的裝置。該工具專為教育目的和深度網路協議分析而建立。
 
 > [!WARNING]
-> **注意：YAML 訂閱和超時 (Timeout) 問題：**
-> 許多 VPN 提供商故意（或由於 API 設定不當）限制第三方客戶端匯出訂閱。伺服器可能成功加載到您的列表中，但在嘗試連線時會進入無限超時。
-> 💡 **如何排查原因：** 如果您獲取同一個節點的「原始」連結（例如 `vless://...` 或 JSON 程式碼），將其手動添加為本地設定檔，並且 **它可以正常運作** —— 那麼問題 100% 出在提供商那邊。這意味著在嘗試更新訂閱時，他們的伺服器根據 `User-Agent` 攔截了客戶端的請求。在其他情況下，超時可能是由於防火牆對協議特徵進行了精準封鎖。
+> **關於 YAML 訂閱和超時 (Timeout) 的警告：**
+> 許多 VPN 供應商在匯出訂閱時故意（或由於 API 設定不當）限制第三方客戶端。伺服器可能成功載入您的列表中，但在嘗試連線時會導致無限超時。
+> 💡 **如何檢查問題所在：** 如果您獲取同一節點的「原始」連結（例如 `vless://...` 或 JSON 程式碼），將其作為本地設定檔手動新增，並且 **它可以正常運作** — 那麼問題 100% 出在供應商那邊。這意味著他們的伺服器在嘗試更新訂閱時透過 `User-Agent` 阻止了您的客戶端請求。在其他情況下，超時可能是由於您的 ISP (DPI) 針對協議簽名進行了定向封鎖。
 
 ---
 
-### 📸 介面展示 (ULTRA Design)
+### 📸 介面 (ULTRA Design)
 
 <p align="center">
   <a href="https://raw.githubusercontent.com/jinxpil/flclash-converter/main/media/Gemini_Generated_Image_w0ysv7w0ysv7w0ys.png" target="_blank">
@@ -78,13 +78,13 @@
 
 ---
 
-### 🔥 17.05 ULTRA 版本更新了什麼？ (高併發完美版)
+### 🔥 17.05 ULTRA 版本有什麼新功能？ (The HighLoad Perfection)
 
-* 🌐 **全面協議擴展：** 增加對 **VMess、Hysteria2 (hy2)、Shadowsocks (SS) 和 ShadowsocksR (SSR)** 的完整解析支援。
-* 🚀 **極限效能 (HighLoad)：** 引入非同步分塊處理與 `Set` 字典。DOM 虛擬化技術讓您在毫秒內加載並去重 **250,000+ 個節點**，瀏覽器絲滑不卡頓！
-* 🛡️ **防彈級 YAML 淨化器：** 工業級準入控制。腳本會自動清理公共節點庫中的垃圾（不可見 ASCII 字元、虛假的 `2022-blake3` 加密、空密碼），確保 100% 穩定匯入 Mihomo。
-* ⚙️ **徹底解決超時問題：** YAML 生成器已根據 Mihomo 嚴格標準重寫（添加了 `alpn`、`skip-cert-verify: true`、`servername` 以及改進的 Fake-IP DNS 路由）。
-* 🎨 **全新 UI/UX：** 獨立的明/暗主題（支援分別儲存自訂顏色），以及**「訂閱模式」開關**，可將 RAW 連結（Pastebin/GitHub）直接嵌入到 `proxy-providers` 模組中。
+* 🌐 **全球協議擴展：** 增加了對 **VMess, Hysteria2 (hy2), Shadowsocks (SS) 和 ShadowsocksR (SSR)** 的完整解析支援。
+* 🚀 **極限性能 (HighLoad)：** 引入了非同步分塊和 `Set` 字典。DOM 虛擬化允許在幾毫秒內載入和去重 **250,000+ 個節點**，而不會使瀏覽器崩潰！
+* 🛡️ **穿甲級 YAML 淨化器：** 工業級面部識別控制。腳本自動銷毀公共列表中的垃圾（不可見的 ASCII 字元，偽造的 `2022-blake3` 密碼，空密碼），並保證 100% 穩定匯入 Mihomo。
+* ⚙️ **戰勝超時：** YAML 生成器已被重寫以滿足嚴格的 Mihomo 標準（新增了 `alpn`, `skip-cert-verify: true`, `servername` 和增強的 Fake-IP DNS）。
+* 🎨 **全新的 UI/UX：** 獨立的淺色/深色主題以及獨立的顏色儲存，以及一個 **「訂閱模式」切換開關**，用於將 RAW 連結（Pastebin/GitHub）直接嵌入到 `proxy-providers` 區塊中。
 
 ---
 
@@ -105,43 +105,106 @@
 
 ---
 
-### 🎯 配置與路由 (預設)
+### 🎯 開箱即用的預設
 
-為了避免在頁面上堆砌大量程式碼，所有現成的預設配置都已提取到獨立的儲存庫文件中。
+為了避免頁面充滿程式碼，所有現成的預設都已移至以客戶端命名的單獨資料夾中。
 
-* 🌐 **Happ 分流配置** — 透過 `routing.happ.su` 建構的優化規則預設（繞過限制、AdBlock等）。**嚴格**專為 Happ 客戶端設計。
-    * 📄 配置文件連結：[`./rus_vp_happ.json`](./rus_vp_happ.json)
-    * 🔗 客戶端匯入連結：`https://raw.githubusercontent.com/JINXPIL/flclash-converter/refs/heads/main/rus_vp_happ.json`
-* 🛠️ **優化的 YAML 配置 (Mihomo/Clash)** — v79.0 Ultimate，具備嚴格的 TLS 瀏覽器指紋和防 DPI 嗅探保護。
-    * 📄 配置文件連結：[`./GL_Crimea_ipv6_yan(9.35).yml`](./GL_Crimea_ipv6_yan(9.35).yml)
-    * 🔗 客戶端匯入連結：`https://raw.githubusercontent.com/JINXPIL/flclash-converter/refs/heads/main/GL_Crimea_ipv6_yan(9.35).yml`
+<table width="100%">
+<thead><tr><th align="left">平台</th><th align="left">配置</th><th align="left">匯入連結</th></tr></thead>
+<tbody>
+<tr>
+  <td><b>Happ (Routing)</b></td>
+  <td>專為俄羅斯地區優化，內建廣告攔截</td>
+  <td>
+    <a href="https://jinxpil.github.io/flclash-converter/happ.html">⚡ 快速安裝 (一鍵)</a><br>
+    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/HAPP/DEFAULT.json">📄 查看程式碼 (JSON)</a>
+  </td>
+</tr>
+<tr>
+  <td><b>INCY (Routing)</b></td>
+  <td>專為俄羅斯地區優化，內建廣告攔截</td>
+  <td>
+    <a href="https://jinxpil.github.io/flclash-converter/incy.html">⚡ 快速安裝 (一鍵)</a><br>
+    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/INCY/DEFAULT.json">📄 查看程式碼 (JSON)</a>
+  </td>
+</tr>
+<tr>
+  <td><b>Mihomo / Clash Meta</b></td>
+  <td>v79.0 Ultimate (DPI 規避, 嚴格的 TLS)</td>
+  <td><a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/MIHOMO/ULTIMATE.yml">🔗 匯入 YML 配置</a></td>
+</tr>
+</tbody>
+</table>
+
+---
+
+### 🚦 路由規則內部邏輯
+
+可靠的「外科手術式」分流，以便所需資源無延遲載入，而受阻的資源變得可存取。
+
+<table width="100%">
+<tbody>
+<tr>
+  <td>🔴 <b>BLOCK (阻止)</b></td>
+  <td>廣告，追蹤器，遙測（節省伺服器流量和設備電池）。</td>
+</tr>
+<tr>
+  <td>🟢 <b>DIRECT (直連)</b></td>
+  <td>本地 ISP，國內銀行，政府服務（理想的低延遲，銀行不會因可疑 IP 封禁）。</td>
+</tr>
+<tr>
+  <td>🔵 <b>PROXY (代理)</b></td>
+  <td>YouTube, Instagram, ChatGPT, 國外 CDN 和所有其他被封鎖的流量。</td>
+</tr>
+</tbody>
+</table>
+
+---
+
+### 🛡️ DNS 設定
+
+<table width="100%">
+<thead><tr><th align="center">目的</th><th align="left">伺服器</th><th align="left">原因</th></tr></thead>
+<tbody>
+<tr>
+  <td align="center">🏠 <b>DIRECT (國內)</b></td>
+  <td><a href="https://dns.yandex.ru/">Yandex DNS</a> <code>77.88.8.8</code></td>
+  <td>快速解析內部資源，本地延遲低，無需啟動 VPN 即可運作。</td>
+</tr>
+<tr>
+  <td align="center">🌍 <b>PROXY (國外)</b></td>
+  <td><a href="https://developers.cloudflare.com/1.1.1.1/">Cloudflare</a> / <a href="https://developers.google.com/speed/public-dns/">Google</a></td>
+  <td>代理流量的可靠解析，防止本地 ISP 的 DNS 欺騙。</td>
+</tr>
+</tbody>
+</table>
 
 ---
 > [!NOTE]
-> 目前，像 **NekoBox** 和 **NekoRay** 這類熱門客戶端已被認為是過時的。建議遷移到基於最新的 **sing-box** 和 **Xray** 核心的現代優化替代方案（例如 **Exclave**，它完全復刻了 NekoBox 的介面，或者 **Incy**）。
+> 諸如 **NekoBox** 和 **NekoRay** 之類的流行客戶端目前已被視為過時。建議切換到基於最新 **sing-box** 和 **Xray** 核心的現代和優化替代方案（例如，完全複製 NekoBox 介面的 **Exclave**，或 **Incy**）。
 
 <details>
 <summary><b>🤖 Android</b></summary>
 
-* [v2RayTun](https://v2raytun.com/) — 基於 Xray Core 的高速、安全客戶端。
-* [FlClash](https://github.com/chen08209/FlClash) — 優秀的跨平台客戶端。
-* [Incy](https://incy.cc/) — 支援一鍵匯入的現代快速客戶端。
-* [Happ](https://www.happ.su/main) — 方便管理伺服器列表的代理工具。
-* [Exclave](https://github.com/ExclaveNetwork/Exclave) — NekoBox 的現代替代品，介面熟悉。
-* [Sing-box](https://github.com/SagerNet/sing-box) — 用於高級配置的官方純淨核心。
+* [v2RayTun](https://v2raytun.com/) — 基於 Xray Core 的高速安全客戶端。
+* [FlClash](https://github.com/chen08209/FlClash) — 主要的跨平台客戶端。
+* [Incy](https://incy.cc/) — 現代，快速的客戶端，支援一鍵匯入。
+* [Happ](https://www.happ.su/main) — 用於方便管理伺服器列表的代理實用程式。
+* [Exclave](https://github.com/ExclaveNetwork/Exclave) — NekoBox 的現代替代品，具有熟悉的 UI。
+* [Sing-box](https://github.com/SagerNet/sing-box) — 官方純淨核心，用於高級配置。
 * [Hiddify App](https://github.com/hiddify/hiddify-app) — 適用於任何配置類型的通用客戶端。
-* [v2rayNG](https://github.com/2dust/v2rayNG) — 基於 Xray 核心的穩定經典方案。
-* [Karing](https://github.com/KaringX/karing) — 功能豐富的圖形介面。
+* [v2rayNG](https://github.com/2dust/v2rayNG) — Xray 核心的穩定經典解決方案。
+* [Karing](https://github.com/KaringX/karing) — 功能豐富的 GUI。
 * [Clash Meta for Android](https://github.com/MetaCubeX/ClashMetaForAndroid)
-* ~~[NekoBox For Android](https://github.com/MatsuriDayo/NekoBoxForAndroid)~~ *(已過時)*
+* ~~[NekoBox For Android](https://github.com/MatsuriDayo/NekoBoxForAndroid)~~ *(已棄用)*
 </details>
 
 <details>
 <summary><b>🍏 iOS</b></summary>
 
-* [v2RayTun](https://v2raytun.com/) — 基於 Xray Core 的高速、安全客戶端。
-* [Incy](https://incy.cc/) — App Store 上出色的現代客戶端。
-* [Happ](https://www.happ.su/main) — 舒適的代理工具。
+* [v2RayTun](https://v2raytun.com/) — 基於 Xray Core 的高速安全客戶端。
+* [Incy](https://incy.cc/) — App Store 中優秀的現代客戶端。
+* [Happ](https://www.happ.su/main) — 舒適的代理實用程式。
 * [Karing](https://apps.apple.com/us/app/karing/id6472431552)
 * [Clash.MI](https://apps.apple.com/us/app/clash-mi/id6744321968)
 * [Stash](https://apps.apple.com/us/app/stash-rule-based-proxy/id1596063349)
@@ -152,29 +215,29 @@
 <details>
 <summary><b>💻 Desktop (Win/Mac/Linux)</b></summary>
 
-* [v2RayTun](https://v2raytun.com/) — 基於 Xray Core 的高速、安全客戶端。
+* [v2RayTun](https://v2raytun.com/) — 基於 Xray Core 的高速安全客戶端。
 * [Happ](https://www.happ.su/main) — 跨平台桌面版本。
-* [v2rayN](https://github.com/2dust/v2rayN) — Windows 上強大的可定制客戶端。
-* [FlClash](https://github.com/chen08209/FlClash) — 極簡快速的 GUI。
+* [v2rayN](https://github.com/2dust/v2rayN) — 適用於 Windows 的強大可客製化客戶端。
+* [FlClash](https://github.com/chen08209/FlClash) — 極簡且快速的 GUI。
 * [Karing](https://github.com/KaringX/karing)
 * [Clash Verge Rev](https://github.com/clash-verge-rev/clash-verge-rev)
-* ~~[NekoRay](https://github.com/MatsuriDayo/nekoray)~~ *(已過時)*
+* ~~[NekoRay](https://github.com/MatsuriDayo/nekoray)~~ *(已棄用)*
 </details>
 
 ---
 
 ### 🛡️ 替代工具 (DPI 繞過)
 
-*如果標準 VPN 協議被您的 ISP 完全封鎖，請使用本地的深度包檢測繞過工具：*
+*如果標準 VPN 協議被您的 ISP 或 DPI 完全封鎖，請使用本地深度封包檢測繞過工具：*
 
-* [Zapret](https://github.com/bol-van/zapret) — 系統級別最強大、最靈活的深度 DPI 繞過工具。
-* [Zapret-discord-youtube](https://github.com/Flowseal/zapret-discord-youtube) — 針對特定流行服務優化的現成腳本。
-* [ByeByeDPI](https://github.com/romanvht/ByeByeDPI) — 久經考驗的經典 Android 本地運行方案。
+* [Zapret](https://github.com/bol-van/zapret) — 在系統層面進行深度 DPI 繞過的最強大，最靈活的工具。
+* [Zapret-discord-youtube](https://github.com/Flowseal/zapret-discord-youtube) — 針對特定熱門服務優化和配置的現成腳本。
+* [ByeByeDPI](https://github.com/romanvht/ByeByeDPI) — 在 Android 上本地執行的經過驗證的經典解決方案。
 
 ---
 
-### ⭐ 支援項目
+### ⭐ 支援該專案
 
-**如果 Network Builder ULTRA 幫助到了您，請不要忘記點個 Star！這將激勵我們繼續開發。** :star2:
+**如果 Network Builder ULTRA 幫助了您，請不要忘記留下一顆星！這會激發該專案的進一步發展。** :star2:
 
-[![Star History Chart](https://api.star-history.com/svg?repos=jinxpil/flclash-converter&type=Date)](https://star-history.com/#jinxpil/flclash-converter&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=JINXPIL/flclash-converter&type=Date)](https://star-history.com/#JINXPIL/flclash-converter&Date)
