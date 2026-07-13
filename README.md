@@ -107,7 +107,7 @@
 
 ### 🎯 Готовые пресеты
 
-Чтобы не засорять страницу портянками кода, все готовые пресеты вынесены в отдельную папку `configuration/`.
+Чтобы не засорять страницу портянками кода, все готовые пресеты вынесены в отдельные папки по названиям клиентов.
 
 <table width="100%">
 <thead><tr><th align="left">Платформа</th><th align="left">Конфигурация</th><th align="left">Ссылка для импорта</th></tr></thead>
@@ -117,13 +117,21 @@
   <td>Оптимизировано для Крыма, СевГУ, вшит AdBlock</td>
   <td>
     <a href="https://jinxpil.github.io/flclash-converter/happ.html">⚡ Быстрая установка (1 клик)</a><br>
-    <a href="https://github.com/JINXPIL/flclash-converter/blob/main/configuration/HAPP_INSTALL.DEEPLINK">🔗 Диплинк (Текст)</a>
+    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/HAPP/DEFAULT.json">📄 Просмотр кода (JSON)</a>
   </td>
 </tr>
 <tr>
-  <td><b>Mihomo / Clash</b></td>
+  <td><b>INCY (Routing)</b></td>
+  <td>Оптимизировано для Крыма, СевГУ, вшит AdBlock</td>
+  <td>
+    <a href="https://jinxpil.github.io/flclash-converter/incy.html">⚡ Быстрая установка (1 клик)</a><br>
+    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/INCY/DEFAULT.json">📄 Просмотр кода (JSON)</a>
+  </td>
+</tr>
+<tr>
+  <td><b>Mihomo / Clash Meta</b></td>
   <td>v79.0 Ultimate (Защита от DPI-анализаторов, строгий TLS)</td>
-  <td><a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/configuration/GL_Crimea_ipv6_yan(9.35).yml">🔗 Импорт YML Конфига</a></td>
+  <td><a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/MIHOMO/ULTIMATE.yml">🔗 Импорт YML Конфига</a></td>
 </tr>
 </tbody>
 </table>
