@@ -6,7 +6,7 @@ on:
     branches:
       - main
     paths:
-      - 'HAPP/DEFAULT.json' # Теперь бот следит за файлом в папке HAPP
+      - 'HAPP/DEFAULT.json'
 
 permissions:
   contents: write
@@ -23,25 +23,23 @@ jobs:
         run: |
           set -euo pipefail
           
-          # Получаем текущее время
           NOW_EPOCH="$(date -u +%s)"
           
-          # 1. Обновляем время в исходном файле HAPP/DEFAULT.json
+          # 1. Обновляем время
           tmp="$(mktemp)"
           jq --arg ts "$NOW_EPOCH" '.LastUpdated = $ts' HAPP/DEFAULT.json > "$tmp"
           mv "$tmp" HAPP/DEFAULT.json
           
-          # 2. Создаем папку INCY и копируем туда актуальный JSON
-          # (чтобы у пользователей INCY был свой файл для скачивания)
+          # 2. Создаем папку INCY и копируем JSON
           mkdir -p INCY
           cp HAPP/DEFAULT.json INCY/DEFAULT.json
           
-          # 3. Сжимаем JSON и кодируем в Base64
+          # 3. Кодируем в Base64
           BASE64=$(jq -c . HAPP/DEFAULT.json | base64 -w 0)
           
-          # 4. Создаем магические ссылки (диплинки) для обоих клиентов!
-          printf 'happ://routing/onadd/%s\n' "$BASE64" > HAPP/DEFAULT.DEEPLINK
-          printf 'incy://routing/onadd/%s\n' "$BASE64" > INCY/DEFAULT.DEEPLINK
+          # 4. СОЗДАЕМ ФАЙЛЫ С ТВОИМИ ИМЕНАМИ!
+          printf 'happ://routing/onadd/%s\n' "$BASE64" > HAPP/HAPP_INSTALL.DEEPLINK
+          printf 'incy://routing/onadd/%s\n' "$BASE64" > INCY/INCY_INSTALL.DEEPLINK
 
       - name: 🚀 Commit and push changes
         shell: bash
@@ -51,7 +49,6 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
-          # Добавляем папки HAPP и INCY целиком
           git add HAPP/ INCY/
           
           if git diff --cached --quiet; then
