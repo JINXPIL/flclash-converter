@@ -107,7 +107,7 @@
 
 ### 🎯 Готовые пресеты
 
-Чтобы не засорять страницу портянками кода, все готовые пресеты вынесены в отдельные файлы репозитория.
+Чтобы не засорять страницу портянками кода, все готовые пресеты вынесены в отдельную папку `configuration/`.
 
 <table width="100%">
 <thead><tr><th align="left">Платформа</th><th align="left">Конфигурация</th><th align="left">Ссылка для импорта</th></tr></thead>
@@ -116,14 +116,14 @@
   <td><b>Happ (Routing)</b></td>
   <td>Оптимизировано для Крыма, СевГУ, вшит AdBlock</td>
   <td>
-    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/refs/heads/main/HAPP_INSTALL.DEEPLINK">🔗 Быстрая установка (Deeplink)</a><br>
-    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/refs/heads/main/rus_vp_happ.json">📄 Просмотр кода (JSON)</a>
+    <a href="https://github.com/JINXPIL/flclash-converter/blob/main/configuration/HAPP_INSTALL.DEEPLINK">🔗 Получить Deeplink-ссылку</a><br>
+    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/configuration/rus_vp_happ.json">📄 Просмотр кода (JSON)</a>
   </td>
 </tr>
 <tr>
   <td><b>Mihomo / Clash</b></td>
   <td>v79.0 Ultimate (Защита от DPI-анализаторов, строгий TLS)</td>
-  <td><a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/refs/heads/main/GL_Crimea_ipv6_yan(9.35).yml">🔗 Импорт YML Конфига</a></td>
+  <td><a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/configuration/GL_Crimea_ipv6_yan(9.35).yml">🔗 Импорт YML Конфига</a></td>
 </tr>
 </tbody>
 </table>
