@@ -1,32 +1,68 @@
-name: Generate Happ Deeplink
+name: ⚡ Network Builder - Auto-Deploy
 
 on:
+  # Позволяет запускать скрипт вручную с кнопки на GitHub
+  workflow_dispatch: 
   push:
     branches:
       - main
     paths:
-      - 'rus_vp_happ.json' # Экшен запустится только если ты обновил этот файл
+      # Скрипт следит только за файлом в новой папке
+      - 'configuration/rus_vp_happ.json' 
+
+permissions:
+  contents: write
 
 jobs:
-  generate-deeplink:
+  build-and-deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write # Даем права боту на коммит
     steps:
-      - name: Checkout repository
+      - name: 📥 Checkout repository
         uses: actions/checkout@v4
 
-      - name: Convert JSON to Base64 and create Deeplink
+      - name: ⚙️ Validate, Update Timestamp and Generate Deeplink
+        shell: bash
         run: |
-          # Кодируем твой JSON в base64 без переносов строк (-w 0)
-          BASE64=$(cat rus_vp_happ.json | base64 -w 0)
-          # Создаем файл с магической ссылкой, onadd значит "Добавить и сразу включить"
-          echo -n "happ://routing/onadd/$BASE64" > HAPP_INSTALL.DEEPLINK
+          # Включаем строгий режим (как у PRO-разработчиков): 
+          # Скрипт немедленно остановится, если где-то произойдет ошибка
+          set -euo pipefail
+          
+          # Получаем текущее время в формате UNIX (секунды)
+          NOW_EPOCH="$(date -u +%s)"
+          
+          echo "Текущее время: $NOW_EPOCH"
+          
+          # 1. Берем твой JSON, через утилиту `jq` обновляем в нем параметр LastUpdated 
+          # на текущее время. Если в коде была ошибка (забыл запятую), jq это поймает и остановит скрипт.
+          tmp="$(mktemp)"
+          jq --arg ts "$NOW_EPOCH" '.LastUpdated = $ts' configuration/rus_vp_happ.json > "$tmp"
+          mv "$tmp" configuration/rus_vp_happ.json
+          
+          # 2. Сжимаем JSON в одну строку (убираем пробелы) и кодируем в Base64. 
+          # Это делает диплинк короче и надежнее!
+          BASE64=$(jq -c . configuration/rus_vp_happ.json | base64 -w 0)
+          
+          # 3. Сохраняем в файл диплинка
+          printf 'happ://routing/onadd/%s\n' "$BASE64" > configuration/HAPP_INSTALL.DEEPLINK
 
-      - name: Commit and push changes
+      - name: 🚀 Commit and push changes
+        shell: bash
         run: |
+          set -euo pipefail
+          
+          # Представляемся системным ботом GitHub
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add HAPP_INSTALL.DEEPLINK
-          git commit -m "⚡ Auto-generate Happ Deeplink" || echo "No changes to commit"
+          
+          # Добавляем измененные файлы
+          git add configuration/rus_vp_happ.json configuration/HAPP_INSTALL.DEEPLINK
+          
+          # Проверяем, есть ли реальные изменения. Если нет - просто завершаем без ошибки.
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          
+          # Красивый коммит с датой
+          git commit -m "⚡ Auto-update config & Deeplink [$(date -u +%Y-%m-%d %H:%M)]"
           git push
