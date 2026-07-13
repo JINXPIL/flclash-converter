@@ -1,23 +1,110 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Установка Happ Конфигурации...</title>
+    <title>Установка конфигурации Happ...</title>
+    <style>
+        /* Современный темный дизайн в стиле GitHub */
+        body {
+            background-color: #0d1117;
+            color: #c9d1d9;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+            padding: 0 20px;
+        }
+        /* Анимация загрузки */
+        .loader {
+            border: 4px solid #161b22;
+            border-top: 4px solid #58a6ff;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 25px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        h2 { color: #ffffff; margin-bottom: 12px; font-weight: 600; }
+        p { color: #8b949e; line-height: 1.5; max-width: 450px; font-size: 15px; }
+        
+        /* Кнопка ручного запуска */
+        .btn {
+            display: none; /* Скрыта, пока не скачается ссылка */
+            margin-top: 30px;
+            padding: 14px 28px;
+            background-color: #238636;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: background-color 0.2s, transform 0.1s;
+            box-shadow: 0 4px 12px rgba(35, 134, 54, 0.2);
+        }
+        .btn:hover { background-color: #2ea043; }
+        .btn:active { transform: scale(0.97); }
+        
+        .error { color: #ff7b72; display: none; margin-top: 20px; background: rgba(255,123,114,0.1); padding: 15px; border-radius: 8px; border: 1px solid rgba(255,123,114,0.4); }
+    </style>
 </head>
-<body style="background: #121212; color: #ffffff; font-family: sans-serif; text-align: center; padding-top: 20%;">
-    <h2>⏳ Запускаем Happ...</h2>
-    <p>Если приложение не открылось автоматически, проверьте, что оно установлено.</p>
+<body>
+    <div class="loader" id="spinner"></div>
+    <h2 id="status-title">Подготовка конфигурации...</h2>
+    <p id="status-desc">Надежно зашифровано. Загружаем актуальные правила обхода блокировок для вашего устройства.</p>
+
+    <!-- Эта кнопка появится после загрузки -->
+    <a href="#" class="btn" id="manual-btn">🚀 Открыть в приложении Happ</a>
     
+    <div class="error" id="error-msg">❌ Ошибка загрузки. Проверьте интернет-соединение или попробуйте позже.</div>
+
     <script>
-        // Берем твою ссылку из папки configuration и редиректим на неё
-        fetch('https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/configuration/HAPP_INSTALL.DEEPLINK')
-            .then(response => response.text())
+        // Ссылка на твой файл с диплинком
+        const targetUrl = 'https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/configuration/HAPP_INSTALL.DEEPLINK';
+        
+        // ?t=... заставляет GitHub отдать свежий файл, игнорируя кэш
+        fetch(targetUrl + '?t=' + new Date().getTime())
+            .then(response => {
+                if (!response.ok) throw new Error('Ошибка сети');
+                return response.text();
+            })
             .then(text => {
-                window.location.href = text.trim();
+                const deepLink = text.trim();
+                
+                // Проверяем, что скачалась именно ссылка Happ, а не 404 страница
+                if (deepLink.startsWith('happ://')) {
+                    // Убираем крутилку, обновляем текст
+                    document.getElementById('spinner').style.display = 'none';
+                    document.getElementById('status-title').innerText = '✅ Конфигурация готова!';
+                    document.getElementById('status-desc').innerText = 'Если приложение не открылось автоматически, нажмите зеленую кнопку ниже. (Убедитесь, что Happ установлен).';
+                    
+                    // Показываем кнопку
+                    const btn = document.getElementById('manual-btn');
+                    btn.href = deepLink;
+                    btn.style.display = 'inline-block';
+
+                    // Пытаемся сделать авто-редирект (сработает на ПК, но на смартфонах может быть заблокирован)
+                    setTimeout(() => {
+                        window.location.href = deepLink;
+                    }, 600);
+                } else {
+                    throw new Error('Неверный формат диплинка');
+                }
             })
             .catch(err => {
-                document.body.innerHTML = '<h2 style="color: #ff5252;">❌ Ошибка загрузки</h2>';
+                document.getElementById('spinner').style.display = 'none';
+                document.getElementById('status-title').innerText = 'Ошибка';
+                document.getElementById('status-desc').style.display = 'none';
+                document.getElementById('error-msg').style.display = 'block';
+                console.error('Fetch error:', err);
             });
     </script>
 </body>
