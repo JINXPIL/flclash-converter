@@ -2,142 +2,216 @@
 <html lang="ru">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    
-    <!-- CSP: разрешили загрузку новой мощной библиотеки QRious -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; connect-src https://raw.githubusercontent.com https://cdn.jsdelivr.net; style-src 'unsafe-inline'; script-src 'unsafe-inline' https://cdnjs.cloudflare.com; img-src data:;">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>Установка конфигурации Happ...</title>
-    <style>
-        body { background-color: #0d1117; color: #c9d1d9; font-family: -apple-system, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; text-align: center; padding: 0 20px; overflow-y: auto; }
-        .loader { border: 4px solid #161b22; border-top: 4px solid #58a6ff; border-radius: 50%; width: 48px; height: 48px; margin-bottom: 25px; animation: spin 1s linear infinite; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-        h2 { color: #ffffff; margin-bottom: 12px; }
-        p { color: #8b949e; line-height: 1.5; max-width: 450px; }
-        
-        .btn { display: none; margin-top: 25px; padding: 14px 28px; background-color: #238636; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; width: 250px; box-sizing: border-box; }
-        .btn-copy { background-color: #21262d; border: 1px solid #30363d; margin-top: 12px; cursor: pointer; }
-        .btn-copy:hover { background-color: #30363d; }
-        .error { color: #ff7b72; display: none; margin-top: 20px; padding: 15px; border-radius: 8px; background: rgba(255,123,114,0.1); border: 1px solid rgba(255,123,114,0.4); }
-        
-        /* Адаптивный контейнер для QR-кода */
-        .qr-container { display: none; margin-top: 25px; background: #ffffff; padding: 15px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); width: fit-content; }
-        .qr-container canvas { display: block; margin: 0 auto; transition: width 0.1s; }
-        .qr-hint { color: #8b949e; font-size: 13px; margin-top: 15px; }
+    
+    <!-- 🛡️ SECURITY 2026: Strict CSP + Permissions-Policy -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; connect-src https://raw.githubusercontent.com https://cdn.jsdelivr.net; style-src 'unsafe-inline'; script-src 'unsafe-inline' https://cdnjs.cloudflare.com; img-src data:;">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta name="referrer" content="no-referrer">
+    <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), interest-cohort=()">
 
-        /* Стили для ползунка */
-        .slider-box { display: none; margin-top: 15px; width: 100%; max-width: 300px; }
-        .slider-box label { color: #8b949e; font-size: 13px; display: block; margin-bottom: 8px; }
-        .slider-box input[type="range"] { width: 100%; accent-color: #238636; cursor: pointer; }
+    <!-- 🚀 NETWORK: Preconnect -->
+    <link rel="preconnect" href="https://raw.githubusercontent.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+
+    <style>
+        /* 🎨 UI/UX 2026: Плавность, современные системные шрифты, аппаратное ускорение */
+        :root { --bg: #0d1117; --text-main: #c9d1d9; --text-muted: #8b949e; --accent: #238636; --accent-hover: #2ea043; --card: #161b22; }
+        body { background-color: var(--bg); color: var(--text-main); font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; text-align: center; padding: 20px; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+        
+        main { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 400px; }
+        
+        /* Лоадер */
+        .loader { border: 3px solid var(--card); border-top: 3px solid #58a6ff; border-radius: 50%; width: 44px; height: 44px; margin-bottom: 24px; animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite; transform: translateZ(0); }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        
+        h2 { font-size: 22px; margin: 0 0 10px 0; font-weight: 600; letter-spacing: -0.3px; }
+        p { color: var(--text-muted); line-height: 1.5; font-size: 15px; margin: 0 0 24px 0; }
+        
+        /* Кнопки с пружинной анимацией */
+        .btn-group { display: none; width: 100%; gap: 12px; flex-direction: column; animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 24px; background-color: var(--accent); color: #fff; text-decoration: none; border-radius: 10px; font-weight: 600; font-size: 16px; border: none; cursor: pointer; transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1); user-select: none; -webkit-tap-highlight-color: transparent; }
+        .btn:hover { background-color: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(35,134,54,0.2); }
+        .btn:active { transform: scale(0.96); }
+        
+        .btn-secondary { background-color: var(--card); border: 1px solid #30363d; color: var(--text-main); }
+        .btn-secondary:hover { background-color: #1f242c; border-color: #8b949e; }
+        
+        .error { color: #ff7b72; display: none; padding: 16px; border-radius: 10px; background: rgba(255,123,114,0.1); border: 1px solid rgba(255,123,114,0.3); font-size: 14px; animation: fadeUp 0.4s ease; }
+        
+        /* Glassmorphism QR-контейнер */
+        .qr-wrapper { display: none; width: 100%; flex-direction: column; align-items: center; animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .qr-container { background: #fff; padding: 16px; border-radius: 16px; box-shadow: 0 12px 32px rgba(0,0,0,0.5); display: inline-block; }
+        .qr-container canvas { display: block; max-width: 100%; height: auto !important; border-radius: 4px; }
+        
+        /* Ползунок */
+        .slider-box { width: 100%; margin-top: 20px; }
+        .slider-box label { color: var(--text-muted); font-size: 12px; display: block; margin-bottom: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+        input[type="range"] { -webkit-appearance: none; width: 100%; height: 6px; background: var(--card); border-radius: 3px; outline: none; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--text-main); cursor: pointer; transition: transform 0.1s; }
+        input[type="range"]::-webkit-slider-thumb:active { transform: scale(1.2); }
+
+        @keyframes fadeUp {
+            0% { opacity: 0; transform: translateY(15px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
     </style>
-    <!-- Подключаем QRious - лучшую библиотеку для тяжелых данных -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 </head>
 <body>
-    <div class="loader" id="ui-spinner"></div>
-    <h2 id="ui-title">Подготовка конфигурации...</h2>
-    <p id="ui-desc">Безопасное соединение. Загружаем актуальные правила маршрутизации.</p>
-    
-    <div class="qr-container" id="qr-box">
-        <canvas id="qr-canvas"></canvas>
-    </div>
-    
-    <div class="qr-hint" id="qr-hint" style="display:none;">Отсканируйте камерой телефона</div>
+    <main>
+        <div class="loader" id="ui-spinner" role="status"></div>
+        <h2 id="ui-title">Инициализация...</h2>
+        <p id="ui-desc">Устанавливаем защищенное соединение с базой маршрутизации.</p>
+        
+        <!-- UI для десктопа (QR) -->
+        <div class="qr-wrapper" id="qr-wrapper">
+            <div class="qr-container"><canvas id="qr-canvas"></canvas></div>
+            <div class="slider-box">
+                <label for="qr-size">Масштаб QR-кода</label>
+                <input type="range" id="qr-size" min="200" max="500" step="10" value="250" aria-label="Размер QR кода">
+            </div>
+        </div>
 
-    <!-- Ползунок управления размером -->
-    <div class="slider-box" id="slider-box">
-        <label for="qr-size">Размер QR-кода:</label>
-        <input type="range" id="qr-size" min="200" max="650" step="10" value="350">
-    </div>
-
-    <a href="#" class="btn" id="ui-btn">🚀 Открыть в приложении Happ</a>
-    <button class="btn btn-copy" id="ui-copy">📋 Скопировать ссылку</button>
-    
-    <div class="error" id="ui-error"></div>
+        <!-- Кнопки действий -->
+        <div class="btn-group" id="btn-group">
+            <a href="#" class="btn" id="ui-btn">🚀 Открыть в Happ</a>
+            <button class="btn btn-secondary" id="ui-copy">📋 Скопировать ссылку</button>
+            <button class="btn btn-secondary" id="ui-share" style="display:none;">📤 Поделиться с другом</button>
+        </div>
+        
+        <div class="error" id="ui-error" role="alert"></div>
+    </main>
 
     <script>
+        const DOM = {
+            spinner: document.getElementById('ui-spinner'),
+            title: document.getElementById('ui-title'),
+            desc: document.getElementById('ui-desc'),
+            btnGroup: document.getElementById('btn-group'),
+            btnMain: document.getElementById('ui-btn'),
+            btnCopy: document.getElementById('ui-copy'),
+            btnShare: document.getElementById('ui-share'),
+            qrWrapper: document.getElementById('qr-wrapper'),
+            error: document.getElementById('ui-error')
+        };
+
         const sources = [
             `https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/HAPP/HAPP_INSTALL.DEEPLINK?t=${Date.now()}`,
             `https://cdn.jsdelivr.net/gh/JINXPIL/flclash-converter@main/HAPP/HAPP_INSTALL.DEEPLINK`
         ];
 
-        async function fetchLink() {
-            let lastError = '';
+        // 🚀 Оптимизация 1: Ленивая загрузка скрипта QR только для ПК
+        function loadQRious() {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = "https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js";
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        }
+
+        async function fetchConfig() {
             for (let url of sources) {
                 try {
-                    const res = await fetch(url, { cache: 'no-store' });
+                    const controller = new AbortController();
+                    const timeout = setTimeout(() => controller.abort(), 4000);
+                    const res = await fetch(url, { cache: 'no-store', signal: controller.signal });
+                    clearTimeout(timeout);
+                    
                     if (res.status === 404) throw new Error('404');
                     if (res.ok) {
                         const text = (await res.text()).trim();
-                        // Проверяем протокол happ://
                         if (text.startsWith('happ://')) return text;
                     }
-                } catch (e) { lastError = e.message; }
+                } catch (e) { if(e.message === '404') throw e; }
             }
-            throw new Error(lastError === '404' ? '404' : 'NETWORK');
+            throw new Error('NETWORK');
         }
 
-        fetchLink().then(link => {
-            document.getElementById('ui-spinner').style.display = 'none';
-            document.getElementById('ui-title').textContent = '✅ Конфигурация готова!';
-            document.getElementById('ui-desc').innerHTML = 'На телефоне приложение откроется само.<br><b>На ПК:</b> отсканируйте QR-код или скопируйте ссылку.';
-            
-            document.getElementById('ui-btn').href = link;
-            document.getElementById('ui-btn').style.display = 'block';
-            
-            const copyBtn = document.getElementById('ui-copy');
-            copyBtn.style.display = 'block';
-            copyBtn.onclick = function() {
-                navigator.clipboard.writeText(link).then(() => {
-                    copyBtn.textContent = '✅ Скопировано!';
-                    copyBtn.style.backgroundColor = '#238636';
-                    copyBtn.style.borderColor = '#238636';
-                }).catch(err => {
-                    alert('Не удалось скопировать. Выделите ссылку вручную.');
-                });
-            };
-
-            // Генерация QR-кода
+        async function init() {
             try {
-                const qrCanvas = document.getElementById('qr-canvas');
-                const defaultSize = 350;
+                const link = await fetchConfig();
                 
-                // Создаем инстанс QR
-                const qr = new QRious({
-                    element: qrCanvas,
-                    value: link,
-                    size: defaultSize,
-                    level: 'L'
-                });
+                DOM.spinner.style.display = 'none';
+                DOM.title.textContent = '✅ Готово к установке';
+                DOM.btnMain.href = link;
+                DOM.btnGroup.style.display = 'flex';
+
+                const isMobile = /Android|webOS|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth <= 768;
+
+                if (isMobile) {
+                    DOM.desc.textContent = 'Нажмите зеленую кнопку, чтобы применить правила.';
+                    
+                    // 🚀 Оптимизация 2: Нативный Web Share API для телефонов
+                    if (navigator.share) {
+                        DOM.btnShare.style.display = 'flex';
+                        DOM.btnShare.onclick = () => {
+                            navigator.share({
+                                title: 'Happ VPN Routing',
+                                text: 'Установи профиль маршрутизации в 1 клик!',
+                                url: 'https://jinxpil.github.io/flclash-converter/happ.html' // Делимся сайтом, а не Base64
+                            }).catch(() => {});
+                        };
+                    }
+                    
+                    // Автопереход на мобильных
+                    requestAnimationFrame(() => {
+                        setTimeout(() => window.location.replace(link), 400);
+                    });
+                } else {
+                    DOM.desc.innerHTML = 'Отсканируйте камерой смартфона или скопируйте ссылку в десктопный клиент.';
+                    
+                    // Динамически грузим QR-библиотеку только для ПК!
+                    await loadQRious();
+                    const qrCanvas = document.getElementById('qr-canvas');
+                    const qr = new QRious({
+                        element: qrCanvas,
+                        value: link,
+                        size: 250,
+                        level: 'L'
+                    });
+                    
+                    DOM.qrWrapper.style.display = 'flex';
+                    
+                    document.getElementById('qr-size').addEventListener('input', function() {
+                        qr.size = parseInt(this.value, 10);
+                    });
+                }
+
+                // 🚀 Оптимизация 3: Умный клипборд (Toast feedback)
+                DOM.btnCopy.onclick = async () => {
+                    try {
+                        await navigator.clipboard.writeText(link);
+                        DOM.btnCopy.innerHTML = '✅ Скопировано в буфер!';
+                        DOM.btnCopy.style.borderColor = 'var(--accent)';
+                        DOM.btnCopy.style.color = 'var(--accent)';
+                        setTimeout(() => {
+                            DOM.btnCopy.innerHTML = '📋 Скопировать ссылку';
+                            DOM.btnCopy.style.borderColor = '#30363d';
+                            DOM.btnCopy.style.color = 'var(--text-main)';
+                        }, 2500);
+                    } catch (e) {
+                        prompt('Скопируйте эту ссылку:', link);
+                    }
+                };
+
+            } catch (err) {
+                DOM.spinner.style.display = 'none';
+                DOM.title.textContent = 'Ошибка загрузки';
+                DOM.desc.style.display = 'none';
                 
-                // Отображаем элементы
-                document.getElementById('qr-box').style.display = 'block';
-                document.getElementById('qr-hint').style.display = 'block';
-                document.getElementById('slider-box').style.display = 'block';
-
-                // Подключаем ползунок к размеру QR-кода
-                const slider = document.getElementById('qr-size');
-                slider.addEventListener('input', function() {
-                    qr.size = parseInt(this.value, 10);
-                });
-
-            } catch (e) {
-                console.warn('Ошибка рендера QR-кода', e);
+                if (err.message === '404') {
+                    DOM.error.innerHTML = '❌ Файл не найден.<br>Зайдите в GitHub ➔ <b>Actions</b> ➔ Run workflow.';
+                } else {
+                    DOM.error.textContent = '❌ Сетевой сбой. Пожалуйста, отключите AdBlock/VPN для этой страницы.';
+                }
+                DOM.error.style.display = 'block';
             }
+        }
 
-            setTimeout(() => window.location.replace(link), 300);
-
-        }).catch(err => {
-            document.getElementById('ui-spinner').style.display = 'none';
-            document.getElementById('ui-title').textContent = 'Ошибка загрузки';
-            document.getElementById('ui-desc').style.display = 'none';
-            const errBox = document.getElementById('ui-error');
-            if (err.message === '404') {
-                errBox.innerHTML = '❌ Файл диплинка ещё не создан!<br><br>Зайдите на GitHub во вкладку <b>Actions</b> и нажмите <b>Run workflow</b>.';
-            } else {
-                errBox.textContent = '❌ Ошибка сети. Отключите VPN/AdBlock или попробуйте позже.';
-            }
-            errBox.style.display = 'block';
-        });
+        init();
     </script>
 </body>
 </html>
