@@ -3,7 +3,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; connect-src https://raw.githubusercontent.com https://cdn.jsdelivr.net; style-src 'unsafe-inline'; script-src 'unsafe-inline';">
+    
+    <!-- CSP обновлен: разрешена загрузка скрипта qrcode.js и картинок (QR) -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; connect-src https://raw.githubusercontent.com https://cdn.jsdelivr.net; style-src 'unsafe-inline'; script-src 'unsafe-inline' https://cdnjs.cloudflare.com; img-src data:;">
     <title>Установка конфигурации INCY...</title>
     <style>
         body { background-color: #0d1117; color: #c9d1d9; font-family: -apple-system, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; text-align: center; padding: 0 20px; }
@@ -11,26 +13,38 @@
         @keyframes spin { 100% { transform: rotate(360deg); } }
         h2 { color: #ffffff; margin-bottom: 12px; }
         p { color: #8b949e; line-height: 1.5; max-width: 450px; }
+        
         .btn { display: none; margin-top: 25px; padding: 14px 28px; background-color: #238636; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; width: 250px; box-sizing: border-box; }
         .btn-copy { background-color: #21262d; border: 1px solid #30363d; margin-top: 12px; cursor: pointer; }
         .btn-copy:hover { background-color: #30363d; }
         .error { color: #ff7b72; display: none; margin-top: 20px; padding: 15px; border-radius: 8px; background: rgba(255,123,114,0.1); border: 1px solid rgba(255,123,114,0.4); }
+        
+        /* Стили для QR-кода */
+        .qr-container { display: none; margin-top: 25px; background: #ffffff; padding: 15px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+        .qr-container canvas, .qr-container img { display: block; margin: 0 auto; }
+        .qr-hint { color: #8b949e; font-size: 13px; margin-top: 15px; }
     </style>
+    <!-- Локальный генератор QR кодов -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
     <div class="loader" id="ui-spinner"></div>
     <h2 id="ui-title">Подготовка конфигурации...</h2>
     <p id="ui-desc">Безопасное соединение. Загружаем актуальные правила маршрутизации.</p>
     
-    <a href="#" class="btn" id="ui-btn">🚀 Открыть в приложении</a>
+    <!-- Контейнер для QR-кода -->
+    <div class="qr-container" id="qr-box"></div>
+    <div class="qr-hint" id="qr-hint" style="display:none;">Отсканируйте камерой телефона</div>
+
+    <a href="#" class="btn" id="ui-btn">🚀 Открыть в приложении INCY</a>
     <button class="btn btn-copy" id="ui-copy">📋 Скопировать ссылку</button>
     
     <div class="error" id="ui-error"></div>
 
     <script>
         const sources = [
-            `https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/INCY/INCY_INSTALL.DEEPLINK?t=${Date.now()}`,
-            `https://cdn.jsdelivr.net/gh/JINXPIL/flclash-converter@main/INCY/INCY_INSTALL.DEEPLINK`
+            `https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/INCY_INSTALL.DEEPLINK?t=${Date.now()}`,
+            `https://cdn.jsdelivr.net/gh/JINXPIL/flclash-converter@main/INCY_INSTALL.DEEPLINK`
         ];
 
         async function fetchLink() {
@@ -51,13 +65,12 @@
         fetchLink().then(link => {
             document.getElementById('ui-spinner').style.display = 'none';
             document.getElementById('ui-title').textContent = '✅ Конфигурация готова!';
-            document.getElementById('ui-desc').innerHTML = 'На телефоне приложение откроется само.<br><b>На ПК:</b> нажмите "Скопировать" и вставьте в приложение.';
+            document.getElementById('ui-desc').innerHTML = 'На телефоне приложение откроется само.<br><b>На ПК:</b> отсканируйте QR-код или скопируйте ссылку.';
             
-            // Зеленая кнопка для телефонов
+            // Показываем кнопки
             document.getElementById('ui-btn').href = link;
             document.getElementById('ui-btn').style.display = 'block';
             
-            // Кнопка копирования для ПК
             const copyBtn = document.getElementById('ui-copy');
             copyBtn.style.display = 'block';
             copyBtn.onclick = function() {
@@ -69,6 +82,27 @@
                     alert('Не удалось скопировать. Выделите ссылку вручную.');
                 });
             };
+
+            // Генерируем QR-код
+            try {
+                const qrBox = document.getElementById('qr-box');
+                qrBox.style.display = 'block';
+                document.getElementById('qr-hint').style.display = 'block';
+                
+                new QRCode(qrBox, {
+                    text: link,
+                    width: 220,
+                    height: 220,
+                    colorDark : "#000000",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.L // Уровень сжатия, чтобы вместить больше текста
+                });
+            } catch (e) {
+                // Если код слишком длинный для QR, просто скрываем его (кнопки останутся)
+                console.warn('QR-код слишком длинный', e);
+                document.getElementById('qr-box').style.display = 'none';
+                document.getElementById('qr-hint').style.display = 'none';
+            }
 
             // Пытаемся открыть автоматически (сработает на смартфонах)
             setTimeout(() => window.location.replace(link), 300);
