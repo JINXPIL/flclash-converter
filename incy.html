@@ -42,9 +42,10 @@
     <div class="error" id="ui-error"></div>
 
     <script>
+        // ИСПРАВЛЕННЫЙ ПУТЬ: Теперь ищет файл в папке INCY
         const sources = [
-            `https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/INCY_INSTALL.DEEPLINK?t=${Date.now()}`,
-            `https://cdn.jsdelivr.net/gh/JINXPIL/flclash-converter@main/INCY_INSTALL.DEEPLINK`
+            `https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/INCY/INCY_INSTALL.DEEPLINK?t=${Date.now()}`,
+            `https://cdn.jsdelivr.net/gh/JINXPIL/flclash-converter@main/INCY/INCY_INSTALL.DEEPLINK`
         ];
 
         async function fetchLink() {
@@ -95,16 +96,15 @@
                     height: 220,
                     colorDark : "#000000",
                     colorLight : "#ffffff",
-                    correctLevel : QRCode.CorrectLevel.L // Уровень сжатия, чтобы вместить больше текста
+                    correctLevel : QRCode.CorrectLevel.L
                 });
             } catch (e) {
-                // Если код слишком длинный для QR, просто скрываем его (кнопки останутся)
                 console.warn('QR-код слишком длинный', e);
                 document.getElementById('qr-box').style.display = 'none';
                 document.getElementById('qr-hint').style.display = 'none';
             }
 
-            // Пытаемся открыть автоматически (сработает на смартфонах)
+            // Пытаемся открыть автоматически
             setTimeout(() => window.location.replace(link), 300);
 
         }).catch(err => {
