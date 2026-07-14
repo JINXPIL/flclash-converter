@@ -2,141 +2,233 @@
 <html lang="ru">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Установка конфигурации Happ...</title>
-    <!-- Библиотека загружается сразу и надежно -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Установка конфигурации INCY...</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; connect-src https://raw.githubusercontent.com https://cdn.jsdelivr.net; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:;">
+    <meta name="referrer" content="no-referrer">
+
     <style>
-        body { background-color: #0d1117; color: #c9d1d9; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; text-align: center; }
-        .loader { border: 4px solid #161b22; border-top: 4px solid #58a6ff; border-radius: 50%; width: 44px; height: 44px; margin-bottom: 20px; animation: spin 1s linear infinite; }
+        :root { 
+            --bg: #0d1117; --text-main: #c9d1d9; --text-muted: #8b949e; 
+            --accent: #238636; --accent-hover: #2ea043; 
+            --card: #161b22; --border: #30363d;
+            --qr-scale: 1; /* Переменная масштаба */
+        }
+        
+        body { background-color: var(--bg); color: var(--text-main); font-family: system-ui, -apple-system, sans-serif; display: flex; justify-content: center; min-height: 100vh; margin: 0; padding: 40px 20px; box-sizing: border-box; }
+        main { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 400px; text-align: center; gap: 24px; }
+        
+        .header-block { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+        .loader { border: 3px solid var(--card); border-top: 3px solid #58a6ff; border-radius: 50%; width: 44px; height: 44px; animation: spin 0.8s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
-        h2 { color: #ffffff; margin: 0 0 10px 0; }
-        p { color: #8b949e; font-size: 15px; margin: 0; max-width: 400px; }
         
-        /* --- Идеальный блок QR-кода --- */
-        #qr-section { display: none; flex-direction: column; align-items: center; margin-top: 25px; }
+        h2 { font-size: 22px; margin: 0; font-weight: 600; }
+        p { color: var(--text-muted); line-height: 1.5; font-size: 15px; margin: 0; }
         
-        /* Зона для QR-кода (чтобы при увеличении он не сдвигал кнопки вниз) */
-        .qr-stage { height: 280px; display: flex; align-items: center; justify-content: center; margin-bottom: 15px; }
+        /* --- СЕКЦИЯ QR-КОДА (Скрыта по умолчанию) --- */
+        .qr-section { display: none; flex-direction: column; align-items: center; width: 100%; gap: 20px; animation: fadeUp 0.5s ease forwards; }
         
-        /* Сама белая карточка. Меняет размер плавно через transform */
-        .qr-card { background: #ffffff; padding: 12px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); transition: transform 0.1s; }
-        .qr-card canvas { display: block; }
+        /* Зона масштабирования (невидимая), чтобы кнопки не прыгали */
+        .qr-stage { height: 280px; display: flex; align-items: center; justify-content: center; width: 100%; }
         
-        /* --- Красивый ползунок --- */
-        .slider-box { background: #161b22; border: 1px solid #30363d; padding: 12px 20px; border-radius: 10px; width: 250px; box-sizing: border-box; }
-        .slider-box label { color: #8b949e; font-size: 11px; font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 10px; }
-        input[type="range"] { -webkit-appearance: none; width: 100%; background: transparent; outline: none; margin: 0; }
-        input[type="range"]::-webkit-slider-runnable-track { width: 100%; height: 6px; background: #30363d; border-radius: 4px; }
-        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%; background: #ffffff; cursor: pointer; margin-top: -6px; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+        /* Белая карточка QR-кода */
+        .qr-card { background: #ffffff; padding: 12px; border-radius: 12px; box-shadow: 0 12px 32px rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; width: 250px; height: 250px; box-sizing: border-box; transform: scale(var(--qr-scale)); transform-origin: center; transition: transform 0.1s linear; }
+        .qr-card img { width: 100%; height: 100%; display: block; image-rendering: pixelated; } /* Пиксельная отрисовка, чтобы не мылило */
         
-        /* --- Кнопки --- */
-        .btn { display: none; margin-top: 15px; padding: 14px 20px; background-color: #238636; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 15px; width: 250px; box-sizing: border-box; cursor: pointer; border: none; }
-        .btn-copy { background-color: #21262d; border: 1px solid #30363d; margin-top: 10px; }
-        .error { color: #ff7b72; display: none; margin-top: 20px; padding: 15px; background: rgba(255,123,114,0.1); border-radius: 8px; border: 1px solid rgba(255,123,114,0.4); max-width: 400px; }
+        /* --- ЖЕЛЕЗОБЕТОННЫЙ ПОЛЗУНОК --- */
+        .slider-box { width: 100%; background: var(--card); padding: 16px 20px; border-radius: 12px; border: 1px solid var(--border); box-sizing: border-box; }
+        .slider-box label { color: var(--text-muted); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 12px; }
+        input[type="range"] { -webkit-appearance: none; width: 100%; background: transparent; margin: 0; padding: 0; }
+        input[type="range"]:focus { outline: none; }
+        input[type="range"]::-webkit-slider-runnable-track { width: 100%; height: 8px; cursor: pointer; background: var(--border); border-radius: 4px; border: none; }
+        input[type="range"]::-webkit-slider-thumb { border: 1px solid #ffffff; height: 24px; width: 24px; border-radius: 50%; background: #ffffff; cursor: pointer; -webkit-appearance: none; margin-top: -8px; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+        input[type="range"]::-moz-range-track { width: 100%; height: 8px; cursor: pointer; background: var(--border); border-radius: 4px; border: none; }
+        input[type="range"]::-moz-range-thumb { border: 1px solid #ffffff; height: 24px; width: 24px; border-radius: 50%; background: #ffffff; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+
+        /* --- КНОПКИ --- */
+        .btn-group { display: none; width: 100%; flex-direction: column; gap: 12px; animation: fadeUp 0.5s ease forwards; }
+        .btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px; background-color: var(--accent); color: #fff; text-decoration: none; border-radius: 10px; font-weight: 600; font-size: 15px; border: none; cursor: pointer; transition: all 0.2s; user-select: none; width: 100%; box-sizing: border-box; }
+        .btn:hover { background-color: var(--accent-hover); }
+        .btn:active { transform: scale(0.98); }
+        .btn-secondary { background-color: var(--card); border: 1px solid var(--border); color: var(--text-main); }
+        .btn-secondary:hover { background-color: #1f242c; border-color: #8b949e; }
+        
+        .error { display: none; width: 100%; padding: 16px; border-radius: 10px; background: rgba(255,123,114,0.1); border: 1px solid rgba(255,123,114,0.3); color: #ff7b72; font-size: 14px; box-sizing: border-box; text-align: left; line-height: 1.4; }
+
+        @keyframes fadeUp { 0% { opacity: 0; transform: translateY(15px); } 100% { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
-    <div class="loader" id="loader"></div>
-    <h2 id="title">Загрузка...</h2>
-    <p id="desc">Получаем конфигурацию с сервера.</p>
-
-    <!-- Секция QR -->
-    <div id="qr-section">
-        <div class="qr-stage">
-            <div class="qr-card" id="qr-card">
-                <canvas id="qr-canvas"></canvas>
+    <main>
+        <div class="header-block">
+            <div class="loader" id="ui-spinner"></div>
+            <h2 id="ui-title">Загрузка...</h2>
+            <p id="ui-desc">Подключаемся к базе маршрутизации.</p>
+        </div>
+        
+        <div class="qr-section" id="qr-section">
+            <div class="qr-stage">
+                <div class="qr-card" id="qr-card"></div>
+            </div>
+            <div class="slider-box">
+                <label for="qr-size">МАСШТАБ QR-КОДА</label>
+                <!-- Масштаб от 0.8 (80%) до 1.4 (140%) -->
+                <input type="range" id="qr-size" min="0.8" max="1.4" step="0.05" value="1">
             </div>
         </div>
-        <div class="slider-box">
-            <label>Масштаб QR-кода</label>
-            <input type="range" id="qr-size" min="0.8" max="1.5" step="0.05" value="1">
-        </div>
-    </div>
 
-    <a href="#" class="btn" id="btn-open">🚀 Открыть в Happ</a>
-    <button class="btn btn-copy" id="btn-copy">📋 Скопировать ссылку</button>
-    
-    <div class="error" id="error-msg"></div>
+        <div class="btn-group" id="btn-group">
+            <a href="#" class="btn" id="ui-btn">🚀 Открыть в INCY</a>
+            <button class="btn btn-secondary" id="ui-copy">📋 Скопировать код конфигурации</button>
+            <button class="btn btn-secondary" id="ui-share">📤 Поделиться сайтом</button>
+        </div>
+        
+        <div class="error" id="ui-error"></div>
+    </main>
+
+    <!-- ОФФЛАЙН ГЕНЕРАТОР QR КОДА (Никаких внешних библиотек) -->
+    <script>
+        var qrcode=function(){var q=function(a){this.a=a;this.c=null};q.prototype={a:function(a){return this.a[a]},b:function(a){return this.a.length},c:function(){return this.c}};var b=function(a,e){this.typeNumber=a;this.errorCorrectLevel=e;this.modules=null;this.moduleCount=0;this.dataCache=null;this.dataList=[]};b.prototype={addData:function(a){var e=new p(a);this.dataList.push(e);this.dataCache=null},isDark:function(a,e){if(0>a||this.moduleCount<=a||0>e||this.moduleCount<=e)throw Error(a+","+e);return this.modules[a][e]},getModuleCount:function(){return this.moduleCount},make:function(){this.makeImpl(!1,this.getBestMaskPattern())},makeImpl:function(a,e){this.moduleCount=4*this.typeNumber+17;this.modules=Array(this.moduleCount);for(var c=0;c<this.moduleCount;c++){this.modules[c]=Array(this.moduleCount);for(var d=0;d<this.moduleCount;d++)this.modules[c][d]=null}this.setupPositionProbePattern(0,0);this.setupPositionProbePattern(this.moduleCount-7,0);this.setupPositionProbePattern(0,this.moduleCount-7);this.setupPositionAdjustPattern();this.setupTimingPattern();this.setupTypeInfo(a,e);7<=this.typeNumber&&this.setupTypeNumber(a);null==this.dataCache&&(this.dataCache=b.createData(this.typeNumber,this.errorCorrectLevel,this.dataList));this.mapData(this.dataCache,e)},setupPositionProbePattern:function(a,b){for(var c=-1;7>=c;c++)if(!(-1>=a+c||this.moduleCount<=a+c))for(var d=-1;7>=d;d++)-1>=b+d||this.moduleCount<=b+d||(this.modules[a+c][b+d]=0<=c&&6>=c&&(0==d||6==d)||0<=d&&6>=d&&(0==c||6==c)||2<=c&&4>=c&&2<=d&&4>=d?!0:!1)},getBestMaskPattern:function(){for(var a=0,e=0,c=0;8>c;c++){this.makeImpl(!0,c);var d=l.getLostPoint(this);if(0==c||a>d)a=d,e=c}return e},createMovieClip:function(a,b,c){var d=a.createEmptyMovieClip(b,c);this.make();for(var e=0;e<this.modules.length;e++)for(var f=e*1,g=0;g<this.modules[e].length;g++)var h=g*1,k=this.modules[e][g];return d},setupTimingPattern:function(){for(var a=8;a<this.moduleCount-8;a++)null==this.modules[a][6]&&(this.modules[a][6]=0==a%2);for(a=8;a<this.moduleCount-8;a++)null==this.modules[6][a]&&(this.modules[6][a]=0==a%2)},setupPositionAdjustPattern:function(){for(var a=l.getPatternPosition(this.typeNumber),b=0;b<a.length;b++)for(var c=0;c<a.length;c++){var d=a[b],f=a[c];if(null==this.modules[d][f])for(var g=-2;2>=g;g++)for(var h=-2;2>=h;h++)this.modules[d+g][f+h]=-2==g||2==g||-2==h||2==h||0==g&&0==h?!0:!1}},setupTypeNumber:function(a){for(var b=l.getBCHTypeNumber(this.typeNumber),c=0;18>c;c++){var d=!a&&1==(b>>c&1);this.modules[Math.floor(c/3)][c%3+this.moduleCount-8-3]=d}for(c=0;18>c;c++)d=!a&&1==(b>>c&1),this.modules[c%3+this.moduleCount-8-3][Math.floor(c/3)]=d},setupTypeInfo:function(a,b){for(var c=this.errorCorrectLevel<<3|b,d=l.getBCHTypeInfo(c),f=0;15>f;f++){var g=!a&&1==(d>>f&1);6>f?this.modules[f][8]=g:8>f?this.modules[f+1][8]=g:this.modules[this.moduleCount-15+f][8]=g}for(f=0;15>f;f++)g=!a&&1==(d>>f&1),8>f?this.modules[8][this.moduleCount-f-1]=g:9>f?this.modules[8][15-f-1+1]=g:this.modules[8][15-f-1]=g;this.modules[this.moduleCount-8][8]=!a},mapData:function(a,b){for(var c=-1,d=this.moduleCount-1,f=7,g=0,h=this.moduleCount-1;0<h;h-=2)for(6==h&&h--;;){for(var k=0;2>k;k++)if(null==this.modules[d][h-k]){var n=!1;g<a.length&&(n=1==(a[g]>>>f&1));l.getMask(b,d,h-k)&&(n=!n);this.modules[d][h-k]=n;f--;-1==f&&(g++,f=7)}d+=c;if(0>d||this.moduleCount<=d){d-=c;c=-c;break}}}};b.PAD0=236;b.PAD1=17;b.createData=function(a,e,c){for(var d=u.getRSBlocks(a,e),f=new r,g=0;g<c.length;g++){var h=c[g];f.put(h.mode,4);f.put(h.getLength(),l.getLengthInBits(h.mode,a));h.write(f)}for(g=a=0;g<d.length;g++)a+=d[g].dataCount;if(f.getLengthInBits()>8*a)throw Error("code length overflow. ("+f.getLengthInBits()+">"+8*a+")");for(f.getLengthInBits()+4<=8*a&&f.put(0,4);0!=f.getLengthInBits()%8;)f.putBit(!1);for(;!(f.getLengthInBits()>=8*a);){f.put(b.PAD0,8);if(f.getLengthInBits()>=8*a)break;f.put(b.PAD1,8)}return b.createBytes(f,d)};b.createBytes=function(a,b){for(var c=0,d=0,f=0,g=Array(b.length),h=Array(b.length),k=0;k<b.length;k++){var n=b[k].dataCount,m=b[k].totalCount-n;c=Math.max(c,n);d=Math.max(d,m);g[k]=Array(n);for(var p=0;p<g[k].length;p++)g[k][p]=255&a.buffer[p+f];f+=n;var q=l.getErrorCorrectPolynomial(m),v=new t(g[k],q.getLength()-1),q=v.mod(q);h[k]=Array(q.getLength()-1);for(p=0;p<h[k].length;p++)var w=p+q.getLength()-h[k].length,h=h[k],w=0<=w?q.get(w):0,h=h[p]=w}for(q=k=0;q<b.length;q++)k+=b[q].totalCount;c=Array(k);for(q=p=0;q<c;q++)for(k=0;k<b.length;k++)q<g[k].length&&(c[p++]=g[k][q]);for(q=0;q<d;q++)for(k=0;k<b.length;k++)q<h[k].length&&(c[p++]=h[k][q]);return c};for(var g=1,a=1;255>a;a++)g=g<<1^g>>>7*285,1;var l={PATTERN_POSITION_TABLE:[[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46],[6,28,50],[6,30,54],[6,32,58],[6,34,62],[6,26,46,66],[6,26,48,70],[6,26,50,74],[6,30,54,78],[6,30,56,82],[6,30,58,86],[6,34,62,90],[6,28,50,72,94],[6,26,50,74,98],[6,30,54,78,102],[6,28,54,80,106],[6,32,58,84,110],[6,30,58,86,114],[6,34,62,90,118],[6,26,50,74,98,122],[6,30,54,78,102,126],[6,26,52,78,104,130],[6,30,56,82,108,134],[6,34,60,86,112,138],[6,30,58,86,114,142],[6,34,62,90,118,146],[6,30,54,78,102,126,150],[6,24,50,76,102,128,154],[6,28,54,80,106,132,158],[6,32,58,84,110,136,162],[6,26,54,82,110,138,166],[6,30,58,86,114,142,170]],G15:1335,G18:7973,G15_MASK:21522,getBCHTypeInfo:function(a){for(var b=a<<10;0<=l.getBCHDigit(b)-l.getBCHDigit(l.G15);)b^=l.G15<<l.getBCHDigit(b)-l.getBCHDigit(l.G15);return(a<<10|b)^l.G15_MASK},getBCHTypeNumber:function(a){for(var b=a<<12;0<=l.getBCHDigit(b)-l.getBCHDigit(l.G18);)b^=l.G18<<l.getBCHDigit(b)-l.getBCHDigit(l.G18);return a<<12|b},getBCHDigit:function(a){for(var b=0;0!=a;)b++,a>>>=1;return b},getPatternPosition:function(a){return l.PATTERN_POSITION_TABLE[a-1]},getMask:function(a,b,c){switch(a){case 0:return 0==(b+c)%2;case 1:return 0==b%2;case 2:return 0==c%3;case 3:return 0==(b+c)%3;case 4:return 0==(Math.floor(b/2)+Math.floor(c/3))%2;case 5:return 0==b*c%2+b*c%3;case 6:return 0==(b*c%2+b*c%3)%2;case 7:return 0==(b*c%3+(b+c)%2)%2;default:throw Error("bad maskPattern:"+a);}},getErrorCorrectPolynomial:function(a){for(var b=new t([1],0),c=0;c<a;c++)b=b.multiply(new t([1,g(c)],0));return b},getLengthInBits:function(a,b){if(1<=b&&10>b)switch(a){case 1:return 10;case 2:return 9;case 4:return 8;case 8:return 8;default:throw Error("mode:"+a);}else if(27>b)switch(a){case 1:return 12;case 2:return 11;case 4:return 16;case 8:return 10;default:throw Error("mode:"+a);}else if(41>b)switch(a){case 1:return 14;case 2:return 13;case 4:return 16;case 8:return 12;default:throw Error("mode:"+a);}else throw Error("type:"+b);},getLostPoint:function(a){for(var b=a.getModuleCount(),c=0,d=0;d<b;d++)for(var f=0;f<b;f++){for(var g=0,h=a.isDark(d,f),k=-1;1>=k;k++)if(!(0>d+k||b<=d+k))for(var n=-1;1>=n;n++)0>f+n||b<=f+n||0==k&&0==n||h==a.isDark(d+k,f+n)&&g++;5<g&&(c+=3+g-5)}for(d=0;d<b-1;d++)for(f=0;f<b-1;f++)g=0,a.isDark(d,f)&&g++,a.isDark(d+1,f)&&g++,a.isDark(d,f+1)&&g++,a.isDark(d+1,f+1)&&g++,(0==g||4==g)&&(c+=3);for(d=0;d<b;d++)for(f=0;f<b-6;f++)a.isDark(d,f)&&!a.isDark(d,f+1)&&a.isDark(d,f+2)&&a.isDark(d,f+3)&&a.isDark(d,f+4)&&!a.isDark(d,f+5)&&a.isDark(d,f+6)&&(c+=40);for(f=0;f<b;f++)for(d=0;d<b-6;d++)a.isDark(d,f)&&!a.isDark(d+1,f)&&a.isDark(d+2,f)&&a.isDark(d+3,f)&&a.isDark(d+4,f)&&!a.isDark(d+5,f)&&a.isDark(d+6,f)&&(c+=40);for(f=g=0;f<b;f++)for(d=0;d<b;d++)a.isDark(d,f)&&g++;a=Math.abs(100*g/b/b-50)/5;return c+=10*a}},t=function(a,b){if(0==a.length)throw Error(a.length+"/"+b);for(var c=0;0<a.length&&0==a[0];)a.shift(),c++;this.num=Array(a.length);for(var d=0;d<a.length;d++)this.num[d]=a[d];this.num.length;this.num.length};t.prototype={get:function(a){return this.num[a]},getLength:function(){return this.num.length},multiply:function(a){for(var b=Array(this.getLength()+a.getLength()-1),c=0;c<this.getLength();c++)for(var d=0;d<a.getLength();d++)b[c+d]^=function(a,b){return 0==a||0==b?0:g((Math.log(a)/Math.log(2)+Math.log(b)/Math.log(2))%255)}(this.get(c),a.get(d));return new t(b,0)},mod:function(a){if(this.getLength()-a.getLength()<0)return this;for(var b=function(a,b){if(0==a)return 0;if(0==b)throw Error("log(0)");return g((Math.log(a)/Math.log(2)-Math.log(b)/Math.log(2)+255)%255)}(this.get(0),a.get(0)),c=Array(this.getLength()),d=0;d<this.getLength();d++)c[d]=this.get(d);for(d=0;d<a.getLength();d++)c[d]^=function(a,b){return 0==a||0==b?0:g((Math.log(a)/Math.log(2)+Math.log(b)/Math.log(2))%255)}(b,a.get(d));return(new t(c,0)).mod(a)}},u={RS_BLOCK_TABLE:[[1,26,19],[1,26,16],[1,26,13],[1,26,9],[1,44,34],[1,44,28],[1,44,22],[1,44,16],[1,70,55],[1,70,44],[2,35,17],[2,35,13],[1,100,80],[2,50,32],[2,50,24],[4,25,9],[1,134,108],[2,67,43],[2,33,15,2,34,16],[2,33,11,2,34,12],[2,86,68],[4,43,27],[4,43,19],[4,43,15],[2,98,78],[4,49,31],[2,32,14,4,33,15],[4,39,13,1,40,14],[2,121,97],[2,60,38,2,61,39],[4,40,18,2,41,19],[4,40,14,2,41,15],[2,146,116],[3,58,36,2,59,37],[4,36,16,4,37,17],[4,36,12,4,37,13],[2,86,68,2,87,69],[4,69,43,1,70,44],[6,43,19,2,44,20],[6,43,15,2,44,16],[4,101,81],[1,80,50,4,81,51],[4,50,22,4,51,23],[3,36,12,8,37,13],[2,116,92,2,117,93],[6,58,36,2,59,37],[4,46,20,6,47,21],[7,42,14,4,43,15],[4,133,107],[8,59,37,1,60,38],[8,44,20,4,45,21],[12,33,11,4,34,12],[3,145,115,1,146,116],[4,73,45,5,74,46],[11,36,16,5,37,17],[11,36,12,5,37,13],[5,109,87,1,110,88],[5,65,41,5,66,42],[5,54,24,7,55,25],[11,36,12,7,37,13],[5,122,98,1,123,99],[7,73,45,3,74,46],[15,43,19,2,44,20],[3,45,15,13,46,16],[1,135,107,5,136,108],[10,74,46,1,75,47],[1,50,22,15,51,23],[2,42,14,17,43,15],[5,150,120,1,151,121],[9,69,43,4,70,44],[17,50,22,1,51,23],[2,42,14,19,43,15],[3,141,113,4,142,114],[3,70,44,11,71,45],[17,47,21,4,48,22],[9,39,13,16,40,14],[3,135,107,5,136,108],[3,67,41,13,68,42],[15,54,24,5,55,25],[15,43,15,10,44,16],[4,144,116,4,145,117],[17,68,42],[17,50,22,6,51,23],[19,46,16,6,47,17],[2,139,111,7,140,112],[17,74,46],[7,54,24,16,55,25],[34,37,13],[4,151,121,5,152,122],[4,75,47,14,76,48],[11,54,24,14,55,25],[16,45,15,14,46,16],[6,147,117,4,148,118],[6,73,45,14,74,46],[11,54,24,16,55,25],[30,46,16,2,47,17],[8,132,106,4,133,107],[8,75,47,13,76,48],[7,54,24,22,55,25],[22,45,15,13,46,16],[10,142,114,2,143,115],[19,74,46,4,75,47],[28,50,22,6,51,23],[33,46,16,4,47,17],[8,152,122,4,153,123],[22,73,45,3,74,46],[8,53,23,26,54,24],[12,45,15,28,46,16],[3,147,117,10,148,118],[3,73,45,23,74,46],[4,54,24,31,55,25],[11,45,15,31,46,16],[7,146,116,7,147,117],[21,73,45,7,74,46],[1,53,23,37,54,24],[19,45,15,26,46,16],[5,145,115,10,146,116],[19,75,47,10,76,48],[15,54,24,25,55,25],[23,45,15,25,46,16],[13,145,115,3,146,116],[2,74,46,29,75,47],[42,54,24,1,55,25],[23,45,15,28,46,16],[17,145,115],[10,74,46,23,75,47],[10,54,24,35,55,25],[19,45,15,35,46,16],[17,145,115,1,146,116],[14,74,46,21,75,47],[29,54,24,19,55,25],[11,45,15,46,46,16],[13,145,115,6,146,116],[14,74,46,23,75,47],[44,54,24,7,55,25],[59,46,16,1,47,17],[12,151,121,7,152,122],[12,75,47,26,76,48],[39,54,24,14,55,25],[22,45,15,41,46,16],[6,151,121,14,152,122],[6,75,47,34,76,48],[46,54,24,10,55,25],[2,45,15,64,46,16],[17,152,122,4,153,123],[29,74,46,14,75,47],[49,54,24,10,55,25],[24,45,15,46,46,16],[4,152,122,18,153,123],[13,74,46,32,75,47],[48,54,24,14,55,25],[42,45,15,32,46,16],[20,147,117,4,148,118],[40,75,47,7,76,48],[43,54,24,22,55,25],[10,45,15,67,46,16],[19,148,118,6,149,119],[18,75,47,31,76,48],[34,54,24,34,55,25],[20,45,15,61,46,16]],getRSBlocks:function(a,b){var c=u.getRsBlockTable(a,b);if(void 0==c)throw Error("bad rs block @ typeNumber:"+a+"/errorCorrectLevel:"+b);for(var d=c.length/3,f=[],g=0;g<d;g++)for(var h=c[3*g+0],k=c[3*g+1],n=c[3*g+2],m=0;m<h;m++)f.push(new x(k,n));return f},getRsBlockTable:function(a,b){switch(b){case 1:return u.RS_BLOCK_TABLE[4*(a-1)+0];case 0:return u.RS_BLOCK_TABLE[4*(a-1)+1];case 3:return u.RS_BLOCK_TABLE[4*(a-1)+2];case 2:return u.RS_BLOCK_TABLE[4*(a-1)+3]}}},r=function(){this.buffer=[];this.length=0};r.prototype={get:function(a){return 1==(this.buffer[Math.floor(a/8)]>>>7-a%8&1)},put:function(a,b){for(var c=0;c<b;c++)this.putBit(1==(a>>>b-c-1&1))},getLengthInBits:function(){return this.length},putBit:function(a){var b=Math.floor(this.length/8);this.buffer.length<=b&&this.buffer.push(0);a&&(this.buffer[b]|=128>>>this.length%8);this.length++}};var x=function(a,b){this.totalCount=a;this.dataCount=b},p=function(a){this.mode=4;this.data=a};p.prototype={getLength:function(a){return this.data.length},write:function(a){for(var b=0;b<this.data.length;b++)a.put(this.data.charCodeAt(b),8)}};var generateQR=function(a){var c=new b(0,1);c.addData(a);c.make();for(var d=c.getModuleCount(),f=10,g='<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1 -1 '+(d+2)+" "+(d+2)+'" shape-rendering="crispEdges">',h=0;h<d;h++)for(var k=0;k<d;k++)c.isDark(h,k)&&(g+='<rect width="1" height="1" x="'+k+'" y="'+h+'" fill="#000"/>');return g+"</svg>"};}();
+    </script>
 
     <script>
+        const DOM = {
+            spinner: document.getElementById('ui-spinner'),
+            title: document.getElementById('ui-title'),
+            desc: document.getElementById('ui-desc'),
+            qrSection: document.getElementById('qr-section'),
+            qrCard: document.getElementById('qr-card'),
+            qrSizeSlider: document.getElementById('qr-size'),
+            btnGroup: document.getElementById('btn-group'),
+            btnMain: document.getElementById('ui-btn'),
+            btnCopy: document.getElementById('ui-copy'),
+            btnShare: document.getElementById('ui-share'),
+            error: document.getElementById('ui-error')
+        };
+
+        const LOCAL_STORAGE_KEY = 'incy_deeplink_backup';
+
+        // 🚀 URL для скачивания (твои файлы)
         const sources = [
-            `https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/HAPP/HAPP_INSTALL.DEEPLINK?t=${Date.now()}`,
-            `https://cdn.jsdelivr.net/gh/JINXPIL/flclash-converter@main/HAPP/HAPP_INSTALL.DEEPLINK`
+            `https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/INCY/INCY_INSTALL.DEEPLINK?t=${Date.now()}`,
+            `https://cdn.jsdelivr.net/gh/JINXPIL/flclash-converter@main/INCY/INCY_INSTALL.DEEPLINK`
         ];
 
         async function fetchConfig() {
+            let fetchedLink = null;
             for (let url of sources) {
                 try {
-                    const res = await fetch(url, { cache: 'no-store' });
+                    const controller = new AbortController();
+                    const timeout = setTimeout(() => controller.abort(), 3000); // Тайм-аут 3 сек
+                    const res = await fetch(url, { cache: 'no-store', signal: controller.signal });
+                    clearTimeout(timeout);
+                    
                     if (res.ok) {
                         const text = (await res.text()).trim();
-                        if (text.startsWith('happ://')) return text;
+                        if (text.startsWith('incy://')) {
+                            fetchedLink = text;
+                            break;
+                        }
                     }
                 } catch (e) {}
             }
-            throw new Error('FAIL');
+
+            if (fetchedLink) {
+                // Если скачали успешно, сохраняем локально про запас (для оффлайна)
+                localStorage.setItem(LOCAL_STORAGE_KEY, fetchedLink);
+                return fetchedLink;
+            } else {
+                // Если сеть отвалилась, пытаемся достать последний известный конфиг из памяти
+                const backup = localStorage.getItem(LOCAL_STORAGE_KEY);
+                if (backup) {
+                    DOM.title.innerHTML = '⚠️ Режим Оффлайн';
+                    return backup;
+                }
+                throw new Error('NETWORK_AND_NO_BACKUP');
+            }
         }
 
-        fetchConfig().then(link => {
-            document.getElementById('loader').style.display = 'none';
-            document.getElementById('title').textContent = '✅ Готово к установке!';
-            
-            const isMobile = /Android|webOS|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth <= 768;
+        async function init() {
+            try {
+                const link = await fetchConfig();
+                
+                DOM.spinner.style.display = 'none';
+                if (DOM.title.innerHTML !== '⚠️ Режим Оффлайн') {
+                    DOM.title.textContent = '✅ Готово к установке';
+                }
+                
+                DOM.btnMain.href = link;
+                
+                // ❗️ КНОПКИ ТЕПЕРЬ ПОКАЗЫВАЮТСЯ ВСЕГДА, ЕСЛИ ЕСТЬ ССЫЛКА
+                DOM.btnGroup.style.display = 'flex';
 
-            if (isMobile) {
-                document.getElementById('desc').textContent = 'Нажмите кнопку ниже, чтобы применить правила.';
-                setTimeout(() => window.location.replace(link), 300);
-            } else {
-                document.getElementById('desc').innerHTML = 'Отсканируйте камерой смартфона или скопируйте ссылку.';
+                const isMobile = /Android|webOS|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth <= 768;
+
+                if (isMobile) {
+                    DOM.desc.textContent = 'Нажмите зеленую кнопку, чтобы применить правила.';
+                    // На мобильных устройствах приложение открывается само
+                    requestAnimationFrame(() => { setTimeout(() => window.location.replace(link), 300); });
+                } else {
+                    DOM.desc.innerHTML = 'Отсканируйте камерой смартфона или скопируйте ссылку в десктопный клиент.';
+                    
+                    // Рисуем SVG QR-код встроенным оффлайн-генератором!
+                    try {
+                        const svgString = generateQR(link);
+                        // Очищаем белый квадрат и вставляем туда сверхчеткий векторный код
+                        DOM.qrCard.innerHTML = svgString;
+                        DOM.qrSection.style.display = 'flex';
+                    } catch (e) {
+                        // Если Base64 гигантский и пробил лимит QR-кода, блок просто не появится
+                        console.warn('QR Limit Exceeded');
+                    }
+
+                    // Масштабируем QR-код (от 0.8 до 1.4)
+                    DOM.qrSizeSlider.addEventListener('input', function() {
+                        document.documentElement.style.setProperty('--qr-scale', this.value);
+                    });
+                }
+
+                // Логика копирования
+                DOM.btnCopy.onclick = async () => {
+                    try {
+                        await navigator.clipboard.writeText(link);
+                        DOM.btnCopy.innerHTML = '✅ Скопировано в буфер!';
+                        DOM.btnCopy.style.borderColor = 'var(--accent)';
+                        DOM.btnCopy.style.color = 'var(--accent)';
+                        setTimeout(() => {
+                            DOM.btnCopy.innerHTML = '📋 Скопировать код конфигурации';
+                            DOM.btnCopy.style.borderColor = 'var(--border)';
+                            DOM.btnCopy.style.color = 'var(--text-main)';
+                        }, 2000);
+                    } catch (e) { prompt('Скопируйте эту ссылку:', link); }
+                };
+
+                // Логика кнопки Поделиться
+                DOM.btnShare.onclick = async () => {
+                    const shareData = { title: 'Network Builder', text: 'Установи профиль маршрутизации в 1 клик!', url: 'https://jinxpil.github.io/flclash-converter/incy.html' };
+                    if (navigator.share) {
+                        try { await navigator.share(shareData); } catch (err) {}
+                    } else {
+                        try {
+                            await navigator.clipboard.writeText(`${shareData.text} ${shareData.url}`);
+                            DOM.btnShare.innerHTML = '✅ Ссылка на сайт скопирована!';
+                            setTimeout(() => { DOM.btnShare.innerHTML = '📤 Поделиться сайтом'; }, 2000);
+                        } catch (e) { prompt('Скопируйте ссылку:', shareData.url); }
+                    }
+                };
+
+            } catch (err) {
+                // Сюда скрипт попадет ТОЛЬКО если нет ни интернета, ни кэша в памяти
+                DOM.spinner.style.display = 'none';
+                DOM.title.textContent = 'Ошибка загрузки';
+                DOM.desc.style.display = 'none';
                 
-                // Рисуем четкий QR-код ОДИН РАЗ
-                new QRious({
-                    element: document.getElementById('qr-canvas'),
-                    value: link,
-                    size: 250,
-                    level: 'L'
-                });
-                
-                document.getElementById('qr-section').style.display = 'flex';
-                
-                // Масштабируем саму карточку через CSS (никаких белых рамок)
-                document.getElementById('qr-size').addEventListener('input', function() {
-                    document.getElementById('qr-card').style.transform = `scale(${this.value})`;
-                });
+                DOM.error.innerHTML = '<b>❌ Сетевой сбой</b><br>Файл недоступен и нет сохраненной копии. Пожалуйста, проверьте интернет.';
+                DOM.error.style.display = 'block';
             }
-
-            // Показываем кнопки
-            const btnOpen = document.getElementById('btn-open');
-            btnOpen.href = link;
-            btnOpen.style.display = 'block';
-
-            const btnCopy = document.getElementById('btn-copy');
-            btnCopy.style.display = 'block';
-            btnCopy.onclick = () => {
-                navigator.clipboard.writeText(link).then(() => {
-                    btnCopy.textContent = '✅ Скопировано!';
-                    btnCopy.style.backgroundColor = '#238636';
-                    btnCopy.style.borderColor = '#238636';
-                    setTimeout(() => {
-                        btnCopy.textContent = '📋 Скопировать ссылку';
-                        btnCopy.style.backgroundColor = '#21262d';
-                        btnCopy.style.borderColor = '#30363d';
-                    }, 2000);
-                }).catch(() => alert('Не удалось скопировать.'));
-            };
-
-        }).catch(() => {
-            // Если произошла ошибка - прячем всё и показываем текст
-            document.getElementById('loader').style.display = 'none';
-            document.getElementById('title').textContent = 'Ошибка загрузки';
-            document.getElementById('desc').style.display = 'none';
-            document.getElementById('qr-section').style.display = 'none';
-            
-            const err = document.getElementById('error-msg');
-            err.textContent = '❌ Не удалось скачать файл конфигурации. Проверьте интернет или отключите блокировщики рекламы.';
-            err.style.display = 'block';
-        });
+        }
+        
+        init();
     </script>
 </body>
 </html>
