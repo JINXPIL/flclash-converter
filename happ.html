@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>Установка конфигурации Happ...</title>
     
-    <!-- CSP: Разрешена загрузка qrcode.min.js и выполнение скриптов -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'none'; connect-src https://raw.githubusercontent.com https://cdn.jsdelivr.net; style-src 'unsafe-inline'; script-src 'unsafe-inline' https://cdnjs.cloudflare.com;">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta name="referrer" content="no-referrer">
@@ -15,90 +14,34 @@
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 
     <style>
-        /* Современные CSS переменные */
-        :root { 
-            --bg: #0d1117; --text-main: #c9d1d9; --text-muted: #8b949e; 
-            --accent: #238636; --accent-hover: #2ea043; 
-            --card: #161b22; --border: #30363d;
-            --qr-size: 250px; /* Динамический размер QR */
-        }
-        
-        body { 
-            background-color: var(--bg); color: var(--text-main); 
-            font-family: system-ui, -apple-system, sans-serif; 
-            display: flex; justify-content: center; min-height: 100vh; 
-            margin: 0; padding: 40px 20px; box-sizing: border-box; 
-        }
-        
-        main { 
-            display: flex; flex-direction: column; align-items: center; 
-            width: 100%; max-width: 420px; text-align: center; 
-            gap: 24px; /* Жесткие отступы между всеми блоками */
-        }
-        
+        :root { --bg: #0d1117; --text-main: #c9d1d9; --text-muted: #8b949e; --accent: #238636; --accent-hover: #2ea043; --card: #161b22; --border: #30363d; --qr-size: 250px; }
+        body { background-color: var(--bg); color: var(--text-main); font-family: system-ui, -apple-system, sans-serif; display: flex; justify-content: center; min-height: 100vh; margin: 0; padding: 40px 20px; box-sizing: border-box; }
+        main { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 420px; text-align: center; gap: 24px; }
         .header-block { display: flex; flex-direction: column; align-items: center; gap: 12px; }
-        
         .loader { border: 3px solid var(--card); border-top: 3px solid #58a6ff; border-radius: 50%; width: 40px; height: 40px; animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
-        
         h2 { font-size: 22px; margin: 0; font-weight: 600; }
         p { color: var(--text-muted); line-height: 1.5; font-size: 15px; margin: 0; }
         
-        /* Блок QR-кода */
-        .qr-section { 
-            display: none; flex-direction: column; align-items: center; 
-            width: 100%; gap: 16px; animation: fadeUp 0.5s ease-out forwards; 
-        }
-        
-        /* Идеальный белый квадрат, который обтягивает QR-код */
-        .qr-card { 
-            background: #ffffff; padding: 12px; border-radius: 16px; 
-            box-shadow: 0 12px 32px rgba(0,0,0,0.5); 
-            display: flex; justify-content: center; align-items: center;
-            width: var(--qr-size); height: var(--qr-size);
-            transition: width 0.1s linear, height 0.1s linear; /* Плавное изменение размера */
-        }
-        
-        /* SVG внутри карточки занимает 100% места */
+        .qr-section { display: none; flex-direction: column; align-items: center; width: 100%; gap: 16px; animation: fadeUp 0.5s ease-out forwards; }
+        .qr-card { background: #ffffff; padding: 12px; border-radius: 16px; box-shadow: 0 12px 32px rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; width: var(--qr-size); height: var(--qr-size); transition: width 0.1s linear, height 0.1s linear; }
         .qr-card svg { width: 100%; height: 100%; display: block; }
         
-        /* Современный ползунок */
-        .slider-box { 
-            width: 100%; background: var(--card); padding: 14px 20px; 
-            border-radius: 12px; border: 1px solid var(--border); box-sizing: border-box; 
-        }
-        .slider-box label { 
-            color: var(--text-muted); font-size: 11px; font-weight: 600; 
-            text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 12px; 
-        }
+        .slider-box { width: 100%; background: var(--card); padding: 14px 20px; border-radius: 12px; border: 1px solid var(--border); box-sizing: border-box; }
+        .slider-box label { color: var(--text-muted); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 12px; }
         input[type="range"] { -webkit-appearance: none; width: 100%; background: transparent; outline: none; margin: 0; }
         input[type="range"]::-webkit-slider-runnable-track { width: 100%; height: 6px; background: var(--border); border-radius: 4px; }
-        input[type="range"]::-webkit-slider-thumb { 
-            -webkit-appearance: none; height: 20px; width: 20px; border-radius: 50%; 
-            background: #ffffff; box-shadow: 0 2px 6px rgba(0,0,0,0.4); 
-            margin-top: -7px; cursor: pointer; transition: transform 0.1s; 
-        }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; height: 20px; width: 20px; border-radius: 50%; background: #ffffff; box-shadow: 0 2px 6px rgba(0,0,0,0.4); margin-top: -7px; cursor: pointer; transition: transform 0.1s; }
         input[type="range"]::-webkit-slider-thumb:active { transform: scale(1.15); }
-        input[type="range"]::-moz-range-track { width: 100%; height: 6px; background: var(--border); border-radius: 4px; border: none; }
-        input[type="range"]::-moz-range-thumb { height: 20px; width: 20px; border-radius: 50%; background: #ffffff; border: none; cursor: pointer; }
-
-        /* Блок кнопок */
-        .btn-group { display: none; width: 100%; flex-direction: column; gap: 12px; animation: fadeUp 0.5s ease-out forwards; }
         
-        .btn { 
-            display: flex; align-items: center; justify-content: center; gap: 8px; 
-            padding: 14px; background-color: var(--accent); color: #fff; text-decoration: none; 
-            border-radius: 10px; font-weight: 600; font-size: 15px; border: none; 
-            cursor: pointer; transition: all 0.2s; user-select: none; width: 100%; box-sizing: border-box;
-        }
+        .btn-group { display: none; width: 100%; flex-direction: column; gap: 12px; animation: fadeUp 0.5s ease-out forwards; }
+        .btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px; background-color: var(--accent); color: #fff; text-decoration: none; border-radius: 10px; font-weight: 600; font-size: 15px; border: none; cursor: pointer; transition: all 0.2s; user-select: none; width: 100%; box-sizing: border-box; }
         .btn:hover { background-color: var(--accent-hover); }
         .btn:active { transform: scale(0.98); }
-        
         .btn-secondary { background-color: var(--card); border: 1px solid var(--border); color: var(--text-main); }
         .btn-secondary:hover { background-color: #1f242c; border-color: #8b949e; }
         
         .error { display: none; width: 100%; padding: 16px; border-radius: 10px; background: rgba(255,123,114,0.1); border: 1px solid rgba(255,123,114,0.3); color: #ff7b72; font-size: 14px; animation: fadeUp 0.4s ease; box-sizing: border-box; }
-
         @keyframes fadeUp { 0% { opacity: 0; transform: translateY(15px); } 100% { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
@@ -110,17 +53,14 @@
             <p id="ui-desc">Устанавливаем защищенное соединение с базой маршрутизации.</p>
         </div>
         
-        <!-- Секция QR-кода -->
         <div class="qr-section" id="qr-section">
             <div class="qr-card" id="qr-card"></div>
             <div class="slider-box">
                 <label for="qr-size">МАСТШТАБ QR-КОДА</label>
-                <!-- Меняем размер от 200px до 450px -->
                 <input type="range" id="qr-size" min="200" max="450" step="5" value="250">
             </div>
         </div>
 
-        <!-- Секция кнопок -->
         <div class="btn-group" id="btn-group">
             <a href="#" class="btn" id="ui-btn">🚀 Открыть в Happ</a>
             <button class="btn btn-secondary" id="ui-copy">📋 Скопировать код конфигурации</button>
@@ -150,7 +90,6 @@
             `https://cdn.jsdelivr.net/gh/JINXPIL/flclash-converter@main/HAPP/HAPP_INSTALL.DEEPLINK`
         ];
 
-        // 🚀 Используем легкую и современную библиотеку qrcode-svg
         function loadQRRenderer() {
             return new Promise((resolve, reject) => {
                 const script = document.createElement('script');
@@ -186,6 +125,8 @@
                 DOM.spinner.style.display = 'none';
                 DOM.title.textContent = '✅ Готово к установке';
                 DOM.btnMain.href = link;
+                
+                // ВАЖНО: Показываем кнопки ТОЛЬКО если ссылка успешно скачалась!
                 DOM.btnGroup.style.display = 'flex';
 
                 const isMobile = /Android|webOS|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth <= 768;
@@ -197,26 +138,24 @@
                     DOM.desc.innerHTML = 'Отсканируйте камерой смартфона или скопируйте ссылку в десктопный клиент.';
                     
                     await loadQRRenderer();
+                    
+                    // Показываем блок QR-кода ТОЛЬКО после скачивания библиотеки
                     DOM.qrSection.style.display = 'flex';
                     
-                    // Рисуем SVG QR-код. Он идеально четкий и растягивается CSS'ом.
                     new QRCode(DOM.qrCard, {
                         text: link,
-                        width: 512, // Внутреннее высокое разрешение
+                        width: 512, 
                         height: 512,
                         colorDark : "#000000",
                         colorLight : "#ffffff",
                         correctLevel : QRCode.CorrectLevel.L,
-                        useSVG: true // Принудительно векторный формат
+                        useSVG: true 
                     });
                     
-                    // Убираем лишние теги <img>, которые генерит старая либа, оставляем только <canvas>/<svg>
                     const img = DOM.qrCard.querySelector('img');
                     if (img) img.style.display = 'none';
 
-                    // Плавная логика ползунка через CSS-переменную
                     DOM.qrSizeSlider.addEventListener('input', function() {
-                        // Меняем размер самого белого квадрата
                         document.documentElement.style.setProperty('--qr-size', `${this.value}px`);
                     });
                 }
@@ -249,12 +188,17 @@
                 };
 
             } catch (err) {
+                // Если произошла ошибка (404 или Network)
                 DOM.spinner.style.display = 'none';
                 DOM.title.textContent = 'Ошибка загрузки';
                 DOM.desc.style.display = 'none';
                 
+                // ВАЖНО: Прячем QR-секцию и кнопки, чтобы не пугать пользователя
+                DOM.qrSection.style.display = 'none';
+                DOM.btnGroup.style.display = 'none';
+                
                 if (err.message === '404') {
-                    DOM.error.innerHTML = '❌ Файл не найден.<br>Зайдите в GitHub ➔ <b>Actions</b> ➔ Run workflow.';
+                    DOM.error.innerHTML = '❌ Файл не найден.<br>Убедитесь, что бот сгенерировал файл <b>HAPP_INSTALL.DEEPLINK</b> в папке <b>HAPP</b>.';
                 } else {
                     DOM.error.textContent = '❌ Сетевой сбой. Пожалуйста, отключите AdBlock/VPN для этой страницы.';
                 }
