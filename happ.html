@@ -5,81 +5,125 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>Установка конфигурации Happ...</title>
     
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; connect-src https://raw.githubusercontent.com https://cdn.jsdelivr.net; style-src 'unsafe-inline'; script-src 'unsafe-inline' https://cdnjs.cloudflare.com; img-src data:;">
+    <!-- CSP: Разрешена загрузка qrcode.min.js и выполнение скриптов -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; connect-src https://raw.githubusercontent.com https://cdn.jsdelivr.net; style-src 'unsafe-inline'; script-src 'unsafe-inline' https://cdnjs.cloudflare.com;">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta name="referrer" content="no-referrer">
+    <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), interest-cohort=()">
 
     <link rel="preconnect" href="https://raw.githubusercontent.com" crossorigin>
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 
     <style>
-        :root { --bg: #0d1117; --text-main: #c9d1d9; --text-muted: #8b949e; --accent: #238636; --accent-hover: #2ea043; --card: #161b22; --border: #30363d; }
-        body { background-color: var(--bg); color: var(--text-main); font-family: system-ui, -apple-system, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
+        /* Современные CSS переменные */
+        :root { 
+            --bg: #0d1117; --text-main: #c9d1d9; --text-muted: #8b949e; 
+            --accent: #238636; --accent-hover: #2ea043; 
+            --card: #161b22; --border: #30363d;
+            --qr-size: 250px; /* Динамический размер QR */
+        }
         
-        main { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 400px; text-align: center; }
+        body { 
+            background-color: var(--bg); color: var(--text-main); 
+            font-family: system-ui, -apple-system, sans-serif; 
+            display: flex; justify-content: center; min-height: 100vh; 
+            margin: 0; padding: 40px 20px; box-sizing: border-box; 
+        }
         
-        .loader { border: 3px solid var(--card); border-top: 3px solid #58a6ff; border-radius: 50%; width: 44px; height: 44px; margin-bottom: 24px; animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
+        main { 
+            display: flex; flex-direction: column; align-items: center; 
+            width: 100%; max-width: 420px; text-align: center; 
+            gap: 24px; /* Жесткие отступы между всеми блоками */
+        }
+        
+        .header-block { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+        
+        .loader { border: 3px solid var(--card); border-top: 3px solid #58a6ff; border-radius: 50%; width: 40px; height: 40px; animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
         
-        h2 { font-size: 22px; margin: 0 0 10px 0; font-weight: 600; }
-        p { color: var(--text-muted); line-height: 1.5; font-size: 15px; margin: 0 0 24px 0; }
+        h2 { font-size: 22px; margin: 0; font-weight: 600; }
+        p { color: var(--text-muted); line-height: 1.5; font-size: 15px; margin: 0; }
         
-        .btn-group { display: none; width: 100%; gap: 12px; flex-direction: column; animation: fadeUp 0.5s forwards; margin-top: 20px; }
-        .btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 24px; background-color: var(--accent); color: #fff; text-decoration: none; border-radius: 10px; font-weight: 600; font-size: 16px; border: none; cursor: pointer; transition: all 0.2s; user-select: none; }
+        /* Блок QR-кода */
+        .qr-section { 
+            display: none; flex-direction: column; align-items: center; 
+            width: 100%; gap: 16px; animation: fadeUp 0.5s ease-out forwards; 
+        }
+        
+        /* Идеальный белый квадрат, который обтягивает QR-код */
+        .qr-card { 
+            background: #ffffff; padding: 12px; border-radius: 16px; 
+            box-shadow: 0 12px 32px rgba(0,0,0,0.5); 
+            display: flex; justify-content: center; align-items: center;
+            width: var(--qr-size); height: var(--qr-size);
+            transition: width 0.1s linear, height 0.1s linear; /* Плавное изменение размера */
+        }
+        
+        /* SVG внутри карточки занимает 100% места */
+        .qr-card svg { width: 100%; height: 100%; display: block; }
+        
+        /* Современный ползунок */
+        .slider-box { 
+            width: 100%; background: var(--card); padding: 14px 20px; 
+            border-radius: 12px; border: 1px solid var(--border); box-sizing: border-box; 
+        }
+        .slider-box label { 
+            color: var(--text-muted); font-size: 11px; font-weight: 600; 
+            text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 12px; 
+        }
+        input[type="range"] { -webkit-appearance: none; width: 100%; background: transparent; outline: none; margin: 0; }
+        input[type="range"]::-webkit-slider-runnable-track { width: 100%; height: 6px; background: var(--border); border-radius: 4px; }
+        input[type="range"]::-webkit-slider-thumb { 
+            -webkit-appearance: none; height: 20px; width: 20px; border-radius: 50%; 
+            background: #ffffff; box-shadow: 0 2px 6px rgba(0,0,0,0.4); 
+            margin-top: -7px; cursor: pointer; transition: transform 0.1s; 
+        }
+        input[type="range"]::-webkit-slider-thumb:active { transform: scale(1.15); }
+        input[type="range"]::-moz-range-track { width: 100%; height: 6px; background: var(--border); border-radius: 4px; border: none; }
+        input[type="range"]::-moz-range-thumb { height: 20px; width: 20px; border-radius: 50%; background: #ffffff; border: none; cursor: pointer; }
+
+        /* Блок кнопок */
+        .btn-group { display: none; width: 100%; flex-direction: column; gap: 12px; animation: fadeUp 0.5s ease-out forwards; }
+        
+        .btn { 
+            display: flex; align-items: center; justify-content: center; gap: 8px; 
+            padding: 14px; background-color: var(--accent); color: #fff; text-decoration: none; 
+            border-radius: 10px; font-weight: 600; font-size: 15px; border: none; 
+            cursor: pointer; transition: all 0.2s; user-select: none; width: 100%; box-sizing: border-box;
+        }
         .btn:hover { background-color: var(--accent-hover); }
-        .btn:active { transform: scale(0.97); }
+        .btn:active { transform: scale(0.98); }
         
         .btn-secondary { background-color: var(--card); border: 1px solid var(--border); color: var(--text-main); }
         .btn-secondary:hover { background-color: #1f242c; border-color: #8b949e; }
         
-        .error { color: #ff7b72; display: none; padding: 16px; border-radius: 10px; background: rgba(255,123,114,0.1); border: 1px solid rgba(255,123,114,0.3); font-size: 14px; animation: fadeUp 0.4s ease; margin-top: 20px; }
-        
-        /* Контейнер QR-кода */
-        .qr-wrapper { display: none; width: 100%; flex-direction: column; align-items: center; animation: fadeUp 0.6s forwards; }
-        /* Контейнер для масштабирования (overflow hidden не нужен, пусть растет) */
-        .qr-scale-box { display: flex; justify-content: center; align-items: center; padding: 20px 0; height: 280px; }
-        
-        .qr-container { background: #fff; padding: 12px; border-radius: 14px; box-shadow: 0 12px 32px rgba(0,0,0,0.5); display: inline-block; transition: transform 0.1s ease-out; transform-origin: center center; }
-        .qr-container canvas { display: block; }
-        
-        /* Улучшенный ползунок в стиле macOS/iOS */
-        .slider-box { width: 100%; margin-top: 10px; display: flex; flex-direction: column; align-items: center; background: var(--card); padding: 12px 20px; border-radius: 12px; border: 1px solid var(--border); box-sizing: border-box; }
-        .slider-box label { color: var(--text-muted); font-size: 11px; margin-bottom: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
-        
-        input[type="range"] { -webkit-appearance: none; width: 100%; background: transparent; margin: 0; outline: none; }
-        /* Трек (линия) ползунка */
-        input[type="range"]::-webkit-slider-runnable-track { width: 100%; height: 6px; background: #30363d; border-radius: 4px; border: none; }
-        /* Сам ползунок (кружок) */
-        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; height: 20px; width: 20px; border-radius: 50%; background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.5); cursor: pointer; margin-top: -7px; transition: transform 0.1s; }
-        input[type="range"]::-webkit-slider-thumb:active { transform: scale(1.2); }
-        /* Для Firefox */
-        input[type="range"]::-moz-range-track { width: 100%; height: 6px; background: #30363d; border-radius: 4px; border: none; }
-        input[type="range"]::-moz-range-thumb { height: 20px; width: 20px; border-radius: 50%; background: #fff; border: none; box-shadow: 0 2px 6px rgba(0,0,0,0.5); cursor: pointer; }
+        .error { display: none; width: 100%; padding: 16px; border-radius: 10px; background: rgba(255,123,114,0.1); border: 1px solid rgba(255,123,114,0.3); color: #ff7b72; font-size: 14px; animation: fadeUp 0.4s ease; box-sizing: border-box; }
 
         @keyframes fadeUp { 0% { opacity: 0; transform: translateY(15px); } 100% { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
     <main>
-        <div class="loader" id="ui-spinner"></div>
-        <h2 id="ui-title">Инициализация...</h2>
-        <p id="ui-desc">Устанавливаем защищенное соединение с базой маршрутизации.</p>
+        <div class="header-block">
+            <div class="loader" id="ui-spinner"></div>
+            <h2 id="ui-title">Инициализация...</h2>
+            <p id="ui-desc">Устанавливаем защищенное соединение с базой маршрутизации.</p>
+        </div>
         
-        <div class="qr-wrapper" id="qr-wrapper">
-            <div class="qr-scale-box">
-                <div class="qr-container" id="qr-container"><canvas id="qr-canvas"></canvas></div>
-            </div>
+        <!-- Секция QR-кода -->
+        <div class="qr-section" id="qr-section">
+            <div class="qr-card" id="qr-card"></div>
             <div class="slider-box">
-                <label for="qr-size">Масштаб QR-кода</label>
-                <!-- Значение от 0.8 до 1.5 - это scale в CSS -->
-                <input type="range" id="qr-size" min="0.8" max="1.5" step="0.05" value="1">
+                <label for="qr-size">МАСТШТАБ QR-КОДА</label>
+                <!-- Меняем размер от 200px до 450px -->
+                <input type="range" id="qr-size" min="200" max="450" step="5" value="250">
             </div>
         </div>
 
+        <!-- Секция кнопок -->
         <div class="btn-group" id="btn-group">
             <a href="#" class="btn" id="ui-btn">🚀 Открыть в Happ</a>
             <button class="btn btn-secondary" id="ui-copy">📋 Скопировать код конфигурации</button>
-            <!-- Кнопка Поделиться теперь видна всегда -->
             <button class="btn btn-secondary" id="ui-share">📤 Поделиться сайтом</button>
         </div>
         
@@ -91,12 +135,13 @@
             spinner: document.getElementById('ui-spinner'),
             title: document.getElementById('ui-title'),
             desc: document.getElementById('ui-desc'),
+            qrSection: document.getElementById('qr-section'),
+            qrCard: document.getElementById('qr-card'),
+            qrSizeSlider: document.getElementById('qr-size'),
             btnGroup: document.getElementById('btn-group'),
             btnMain: document.getElementById('ui-btn'),
             btnCopy: document.getElementById('ui-copy'),
             btnShare: document.getElementById('ui-share'),
-            qrWrapper: document.getElementById('qr-wrapper'),
-            qrContainer: document.getElementById('qr-container'),
             error: document.getElementById('ui-error')
         };
 
@@ -105,10 +150,11 @@
             `https://cdn.jsdelivr.net/gh/JINXPIL/flclash-converter@main/HAPP/HAPP_INSTALL.DEEPLINK`
         ];
 
-        function loadQRious() {
+        // 🚀 Используем легкую и современную библиотеку qrcode-svg
+        function loadQRRenderer() {
             return new Promise((resolve, reject) => {
                 const script = document.createElement('script');
-                script.src = "https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js";
+                script.src = "https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js";
                 script.onload = resolve;
                 script.onerror = reject;
                 document.head.appendChild(script);
@@ -122,6 +168,7 @@
                     const timeout = setTimeout(() => controller.abort(), 4000);
                     const res = await fetch(url, { cache: 'no-store', signal: controller.signal });
                     clearTimeout(timeout);
+                    
                     if (res.status === 404) throw new Error('404');
                     if (res.ok) {
                         const text = (await res.text()).trim();
@@ -145,26 +192,32 @@
 
                 if (isMobile) {
                     DOM.desc.textContent = 'Нажмите зеленую кнопку, чтобы применить правила.';
-                    setTimeout(() => window.location.replace(link), 400);
+                    requestAnimationFrame(() => { setTimeout(() => window.location.replace(link), 400); });
                 } else {
                     DOM.desc.innerHTML = 'Отсканируйте камерой смартфона или скопируйте ссылку в десктопный клиент.';
                     
-                    await loadQRious();
-                    const qrCanvas = document.getElementById('qr-canvas');
+                    await loadQRRenderer();
+                    DOM.qrSection.style.display = 'flex';
                     
-                    // Генерируем ОДИН раз в высоком качестве (350px)
-                    new QRious({
-                        element: qrCanvas,
-                        value: link,
-                        size: 350,
-                        level: 'L'
+                    // Рисуем SVG QR-код. Он идеально четкий и растягивается CSS'ом.
+                    new QRCode(DOM.qrCard, {
+                        text: link,
+                        width: 512, // Внутреннее высокое разрешение
+                        height: 512,
+                        colorDark : "#000000",
+                        colorLight : "#ffffff",
+                        correctLevel : QRCode.CorrectLevel.L,
+                        useSVG: true // Принудительно векторный формат
                     });
                     
-                    DOM.qrWrapper.style.display = 'flex';
-                    
-                    // Меняем размер контейнера через CSS Transform (scale), а не перерисовываем QR
-                    document.getElementById('qr-size').addEventListener('input', function() {
-                        DOM.qrContainer.style.transform = `scale(${this.value})`;
+                    // Убираем лишние теги <img>, которые генерит старая либа, оставляем только <canvas>/<svg>
+                    const img = DOM.qrCard.querySelector('img');
+                    if (img) img.style.display = 'none';
+
+                    // Плавная логика ползунка через CSS-переменную
+                    DOM.qrSizeSlider.addEventListener('input', function() {
+                        // Меняем размер самого белого квадрата
+                        document.documentElement.style.setProperty('--qr-size', `${this.value}px`);
                     });
                 }
 
@@ -179,33 +232,19 @@
                             DOM.btnCopy.style.borderColor = 'var(--border)';
                             DOM.btnCopy.style.color = 'var(--text-main)';
                         }, 2500);
-                    } catch (e) {
-                        prompt('Скопируйте эту ссылку:', link);
-                    }
+                    } catch (e) { prompt('Скопируйте эту ссылку:', link); }
                 };
 
-                // Кнопка "Поделиться" теперь работает и на ПК, и на мобилках
                 DOM.btnShare.onclick = async () => {
-                    const shareData = {
-                        title: 'Network Builder ULTRA',
-                        text: 'Установи профиль маршрутизации (обход DPI) в 1 клик!',
-                        url: 'https://jinxpil.github.io/flclash-converter/happ.html'
-                    };
-                    
+                    const shareData = { title: 'Network Builder', text: 'Установи профиль маршрутизации в 1 клик!', url: 'https://jinxpil.github.io/flclash-converter/happ.html' };
                     if (navigator.share) {
-                        // Нативное окно Share (Телефоны / macOS)
-                        try {
-                            await navigator.share(shareData);
-                        } catch (err) {}
+                        try { await navigator.share(shareData); } catch (err) {}
                     } else {
-                        // Для обычного ПК просто копируем ссылку на сайт в буфер
                         try {
                             await navigator.clipboard.writeText(`${shareData.text} ${shareData.url}`);
                             DOM.btnShare.innerHTML = '✅ Ссылка на сайт скопирована!';
                             setTimeout(() => { DOM.btnShare.innerHTML = '📤 Поделиться сайтом'; }, 2500);
-                        } catch (e) {
-                            prompt('Скопируйте ссылку для отправки другу:', shareData.url);
-                        }
+                        } catch (e) { prompt('Скопируйте ссылку:', shareData.url); }
                     }
                 };
 
@@ -213,6 +252,7 @@
                 DOM.spinner.style.display = 'none';
                 DOM.title.textContent = 'Ошибка загрузки';
                 DOM.desc.style.display = 'none';
+                
                 if (err.message === '404') {
                     DOM.error.innerHTML = '❌ Файл не найден.<br>Зайдите в GitHub ➔ <b>Actions</b> ➔ Run workflow.';
                 } else {
@@ -221,7 +261,6 @@
                 DOM.error.style.display = 'block';
             }
         }
-
         init();
     </script>
 </body>
