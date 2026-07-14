@@ -2,210 +2,141 @@
 <html lang="ru">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Установка конфигурации Happ...</title>
-    
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; connect-src https://raw.githubusercontent.com https://cdn.jsdelivr.net; style-src 'unsafe-inline'; script-src 'unsafe-inline' https://cdnjs.cloudflare.com;">
-    <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta name="referrer" content="no-referrer">
-    <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), interest-cohort=()">
-
-    <link rel="preconnect" href="https://raw.githubusercontent.com" crossorigin>
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-
+    <!-- Библиотека загружается сразу и надежно -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <style>
-        :root { --bg: #0d1117; --text-main: #c9d1d9; --text-muted: #8b949e; --accent: #238636; --accent-hover: #2ea043; --card: #161b22; --border: #30363d; --qr-size: 250px; }
-        body { background-color: var(--bg); color: var(--text-main); font-family: system-ui, -apple-system, sans-serif; display: flex; justify-content: center; min-height: 100vh; margin: 0; padding: 40px 20px; box-sizing: border-box; }
-        main { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 420px; text-align: center; gap: 24px; }
-        .header-block { display: flex; flex-direction: column; align-items: center; gap: 12px; }
-        .loader { border: 3px solid var(--card); border-top: 3px solid #58a6ff; border-radius: 50%; width: 40px; height: 40px; animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
+        body { background-color: #0d1117; color: #c9d1d9; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; text-align: center; }
+        .loader { border: 4px solid #161b22; border-top: 4px solid #58a6ff; border-radius: 50%; width: 44px; height: 44px; margin-bottom: 20px; animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
-        h2 { font-size: 22px; margin: 0; font-weight: 600; }
-        p { color: var(--text-muted); line-height: 1.5; font-size: 15px; margin: 0; }
+        h2 { color: #ffffff; margin: 0 0 10px 0; }
+        p { color: #8b949e; font-size: 15px; margin: 0; max-width: 400px; }
         
-        .qr-section { display: none; flex-direction: column; align-items: center; width: 100%; gap: 16px; animation: fadeUp 0.5s ease-out forwards; }
-        .qr-card { background: #ffffff; padding: 12px; border-radius: 16px; box-shadow: 0 12px 32px rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; width: var(--qr-size); height: var(--qr-size); transition: width 0.1s linear, height 0.1s linear; }
-        .qr-card svg { width: 100%; height: 100%; display: block; }
+        /* --- Идеальный блок QR-кода --- */
+        #qr-section { display: none; flex-direction: column; align-items: center; margin-top: 25px; }
         
-        .slider-box { width: 100%; background: var(--card); padding: 14px 20px; border-radius: 12px; border: 1px solid var(--border); box-sizing: border-box; }
-        .slider-box label { color: var(--text-muted); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 12px; }
+        /* Зона для QR-кода (чтобы при увеличении он не сдвигал кнопки вниз) */
+        .qr-stage { height: 280px; display: flex; align-items: center; justify-content: center; margin-bottom: 15px; }
+        
+        /* Сама белая карточка. Меняет размер плавно через transform */
+        .qr-card { background: #ffffff; padding: 12px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); transition: transform 0.1s; }
+        .qr-card canvas { display: block; }
+        
+        /* --- Красивый ползунок --- */
+        .slider-box { background: #161b22; border: 1px solid #30363d; padding: 12px 20px; border-radius: 10px; width: 250px; box-sizing: border-box; }
+        .slider-box label { color: #8b949e; font-size: 11px; font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 10px; }
         input[type="range"] { -webkit-appearance: none; width: 100%; background: transparent; outline: none; margin: 0; }
-        input[type="range"]::-webkit-slider-runnable-track { width: 100%; height: 6px; background: var(--border); border-radius: 4px; }
-        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; height: 20px; width: 20px; border-radius: 50%; background: #ffffff; box-shadow: 0 2px 6px rgba(0,0,0,0.4); margin-top: -7px; cursor: pointer; transition: transform 0.1s; }
-        input[type="range"]::-webkit-slider-thumb:active { transform: scale(1.15); }
+        input[type="range"]::-webkit-slider-runnable-track { width: 100%; height: 6px; background: #30363d; border-radius: 4px; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%; background: #ffffff; cursor: pointer; margin-top: -6px; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
         
-        .btn-group { display: none; width: 100%; flex-direction: column; gap: 12px; animation: fadeUp 0.5s ease-out forwards; }
-        .btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px; background-color: var(--accent); color: #fff; text-decoration: none; border-radius: 10px; font-weight: 600; font-size: 15px; border: none; cursor: pointer; transition: all 0.2s; user-select: none; width: 100%; box-sizing: border-box; }
-        .btn:hover { background-color: var(--accent-hover); }
-        .btn:active { transform: scale(0.98); }
-        .btn-secondary { background-color: var(--card); border: 1px solid var(--border); color: var(--text-main); }
-        .btn-secondary:hover { background-color: #1f242c; border-color: #8b949e; }
-        
-        .error { display: none; width: 100%; padding: 16px; border-radius: 10px; background: rgba(255,123,114,0.1); border: 1px solid rgba(255,123,114,0.3); color: #ff7b72; font-size: 14px; animation: fadeUp 0.4s ease; box-sizing: border-box; }
-        @keyframes fadeUp { 0% { opacity: 0; transform: translateY(15px); } 100% { opacity: 1; transform: translateY(0); } }
+        /* --- Кнопки --- */
+        .btn { display: none; margin-top: 15px; padding: 14px 20px; background-color: #238636; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 15px; width: 250px; box-sizing: border-box; cursor: pointer; border: none; }
+        .btn-copy { background-color: #21262d; border: 1px solid #30363d; margin-top: 10px; }
+        .error { color: #ff7b72; display: none; margin-top: 20px; padding: 15px; background: rgba(255,123,114,0.1); border-radius: 8px; border: 1px solid rgba(255,123,114,0.4); max-width: 400px; }
     </style>
 </head>
 <body>
-    <main>
-        <div class="header-block">
-            <div class="loader" id="ui-spinner"></div>
-            <h2 id="ui-title">Инициализация...</h2>
-            <p id="ui-desc">Устанавливаем защищенное соединение с базой маршрутизации.</p>
-        </div>
-        
-        <div class="qr-section" id="qr-section">
-            <div class="qr-card" id="qr-card"></div>
-            <div class="slider-box">
-                <label for="qr-size">МАСТШТАБ QR-КОДА</label>
-                <input type="range" id="qr-size" min="200" max="450" step="5" value="250">
+    <div class="loader" id="loader"></div>
+    <h2 id="title">Загрузка...</h2>
+    <p id="desc">Получаем конфигурацию с сервера.</p>
+
+    <!-- Секция QR -->
+    <div id="qr-section">
+        <div class="qr-stage">
+            <div class="qr-card" id="qr-card">
+                <canvas id="qr-canvas"></canvas>
             </div>
         </div>
-
-        <div class="btn-group" id="btn-group">
-            <a href="#" class="btn" id="ui-btn">🚀 Открыть в Happ</a>
-            <button class="btn btn-secondary" id="ui-copy">📋 Скопировать код конфигурации</button>
-            <button class="btn btn-secondary" id="ui-share">📤 Поделиться сайтом</button>
+        <div class="slider-box">
+            <label>Масштаб QR-кода</label>
+            <input type="range" id="qr-size" min="0.8" max="1.5" step="0.05" value="1">
         </div>
-        
-        <div class="error" id="ui-error"></div>
-    </main>
+    </div>
+
+    <a href="#" class="btn" id="btn-open">🚀 Открыть в Happ</a>
+    <button class="btn btn-copy" id="btn-copy">📋 Скопировать ссылку</button>
+    
+    <div class="error" id="error-msg"></div>
 
     <script>
-        const DOM = {
-            spinner: document.getElementById('ui-spinner'),
-            title: document.getElementById('ui-title'),
-            desc: document.getElementById('ui-desc'),
-            qrSection: document.getElementById('qr-section'),
-            qrCard: document.getElementById('qr-card'),
-            qrSizeSlider: document.getElementById('qr-size'),
-            btnGroup: document.getElementById('btn-group'),
-            btnMain: document.getElementById('ui-btn'),
-            btnCopy: document.getElementById('ui-copy'),
-            btnShare: document.getElementById('ui-share'),
-            error: document.getElementById('ui-error')
-        };
-
         const sources = [
             `https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/HAPP/HAPP_INSTALL.DEEPLINK?t=${Date.now()}`,
             `https://cdn.jsdelivr.net/gh/JINXPIL/flclash-converter@main/HAPP/HAPP_INSTALL.DEEPLINK`
         ];
 
-        function loadQRRenderer() {
-            return new Promise((resolve, reject) => {
-                const script = document.createElement('script');
-                script.src = "https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js";
-                script.onload = resolve;
-                script.onerror = reject;
-                document.head.appendChild(script);
-            });
-        }
-
         async function fetchConfig() {
             for (let url of sources) {
                 try {
-                    const controller = new AbortController();
-                    const timeout = setTimeout(() => controller.abort(), 4000);
-                    const res = await fetch(url, { cache: 'no-store', signal: controller.signal });
-                    clearTimeout(timeout);
-                    
-                    if (res.status === 404) throw new Error('404');
+                    const res = await fetch(url, { cache: 'no-store' });
                     if (res.ok) {
                         const text = (await res.text()).trim();
                         if (text.startsWith('happ://')) return text;
                     }
-                } catch (e) { if(e.message === '404') throw e; }
+                } catch (e) {}
             }
-            throw new Error('NETWORK');
+            throw new Error('FAIL');
         }
 
-        async function init() {
-            try {
-                const link = await fetchConfig();
+        fetchConfig().then(link => {
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('title').textContent = '✅ Готово к установке!';
+            
+            const isMobile = /Android|webOS|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth <= 768;
+
+            if (isMobile) {
+                document.getElementById('desc').textContent = 'Нажмите кнопку ниже, чтобы применить правила.';
+                setTimeout(() => window.location.replace(link), 300);
+            } else {
+                document.getElementById('desc').innerHTML = 'Отсканируйте камерой смартфона или скопируйте ссылку.';
                 
-                DOM.spinner.style.display = 'none';
-                DOM.title.textContent = '✅ Готово к установке';
-                DOM.btnMain.href = link;
+                // Рисуем четкий QR-код ОДИН РАЗ
+                new QRious({
+                    element: document.getElementById('qr-canvas'),
+                    value: link,
+                    size: 250,
+                    level: 'L'
+                });
                 
-                // ВАЖНО: Показываем кнопки ТОЛЬКО если ссылка успешно скачалась!
-                DOM.btnGroup.style.display = 'flex';
-
-                const isMobile = /Android|webOS|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth <= 768;
-
-                if (isMobile) {
-                    DOM.desc.textContent = 'Нажмите зеленую кнопку, чтобы применить правила.';
-                    requestAnimationFrame(() => { setTimeout(() => window.location.replace(link), 400); });
-                } else {
-                    DOM.desc.innerHTML = 'Отсканируйте камерой смартфона или скопируйте ссылку в десктопный клиент.';
-                    
-                    await loadQRRenderer();
-                    
-                    // Показываем блок QR-кода ТОЛЬКО после скачивания библиотеки
-                    DOM.qrSection.style.display = 'flex';
-                    
-                    new QRCode(DOM.qrCard, {
-                        text: link,
-                        width: 512, 
-                        height: 512,
-                        colorDark : "#000000",
-                        colorLight : "#ffffff",
-                        correctLevel : QRCode.CorrectLevel.L,
-                        useSVG: true 
-                    });
-                    
-                    const img = DOM.qrCard.querySelector('img');
-                    if (img) img.style.display = 'none';
-
-                    DOM.qrSizeSlider.addEventListener('input', function() {
-                        document.documentElement.style.setProperty('--qr-size', `${this.value}px`);
-                    });
-                }
-
-                DOM.btnCopy.onclick = async () => {
-                    try {
-                        await navigator.clipboard.writeText(link);
-                        DOM.btnCopy.innerHTML = '✅ Скопировано в буфер!';
-                        DOM.btnCopy.style.borderColor = 'var(--accent)';
-                        DOM.btnCopy.style.color = 'var(--accent)';
-                        setTimeout(() => {
-                            DOM.btnCopy.innerHTML = '📋 Скопировать код конфигурации';
-                            DOM.btnCopy.style.borderColor = 'var(--border)';
-                            DOM.btnCopy.style.color = 'var(--text-main)';
-                        }, 2500);
-                    } catch (e) { prompt('Скопируйте эту ссылку:', link); }
-                };
-
-                DOM.btnShare.onclick = async () => {
-                    const shareData = { title: 'Network Builder', text: 'Установи профиль маршрутизации в 1 клик!', url: 'https://jinxpil.github.io/flclash-converter/happ.html' };
-                    if (navigator.share) {
-                        try { await navigator.share(shareData); } catch (err) {}
-                    } else {
-                        try {
-                            await navigator.clipboard.writeText(`${shareData.text} ${shareData.url}`);
-                            DOM.btnShare.innerHTML = '✅ Ссылка на сайт скопирована!';
-                            setTimeout(() => { DOM.btnShare.innerHTML = '📤 Поделиться сайтом'; }, 2500);
-                        } catch (e) { prompt('Скопируйте ссылку:', shareData.url); }
-                    }
-                };
-
-            } catch (err) {
-                // Если произошла ошибка (404 или Network)
-                DOM.spinner.style.display = 'none';
-                DOM.title.textContent = 'Ошибка загрузки';
-                DOM.desc.style.display = 'none';
+                document.getElementById('qr-section').style.display = 'flex';
                 
-                // ВАЖНО: Прячем QR-секцию и кнопки, чтобы не пугать пользователя
-                DOM.qrSection.style.display = 'none';
-                DOM.btnGroup.style.display = 'none';
-                
-                if (err.message === '404') {
-                    DOM.error.innerHTML = '❌ Файл не найден.<br>Убедитесь, что бот сгенерировал файл <b>HAPP_INSTALL.DEEPLINK</b> в папке <b>HAPP</b>.';
-                } else {
-                    DOM.error.textContent = '❌ Сетевой сбой. Пожалуйста, отключите AdBlock/VPN для этой страницы.';
-                }
-                DOM.error.style.display = 'block';
+                // Масштабируем саму карточку через CSS (никаких белых рамок)
+                document.getElementById('qr-size').addEventListener('input', function() {
+                    document.getElementById('qr-card').style.transform = `scale(${this.value})`;
+                });
             }
-        }
-        init();
+
+            // Показываем кнопки
+            const btnOpen = document.getElementById('btn-open');
+            btnOpen.href = link;
+            btnOpen.style.display = 'block';
+
+            const btnCopy = document.getElementById('btn-copy');
+            btnCopy.style.display = 'block';
+            btnCopy.onclick = () => {
+                navigator.clipboard.writeText(link).then(() => {
+                    btnCopy.textContent = '✅ Скопировано!';
+                    btnCopy.style.backgroundColor = '#238636';
+                    btnCopy.style.borderColor = '#238636';
+                    setTimeout(() => {
+                        btnCopy.textContent = '📋 Скопировать ссылку';
+                        btnCopy.style.backgroundColor = '#21262d';
+                        btnCopy.style.borderColor = '#30363d';
+                    }, 2000);
+                }).catch(() => alert('Не удалось скопировать.'));
+            };
+
+        }).catch(() => {
+            // Если произошла ошибка - прячем всё и показываем текст
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('title').textContent = 'Ошибка загрузки';
+            document.getElementById('desc').style.display = 'none';
+            document.getElementById('qr-section').style.display = 'none';
+            
+            const err = document.getElementById('error-msg');
+            err.textContent = '❌ Не удалось скачать файл конфигурации. Проверьте интернет или отключите блокировщики рекламы.';
+            err.style.display = 'block';
+        });
     </script>
 </body>
 </html>
