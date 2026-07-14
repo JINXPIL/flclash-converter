@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     
-    <!-- CSP обновлен: разрешена загрузка скрипта qrcode.js и картинок (QR) -->
+    <!-- CSP: разрешили загрузку новой мощной библиотеки QRious -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'none'; connect-src https://raw.githubusercontent.com https://cdn.jsdelivr.net; style-src 'unsafe-inline'; script-src 'unsafe-inline' https://cdnjs.cloudflare.com; img-src data:;">
     <title>Установка конфигурации INCY...</title>
     <style>
@@ -19,21 +19,22 @@
         .btn-copy:hover { background-color: #30363d; }
         .error { color: #ff7b72; display: none; margin-top: 20px; padding: 15px; border-radius: 8px; background: rgba(255,123,114,0.1); border: 1px solid rgba(255,123,114,0.4); }
         
-        /* Стили для QR-кода */
-        .qr-container { display: none; margin-top: 25px; background: #ffffff; padding: 15px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
-        .qr-container canvas, .qr-container img { display: block; margin: 0 auto; }
+        /* Увеличенный контейнер для плотного QR-кода */
+        .qr-container { display: none; margin-top: 25px; background: #ffffff; padding: 20px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+        .qr-container canvas { display: block; margin: 0 auto; max-width: 100%; height: auto; }
         .qr-hint { color: #8b949e; font-size: 13px; margin-top: 15px; }
     </style>
-    <!-- Локальный генератор QR кодов -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- Подключаем QRious - лучшую библиотеку для тяжелых данных -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 </head>
 <body>
     <div class="loader" id="ui-spinner"></div>
     <h2 id="ui-title">Подготовка конфигурации...</h2>
     <p id="ui-desc">Безопасное соединение. Загружаем актуальные правила маршрутизации.</p>
     
-    <!-- Контейнер для QR-кода -->
-    <div class="qr-container" id="qr-box"></div>
+    <div class="qr-container" id="qr-box">
+        <canvas id="qr-canvas"></canvas>
+    </div>
     <div class="qr-hint" id="qr-hint" style="display:none;">Отсканируйте камерой телефона</div>
 
     <a href="#" class="btn" id="ui-btn">🚀 Открыть в приложении INCY</a>
@@ -42,7 +43,6 @@
     <div class="error" id="ui-error"></div>
 
     <script>
-        // ИСПРАВЛЕННЫЙ ПУТЬ: Теперь ищет файл в папке INCY
         const sources = [
             `https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/INCY/INCY_INSTALL.DEEPLINK?t=${Date.now()}`,
             `https://cdn.jsdelivr.net/gh/JINXPIL/flclash-converter@main/INCY/INCY_INSTALL.DEEPLINK`
@@ -68,7 +68,6 @@
             document.getElementById('ui-title').textContent = '✅ Конфигурация готова!';
             document.getElementById('ui-desc').innerHTML = 'На телефоне приложение откроется само.<br><b>На ПК:</b> отсканируйте QR-код или скопируйте ссылку.';
             
-            // Показываем кнопки
             document.getElementById('ui-btn').href = link;
             document.getElementById('ui-btn').style.display = 'block';
             
@@ -84,27 +83,22 @@
                 });
             };
 
-            // Генерируем QR-код
+            // Генерация QR-кода через мощный QRious
             try {
-                const qrBox = document.getElementById('qr-box');
-                qrBox.style.display = 'block';
-                document.getElementById('qr-hint').style.display = 'block';
-                
-                new QRCode(qrBox, {
-                    text: link,
-                    width: 220,
-                    height: 220,
-                    colorDark : "#000000",
-                    colorLight : "#ffffff",
-                    correctLevel : QRCode.CorrectLevel.L
+                const qrCanvas = document.getElementById('qr-canvas');
+                new QRious({
+                    element: qrCanvas,
+                    value: link,
+                    size: 350, // Увеличили размер до 350px для сверхчеткости микро-пикселей
+                    level: 'L' // Уровень 'L' позволяет вместить максимальный объем данных
                 });
+                
+                document.getElementById('qr-box').style.display = 'block';
+                document.getElementById('qr-hint').style.display = 'block';
             } catch (e) {
-                console.warn('QR-код слишком длинный', e);
-                document.getElementById('qr-box').style.display = 'none';
-                document.getElementById('qr-hint').style.display = 'none';
+                console.warn('QR-код превышает абсолютный физический лимит стандарта', e);
             }
 
-            // Пытаемся открыть автоматически
             setTimeout(() => window.location.replace(link), 300);
 
         }).catch(err => {
