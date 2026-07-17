@@ -276,7 +276,12 @@
     "domain:narhsi.ru",
     "domain:mail.ru",
     "domain:avito.st",
-    "domain:mds.yandex.net"
+    "domain:mds.yandex.net",
+    "domain:libtorrent.org",
+    "domain:bittorrent.com",
+    "domain:transmissionbt.com",
+    "domain:silotis.us",
+    "domain:t-ru.org"
   ],
   "DirectIp": [
     "127.0.0.0/8",
