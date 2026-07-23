@@ -1,5 +1,5 @@
 {
-  "Name": "RUS-VIP-ULTIMATE v82.11 (Quad9 DNS)",
+  "Name": "RUS-VIP-ULTIMATE v82.11 (Optimized)",
   "GlobalProxy": "true",
   "RouteOrder": "block-direct-proxy",
   "RemoteDNSType": "DoH",
@@ -352,8 +352,6 @@
     "domain:capcut.com",
     "domain:capcut.net",
     "domain:capcutv.com",
-    "domain:byteoversea.com",
-    "domain:byteoversea.net",
     "domain:ibytedtos.com",
     "domain:faceu.mobi",
     "domain:viamaker.com",
@@ -362,7 +360,6 @@
     "domain:bytedance.net",
     "domain:byteimg.com",
     "domain:ibyteimg.com",
-    "domain:pstatp.com",
     "geosite:onedrive",
     "geosite:mozilla",
     "geosite:category-porn",
@@ -408,7 +405,19 @@
     "onlyfans.com",
     "chaturbate.com",
     "domain:pinterest.com",
-    "domain:pinimg.com"
+    "domain:pinimg.com",
+    "ytimg.com",
+    "ggpht.com",
+    "youtu.be",
+    "youtubei.googleapis.com",
+    "youtube-nocookie.com",
+    "googlesyndication.com",
+    "domain:yt3.ggpht.com",
+    "tiktokcdn.com",
+    "tiktokcdn-us.com",
+    "muscdn.com",
+    "musical.ly",
+    "tiktokinfo.com"
   ],
   "ProxyIp": [
     "geoip:telegram",
@@ -464,10 +473,15 @@
     "app.tanker.yandex.net",
     "startup.mobile.yandex.net",
     "crashlyticsreports-pa.googleapis.com",
-    "firebase-settings.crashlytics.com"
+    "firebase-settings.crashlytics.com",
+    "domain:app-measurement.com",
+    "domain:byteoversea.com",
+    "domain:byteoversea.net",
+    "domain:pstatp.com",
+    "log.tiktokv.com"
   ],
   "BlockIp": [],
   "DomainStrategy": "IPIfNonMatch",
-  "FakeDNS": "false",
+  "FakeDNS": "true",
   "UseChunkFiles": "true"
 }
