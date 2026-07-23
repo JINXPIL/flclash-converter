@@ -10,7 +10,7 @@
   "DomesticDNSIP": "77.88.8.8",
   "Geoipurl": "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.dat",
   "Geositeurl": "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geosite.dat",
-  "LastUpdated": "1784298713",
+  "LastUpdated": "1784837724",
   "DnsHosts": {
     "dns.quad9.net": "9.9.9.9",
     "cloudflare-dns.com": "1.1.1.1",
