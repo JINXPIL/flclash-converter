@@ -1,5 +1,5 @@
 {
-  "Name": "RUS-VIP-ULTIMATE v82.40 (Final Clean)",
+  "Name": "RUS-VIP-ULTIMATE v82.41 (Bulletproof)",
   "GlobalProxy": "true",
   "RouteOrder": "block-direct-proxy",
   "RemoteDNSType": "DoH",
@@ -10,7 +10,7 @@
   "DomesticDNSIP": "77.88.8.8",
   "Geoipurl": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.dat",
   "Geositeurl": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geosite.dat",
-  "LastUpdated": "1784992592",
+  "LastUpdated": "1784298713",
   "DnsHosts": {
     "dns.quad9.net": "9.9.9.9",
     "cloudflare-dns.com": "1.1.1.1",
@@ -745,11 +745,6 @@
     "domain:stun.services.mozilla.com",
     "domain:turn.cloudflare.com",
     "domain:webrtc.org",
-    "domain:cloudfront.net",
-    "domain:akamaihd.net",
-    "domain:akamaized.net",
-    "domain:fastly.net",
-    "domain:appspot.com",
     "domain:cursor.sh",
     "domain:cursor.com",
     "domain:githubcopilot.com",
@@ -764,8 +759,6 @@
     "domain:etherscan.io"
   ],
   "BlockSites": [
-    "geosite:malware",
-    "geosite:phishing",
     "geosite:category-ads-all",
     "domain:trafficjunky.com",
     "domain:pornhubpremium.com",
