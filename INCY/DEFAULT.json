@@ -1,5 +1,5 @@
 {
-  "Name": "RUS-VIP-ULTIMATE v82.41 (Bulletproof)",
+  "Name": "RUS-VIP-ULTIMATE v82.42 (No-EOF Edition)",
   "GlobalProxy": "true",
   "RouteOrder": "block-direct-proxy",
   "RemoteDNSType": "DoH",
@@ -10,7 +10,7 @@
   "DomesticDNSIP": "77.88.8.8",
   "Geoipurl": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.dat",
   "Geositeurl": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geosite.dat",
-  "LastUpdated": "1784994440",
+  "LastUpdated": "1784995541",
   "DnsHosts": {
     "dns.quad9.net": "9.9.9.9",
     "cloudflare-dns.com": "1.1.1.1",
@@ -20,7 +20,8 @@
     "doh.pub": "120.53.53.53",
     "time.windows.com": "52.167.21.1",
     "time.apple.com": "17.253.34.253",
-    "time.google.com": "216.239.35.0"
+    "time.google.com": "216.239.35.0",
+    "time.android.com": "216.239.35.0"
   },
   "DirectSites": [
     "domain:localhost",
@@ -54,8 +55,8 @@
     "geosite:category-ecommerce-ru",
     "geosite:category-entertainment-ru",
     "geosite:category-ru",
-    "geosite:microsoft-update",
-    "geosite:apple-update",
+    "domain:windowsupdate.com",
+    "domain:update.microsoft.com",
     "domain:aliexpress.ru",
     "geosite:category-pt",
     "geosite:tracker",
@@ -745,6 +746,11 @@
     "domain:stun.services.mozilla.com",
     "domain:turn.cloudflare.com",
     "domain:webrtc.org",
+    "domain:cloudfront.net",
+    "domain:akamaihd.net",
+    "domain:akamaized.net",
+    "domain:fastly.net",
+    "domain:appspot.com",
     "domain:cursor.sh",
     "domain:cursor.com",
     "domain:githubcopilot.com",
