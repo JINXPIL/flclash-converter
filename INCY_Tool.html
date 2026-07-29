@@ -13,7 +13,7 @@
     <style>
         /* ================= ДИНАМИЧЕСКАЯ ТЕМА ================= */
         :root {
-            /* Темная тема (По умолчанию) */
+            /* Темная тема */
             --bg-body: #0a0d14; --bg-card: #111827; --bg-input: #1f2937;
             --border-gray: #374151; --accent-blue: #3b82f6; --accent-green: #10b981;
             --text-main: #e5e7eb; --text-muted: #9ca3af;
@@ -60,7 +60,7 @@
         .btn-util { background: var(--bg-card); }
         
         .btn-primary { width: 100%; padding: 16px; background: var(--accent-blue); color: white; font-size: 15px; border-radius: 12px; box-shadow: 0 0 15px rgba(59,130,246,0.3); }
-        .btn-green { padding: 16px; background: rgba(16, 185, 129, 0.1); border: 1px solid var(--accent-green); color: var(--accent-green); font-size: 14px; border-radius: 12px; width: 100%;}
+        .btn-green { padding: 16px !important; background: rgba(16, 185, 129, 0.1); border: 1px solid var(--accent-green); color: var(--accent-green); font-size: 14px; border-radius: 12px; width: 100%;}
         
         a.btn-launch { background: linear-gradient(135deg, var(--accent-blue), #2563eb); color: white; box-shadow: 0 5px 15px rgba(59,130,246,0.4); font-size: 16px; margin-bottom: 16px; padding: 16px; border-radius: 12px; text-decoration: none; display: flex; flex-direction: column; align-items: center; }
         
@@ -83,18 +83,25 @@
         .toolbar-divider { width: 1px; background: var(--border-gray); margin: 0 4px; flex-shrink: 0; }
         
         .editor-workspace { display: flex; height: 320px; }
-        .line-numbers { background: var(--line-num-bg); border-right: 1px solid var(--border-gray); padding: 16px 8px; color: var(--line-num-color); text-align: right; font-family: monospace; font-size: 12px; user-select: none; overflow: hidden; }
+        /* ИСПРАВЛЕНЫ ОТСТУПЫ: Строгая синхронизация 80px снизу */
+        .line-numbers { background: var(--line-num-bg); border-right: 1px solid var(--border-gray); padding: 16px 8px 80px 8px; color: var(--line-num-color); text-align: right; font-family: monospace; font-size: 12px; user-select: none; overflow: hidden; }
         .line-numbers div, .json-textarea { line-height: 22px; }
-        .json-textarea { flex-grow: 1; height: 100%; padding: 16px; font-size: 12px; color: var(--code-color); border: none; background: transparent; resize: none; outline: none; white-space: pre; overflow: auto; padding-bottom: 80px;}
+        .json-textarea { appearance: none; -webkit-appearance: none; flex-grow: 1; height: 100%; padding: 16px; padding-bottom: 80px; font-size: 12px; color: var(--code-color); border: none; background: transparent; resize: none; outline: none; white-space: pre; overflow: auto; }
 
         .resizer { height: 36px; background: var(--bg-input); border-top: 1px solid var(--border-gray); display: flex; justify-content: center; align-items: center; cursor: ns-resize; }
         .resizer-handle { width: 60px; height: 4px; background: var(--border-gray); border-radius: 2px; }
         
-        .fullscreen { position: fixed; inset: 0; z-index: 1000; border-radius: 0; border: none; display: flex; flex-direction: column; background: var(--bg-body); padding-bottom: env(safe-area-inset-bottom, 20px); margin: 0;}
-        .fullscreen .editor-workspace { flex-grow: 1; height: auto !important; }
+        /* ИСПРАВЛЕН FULLSCREEN: Правильные Flex-компоненты для растяжения на 100% */
+        .fullscreen { position: fixed; inset: 0; z-index: 1000; border-radius: 0; border: none; display: flex; flex-direction: column; background: var(--bg-body); padding: 0; padding-bottom: env(safe-area-inset-bottom, 20px); margin: 0;}
+        .fullscreen #editorBlock { display: flex; flex-direction: column; flex: 1; min-height: 0; border: none; }
+        .fullscreen .editor-container { flex: 1; min-height: 0; margin-bottom: 0; border-left: none; border-right: none; border-radius: 0; box-shadow: none; display: flex; flex-direction: column;}
+        .fullscreen .editor-workspace { flex: 1; height: auto !important; min-height: 0; display: flex;}
         .fullscreen .resizer { display: none; }
-        .fullscreen .fs-header { padding: 16px; background: var(--bg-card); padding-top: max(16px, env(safe-area-inset-top, 20px)); margin-bottom: 0;}
+        .fullscreen .fs-header { padding: 16px; background: var(--bg-card); padding-top: max(16px, env(safe-area-inset-top, 20px)); margin-bottom: 0; flex-shrink: 0;}
+        .fullscreen .editor-actions { padding: 0 16px; margin-bottom: 16px; margin-top: 16px; flex-shrink: 0;}
+        .fullscreen .error-box { margin: 0 16px; flex-shrink: 0; }
 
+        .editor-actions { display: flex; gap: 8px; margin-bottom: 16px; }
         .toast { position: fixed; top: max(20px, env(safe-area-inset-top, 20px)); left: 50%; transform: translate(-50%, -20px); opacity: 0; background: var(--bg-input); border: 1px solid var(--border-gray); color: var(--text-main); padding: 12px 24px; border-radius: 12px; font-size: 14px; font-weight: bold; pointer-events: none; transition: 0.3s; z-index: 9999; box-shadow: 0 10px 25px rgba(0,0,0,0.5); text-align: center; max-width: 90%;}
         .toast.show { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
         .toast.error { background: #ef4444; color: white; border-color: #b91c1c; }
@@ -183,10 +190,9 @@
                 
                 <div id="errorBox" class="error-box hidden"></div>
                 
-                <!-- НОВЫЕ КНОПКИ В РЕДАКТОРЕ (С ОТМЕНОЙ) -->
-                <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+                <div class="editor-actions">
                     <button class="btn-action btn-action-red" id="btnCancelEdit" style="flex: 1; padding: 16px; border-radius: 12px; background: rgba(239, 68, 68, 0.1); border: 1px solid var(--red-text);">❌ Отмена</button>
-                    <button class="btn-green" id="btnSaveJson" style="flex: 2;">💾 Применить</button>
+                    <button class="btn-green" id="btnSaveJson" style="flex: 2; margin: 0;">💾 Применить</button>
                 </div>
             </div>
 
@@ -256,7 +262,7 @@
         let isFullscreen = false;
         let currentProtocol = 'incy';
         let hasUnsavedChanges = false;
-        let lastSavedJson = ''; // Сохраняем последнее примененное состояние для кнопки Отмена
+        let lastSavedJson = ''; 
 
         const savedTheme = localStorage.getItem('incy_theme') || 'dark';
         if (savedTheme === 'light') { document.documentElement.classList.add('light-theme'); updateThemeMeta('#f3f4f6');}
@@ -341,11 +347,10 @@
             editorHistory.push(val); if(editorHistory.length > 20) editorHistory.shift();
         }
         
-        // --- УЛУЧШЕННЫЙ ЗАПУСК ИЗ ИСТОРИИ (С Открытием редактора) ---
         window.loadIntoEditor = async function(url) {
             vibe(); els.srcInput.value = url; window.scrollTo({ top: 0, behavior: 'smooth' });
             await processInput();
-            openEditor(); // Автоматически открываем редактор после парсинга
+            openEditor();
             showToast("Загружено в редактор");
         }
 
@@ -419,7 +424,7 @@
                     
                     const code = JSON.stringify(json, null, 4);
                     els.jsonEditor.value = code; 
-                    lastSavedJson = code; // --- Запоминаем исходный код ---
+                    lastSavedJson = code;
                     editorHistory = [code];
                     
                     updateLineNumbers();
@@ -432,7 +437,6 @@
 
         els.fileInput.onchange = e => { let file = e.target.files[0]; if(!file) return; let reader = new FileReader(); reader.onload = ev => { els.srcInput.value = ev.target.result.trim(); processInput(); }; reader.readAsText(file); els.fileInput.value = ''; };
 
-        // --- УПРАВЛЕНИЕ РЕДАКТОРОМ (С ОТМЕНОЙ) ---
         els.btnOpenEditor.onclick = () => {
             vibe(); 
             els.fsHeader.classList.remove('hidden');
@@ -450,7 +454,7 @@
 
         els.btnCancelEdit.onclick = () => {
             vibe();
-            els.jsonEditor.value = lastSavedJson; // Возвращаем код как было до открытия
+            els.jsonEditor.value = lastSavedJson; 
             hasUnsavedChanges = false;
             closeFullscreen();
             closeEditor();
@@ -519,7 +523,7 @@
             try {
                 let parsed = JSON.parse(els.jsonEditor.value);
                 els.jsonEditor.value = JSON.stringify(parsed, null, 4); 
-                lastSavedJson = els.jsonEditor.value; // Сохраняем состояние
+                lastSavedJson = els.jsonEditor.value;
                 
                 let rawMinified = JSON.stringify(parsed);
                 let newUrl = `${currentProtocol}://routing/onadd/${encodeBase64(rawMinified)}`;
