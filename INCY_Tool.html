@@ -43,7 +43,6 @@
         h1 span { color: var(--accent-blue); }
         .subtitle { font-size: 14px; color: var(--text-muted); margin-bottom: 12px;}
 
-        /* Кнопка смены темы */
         .btn-theme { background: var(--bg-card); border: 1px solid var(--border-gray); font-size: 20px; padding: 8px; border-radius: 50%; color: var(--text-main); cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); position: absolute; right: 0; top: 0;}
 
         .card { background: var(--bg-card); border: 1px solid var(--border-gray); border-radius: 16px; padding: 20px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); transition: background-color 0.3s, border-color 0.3s;}
@@ -106,7 +105,6 @@
         .history-name { font-size: 14px; font-weight: bold; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .history-row { display: flex; gap: 8px; width: 100%; justify-content: space-between;}
 
-        /* Кнопка удаления в истории */
         .btn-delete-hist { position: absolute; right: 10px; top: 10px; background: transparent; border: none; font-size: 16px; color: var(--text-muted); cursor: pointer;}
         .btn-delete-hist:active { color: var(--red-text); transform: scale(0.9);}
 
@@ -124,7 +122,6 @@
                 <h1>INCY <span>Tool</span></h1>
                 <p class="subtitle">Ultimate Pro Edition 🚀</p>
             </div>
-            <!-- ФИШКА 1: Переключатель тем (Дневная / Ночная) -->
             <button class="btn-theme" id="btnThemeToggle" title="Сменить тему">🌓</button>
         </header>
 
@@ -137,7 +134,7 @@
             </div>
             
             <div class="input-wrapper">
-                <textarea id="srcInput" class="resizable-box" placeholder="Вставьте любой конфиг (HAPP / INCY / MINI)..." 
+                <textarea id="srcInput" class="resizable-box" placeholder="Вставьте профиль (HAPP / INCY / MINI)..." 
                           autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false"></textarea>
                 <div class="abs-buttons">
                     <button class="btn-action btn-action-blue" id="btnPaste" style="border:none">Вставить</button>
@@ -167,7 +164,6 @@
                         <button class="toolbar-btn btn-util" onclick="document.getElementById('jsonEditor').scrollTop=0">⬆</button>
                         <button class="toolbar-btn btn-util" onclick="document.getElementById('jsonEditor').scrollTop=999999">⬇</button>
                         <div class="toolbar-divider"></div>
-                        <!-- ФИШКА 3: Добавлены data-атрибуты start и end для умных скобок -->
                         <button class="toolbar-btn" data-insert="  ">Tab</button>
                         <button class="toolbar-btn" data-wrap-start='"' data-wrap-end='"'>""</button>
                         <button class="toolbar-btn" data-wrap-start='{' data-wrap-end='}'>{}</button>
@@ -186,17 +182,23 @@
                 </div>
                 
                 <div id="errorBox" class="error-box hidden"></div>
-                <button class="btn-green" id="btnSaveJson" style="margin-bottom: 16px;">💾 Применить изменения</button>
+                
+                <!-- НОВЫЕ КНОПКИ В РЕДАКТОРЕ (С ОТМЕНОЙ) -->
+                <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+                    <button class="btn-action btn-action-red" id="btnCancelEdit" style="flex: 1; padding: 16px; border-radius: 12px; background: rgba(239, 68, 68, 0.1); border: 1px solid var(--red-text);">❌ Отмена</button>
+                    <button class="btn-green" id="btnSaveJson" style="flex: 2;">💾 Применить</button>
+                </div>
             </div>
 
             <div id="resultBlock" style="margin-top: 16px;">
                 <a id="btnDeepLink" class="btn btn-launch" href="#">
-                    <div>🚀 Открыть напрямую в клиенте</div>
-                    <div style="font-size: 11px; font-weight: normal; margin-top: 6px; opacity: 0.8;">(Если не открылось — смените систему ниже)</div>
+                    <div>🚀 Открыть напрямую в приложении</div>
                 </a>
 
+                <button id="btnOpenEditor" class="btn-primary" style="margin-bottom: 16px; background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border-gray); box-shadow: none;">⚙️ Изменить JSON код</button>
+
                 <div class="platform-box">
-                    <div style="font-size: 11px; color: var(--text-muted); font-weight: bold; text-transform: uppercase;">Система адаптации:</div>
+                    <div style="font-size: 11px; color: var(--text-muted); font-weight: bold; text-transform: uppercase;">Платформа:</div>
                     <div class="format-tabs">
                         <button id="btnProtoIncy" class="format-tab active">INCY</button>
                         <button id="btnProtoHapp" class="format-tab">HAPP</button>
@@ -205,16 +207,13 @@
 
                 <textarea id="resultOutput" class="resizable-box" readonly placeholder="Здесь будет ПОЛНАЯ ссылка..." title="Нажмите, чтобы скопировать"></textarea>
                 
-                <div style="font-size: 11px; color: var(--text-muted); text-align: center; margin-bottom: 8px; margin-top: 16px; font-weight: bold; text-transform: uppercase;">Быстрый шаринг (Вместо текста):</div>
-                <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-                    <button class="btn-primary" id="btnCopyMini" style="flex: 1; background: rgba(59,130,246,0.1); border: 1px solid var(--accent-blue); color: var(--accent-blue); font-size: 13px;" title="Сжимает текст в 5 раз">🪄 Сжать (MINI)</button>
-                    <button class="btn-primary" id="btnShareFile" style="flex: 1; background: var(--bg-input); border: 1px solid var(--border-gray); color: var(--text-main); font-size: 13px;">📤 Файлом</button>
+                <div style="font-size: 11px; color: var(--text-muted); text-align: center; margin-bottom: 8px; margin-top: 16px; font-weight: bold; text-transform: uppercase;">Скопировать:</div>
+                <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                    <button class="btn-primary" id="btnCopyMini" style="flex: 1; background: rgba(59,130,246,0.1); border: 1px solid var(--accent-blue); color: var(--accent-blue); font-size: 13px;" title="Сжимает текст в 5 раз">🪄 Сжатая (MINI)</button>
+                    <button class="btn-primary" id="btnCopyResult" style="flex: 1; background: var(--bg-input); border: 1px solid var(--border-gray); color: var(--text-main); font-size: 13px;">📋 Полная</button>
                 </div>
                 
-                <div style="display: flex; gap: 8px; margin-bottom: 8px;">
-                    <button class="btn-primary" id="btnCopyResult" style="flex: 1.5; background: var(--bg-input); border: 1px solid var(--border-gray); color: var(--text-main); font-size: 13px;">📋 Скопировать</button>
-                    <button class="btn-primary" id="btnDownload" style="flex: 1; background: transparent; border: 1px solid var(--border-gray); color: var(--text-main); font-size: 13px;">📥 Скачать</button>
-                </div>
+                <button class="btn-primary" id="btnDownload" style="width: 100%; background: transparent; border: 1px solid var(--border-gray); color: var(--text-main); font-size: 13px;">📥 Скачать .json файлом</button>
             </div>
         </div>
 
@@ -243,22 +242,22 @@
             errorBox: document.getElementById('errorBox'), btnSaveJson: document.getElementById('btnSaveJson'),
             resultBlock: document.getElementById('resultBlock'), resultOutput: document.getElementById('resultOutput'),
             btnCopyResult: document.getElementById('btnCopyResult'), btnCopyMini: document.getElementById('btnCopyMini'),
-            btnShareFile: document.getElementById('btnShareFile'), btnDownload: document.getElementById('btnDownload'), 
+            btnDownload: document.getElementById('btnDownload'), 
             btnUndo: document.getElementById('btnUndo'), btnSearch: document.getElementById('btnSearch'), 
             historyCard: document.getElementById('historyCard'), historyList: document.getElementById('historyList'), 
             btnClearHistory: document.getElementById('btnClearHistory'), toast: document.getElementById('toast'), 
             btnDeepLink: document.getElementById('btnDeepLink'), toolbarBtns: document.querySelectorAll('.toolbar-btn'),
             btnProtoIncy: document.getElementById('btnProtoIncy'), btnProtoHapp: document.getElementById('btnProtoHapp'),
             btnThemeToggle: document.getElementById('btnThemeToggle'),
+            btnOpenEditor: document.getElementById('btnOpenEditor'), btnCancelEdit: document.getElementById('btnCancelEdit')
         };
 
-        // --- СОСТОЯНИЯ ---
         let editorHistory = [];
-        let isFullscreen = false, isEditorOpen = false;
+        let isFullscreen = false;
         let currentProtocol = 'incy';
-        let hasUnsavedChanges = false; // ФИШКА 2: Флаг защиты от выхода
+        let hasUnsavedChanges = false;
+        let lastSavedJson = ''; // Сохраняем последнее примененное состояние для кнопки Отмена
 
-        // --- ФИШКА 1: ТЕМИЗАЦИЯ ---
         const savedTheme = localStorage.getItem('incy_theme') || 'dark';
         if (savedTheme === 'light') { document.documentElement.classList.add('light-theme'); updateThemeMeta('#f3f4f6');}
         
@@ -275,18 +274,13 @@
             if(meta) meta.content = color;
         }
 
-        // --- ФИШКА 2: ОХРАНА НЕСОХРАНЕННЫХ ДАННЫХ ---
         window.addEventListener('beforeunload', function (e) {
-            if (hasUnsavedChanges) {
-                e.preventDefault();
-                e.returnValue = 'У вас есть несохраненные изменения!';
-            }
+            if (hasUnsavedChanges) { e.preventDefault(); e.returnValue = 'У вас есть несохраненные изменения!'; }
         });
 
         const encodeBase64 = str => btoa(unescape(encodeURIComponent(str))).replace(/=+$/, '');
         const decodeBase64 = str => { let p = str.length % 4; if(p) str += '='.repeat(4 - p); return decodeURIComponent(escape(atob(str))); };
 
-        // Универсальный декодер
         async function UniversalDecode(inputStr) {
             let b64 = inputStr.trim().replace(/\s+/g, '');
             if(b64.includes('://')) {
@@ -319,17 +313,14 @@
             } catch(e) { return `incy-mini://${encodeBase64(jsonStr)}`; }
         }
 
-        // --- ЛОЖИКА ПРОТОКОЛОВ (ФИШКА 6) ---
         const setProtocol = (proto) => {
             currentProtocol = proto;
             if(proto === 'incy') { els.btnProtoIncy.classList.add('active'); els.btnProtoHapp.classList.remove('active'); } 
             else { els.btnProtoHapp.classList.add('active'); els.btnProtoIncy.classList.remove('active'); }
             
-            // Динамически переписываем финальную ссылку
             if (els.resultOutput.value) {
                 let urlStr = els.resultOutput.value.replace(/^(happ|incy|incy-mini):\/\//i, `${proto}://`);
                 els.resultOutput.value = urlStr; els.btnDeepLink.href = urlStr;
-                // Невидимо обновляем историю, чтобы там тоже ссылка поменялась
                 updateCurrentHistoryItem(urlStr);
             }
         };
@@ -350,9 +341,12 @@
             editorHistory.push(val); if(editorHistory.length > 20) editorHistory.shift();
         }
         
-        window.loadIntoEditor = function(url) {
+        // --- УЛУЧШЕННЫЙ ЗАПУСК ИЗ ИСТОРИИ (С Открытием редактора) ---
+        window.loadIntoEditor = async function(url) {
             vibe(); els.srcInput.value = url; window.scrollTo({ top: 0, behavior: 'smooth' });
-            processInput(); showToast("Загружено в редактор");
+            await processInput();
+            openEditor(); // Автоматически открываем редактор после парсинга
+            showToast("Загружено в редактор");
         }
 
         els.jsonEditor.addEventListener('keydown', function(e) {
@@ -397,15 +391,6 @@
 
         els.btnCopyMini.onclick = async () => { vibe(); try { const miniUrl = await compressToMini(JSON.stringify(JSON.parse(els.jsonEditor.value))); if(miniUrl) { copyToClipboard(miniUrl); showToast("Короткая ссылка скопирована!"); } } catch(e) { showToast("Сначала восстановите код", true); } };
 
-        els.btnShareFile.onclick = async () => {
-            vibe();
-            try {
-                let name = (els.profileName.textContent.replace(/[^a-z0-9а-яё]/gi, '_').toLowerCase() || 'config') + '.json'; JSON.parse(els.jsonEditor.value); 
-                let file = new File([els.jsonEditor.value], name, {type: 'application/json'});
-                if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: 'Профиль INCY' }); showToast("Файл передан"); } else { showToast("Отправить файл можно только с мобильного", true); }
-            } catch(e) { showToast("Сначала восстановите код", true); }
-        };
-
         els.btnClear.onclick = () => { vibe(); els.srcInput.value = ''; els.resultOutput.value = ''; els.jsonEditor.value = ''; editorHistory = []; els.step2Card.classList.add('hidden'); closeFullscreen(); closeEditor(); hasUnsavedChanges = false;};
         els.btnPaste.onclick = async () => { vibe(); try { const text = await navigator.clipboard.readText(); if(text) { els.srcInput.value = text; processInput(); } } catch(e) { els.srcInput.focus(); showToast("Тапните системную кнопку Вставить", true); } };
 
@@ -429,13 +414,16 @@
                     let rawMinified = JSON.stringify(json);
                     let newUrl = `${currentProtocol}://routing/onadd/${encodeBase64(rawMinified)}`;
                     
-                    els.srcInput.value = newUrl; // Возвращаем всегда полную!
+                    els.srcInput.value = newUrl; 
                     updateOutputLinks(newUrl, json.Name);
                     
                     const code = JSON.stringify(json, null, 4);
-                    els.jsonEditor.value = code; editorHistory = [code];
+                    els.jsonEditor.value = code; 
+                    lastSavedJson = code; // --- Запоминаем исходный код ---
+                    editorHistory = [code];
+                    
                     updateLineNumbers();
-                    els.step2Card.classList.remove('hidden'); els.fsHeader.classList.remove('hidden');
+                    els.step2Card.classList.remove('hidden'); 
                     saveToHistory(json.Name, newUrl);
                     vibe(80); showToast("Распознано успешно!");
                 } catch(e) { vibe(100); showToast("Ошибка структуры конфига", true); }
@@ -444,11 +432,34 @@
 
         els.fileInput.onchange = e => { let file = e.target.files[0]; if(!file) return; let reader = new FileReader(); reader.onload = ev => { els.srcInput.value = ev.target.result.trim(); processInput(); }; reader.readAsText(file); els.fileInput.value = ''; };
 
-        function openEditor() { vibe(); isEditorOpen = true; els.editorBlock.classList.remove('hidden'); els.resultBlock.classList.add('hidden'); els.btnToggleFs.textContent = '⛶ На весь экран'; els.step2Card.scrollIntoView({ behavior: 'smooth', block: 'start' }); updateLineNumbers(); }
-        function closeEditor() { isEditorOpen = false; els.editorBlock.classList.add('hidden'); els.resultBlock.classList.remove('hidden'); els.btnToggleFs.textContent = '⚙️ Редактировать'; }
+        // --- УПРАВЛЕНИЕ РЕДАКТОРОМ (С ОТМЕНОЙ) ---
+        els.btnOpenEditor.onclick = () => {
+            vibe(); 
+            els.fsHeader.classList.remove('hidden');
+            els.editorBlock.classList.remove('hidden'); 
+            els.resultBlock.classList.add('hidden'); 
+            els.step2Card.scrollIntoView({ behavior: 'smooth', block: 'start' }); 
+            updateLineNumbers();
+        };
+
+        function closeEditor() { 
+            els.editorBlock.classList.add('hidden'); 
+            els.fsHeader.classList.add('hidden');
+            els.resultBlock.classList.remove('hidden'); 
+        }
+
+        els.btnCancelEdit.onclick = () => {
+            vibe();
+            els.jsonEditor.value = lastSavedJson; // Возвращаем код как было до открытия
+            hasUnsavedChanges = false;
+            closeFullscreen();
+            closeEditor();
+            showToast("Изменения отменены");
+        };
 
         els.btnToggleFs.onclick = () => {
-            vibe(); if(!isEditorOpen) { openEditor(); return; } isFullscreen = !isFullscreen;
+            vibe();
+            isFullscreen = !isFullscreen;
             if(isFullscreen) { els.step2Card.classList.add('fullscreen'); document.body.style.overflow = 'hidden'; els.btnToggleFs.textContent = '↙ Свернуть'; els.btnToggleFs.classList.add('btn-action-red');
             } else { closeFullscreen(); }
         };
@@ -459,7 +470,6 @@
         els.jsonEditor.addEventListener('input', () => { hasUnsavedChanges = true; updateLineNumbers(); saveEditorState(els.jsonEditor.value); });
         els.jsonEditor.addEventListener('scroll', () => { els.lineNumbers.scrollTop = els.jsonEditor.scrollTop; });
 
-        // --- ФИШКА 3: УМНОЕ ОБЕРТЫВАНИЕ ТЕКСТА ---
         els.toolbarBtns.forEach(btn => {
             btn.onclick = () => {
                 vibe(); 
@@ -472,14 +482,11 @@
                 let insert = btn.getAttribute('data-insert');
 
                 if (wrapStart && wrapEnd && selected.length > 0) {
-                    // Если выделено слово - ОБЕРАЧИВАЕМ ЕГО
                     els.jsonEditor.setRangeText(wrapStart + selected + wrapEnd, start, end, 'select');
-                } else if (wrapStart) { // просто вставка скобок/кавычек
+                } else if (wrapStart) { 
                     els.jsonEditor.setRangeText(wrapStart + wrapEnd, start, end, 'end');
-                    els.jsonEditor.setSelectionRange(start + 1, start + 1); // курсор по центру
-                } else if (insert) {
-                    els.jsonEditor.setRangeText(insert, start, end, 'end');
-                }
+                    els.jsonEditor.setSelectionRange(start + 1, start + 1); 
+                } else if (insert) { els.jsonEditor.setRangeText(insert, start, end, 'end'); }
                 
                 els.jsonEditor.focus(); updateLineNumbers(); saveEditorState(els.jsonEditor.value); hasUnsavedChanges = true;
             }
@@ -494,20 +501,14 @@
             } catch(e) { vibe(100); els.errorBox.textContent = e.message; els.errorBox.classList.remove('hidden'); parseAndScrollToError(e); }
         };
 
-        // --- ФИШКА 4: СНАЙПЕРСКИЙ ПОИСК ОШИБОК ---
         function parseAndScrollToError(e) {
             let msg = e.message;
             let match = msg.match(/position (\d+)/) || msg.match(/line (\d+)/);
             if (match && match[1]) {
                 let idx = parseInt(match[1]);
                 let line;
-                if (msg.includes('position')) {
-                    line = els.jsonEditor.value.substring(0, idx).split('\n').length;
-                    els.jsonEditor.setSelectionRange(idx, idx+1);
-                    els.jsonEditor.focus();
+                if (msg.includes('position')) { line = els.jsonEditor.value.substring(0, idx).split('\n').length;
                 } else { line = idx; }
-                
-                // Скролл к ошибке (отнимаем 3 строки для центрирования)
                 els.jsonEditor.scrollTop = Math.max(0, (line - 3) * 22);
                 showToast("➡️ Ошибка локализована", true);
             }
@@ -518,6 +519,7 @@
             try {
                 let parsed = JSON.parse(els.jsonEditor.value);
                 els.jsonEditor.value = JSON.stringify(parsed, null, 4); 
+                lastSavedJson = els.jsonEditor.value; // Сохраняем состояние
                 
                 let rawMinified = JSON.stringify(parsed);
                 let newUrl = `${currentProtocol}://routing/onadd/${encodeBase64(rawMinified)}`;
@@ -529,10 +531,7 @@
                 
                 showToast("✅ Применено"); setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 300);
             } catch(e) { 
-                vibe(200); 
-                els.errorBox.textContent = "Синтаксис сломан: " + e.message; 
-                els.errorBox.classList.remove('hidden'); 
-                parseAndScrollToError(e);
+                vibe(200); els.errorBox.textContent = "Синтаксис сломан: " + e.message; els.errorBox.classList.remove('hidden'); parseAndScrollToError(e);
             }
         };
 
@@ -563,14 +562,9 @@
             if(hist.length > 0) { hist[0].url = newUrl; localStorage.setItem('incy_history', JSON.stringify(hist)); renderHistory(hist); }
         }
 
-        // --- ФИШКА 5: УДАЛЕНИЕ ИЗ ИСТОРИИ ---
         window.deleteHistoryItem = function(index) {
-            vibe();
-            let hist = JSON.parse(localStorage.getItem('incy_history') || '[]');
-            hist.splice(index, 1);
-            localStorage.setItem('incy_history', JSON.stringify(hist));
-            renderHistory(hist);
-            showToast("Удалено");
+            vibe(); let hist = JSON.parse(localStorage.getItem('incy_history') || '[]');
+            hist.splice(index, 1); localStorage.setItem('incy_history', JSON.stringify(hist)); renderHistory(hist); showToast("Удалено");
         }
         
         function renderHistory(hist) {
