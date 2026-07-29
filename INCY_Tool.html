@@ -13,7 +13,7 @@
     <style>
         /* ================= ДИНАМИЧЕСКАЯ ТЕМА ================= */
         :root {
-            /* Темная тема */
+            /* Темная тема (По умолчанию) */
             --bg-body: #0a0d14; --bg-card: #111827; --bg-input: #1f2937;
             --border-gray: #374151; --accent-blue: #3b82f6; --accent-green: #10b981;
             --text-main: #e5e7eb; --text-muted: #9ca3af;
@@ -68,46 +68,79 @@
         .resizable-box { width: 100%; background: var(--bg-input); border: 1px solid var(--border-gray); border-radius: 12px; padding: 16px; font-family: monospace; font-size: 13px; outline: none; white-space: pre-wrap; transition: 0.3s border; min-height: 150px; resize: vertical; color: var(--code-color);}
         .resizable-box:focus { border-color: var(--accent-blue); }
         #srcInput { padding-bottom: 48px; }
-        #resultOutput { color: var(--accent-green); border-color: rgba(16,185,129,0.3); cursor: pointer; padding-bottom: 16px;}
+        #resultOutput { color: var(--accent-green); border-color: rgba(16,185,129,0.3); cursor: pointer; padding-bottom: 16px; min-height:100px;}
         
         .abs-buttons { position: absolute; bottom: 8px; right: 8px; display: flex; gap: 6px; }
         .fs-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; border-bottom: 1px solid var(--border-gray); padding-bottom: 12px;}
         .fs-header-info { display: flex; flex-direction: column; min-width: 0; flex: 1; align-items: flex-start; }
         #profileName { color: var(--text-main); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
         
-        .editor-container { display: flex; flex-direction: column; background: var(--bg-body); border-radius: 12px; overflow: hidden; border: 1px solid var(--border-gray); margin: 16px 0; box-shadow: inset 0 2px 10px rgba(0,0,0,0.05);}
-        .toolbar { display: flex; overflow-x: auto; padding: 8px 12px; background: var(--bg-input); border-bottom: 1px solid var(--border-gray); gap: 6px; scroll-behavior: smooth; }
+        /* === ВАЖНОЕ: БРОНЕБОЙНЫЙ CSS РЕДАКТОРА === */
+        #editorBlock { display: flex; flex-direction: column; }
+        .editor-container { 
+            display: flex; flex-direction: column; background: var(--bg-body); border-radius: 12px; overflow: hidden; border: 1px solid var(--border-gray); 
+            margin: 16px 0; height: 420px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .toolbar { display: flex; overflow-x: auto; padding: 8px 12px; background: var(--bg-input); border-bottom: 1px solid var(--border-gray); gap: 6px; scroll-behavior: smooth; flex-shrink: 0; }
         .toolbar::-webkit-scrollbar { display: none; }
         .toolbar-btn { background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-gray); padding: 6px 14px; border-radius: 6px; font-family: monospace; font-size: 14px; flex-shrink: 0; }
         .toolbar-btn:active { background: var(--accent-blue); color: white; border-color: var(--accent-blue);}
         .toolbar-divider { width: 1px; background: var(--border-gray); margin: 0 4px; flex-shrink: 0; }
         
-        .editor-workspace { display: flex; height: 320px; }
-        /* ИСПРАВЛЕНЫ ОТСТУПЫ: Строгая синхронизация 80px снизу */
-        .line-numbers { background: var(--line-num-bg); border-right: 1px solid var(--border-gray); padding: 16px 8px 80px 8px; color: var(--line-num-color); text-align: right; font-family: monospace; font-size: 12px; user-select: none; overflow: hidden; }
-        .line-numbers div, .json-textarea { line-height: 22px; }
-        .json-textarea { appearance: none; -webkit-appearance: none; flex-grow: 1; height: 100%; padding: 16px; padding-bottom: 80px; font-size: 12px; color: var(--code-color); border: none; background: transparent; resize: none; outline: none; white-space: pre; overflow: auto; }
+        .editor-workspace { display: flex; flex: 1; min-height: 0; }
+        
+        /* ШАБЛОН ДЛЯ ИДЕАЛЬНОГО ВЫРАВНИВАНИЯ СТРОК */
+        .code-font {
+            font-family: Menlo, Monaco, Consolas, "Courier New", monospace !important;
+            font-size: 13px !important;
+            line-height: 22px !important;
+        }
+        
+        .line-numbers {
+            background: var(--line-num-bg); border-right: 1px solid var(--border-gray);
+            padding: 16px 8px; color: var(--line-num-color); text-align: right;
+            user-select: none; flex-shrink: 0;
+            
+            /* ХАК: Разрешаем родной скролл для мобилок, но скрываем полосу прокрутки */
+            overflow-y: scroll; scrollbar-width: none; -ms-overflow-style: none;
+        }
+        .line-numbers::-webkit-scrollbar { display: none; }
+        .line-numbers div { height: 22px !important; display: flex; align-items: center; justify-content: flex-end;}
+        
+        .json-textarea {
+            flex: 1; color: var(--code-color); background: transparent; border: none;
+            padding: 16px; resize: none; outline: none; min-width: 0;
+            white-space: pre !important; word-wrap: normal !important; overflow: auto;
+            will-change: transform; transform: translateZ(0); /* Хак против обрезания текста на Android WebView */
+        }
 
-        .resizer { height: 36px; background: var(--bg-input); border-top: 1px solid var(--border-gray); display: flex; justify-content: center; align-items: center; cursor: ns-resize; }
+        .resizer { height: 36px; background: var(--bg-input); border-top: 1px solid var(--border-gray); display: flex; justify-content: center; align-items: center; cursor: ns-resize; flex-shrink: 0; }
         .resizer-handle { width: 60px; height: 4px; background: var(--border-gray); border-radius: 2px; }
         
-        /* ИСПРАВЛЕН FULLSCREEN: Правильные Flex-компоненты для растяжения на 100% */
-        .fullscreen { position: fixed; inset: 0; z-index: 1000; border-radius: 0; border: none; display: flex; flex-direction: column; background: var(--bg-body); padding: 0; padding-bottom: env(safe-area-inset-bottom, 20px); margin: 0;}
-        .fullscreen #editorBlock { display: flex; flex-direction: column; flex: 1; min-height: 0; border: none; }
-        .fullscreen .editor-container { flex: 1; min-height: 0; margin-bottom: 0; border-left: none; border-right: none; border-radius: 0; box-shadow: none; display: flex; flex-direction: column;}
-        .fullscreen .editor-workspace { flex: 1; height: auto !important; min-height: 0; display: flex;}
+        /* === ВАЖНОЕ: ИДЕАЛЬНЫЙ ПОЛНОЭКРАННЫЙ РЕЖИМ === */
+        .fullscreen { 
+            position: fixed; inset: 0; z-index: 1000; border-radius: 0; border: none; 
+            display: flex; flex-direction: column; background: var(--bg-body); margin: 0;
+            padding-bottom: env(safe-area-inset-bottom, 0px); /* iPhone вырез */
+        }
+        .fullscreen #editorBlock { flex: 1; min-height: 0; }
+        .fullscreen .editor-container { 
+            flex: 1; min-height: 0; margin: 0; border-radius: 0; 
+            border-left: none; border-right: none; height: auto !important; box-shadow: none; 
+        }
         .fullscreen .resizer { display: none; }
-        .fullscreen .fs-header { padding: 16px; background: var(--bg-card); padding-top: max(16px, env(safe-area-inset-top, 20px)); margin-bottom: 0; flex-shrink: 0;}
-        .fullscreen .editor-actions { padding: 0 16px; margin-bottom: 16px; margin-top: 16px; flex-shrink: 0;}
-        .fullscreen .error-box { margin: 0 16px; flex-shrink: 0; }
+        .fullscreen .fs-header { padding: 16px; padding-top: max(16px, env(safe-area-inset-top, 20px)); background: var(--bg-card); margin: 0;}
+        .fullscreen .editor-actions { padding: 12px 16px; margin: 0; background: var(--bg-card); border-top: 1px solid var(--border-gray);}
+        .fullscreen .error-box { margin: 0 16px; }
 
         .editor-actions { display: flex; gap: 8px; margin-bottom: 16px; }
+
         .toast { position: fixed; top: max(20px, env(safe-area-inset-top, 20px)); left: 50%; transform: translate(-50%, -20px); opacity: 0; background: var(--bg-input); border: 1px solid var(--border-gray); color: var(--text-main); padding: 12px 24px; border-radius: 12px; font-size: 14px; font-weight: bold; pointer-events: none; transition: 0.3s; z-index: 9999; box-shadow: 0 10px 25px rgba(0,0,0,0.5); text-align: center; max-width: 90%;}
         .toast.show { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
         .toast.error { background: #ef4444; color: white; border-color: #b91c1c; }
         .error-box { background: var(--red-bg); color: var(--red-text); padding: 8px 16px; font-size: 12px; border-bottom: 1px solid var(--red-border); font-weight: bold; }
         
-        .history-item { background: var(--bg-card); border: 1px solid var(--border-gray); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 12px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); position: relative;}
+        .history-item { background: var(--bg-card); border: 1px solid var(--border-gray); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 12px; position: relative;}
         .history-info { display: flex; flex-direction: column; padding-right: 20px;}
         .history-name { font-size: 14px; font-weight: bold; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .history-row { display: flex; gap: 8px; width: 100%; justify-content: space-between;}
@@ -162,7 +195,7 @@
 
             <!-- Редактор JSON -->
             <div id="editorBlock" class="hidden">
-                <div class="editor-container">
+                <div class="editor-container" id="editorContainerTarget">
                     
                     <div class="toolbar">
                         <button class="toolbar-btn btn-util" id="btnUndo">↶ Undo</button>
@@ -182,8 +215,8 @@
                     </div>
 
                     <div class="editor-workspace" id="editorWorkspace">
-                        <div class="line-numbers" id="lineNumbers">1</div>
-                        <textarea id="jsonEditor" class="json-textarea" wrap="off" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false"></textarea>
+                        <div class="line-numbers code-font" id="lineNumbers">1</div>
+                        <textarea id="jsonEditor" class="json-textarea code-font" wrap="off" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false"></textarea>
                     </div>
                     <div class="resizer" id="resizer"><div class="resizer-handle"></div></div>
                 </div>
@@ -244,6 +277,7 @@
             profileName: document.getElementById('profileName'), btnToggleFs: document.getElementById('btnToggleFs'),
             editorBlock: document.getElementById('editorBlock'), jsonEditor: document.getElementById('jsonEditor'),
             lineNumbers: document.getElementById('lineNumbers'), editorWorkspace: document.getElementById('editorWorkspace'),
+            editorContainerTarget: document.getElementById('editorContainerTarget'),
             resizer: document.getElementById('resizer'), btnFormat: document.getElementById('btnFormat'),
             errorBox: document.getElementById('errorBox'), btnSaveJson: document.getElementById('btnSaveJson'),
             resultBlock: document.getElementById('resultBlock'), resultOutput: document.getElementById('resultOutput'),
@@ -268,33 +302,22 @@
         if (savedTheme === 'light') { document.documentElement.classList.add('light-theme'); updateThemeMeta('#f3f4f6');}
         
         els.btnThemeToggle.onclick = () => {
-            vibe();
-            document.documentElement.classList.toggle('light-theme');
+            vibe(); document.documentElement.classList.toggle('light-theme');
             let isLight = document.documentElement.classList.contains('light-theme');
             localStorage.setItem('incy_theme', isLight ? 'light' : 'dark');
             updateThemeMeta(isLight ? '#f3f4f6' : '#0a0d14');
         };
+        function updateThemeMeta(color) { let meta = document.getElementById('theme-color-meta'); if(meta) meta.content = color; }
 
-        function updateThemeMeta(color) {
-            let meta = document.getElementById('theme-color-meta');
-            if(meta) meta.content = color;
-        }
-
-        window.addEventListener('beforeunload', function (e) {
-            if (hasUnsavedChanges) { e.preventDefault(); e.returnValue = 'У вас есть несохраненные изменения!'; }
-        });
+        window.addEventListener('beforeunload', function (e) { if (hasUnsavedChanges) { e.preventDefault(); e.returnValue = 'У вас есть несохраненные изменения!'; } });
 
         const encodeBase64 = str => btoa(unescape(encodeURIComponent(str))).replace(/=+$/, '');
         const decodeBase64 = str => { let p = str.length % 4; if(p) str += '='.repeat(4 - p); return decodeURIComponent(escape(atob(str))); };
 
         async function UniversalDecode(inputStr) {
             let b64 = inputStr.trim().replace(/\s+/g, '');
-            if(b64.includes('://')) {
-                let p = b64.split('://')[1];
-                if(p.includes('/onadd/')) b64 = p.split('/onadd/')[1]; else b64 = p;
-            }
-            if(!b64) return null;
-            let pad = b64.length % 4; if(pad) b64 += '='.repeat(4 - pad);
+            if(b64.includes('://')) { let p = b64.split('://')[1]; if(p.includes('/onadd/')) b64 = p.split('/onadd/')[1]; else b64 = p; }
+            if(!b64) return null; let pad = b64.length % 4; if(pad) b64 += '='.repeat(4 - pad);
             let binary; try { binary = atob(b64); } catch(e) { return null; }
             let bytes = new Uint8Array(binary.length); for(let i=0; i<binary.length; i++) bytes[i] = binary.charCodeAt(i);
 
@@ -312,8 +335,7 @@
             if (typeof CompressionStream === 'undefined') return `incy-mini://${encodeBase64(jsonStr)}`;
             try {
                 const stream = new Blob([jsonStr]).stream().pipeThrough(new CompressionStream('deflate-raw'));
-                const buffer = await new Response(stream).arrayBuffer();
-                const bytes = new Uint8Array(buffer);
+                const buffer = await new Response(stream).arrayBuffer(); const bytes = new Uint8Array(buffer);
                 let binary = ''; for (let i = 0; i < bytes.length; i+=1000) binary += String.fromCharCode.apply(null, bytes.subarray(i, i+1000));
                 return `incy-mini://${btoa(binary).replace(/=+$/, '')}`;
             } catch(e) { return `incy-mini://${encodeBase64(jsonStr)}`; }
@@ -326,48 +348,35 @@
             
             if (els.resultOutput.value) {
                 let urlStr = els.resultOutput.value.replace(/^(happ|incy|incy-mini):\/\//i, `${proto}://`);
-                els.resultOutput.value = urlStr; els.btnDeepLink.href = urlStr;
-                updateCurrentHistoryItem(urlStr);
+                els.resultOutput.value = urlStr; els.btnDeepLink.href = urlStr; updateCurrentHistoryItem(urlStr);
             }
         };
 
-        els.btnProtoIncy.onclick = () => { vibe(); setProtocol('incy'); };
-        els.btnProtoHapp.onclick = () => { vibe(); setProtocol('happ'); };
+        els.btnProtoIncy.onclick = () => { vibe(); setProtocol('incy'); }; els.btnProtoHapp.onclick = () => { vibe(); setProtocol('happ'); };
 
         function updateOutputLinks(urlStr, name) {
             urlStr = urlStr.replace(/^(happ|incy|incy-mini):\/\//i, `${currentProtocol}://`);
-            els.resultOutput.value = urlStr; els.btnDeepLink.href = urlStr; 
-            els.profileName.textContent = name || "Без имени";
+            els.resultOutput.value = urlStr; els.btnDeepLink.href = urlStr; els.profileName.textContent = name || "Без имени";
         }
 
         els.btnDeepLink.onclick = () => { vibe(); showToast("Открытие...", false); };
 
-        function saveEditorState(val) {
-            if(editorHistory[editorHistory.length - 1] === val) return;
-            editorHistory.push(val); if(editorHistory.length > 20) editorHistory.shift();
-        }
+        function saveEditorState(val) { if(editorHistory[editorHistory.length - 1] === val) return; editorHistory.push(val); if(editorHistory.length > 20) editorHistory.shift(); }
         
         window.loadIntoEditor = async function(url) {
             vibe(); els.srcInput.value = url; window.scrollTo({ top: 0, behavior: 'smooth' });
-            await processInput();
-            openEditor();
-            showToast("Загружено в редактор");
+            await processInput(); openEditor(); showToast("Загружено в редактор");
         }
 
         els.jsonEditor.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
-                e.preventDefault();
-                let start = this.selectionStart, end = this.selectionEnd, val = this.value;
-                let lineStart = val.substring(0, start).lastIndexOf('\n') + 1;
-                let indent = val.substring(lineStart, start).match(/^\s*/)[0];
-                this.setRangeText('\n' + indent, start, end, 'end');
-                updateLineNumbers(); saveEditorState(this.value); hasUnsavedChanges = true;
+                e.preventDefault(); let start = this.selectionStart, end = this.selectionEnd, val = this.value;
+                let lineStart = val.substring(0, start).lastIndexOf('\n') + 1; let indent = val.substring(lineStart, start).match(/^\s*/)[0];
+                this.setRangeText('\n' + indent, start, end, 'end'); updateLineNumbers(); saveEditorState(this.value); hasUnsavedChanges = true;
             }
         });
 
-        document.body.addEventListener('dragover', e => e.preventDefault());
-        document.body.addEventListener('drop', e => { e.preventDefault(); if(e.dataTransfer.files.length) { let rd = new FileReader(); rd.onload = ev => { els.srcInput.value = ev.target.result.trim(); processInput(); }; rd.readAsText(e.dataTransfer.files[0]); } });
-
+        document.body.addEventListener('dragover', e => e.preventDefault()); document.body.addEventListener('drop', e => { e.preventDefault(); if(e.dataTransfer.files.length) { let rd = new FileReader(); rd.onload = ev => { els.srcInput.value = ev.target.result.trim(); processInput(); }; rd.readAsText(e.dataTransfer.files[0]); } });
         els.resultOutput.onclick = () => { if(els.resultOutput.value) copyToClipboard(els.resultOutput.value); };
 
         els.btnUndo.onclick = () => {
@@ -377,60 +386,43 @@
 
         els.btnSearch.onclick = () => {
             vibe(); let term = prompt("🔍 Что найти в коде?"); if(!term) return;
-            let val = els.jsonEditor.value, startPos = els.jsonEditor.selectionEnd;
-            let idx = val.indexOf(term, startPos); if(idx === -1) idx = val.indexOf(term); 
-            if(idx !== -1) {
-                els.jsonEditor.focus(); els.jsonEditor.setSelectionRange(idx, idx + term.length);
-                let linesBefore = val.substring(0, idx).split('\n').length; els.jsonEditor.scrollTop = Math.max(0, (linesBefore - 3) * 22); showToast("Найдено!");
+            let val = els.jsonEditor.value, startPos = els.jsonEditor.selectionEnd; let idx = val.indexOf(term, startPos); if(idx === -1) idx = val.indexOf(term); 
+            if(idx !== -1) { els.jsonEditor.focus(); els.jsonEditor.setSelectionRange(idx, idx + term.length); let linesBefore = val.substring(0, idx).split('\n').length; els.jsonEditor.scrollTop = Math.max(0, (linesBefore - 3) * 22); showToast("Найдено!");
             } else { vibe(100); showToast(`"${term}" не найдено`, true); }
         };
 
         let toastTimer;
-        function showToast(msg, isError = false) {
-            els.toast.textContent = msg; els.toast.className = `toast show ${isError ? 'error' : ''}`;
-            clearTimeout(toastTimer); toastTimer = setTimeout(() => els.toast.className = 'toast', 2500);
-        }
+        function showToast(msg, isError = false) { els.toast.textContent = msg; els.toast.className = `toast show ${isError ? 'error' : ''}`; clearTimeout(toastTimer); toastTimer = setTimeout(() => els.toast.className = 'toast', 2500); }
 
         function copyToClipboard(text) { vibe(); if (navigator.clipboard) { navigator.clipboard.writeText(text).then(() => showToast('✅ Скопировано!')).catch(() => fallbackCopy(text)); } else { fallbackCopy(text); } }
         function fallbackCopy(text) { let temp = document.createElement("textarea"); temp.value = text; document.body.appendChild(temp); temp.select(); try { document.execCommand("copy"); showToast('✅ Скопировано!'); } catch(err) { showToast('Ошибка копирования', true); } document.body.removeChild(temp); }
 
         els.btnCopyMini.onclick = async () => { vibe(); try { const miniUrl = await compressToMini(JSON.stringify(JSON.parse(els.jsonEditor.value))); if(miniUrl) { copyToClipboard(miniUrl); showToast("Короткая ссылка скопирована!"); } } catch(e) { showToast("Сначала восстановите код", true); } };
-
         els.btnClear.onclick = () => { vibe(); els.srcInput.value = ''; els.resultOutput.value = ''; els.jsonEditor.value = ''; editorHistory = []; els.step2Card.classList.add('hidden'); closeFullscreen(); closeEditor(); hasUnsavedChanges = false;};
         els.btnPaste.onclick = async () => { vibe(); try { const text = await navigator.clipboard.readText(); if(text) { els.srcInput.value = text; processInput(); } } catch(e) { els.srcInput.focus(); showToast("Тапните системную кнопку Вставить", true); } };
 
-        let inputTimer;
-        els.srcInput.addEventListener('input', () => { clearTimeout(inputTimer); inputTimer = setTimeout(processInput, 400); });
+        let inputTimer; els.srcInput.addEventListener('input', () => { clearTimeout(inputTimer); inputTimer = setTimeout(processInput, 400); });
 
         async function processInput() {
-            let val = els.srcInput.value.trim();
-            if(!val) { els.btnClear.onclick(); return; }
-
+            let val = els.srcInput.value.trim(); if(!val) { els.btnClear.onclick(); return; }
             if(val.toLowerCase().startsWith('happ://')) setProtocol('happ');
             else if(val.toLowerCase().startsWith('incy://') || val.toLowerCase().startsWith('incy-mini://')) setProtocol('incy');
 
             let jsonStr = await UniversalDecode(val);
-
             if(jsonStr) {
                 closeEditor(); closeFullscreen(); hasUnsavedChanges = false;
 
                 try {
-                    let json = JSON.parse(jsonStr);
-                    let rawMinified = JSON.stringify(json);
+                    let json = JSON.parse(jsonStr); let rawMinified = JSON.stringify(json);
                     let newUrl = `${currentProtocol}://routing/onadd/${encodeBase64(rawMinified)}`;
                     
-                    els.srcInput.value = newUrl; 
-                    updateOutputLinks(newUrl, json.Name);
+                    els.srcInput.value = newUrl; updateOutputLinks(newUrl, json.Name);
                     
                     const code = JSON.stringify(json, null, 4);
-                    els.jsonEditor.value = code; 
-                    lastSavedJson = code;
-                    editorHistory = [code];
+                    els.jsonEditor.value = code; lastSavedJson = code; editorHistory = [code];
                     
-                    updateLineNumbers();
-                    els.step2Card.classList.remove('hidden'); 
-                    saveToHistory(json.Name, newUrl);
-                    vibe(80); showToast("Распознано успешно!");
+                    updateLineNumbers(); els.step2Card.classList.remove('hidden'); 
+                    saveToHistory(json.Name, newUrl); vibe(80); showToast("Распознано успешно!");
                 } catch(e) { vibe(100); showToast("Ошибка структуры конфига", true); }
             }
         }
@@ -438,32 +430,16 @@
         els.fileInput.onchange = e => { let file = e.target.files[0]; if(!file) return; let reader = new FileReader(); reader.onload = ev => { els.srcInput.value = ev.target.result.trim(); processInput(); }; reader.readAsText(file); els.fileInput.value = ''; };
 
         els.btnOpenEditor.onclick = () => {
-            vibe(); 
-            els.fsHeader.classList.remove('hidden');
-            els.editorBlock.classList.remove('hidden'); 
-            els.resultBlock.classList.add('hidden'); 
-            els.step2Card.scrollIntoView({ behavior: 'smooth', block: 'start' }); 
-            updateLineNumbers();
+            vibe(); els.fsHeader.classList.remove('hidden'); els.editorBlock.classList.remove('hidden'); 
+            els.resultBlock.classList.add('hidden'); els.step2Card.scrollIntoView({ behavior: 'smooth', block: 'start' }); updateLineNumbers();
         };
 
-        function closeEditor() { 
-            els.editorBlock.classList.add('hidden'); 
-            els.fsHeader.classList.add('hidden');
-            els.resultBlock.classList.remove('hidden'); 
-        }
+        function closeEditor() { els.editorBlock.classList.add('hidden'); els.fsHeader.classList.add('hidden'); els.resultBlock.classList.remove('hidden'); }
 
-        els.btnCancelEdit.onclick = () => {
-            vibe();
-            els.jsonEditor.value = lastSavedJson; 
-            hasUnsavedChanges = false;
-            closeFullscreen();
-            closeEditor();
-            showToast("Изменения отменены");
-        };
+        els.btnCancelEdit.onclick = () => { vibe(); els.jsonEditor.value = lastSavedJson; hasUnsavedChanges = false; closeFullscreen(); closeEditor(); showToast("Изменения отменены"); };
 
         els.btnToggleFs.onclick = () => {
-            vibe();
-            isFullscreen = !isFullscreen;
+            vibe(); isFullscreen = !isFullscreen;
             if(isFullscreen) { els.step2Card.classList.add('fullscreen'); document.body.style.overflow = 'hidden'; els.btnToggleFs.textContent = '↙ Свернуть'; els.btnToggleFs.classList.add('btn-action-red');
             } else { closeFullscreen(); }
         };
@@ -471,80 +447,52 @@
 
         function updateLineNumbers() { let lines = els.jsonEditor.value.split('\n').length || 1; els.lineNumbers.innerHTML = Array.from({length: lines}, (_, i) => `<div>${i+1}</div>`).join(''); }
         
+        // ВАЖНЕЙШИЙ ФИКС СИНХРОНИЗАЦИИ
+        els.jsonEditor.addEventListener('scroll', () => { els.lineNumbers.scrollTop = els.jsonEditor.scrollTop; }, { passive: true });
+        
         els.jsonEditor.addEventListener('input', () => { hasUnsavedChanges = true; updateLineNumbers(); saveEditorState(els.jsonEditor.value); });
-        els.jsonEditor.addEventListener('scroll', () => { els.lineNumbers.scrollTop = els.jsonEditor.scrollTop; });
-
+        
         els.toolbarBtns.forEach(btn => {
             btn.onclick = () => {
-                vibe(); 
-                let start = els.jsonEditor.selectionStart, end = els.jsonEditor.selectionEnd;
-                let text = els.jsonEditor.value;
-                let selected = text.substring(start, end);
-                
-                let wrapStart = btn.getAttribute('data-wrap-start');
-                let wrapEnd = btn.getAttribute('data-wrap-end');
-                let insert = btn.getAttribute('data-insert');
-
-                if (wrapStart && wrapEnd && selected.length > 0) {
-                    els.jsonEditor.setRangeText(wrapStart + selected + wrapEnd, start, end, 'select');
-                } else if (wrapStart) { 
-                    els.jsonEditor.setRangeText(wrapStart + wrapEnd, start, end, 'end');
-                    els.jsonEditor.setSelectionRange(start + 1, start + 1); 
+                vibe(); let start = els.jsonEditor.selectionStart, end = els.jsonEditor.selectionEnd;
+                let text = els.jsonEditor.value; let selected = text.substring(start, end);
+                let wrapStart = btn.getAttribute('data-wrap-start'), wrapEnd = btn.getAttribute('data-wrap-end'), insert = btn.getAttribute('data-insert');
+                if (wrapStart && wrapEnd && selected.length > 0) { els.jsonEditor.setRangeText(wrapStart + selected + wrapEnd, start, end, 'select');
+                } else if (wrapStart) { els.jsonEditor.setRangeText(wrapStart + wrapEnd, start, end, 'end'); els.jsonEditor.setSelectionRange(start + 1, start + 1); 
                 } else if (insert) { els.jsonEditor.setRangeText(insert, start, end, 'end'); }
-                
                 els.jsonEditor.focus(); updateLineNumbers(); saveEditorState(els.jsonEditor.value); hasUnsavedChanges = true;
             }
         });
 
-        els.btnFormat.onclick = () => {
-            vibe();
-            try {
-                let formatted = JSON.stringify(JSON.parse(els.jsonEditor.value), null, 4);
-                if(els.jsonEditor.value !== formatted) { els.jsonEditor.value = formatted; saveEditorState(formatted); hasUnsavedChanges = true;}
-                els.errorBox.classList.add('hidden'); updateLineNumbers(); showToast('✨ Отформатировано');
-            } catch(e) { vibe(100); els.errorBox.textContent = e.message; els.errorBox.classList.remove('hidden'); parseAndScrollToError(e); }
-        };
+        els.btnFormat.onclick = () => { vibe(); try { let formatted = JSON.stringify(JSON.parse(els.jsonEditor.value), null, 4); if(els.jsonEditor.value !== formatted) { els.jsonEditor.value = formatted; saveEditorState(formatted); hasUnsavedChanges = true;} els.errorBox.classList.add('hidden'); updateLineNumbers(); showToast('✨ Отформатировано'); } catch(e) { vibe(100); els.errorBox.textContent = e.message; els.errorBox.classList.remove('hidden'); parseAndScrollToError(e); } };
 
         function parseAndScrollToError(e) {
-            let msg = e.message;
-            let match = msg.match(/position (\d+)/) || msg.match(/line (\d+)/);
+            let msg = e.message; let match = msg.match(/position (\d+)/) || msg.match(/line (\d+)/);
             if (match && match[1]) {
-                let idx = parseInt(match[1]);
-                let line;
-                if (msg.includes('position')) { line = els.jsonEditor.value.substring(0, idx).split('\n').length;
-                } else { line = idx; }
-                els.jsonEditor.scrollTop = Math.max(0, (line - 3) * 22);
-                showToast("➡️ Ошибка локализована", true);
+                let idx = parseInt(match[1]), line;
+                if (msg.includes('position')) { line = els.jsonEditor.value.substring(0, idx).split('\n').length; } else { line = idx; }
+                els.jsonEditor.scrollTop = Math.max(0, (line - 3) * 22); showToast("➡️ Ошибка локализована", true);
             }
         }
 
         els.btnSaveJson.onclick = () => {
             vibe();
             try {
-                let parsed = JSON.parse(els.jsonEditor.value);
-                els.jsonEditor.value = JSON.stringify(parsed, null, 4); 
-                lastSavedJson = els.jsonEditor.value;
-                
-                let rawMinified = JSON.stringify(parsed);
-                let newUrl = `${currentProtocol}://routing/onadd/${encodeBase64(rawMinified)}`;
-                
-                updateOutputLinks(newUrl, parsed.Name);
-                saveToHistory(parsed.Name, newUrl);
-                
+                let parsed = JSON.parse(els.jsonEditor.value); els.jsonEditor.value = JSON.stringify(parsed, null, 4); lastSavedJson = els.jsonEditor.value;
+                let rawMinified = JSON.stringify(parsed); let newUrl = `${currentProtocol}://routing/onadd/${encodeBase64(rawMinified)}`;
+                updateOutputLinks(newUrl, parsed.Name); saveToHistory(parsed.Name, newUrl);
                 els.errorBox.classList.add('hidden'); closeFullscreen(); closeEditor(); hasUnsavedChanges = false;
-                
                 showToast("✅ Применено"); setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 300);
-            } catch(e) { 
-                vibe(200); els.errorBox.textContent = "Синтаксис сломан: " + e.message; els.errorBox.classList.remove('hidden'); parseAndScrollToError(e);
-            }
+            } catch(e) { vibe(200); els.errorBox.textContent = "Синтаксис сломан: " + e.message; els.errorBox.classList.remove('hidden'); parseAndScrollToError(e); }
         };
 
         els.btnDownload.onclick = () => { vibe(); try { JSON.parse(els.jsonEditor.value); let blob = new Blob([els.jsonEditor.value], {type: "application/json"}); let a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = (els.profileName.textContent.replace(/[^a-z0-9а-яё]/gi, '_').toLowerCase() || 'config') + ".json"; a.click(); } catch(e) { showToast("Исправьте ошибки JSON", true); } };
         els.btnCopyResult.onclick = () => copyToClipboard(els.resultOutput.value);
 
+        // РЕСАЙЗЕР ДЛЯ НОРМАЛЬНОГО РЕЖИМА
         let isDragging = false, startY = 0, startH = 0;
-        function initDrag(e) { isDragging = true; startY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY; startH = els.editorWorkspace.offsetHeight; document.body.style.userSelect = 'none'; }
-        function doDrag(e) { if(!isDragging) return; if(e.cancelable) e.preventDefault(); let currentY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY; els.editorWorkspace.style.height = Math.max(150, Math.min(startH + (currentY - startY), window.innerHeight * 0.7)) + 'px'; }
+        function initDrag(e) { isDragging = true; startY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY; startH = els.editorContainerTarget.offsetHeight; document.body.style.userSelect = 'none'; }
+        function doDrag(e) { if(!isDragging) return; if(e.cancelable) e.preventDefault(); let currentY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY; els.editorContainerTarget.style.height = Math.max(250, Math.min(startH + (currentY - startY), window.innerHeight * 0.8)) + 'px'; }
         function stopDrag() { isDragging = false; document.body.style.userSelect = ''; }
         
         els.resizer.addEventListener('mousedown', initDrag); els.resizer.addEventListener('touchstart', initDrag, {passive: false});
@@ -552,24 +500,9 @@
         window.addEventListener('mouseup', stopDrag); window.addEventListener('touchend', stopDrag);
 
         function loadHistory() { renderHistory(JSON.parse(localStorage.getItem('incy_history') || '[]')); }
-        
-        function saveToHistory(name, url) {
-            if(!url) return;
-            let hist = JSON.parse(localStorage.getItem('incy_history') || '[]').filter(i => i.url !== url);
-            hist.unshift({ name: name || "Без имени", url, timestamp: Date.now() });
-            if(hist.length > 20) hist.pop();
-            localStorage.setItem('incy_history', JSON.stringify(hist)); renderHistory(hist);
-        }
-
-        function updateCurrentHistoryItem(newUrl) {
-            let hist = JSON.parse(localStorage.getItem('incy_history') || '[]');
-            if(hist.length > 0) { hist[0].url = newUrl; localStorage.setItem('incy_history', JSON.stringify(hist)); renderHistory(hist); }
-        }
-
-        window.deleteHistoryItem = function(index) {
-            vibe(); let hist = JSON.parse(localStorage.getItem('incy_history') || '[]');
-            hist.splice(index, 1); localStorage.setItem('incy_history', JSON.stringify(hist)); renderHistory(hist); showToast("Удалено");
-        }
+        function saveToHistory(name, url) { if(!url) return; let hist = JSON.parse(localStorage.getItem('incy_history') || '[]').filter(i => i.url !== url); hist.unshift({ name: name || "Без имени", url, timestamp: Date.now() }); if(hist.length > 20) hist.pop(); localStorage.setItem('incy_history', JSON.stringify(hist)); renderHistory(hist); }
+        function updateCurrentHistoryItem(newUrl) { let hist = JSON.parse(localStorage.getItem('incy_history') || '[]'); if(hist.length > 0) { hist[0].url = newUrl; localStorage.setItem('incy_history', JSON.stringify(hist)); renderHistory(hist); } }
+        window.deleteHistoryItem = function(index) { vibe(); let hist = JSON.parse(localStorage.getItem('incy_history') || '[]'); hist.splice(index, 1); localStorage.setItem('incy_history', JSON.stringify(hist)); renderHistory(hist); showToast("Удалено"); }
         
         function renderHistory(hist) {
             if(hist.length === 0) { els.historyCard.classList.add('hidden'); return; }
@@ -577,10 +510,7 @@
             els.historyList.innerHTML = hist.map((item, idx) => `
                 <div class="history-item">
                     <button class="btn-delete-hist" onclick="deleteHistoryItem(${idx})" title="Удалить">✖</button>
-                    <div class="history-info">
-                        <span class="history-name">${item.name}</span>
-                        <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">${new Date(item.timestamp).toLocaleString()}</div>
-                    </div>
+                    <div class="history-info"><span class="history-name">${item.name}</span><div style="font-size:11px; color:var(--text-muted); margin-top:2px;">${new Date(item.timestamp).toLocaleString()}</div></div>
                     <div class="history-row">
                         <a href="${item.url}" class="btn btn-action" style="flex: 1.5; background:var(--accent-blue); border:none; color:white; text-decoration:none;" title="Запустить">🚀 Запуск</a>
                         <button class="btn-action btn-util" style="flex: 2;" onclick="loadIntoEditor('${item.url}')">✏️ В редактор</button>
