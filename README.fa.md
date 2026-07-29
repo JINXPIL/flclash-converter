@@ -1,6 +1,6 @@
-<div dir="rtl">
+<div dir="rtl" align="right">
 
-<p align="center">
+<p align="center" dir="ltr">
   <a href="/README.en.md">🇺🇸 English</a> •
   <a href="/README.md">🇷🇺 Русский</a> •
   <a href="/README.zh.md">🇨🇳 简体中文</a> •
@@ -9,7 +9,7 @@
   <a href="/README.es.md">🇪🇸 Español</a>
 </p>
 
-<p align="center">
+<p align="center" dir="ltr">
   <a href="https://github.com/JINXPIL/flclash-converter/releases">
     <img src="https://img.shields.io/github/v/release/JINXPIL/flclash-converter?style=for-the-badge&logo=github&color=181717" alt="Release">
   </a>
@@ -24,145 +24,75 @@
   </a>
 </p>
 
-<h1 align="center">⚡ Network Builder v17.05 ULTRA</h1>
+<h1 align="center" dir="ltr">⚡ Network Builder v17.05 ULTRA</h1>
 
 <p align="center">
-  <b>یک ابزار وب فوق‌العاده قدرتمند و ۱۰۰٪ محلی برای مدیریت پایگاه‌های داده بزرگ سرورهای پروکسی.</b><br>
-  <i>تجزیه، تبدیل و بهینه‌سازی عمیق پیکربندی‌ها برای FlClash، Exclave، Sing-box و Clash Meta.</i>
+  <b>یک ابزار قدرتمند وب و ۱۰۰٪ لوکال (آفلاین) برای مدیریت دیتابیس‌های عظیم پراکسی.</b><br>
+  <i>تجزیه، تبدیل، و بهینه‌سازی حرفه‌ای تنظیمات برای FlClash، Exclave، Sing-box، Clash Meta و محیط PWA برای INCY / HAPP.</i>
 </p>
 
-<p align="center">
-  <img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white" alt="HTML5">
-  <img src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white" alt="CSS3">
-  <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript">
-  <img src="https://img.shields.io/badge/JSON-000000?style=for-the-badge&logo=json&logoColor=white" alt="JSON">
-  <img src="https://img.shields.io/badge/YAML-CB171E?style=for-the-badge&logo=yaml&logoColor=white" alt="YAML">
-</p>
-
-<p align="center">
+<p align="center" dir="ltr">
   <a href="https://jinxpil.github.io/flclash-converter/">
-    <img src="https://img.shields.io/badge/🚀_نسخه_وب_را_باز_کنید-0052FF?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Open Web Version">
+    <img src="https://img.shields.io/badge/🚀_Open_Ultra_Version-0052FF?style=for-the-badge&logo=googlechrome&logoColor=white">
+  </a>
+  <a href="https://jinxpil.github.io/flclash-converter/INCY_Tool.html">
+    <img src="https://img.shields.io/badge/🔮_INCY_CONFIG_TOOL-8A2BE2?style=for-the-badge&logo=pwa&logoColor=white" alt="Open INCY Tool">
   </a>
 </p>
 
 <p align="center">
-  🤖 <b>همچنین به پروژه دوم من نگاهی بیندازید:</b><br>
+  🤖 <b>از پروژه دیگر من نیز دیدن کنید:</b><br>
   👉 <a href="https://github.com/JINXPIL/json-yaml-ai"><b>JSON-YAML-AI</b></a> 👈
 </p>
 
 > [!IMPORTANT]
-> **اعتماد صفر و اولویت حریم خصوصی.** تمام محاسبات دقیقاً به صورت محلی در مرورگر شما انجام می شود. هیچ داده ای هرگز از دستگاه شما خارج نمی شود. این ابزار منحصراً برای مقاصد آموزشی و تحلیل عمیق پروتکل های شبکه ایجاد شده است.
-
-> [!WARNING]
-> **هشدار در مورد اشتراک های YAML و Timeout:**
-> بسیاری از ارائه دهندگان VPN به طور عمدی (یا به دلیل تنظیمات نادرست API) مشتریان شخص ثالث را هنگام خروجی گرفتن از اشتراک ها محدود می کنند. سرورها ممکن است با موفقیت در لیست شما بارگیری شوند، اما تلاش برای اتصال منجر به وقفه (Timeout) بی پایان می شود.
-> 💡 **چگونه بررسی کنیم مشکل از کجاست:** اگر یک پیوند "خام" به همان گره (مثلاً `vless://...` یا کد JSON) دریافت کنید، آن را به صورت دستی به عنوان یک نمایه محلی اضافه کنید، و **کار کند** — مشکل 100% از طرف ارائه دهنده است. این بدان معناست که سرور آنها درخواست های مشتری شما را هنگام تلاش برای به روز رسانی اشتراک مسدود می کند. در موارد دیگر، وقفه ها ممکن است ناشی از مسدود شدن امضاهای پروتکل توسط ISP (فیلترینگ/DPI) شما باشد.
+> **حریم خصوصی حفظ می‌شود.** تمامی پردازش‌ها کاملاً محلی (داخل خود مرورگر) انجام می‌شوند و اطلاعات هرگز دستگاه شما را ترک نمی‌کنند. این پروژه ماهیت کاملاً آموزشی برای بررسی شبکه دارد. در صورتی که اتصال اینترنت شما برای دانلود لیست اشتراکی (Timeout) دچار اختلال است، می‌توانید با این ابزار فایل را تبدیل کرده و کاملا لوکال در برنامه بارگذاری کنید.
 
 ---
 
-### 📸 رابط کاربری (طراحی ULTRA)
+### 🔮 جدید: ابزار پیکربندی INCY (Ultimate PWA IDE)
 
-<p align="center">
-  <a href="https://raw.githubusercontent.com/jinxpil/flclash-converter/main/media/Gemini_Generated_Image_w0ysv7w0ysv7w0ys.png" target="_blank">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jinxpil/flclash-converter/main/media/Gemini_Generated_Image_w0ysv7w0ysv7w0ys.png">
-      <img alt="JSON to YAML" src="https://raw.githubusercontent.com/jinxpil/flclash-converter/main/media/Gemini_Generated_Image_w0ysv7w0ysv7w0ys.png" width="48%">
-    </picture>
-  </a>
-  
-  <a href="https://raw.githubusercontent.com/jinxpil/flclash-converter/main/media/firefox_DHEZPiG4oz.png" target="_blank">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jinxpil/flclash-converter/main/media/firefox_DHEZPiG4oz.png">
-      <img alt="Converter" src="https://raw.githubusercontent.com/jinxpil/flclash-converter/main/media/firefox_DHEZPiG4oz.png" width="48%">
-    </picture>
-  </a>
-</p>
+علاوه بر مبدل کلی، این پروژه اکنون شامل **یک آی‌دی‌ای موبایل کاملاً مستقل** برای ویرایش دقیق و حرفه‌ای پیکربندی‌های مسیریابی به فرمت `incy://` و `happ://` است.
+
+* 📱 **مستقل از سرور و کاملاً PWA:** فقط با استفاده از یک فایل HTML. بدون لایبرری خارجی که امکان استفاده ۱۰۰٪ آفلاین را حتی با افزودن به صفحه خانگی گوشی می‌دهد.
+* 🪄 **فشرده‌ساز INCY-MINI:** الگوریتم اختصاصی که لینک‌های بزرگ را تا ۵ برابر فشرده میکند تا بتوانید از محدودیت حجم کاراکترهای تلگرام/واتساپ عبور کنید.
+* 🚀 **اجرای مستقیم دیپ-لینک:** وارد کردن آنی تنظیمات به برنامه‌ی فیلترشکن نصب‌ شده درون سیستم عامل گوشی فقط با یک ضربه.
+* 🧠 **ویرایشگر هوشمند موبایل:** تورفتگی‌های کد مانند VS Code، کدهای بازگشتی Undo، و ردیاب خودکار خطاهای کدهای JSON.
+
+👉 **[اجرای ابزار INCY Tool](https://jinxpil.github.io/flclash-converter/INCY_Tool.html)**
 
 ---
 
-### 🔥 چه چیزی در نسخه 17.05 ULTRA جدید است؟
+### 🔥 چه چیزی در نسخه 17.05 اضافه شده؟ (عملکرد بی‌نظیر)
 
-* 🌐 **گسترش جهانی پروتکل:** پشتیبانی کامل از تجزیه برای **VMess, Hysteria2 (hy2), Shadowsocks (SS) و ShadowsocksR (SSR)** اضافه شد.
-* 🚀 **عملکرد فوق‌العاده:** DOM مجازی اجازه می دهد تا **250,000+ گره** در میلی ثانیه بدون مسدود کردن مرورگر بارگیری و پاکسازی شوند!
-* 🛡️ **پاک‌کننده زره‌شکن YAML:** کنترل صنعتی. اسکریپت به طور خودکار زباله ها را از لیست های عمومی (کاراکترهای ASCII نامرئی، رمزهای عبور خالی) از بین می برد و واردات پایدار به Mihomo را تضمین می کند.
-* ⚙️ **پیروزی بر Timeouts:** ژنراتور YAML برای مطابقت با استانداردهای دقیق Mihomo بازنویسی شده است.
-* 🎨 **UI/UX جدید:** تم تاریک/روشن مجزا با ذخیره رنگ مستقل و دکمه **"حالت اشتراک"**.
-
----
-
-### 🔌 پروتکل‌های پشتیبانی شده
-
-<table align="center" width="100%">
-  <tr>
-    <td align="center">🛡️ <b>VLESS / VMess</b><br>Reality & Vision</td>
-    <td align="center">⚡ <b>Hysteria 2</b><br>Brutal Speed</td>
-    <td align="center">🐎 <b>Trojan</b><br>Stealth Protocol</td>
-  </tr>
-  <tr>
-    <td align="center">🔒 <b>WireGuard</b><br>Native VPN</td>
-    <td align="center">🌐 <b>SS / SSR</b><br>Shadowsocks</td>
-    <td align="center">🔌 <b>TUIC / Socks5 / HTTP</b><br>Full Support</td>
-  </tr>
-</table>
+* 🌐 **پشتیبانی بسیار گسترده‌تر:** با قابلیت تبدیل **VMess, Hysteria2 (hy2), Shadowsocks, SSR**.
+* 🚀 **رندر کردن با قدرت بی‌کران:** بهره‌مندی از پردازش ناهمگام و استخراج `Set`. بارگذاری و پاک‌سازی ۲۵۰ هزار سرور در کسری از ثانیه χωρίς از کار افتادن مرورگر.
+* 🛡️ **فیلترِ اختصاصی برای پسوندهای خراب YAML:** پاک‌کننده پیشرفته کاراکترهای نامرئی، رمزهای عبور خالی، رمزگذاری‌های قلابی `2022` که وارد کردن تنظیمات در برنامه‌های کلش (مثل Mihomo) را ایمن می‌کند.
+* 🎨 **ظاهری نوین و UX جذاب!** حالت شب/روز جداگانه و گزینه‌ای برای تولید فرمت مستقیم (Subscription Mode Providers) جهت قرارگیری در Pastebin.
 
 ---
 
-### 🎯 پیش‌تنظیمات آماده
+### 🤝 دیتابیس‌های مسیریابی جایگزین
 
-<table width="100%">
-<thead><tr><th align="left">پلتفرم</th><th align="left">پیکربندی</th><th align="left">لینک نصب</th></tr></thead>
-<tbody>
-<tr>
-  <td><b>Happ (Routing)</b></td>
-  <td>بهینه‌سازی شده برای منطقه، دارای مسدودکننده تبلیغات</td>
-  <td>
-    <a href="https://jinxpil.github.io/flclash-converter/happ.html">⚡ نصب سریع (با یک کلیک)</a><br>
-    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/HAPP/DEFAULT.json">📄 مشاهده کد (JSON)</a>
-  </td>
-</tr>
-<tr>
-  <td><b>INCY (Routing)</b></td>
-  <td>بهینه‌سازی شده برای منطقه، دارای مسدودکننده تبلیغات</td>
-  <td>
-    <a href="https://jinxpil.github.io/flclash-converter/incy.html">⚡ نصب سریع (با یک کلیک)</a><br>
-    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/INCY/DEFAULT.json">📄 مشاهده کد (JSON)</a>
-  </td>
-</tr>
-<tr>
-  <td><b>Mihomo / Clash Meta</b></td>
-  <td>نسخه نهایی v79.0 (دور زدن DPI، اثر انگشت سخت‌گیرانه TLS)</td>
-  <td><a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/MIHOMO/ULTIMATE.yml">🔗 وارد کردن پیکربندی YML</a></td>
-</tr>
-</tbody>
-</table>
+اگر به دنبال تنظیمات از پیش آماده‌شده در بین جامعه متن-باز هستید:
+* [Roscomvpn-routing](https://github.com/hydraponique/roscomvpn-routing) — پروژه عالی ارائه‌شده برای بهینه‌سازی دیتابیس‌های مسیریابی مخصوص **HAPP, INCY** و **Clash Meta**.
 
 ---
 
-### 🚦 مسیردهی ترافیک (Split-Tunneling)
+### 🛡️ ابزارهای جایگزین (دور زدن فایروال DPI و پروکسی)
 
-<table width="100%">
-<tbody>
-<tr>
-  <td>🔴 <b>مسدود (BLOCK)</b></td>
-  <td>تبلیغات، ردیاب‌ها، تله‌متری (صرفه‌جویی در ترافیک سرور و باتری دستگاه).</td>
-</tr>
-<tr>
-  <td>🟢 <b>مستقیم (DIRECT)</b></td>
-  <td>سایت‌های داخلی، بانک‌ها و خدمات دولتی (پینگ پایین، جلوگیری از مسدود شدن حساب‌های بانکی).</td>
-</tr>
-<tr>
-  <td>🔵 <b>پروکسی (PROXY)</b></td>
-  <td>یوتیوب، اینستاگرام، تلگرام و تمام ترافیک مسدود شده دیگر.</td>
-</tr>
-</tbody>
-</table>
+*اگر پروتکل‌های VPN متعارف به‌طور کامل توسط ارائه‌دهنده سرویس مسدود شده باشند، می‌توانید از این ابزارها استفاده کنید:*
+
+* [Zapret](https://github.com/bol-van/zapret) — انعطاف‌پذیرترین و قدرتمندترین ابزار برای دور زدن تحلیل عمقی بسته‌های شبکه (DPI) در سطح سیستم عامل.
+* [Zapret2](https://github.com/bol-van/zapret2) — نسخه به‌روزرسانی شده و آزمایشی ابزارهای فریب دی‌پی‌آی.
+* [Zapret-discord-youtube](https://github.com/Flowseal/zapret-discord-youtube) — کدهای راه‌اندازی سریع ارتقا یافته برای یوتیوب و دیسکورد.
+* [ByeByeDPI](https://github.com/romanvht/ByeByeDPI) — ابزار قدیمی و تست‌شده برای دور زدن محدودیت‌های اعمالی در سیستم‌های ویندوز.
+* [tg-ws-proxy](https://github.com/Flowseal/tg-ws-proxy) — ابزاری برای تنظیم پروکسی تلگرام با اتصال قدرتمند WebSockets که باعث عدم فیلترینگ شدید تلگرام می‌گردد.
 
 ---
 
 ### ⭐ حمایت از پروژه
 
-**اگر این ابزار به شما کمک کرد، فراموش نکنید که یک ستاره بگذارید!** :star2:
-
-[![Star History Chart](https://api.star-history.com/svg?repos=JINXPIL/flclash-converter&type=Date)](https://star-history.com/#JINXPIL/flclash-converter&Date)
+**اگر Network Builder ULTRA یا برنامهINC ی به شما کمک کرد، دادن یک ستاره به پروژه باعث ایجاد انگیزه فراوان می‌شود!** ⭐
 
 </div>
