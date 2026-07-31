@@ -66,7 +66,7 @@
         .resizable-box { width: 100%; background: var(--bg-input); border: 1px solid var(--border-gray); border-radius: 12px; padding: 16px; font-family: monospace; font-size: 13px; outline: none; white-space: pre-wrap; transition: 0.3s border; min-height: 150px; resize: vertical; color: var(--code-color);}
         .resizable-box:focus { border-color: var(--accent-blue); }
         #srcInput { padding-bottom: 48px; }
-        #resultOutput { color: var(--accent-green); border-color: rgba(16,185,129,0.3); cursor: pointer; padding-bottom: 16px; min-height:100px; transition: 0.2s all;}
+        #resultOutput { color: var(--accent-green); border-color: rgba(16,185,129,0.3); background: #0a0d14; cursor: pointer; padding-bottom: 16px; min-height:100px; transition: 0.2s all;}
         
         .abs-buttons { position: absolute; bottom: 8px; right: 8px; display: flex; gap: 6px; }
         .fs-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; border-bottom: 1px solid var(--border-gray); padding-bottom: 12px;}
@@ -128,7 +128,6 @@
         .custom-proto-input { width: 100%; background: var(--bg-body); border: 1px solid var(--border-gray); border-radius: 8px; padding: 10px 12px; font-family: monospace; font-size: 13px; color: var(--text-main); outline: none; transition: 0.2s;}
         .custom-proto-input:focus { border-color: var(--accent-blue); }
 
-        /* ИСПРАВЛЕНО: Инпуты и СЕЛЕКТ ФОРМАТА ДЛЯ СКАЧИВАНИЯ (МОБИЛЬНАЯ ВЕРСИЯ) */
         .ext-input {
             background: var(--bg-input); border: 1px solid var(--border-gray); border-radius: 12px; 
             padding: 12px 8px; font-family: monospace; font-size: 14px; color: var(--text-main); 
@@ -136,7 +135,6 @@
         }
         .ext-input:focus { border-color: var(--accent-blue); }
         
-        /* Стилизация нативного select для выбора формата */
         .ext-select {
             appearance: none; -webkit-appearance: none;
             background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
@@ -229,6 +227,7 @@
 
                 <button id="btnOpenEditor" class="btn-primary" style="margin-bottom: 16px; background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border-gray); box-shadow: none;">⚙️ Изменить код (Live Sync)</button>
 
+                <!-- БЛОК ПЛАТФОРМ -->
                 <div class="platform-box">
                     <div style="display: flex; width: 100%; justify-content: space-between; align-items: center;">
                         <div style="font-size: 11px; color: var(--text-muted); font-weight: bold; text-transform: uppercase;">Протокол (Система):</div>
@@ -251,13 +250,12 @@
                     <button class="btn-primary" id="btnCopyResult" style="flex: 1; background: var(--bg-input); border: 1px solid var(--border-gray); color: var(--text-main); font-size: 13px;">📋 Полная</button>
                 </div>
                 
-                <!-- ИСПРАВЛЕННЫЙ БЛОК СОХРАНЕНИЯ ФАЙЛОВ -->
+                <!-- БЛОК СОХРАНЕНИЯ ФАЙЛОВ -->
                 <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px; padding-top: 8px; border-top: 1px dashed var(--border-gray);">
                     <div style="font-size: 11px; color: var(--text-muted); font-weight: bold; text-transform: uppercase;">Сохранить как файл:</div>
                 </div>
                 <div style="display: flex; gap: 8px; align-items: stretch;">
                     <div style="position: relative; display: flex; align-items: stretch;">
-                        <!-- Нативный выбор для смартфона -->
                         <select id="fileExtSelect" class="ext-input ext-select">
                             <option value=".json" selected>.json</option>
                             <option value=".txt">.txt</option>
@@ -266,7 +264,6 @@
                             <option value=".ini">.ini</option>
                             <option value="custom">✍️ Свой..</option>
                         </select>
-                        <!-- Прячется под селектом, открывается только при "Свой формат" -->
                         <input type="text" id="fileExtInput" class="ext-input hidden" placeholder=".ext" spellcheck="false" autocomplete="off" style="text-align: left; padding-left: 12px; width: 100px;">
                     </div>
                     <button class="btn-primary" id="btnDownload" style="flex: 1; background: transparent; border: 1px solid var(--border-gray); color: var(--text-main); font-size: 13px;">📥 Скачать на устройство</button>
@@ -302,7 +299,7 @@
             resultBlock: document.getElementById('resultBlock'), resultOutput: document.getElementById('resultOutput'),
             btnCopyResult: document.getElementById('btnCopyResult'), btnCopyMini: document.getElementById('btnCopyMini'),
             btnDownload: document.getElementById('btnDownload'), 
-            fileExtSelect: document.getElementById('fileExtSelect'), fileExtInput: document.getElementById('fileExtInput'), // Улучшенный выбор скачивания
+            fileExtSelect: document.getElementById('fileExtSelect'), fileExtInput: document.getElementById('fileExtInput'),
             btnUndo: document.getElementById('btnUndo'), btnSearch: document.getElementById('btnSearch'), 
             historyCard: document.getElementById('historyCard'), historyList: document.getElementById('historyList'), 
             btnClearHistory: document.getElementById('btnClearHistory'), toast: document.getElementById('toast'), 
@@ -656,18 +653,15 @@
                 let newUrl = `${safeProtocol}://routing/onadd/${encodeBase64(rawMinified)}`;
                 
                 updateOutputLinks(newUrl, parsed.Name);
-                
                 saveToHistory(parsed.Name, newUrl);
                 
                 els.errorBox.classList.add('hidden'); closeFullscreen(); closeEditor(); hasUnsavedChanges = false;
                 
                 showToast("✅ Сохранено в историю"); setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 300);
-            } catch(e) { 
-                vibe(200); els.errorBox.textContent = "Синтаксис сломан: " + e.message; els.errorBox.classList.remove('hidden'); parseAndScrollToError(e);
-            }
+            } catch(e) { vibe(200); els.errorBox.textContent = "Синтаксис сломан: " + e.message; els.errorBox.classList.remove('hidden'); parseAndScrollToError(e); }
         };
 
-        // --- ЛОГИКА ВЫБОРА ФОРМАТА ДЛЯ СКАЧИВАНИЯ ---
+        // --- ИСПРАВЛЕННАЯ ЛОГИКА ВЫБОРА ФОРМАТА ДЛЯ СКАЧИВАНИЯ ---
         els.fileExtSelect.addEventListener('change', (e) => {
             vibe();
             if(e.target.value === 'custom') {
@@ -699,9 +693,13 @@
                 
             if (!ext.startsWith('.')) ext = '.' + ext;
             if (ext === '.') ext = '.json'; // Фолбэк
+
+            // ФОРСИРУЕМ BINARY СКАЧИВАНИЕ: Браузер НЕ будет лепить .txt к нашим форматам
+            let mType = "application/octet-stream";
+            if (ext === '.json') mType = "application/json;charset=utf-8";
+            else if (ext === '.txt') mType = "text/plain;charset=utf-8";
             
-            let mimeType = ext === '.json' ? "application/json" : "text/plain";
-            let blob = new Blob([text], {type: mimeType}); 
+            let blob = new Blob([text], {type: mType}); 
             let a = document.createElement("a"); 
             a.href = URL.createObjectURL(blob); 
             
