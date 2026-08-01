@@ -72,7 +72,7 @@
         #editorBlock { display: flex; flex-direction: column; }
         .editor-container { display: flex; flex-direction: column; background: var(--bg-body); border-radius: 12px; overflow: hidden; border: 1px solid var(--border-gray); margin: 16px 0; height: 420px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.05); position: relative;}
         
-        /* Скроллбар тулбара */
+        /* Тулбар и скролл */
         .toolbar { display: flex; overflow-x: auto; padding: 8px 12px; background: var(--bg-input); border-bottom: 1px solid var(--border-gray); gap: 6px; scroll-behavior: smooth; flex-shrink: 0; }
         .toolbar::-webkit-scrollbar { height: 4px; }
         .toolbar::-webkit-scrollbar-thumb { background: var(--border-gray); border-radius: 4px; }
@@ -91,7 +91,7 @@
         .json-textarea { flex: 1; color: var(--code-color); background: transparent; border: none; padding: 16px; padding-bottom: 80px; resize: none; outline: none; min-width: 0; white-space: pre !important; word-wrap: normal !important; overflow: auto; }
         .json-textarea.wrap-text { white-space: pre-wrap !important; word-wrap: break-word !important; }
 
-        .resizer { height: 36px; background: var(--bg-input); border-top: 1px solid var(--border-gray); display: flex; justify-content: center; align-items: center; cursor: ns-resize; flex-shrink: 0; }
+        .resizer { height: 32px; background: var(--bg-input); border-top: 1px solid var(--border-gray); display: flex; justify-content: center; align-items: center; cursor: ns-resize; flex-shrink: 0; }
         .resizer-handle { width: 60px; height: 4px; background: var(--border-gray); border-radius: 2px; }
         
         /* Визуализатор Нод */
@@ -128,7 +128,7 @@
         .toast.show { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
         .toast.error { background: #ef4444; color: white; border-color: #b91c1c; }
 
-        /* История */
+        /* История (Smart) */
         .history-item { padding: 14px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-gray); margin-bottom: 10px; display: flex; flex-direction: column; gap: 12px; position: relative;}
         .history-top { display: flex; justify-content: space-between; align-items: flex-start;}
         .history-title { font-size: 15px; font-weight: bold; cursor: pointer; word-break: break-all; opacity: 0.9;}
@@ -162,7 +162,7 @@
     <div class="container">
         <!-- Шапка -->
         <header class="main-header">
-            <button class="icon-btn btn-settings" id="btnSettingsModal" title="Настройки UI">⚙️</button>
+            <button class="icon-btn btn-settings" id="btnSettingsModal" title="Настройки">⚙️</button>
             <div class="main-header-content">
                 <h1>INCY <span>Tool</span></h1>
                 <p class="subtitle">Universal Protocol Engine 🚀</p>
@@ -189,19 +189,19 @@
         <!-- Шаг 2: Вся логика конфига -->
         <div id="step2-card" class="card hidden">
             
-            <!-- Шапка полноэкранного режима (Показывается только когда открыт редактор) -->
+            <!-- Шапка полноэкранного режима (Показывается при активном редакторе) -->
             <div id="fsHeader" class="fs-header hidden">
                 <div class="fs-header-info">
-                    <span class="badge badge-blue">Шаг 2: Настройка</span>
+                    <span class="badge badge-blue">Конфиг • <span id="bdgLinesNum">1</span> строк</span>
                     <strong id="profileName"></strong>
                 </div>
                 <button class="btn-action" id="btnToggleFs">⛶ На весь экран</button>
             </div>
 
-            <!-- РЕДАКТОР (Скрыт по умолчанию, как в V1) -->
+            <!-- РЕДАКТОР (Скрыт по умолчанию для фокуса на экспорт, как в V1) -->
             <div id="editorBlock" class="hidden">
                 <div class="editor-container" id="editorContainerTarget">
-                    <!-- Тулбар с кнопками -->
+                    <!-- Тулбар -->
                     <div class="toolbar">
                         <button class="toolbar-btn btn-util" id="btnUndo">↶ Undo</button>
                         <button class="toolbar-btn btn-util" id="btnSearch">🔍 Поиск</button>
@@ -224,7 +224,7 @@
                         <button class="toolbar-btn" data-insert=",">,</button>
                     </div>
 
-                    <!-- Строка поиска (Inline) -->
+                    <!-- Строка поиска -->
                     <div id="searchBar" class="hidden" style="display: flex; gap: 8px; padding: 8px 12px; background: var(--bg-card); border-bottom: 1px solid var(--border-gray);">
                         <input type="text" id="searchInput" placeholder="Текст для поиска..." style="flex: 1; padding: 6px 10px; border-radius: 8px; border: 1px solid var(--border-gray); background: var(--bg-input); color: var(--text-main); font-size: 14px; outline: none; -webkit-appearance: none;">
                         <button class="btn-action btn-action-blue" id="btnSearchNext">Далее</button>
@@ -244,27 +244,27 @@
                 <!-- Блок для отображения ошибки -->
                 <div id="errorBox" class="error-box hidden"></div>
                 
-                <!-- Те самые кнопки Отмена/Сохранить -->
+                <!-- Те самые кнопки Отмена/Сохранить (Как в V1) -->
                 <div class="editor-actions">
                     <button class="btn-action btn-action-red" id="btnCancelEdit" style="flex: 1; padding: 16px; border-radius: 12px; background: rgba(239, 68, 68, 0.1); border: 1px solid var(--red-text);">❌ Отмена</button>
                     <button class="btn-green" id="btnSaveJson" style="flex: 2; margin: 0;">💾 Завершить</button>
                 </div>
             </div>
 
-            <!-- РЕЗУЛЬТАТ (Станция экспорта, видна по умолчанию при загрузке, как в V1) -->
+            <!-- РЕЗУЛЬТАТ (Станция экспорта, видна по умолчанию при загрузке) -->
             <div id="resultBlock" style="margin-top: 16px;">
                 
                 <a id="btnDeepLink" class="btn btn-launch" href="#">
                     <div>🚀 Открыть напрямую в приложении</div>
                 </a>
 
-                <!-- Кнопка, открывающая редактор -->
+                <!-- КНОПКА, ОТКРЫВАЮЩАЯ РЕДАКТОР -->
                 <button id="btnOpenEditor" class="btn-primary" style="margin-bottom: 16px; background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border-gray); box-shadow: none;">⚙️ Изменить код (Live Sync)</button>
 
                 <!-- БЛОК ПЛАТФОРМ -->
                 <div class="platform-box">
                     <div style="display: flex; width: 100%; justify-content: space-between; align-items: center;">
-                        <div style="font-size: 11px; color: var(--text-muted); font-weight: bold; text-transform: uppercase;">Протокол (Система):</div>
+                        <div style="font-size: 11px; color: var(--text-muted); font-weight: bold; text-transform: uppercase;">Система (Протокол):</div>
                         <div class="format-tabs">
                             <button id="btnProtoIncy" class="format-tab active">INCY</button>
                             <button id="btnProtoHapp" class="format-tab">HAPP</button>
@@ -308,7 +308,7 @@
             </div>
         </div>
 
-        <!-- ИСТОРИЯ КОНФИГОВ -->
+        <!-- ИСТОРИЯ КОНФИГОВ (Smart Version) -->
         <div id="historyCard" class="card hidden">
             <div class="step-header">
                 <span class="badge">История</span>
@@ -319,10 +319,10 @@
         </div>
     </div>
 
-    <!-- МОДАЛКА НАСТРОЕК (Builder) -->
+    <!-- МОДАЛКА НАСТРОЕК (Меню) -->
     <div class="modal-overlay" id="modalSettings">
         <div class="modal-card">
-            <div class="modal-header"> Настройки UI <button class="btn-action" onclick="toggleModal('modalSettings')">✕</button> </div>
+            <div class="modal-header"> Настройки <button class="btn-action" onclick="toggleModal('modalSettings')">✕</button> </div>
             <div style="font-size:11px; color:var(--text-muted); margin-bottom:6px; font-weight:bold;">МОДУЛИ ИНТЕРФЕЙСА:</div>
             <div class="setting-row"><label>Показывать Шаг 1</label><input type="checkbox" id="uiS1" class="toggle-checkbox" checked></div>
             <div class="setting-row"><label>Показывать Историю</label><input type="checkbox" id="uiH" class="toggle-checkbox" checked></div>
@@ -345,8 +345,8 @@
     <!-- МОДАЛКА ШАБЛОНОВ -->
     <div class="modal-overlay" id="modalSnippets">
         <div class="modal-card">
-            <div class="modal-header"> Полезные фрагменты <button class="btn-action" onclick="toggleModal('modalSnippets')">✕</button> </div>
-            <p style="font-size:12px; color:var(--text-muted); margin-bottom: 12px;">Вставятся по курсору.</p>
+            <div class="modal-header"> Шаблоны Кода <button class="btn-action" onclick="toggleModal('modalSnippets')">✕</button> </div>
+            <p style="font-size:12px; color:var(--text-muted); margin-bottom: 12px;">Шаблон вставится в место, где стоит курсор.</p>
             <div class="setting-row" onclick="insSnip(`\n\u0022dns\u0022: {\n  \u0022servers\u0022: [\u00221.1.1.1\u0022, \u00228.8.8.8\u0022]\n}`)" style="cursor:pointer; display:block;"> <strong style="color:var(--accent-blue);">+ Базовый DNS</strong><br><span style="font-size:11px; color:var(--text-muted);">Без утечек</span> </div>
             <div class="setting-row" onclick="insSnip(`\n\u0022routing\u0022: {\n  \u0022rules\u0022: [ { \u0022domain\u0022: [\u0022geosite:ru\u0022], \u0022outboundTag\u0022: \u0022direct\u0022 } ]\n}`)" style="cursor:pointer; display:block;"> <strong style="color:var(--accent-blue);">+ Routing РФ</strong><br><span style="font-size:11px; color:var(--text-muted);">Обход блокировок</span> </div>
         </div>
@@ -356,13 +356,13 @@
     <div class="modal-overlay" id="modalCloud">
         <div class="modal-card">
             <div class="modal-header"> 🚀 Cloud Share <button class="btn-action" onclick="toggleModal('modalCloud')">✕</button> </div>
-            <p style="font-size:12px; color:var(--text-muted); margin-bottom: 16px;">Код шифруется ключом AES-GCM-256 в браузере.</p>
+            <p style="font-size:12px; color:var(--text-muted); margin-bottom: 16px;">Код надёжно шифруется ключом AES-GCM-256 прямо в памяти браузера.</p>
             <input type="text" id="sharePassword" class="resizable-box" style="margin-bottom:12px; min-height:40px; padding:10px;" placeholder="Пароль защиты (можно пустой)">
             <button class="btn-primary" id="btnGenerateCloud">🔐 Зашифровать</button>
             <div id="shareResultBlock" class="hidden" style="margin-top:16px;">
                 <canvas id="qrCanvas"></canvas>
                 <input type="text" id="shareUrlOut" readonly class="resizable-box" style="padding:10px; min-height:40px; text-align:center;">
-                <button class="btn-action" style="width:100%; margin-top:8px;" onclick="copyToC(document.getElementById('shareUrlOut').value)">📋 Копировать</button>
+                <button class="btn-action" style="width:100%; margin-top:8px;" onclick="copyToC(document.getElementById('shareUrlOut').value)">📋 Скопировать</button>
             </div>
         </div>
     </div>
@@ -376,7 +376,7 @@
 
         const els = {
             srcInput: g('srcInput'), btnPaste: g('btnPaste'), btnClear: g('btnClear'),
-            s2: g('step2-card'), fsHeader: g('fsHeader'), pName: g('profileName'), btnToggleFs: g('btnToggleFs'),
+            s2: g('step2-card'), fsHeader: g('fsHeader'), pName: g('profileName'), btnToggleFs: g('btnToggleFs'), bdgLines: g('bdgLinesNum'),
             editorBlock: g('editorBlock'), jsonEditor: g('jsonEditor'), tLineH: g('lineNumbers'), 
             errorBox: g('errorBox'), btnSaveJson: g('btnSaveJson'), btnCancelEdit: g('btnCancelEdit'),
             resultBlock: g('resultBlock'), resOut: g('resultOutput'), btnDeepLink: g('btnDeepLink'),
@@ -387,7 +387,6 @@
 
         let edHist = []; let isFullscreen = false; let currentProtocol = 'incy'; let hasUnsavedChanges = false; let lastSavedJson = '';
 
-        // Восстанавливаем защиту от закрытия вкладки (V1)
         window.addEventListener('beforeunload', function (e) { if (hasUnsavedChanges) { e.preventDefault(); e.returnValue = 'Остались несохраненные изменения!'; } });
 
         // --- ТЕМЫ И НАСТРОЙКИ ---
@@ -408,7 +407,7 @@
         const encodeB64 = str => btoa(unescape(encodeURIComponent(str))).replace(/=+$/, '');
         const decodeB64 = str => { let p = str.length % 4; if(p) str += '='.repeat(4 - p); return decodeURIComponent(escape(atob(str))); };
 
-        // --- ИДЕАЛЬНОЕ ПОВЕДЕНИЕ ВЕРСИИ 1: ОТКРЫТИЕ РЕДАКТОРА ---
+        // --- ЛОГИКА ОТКРЫТИЯ/ЗАКРЫТИЯ РЕДАКТОРА (КАК В V1) ---
         els.btnOpenEditor.onclick = () => {
             vibe(); 
             els.fsHeader.classList.remove('hidden');
@@ -426,7 +425,7 @@
 
         els.btnCancelEdit.onclick = () => {
             vibe();
-            els.jsonEditor.value = lastSavedJson;
+            els.jsonEditor.value = lastSavedJson; // Откат к последнему подтвержденному коду
             els.jsonEditor.dispatchEvent(new Event('input')); 
             hasUnsavedChanges = false;
             closeFullscreen();
@@ -441,11 +440,10 @@
         };
         function closeFullscreen() { isFullscreen = false; els.s2.classList.remove('fullscreen'); document.body.style.overflow = ''; els.btnToggleFs.textContent = '⛶ На весь экран'; els.btnToggleFs.classList.remove('btn-action-red'); }
 
-        // --- ИНСТРУМЕНТЫ РЕДАКТОРА ---
+        // --- ИНСТРУМЕНТЫ РЕДАКТОРА (Undo, Resizer, Сниппеты) ---
         function saveEdState(val) { if(edHist[edHist.length - 1] === val) return; edHist.push(val); if(edHist.length > 20) edHist.shift(); }
         g('btnUndo').onclick = () => { vibe(); if(edHist.length > 1) { edHist.pop(); els.jsonEditor.value = edHist[edHist.length - 1]; updateLines(); showT("↶ Отменено"); hasUnsavedChanges = true; els.jsonEditor.dispatchEvent(new Event('input')); } else { showT("Дальше отменять некуда", 1); } };
 
-        // Ресайзер
         let isDrag=false, startY=0, startH=0;
         const initDrag = e => { isDrag=true; startY=e.type.includes('touch')?e.touches[0].clientY:e.clientY; startH=els.editorContainerTarget.offsetHeight; document.body.style.userSelect='none'; };
         const doDrag = e => { if(!isDrag)return; if(e.cancelable)e.preventDefault(); let currY=e.type.includes('touch')?e.touches[0].clientY:e.clientY; els.editorContainerTarget.style.height=Math.max(150, Math.min(startH+(currY-startY), window.innerHeight*0.8))+'px'; };
@@ -475,7 +473,7 @@
             }
         });
 
-        // Поиск Inline
+        // Поиск (Inline Search)
         let lastSearchTerm = "";
         g('btnSearch').onclick = () => { vibe(); g('searchBar').classList.toggle('hidden'); if(!g('searchBar').classList.contains('hidden')) g('searchInput').focus(); else els.jsonEditor.focus(); };
         g('btnSearchClose').onclick = () => { vibe(); g('searchBar').classList.add('hidden'); els.jsonEditor.focus(); };
@@ -494,14 +492,14 @@
         g('btnSnippetsModal').onclick = () => { vibe(); toggleModal('modalSnippets', true); };
         const insSnip = (txt) => { vibe(); let start = els.jsonEditor.selectionStart, end = els.jsonEditor.selectionEnd; els.jsonEditor.setRangeText(txt, start, end, 'end'); toggleModal('modalSnippets', false); els.jsonEditor.focus(); updateLines(); refreshLinks(); };
 
-        // --- PROTOCOLS ---
-        const setProtocol = (proto) => {
-            let isCustom = proto !== 'incy' && proto !== 'happ' && proto !== 'incy-mini';
-            g('btnProtoIncy').classList.toggle('active', proto === 'incy' || proto === 'incy-mini');
-            g('btnProtoHapp').classList.toggle('active', proto === 'happ');
-            g('btnProtoCustom').classList.toggle('active', isCustom);
-            if (isCustom) { currentProtocol = proto || 'custom'; g('customProtoContainer').classList.add('active'); if(proto !== 'custom') g('customProtoInput').value = proto; } 
-            else { currentProtocol = proto === 'incy-mini' ? 'incy' : proto; g('customProtoContainer').classList.remove('active'); }
+        // --- ВЫБОР ПРОТОКОЛА И ПРЯМАЯ ССЫЛКА ---
+        const setProtocol = (p) => {
+            let isC = p !== 'incy' && p !== 'happ' && p !== 'incy-mini';
+            g('btnProtoIncy').classList.toggle('active', p === 'incy' || p === 'incy-mini');
+            g('btnProtoHapp').classList.toggle('active', p === 'happ');
+            g('btnProtoCustom').classList.toggle('active', isC);
+            if (isC) { currentProtocol = p || 'custom'; g('customProtoContainer').classList.add('active'); if(p !== 'custom') g('customProtoInput').value = p; } 
+            else { currentProtocol = p === 'incy-mini' ? 'incy' : p; g('customProtoContainer').classList.remove('active'); }
         };
         g('btnProtoIncy').onclick = () => { vibe(); setProtocol('incy'); refreshLinks(); };
         g('btnProtoHapp').onclick = () => { vibe(); setProtocol('happ'); refreshLinks(); };
@@ -519,14 +517,13 @@
             } catch(e) {}
         }
 
-        // Фишка V1: анимация моргания фона ссылки
         function updateOutputLinks(urlStr, name) {
             let safeProtocol = currentProtocol === 'custom' ? 'custom' : currentProtocol; urlStr = urlStr.replace(/^([a-zA-Z0-9-]+):\/\//i, `${safeProtocol}://`);
             els.resOut.style.backgroundColor = 'var(--bg-card)'; setTimeout(() => els.resOut.style.backgroundColor = '', 200);
             els.resOut.value = urlStr; els.btnDeepLink.href = urlStr; els.pName.textContent = name || "Без имени";
         }
 
-        // --- LINTER & РЕДАКТОР ---
+        // --- УМНЫЙ LINTER ОШИБОК И ФОРМАТИРОВАНИЕ ---
         function parseAndScrollToError(e) {
             let msg = e.message; let matchPos = msg.match(/position (\d+)/); let matchLine = msg.match(/line (\d+) column (\d+)/); 
             let lineNum = 1; let charIdx = 0;
@@ -542,10 +539,7 @@
             showT("➡️ Ошибка на строке " + lineNum, 1);
         }
 
-        const updateLines = () => { 
-            let ls = els.jsonEditor.value.split('\n').length || 1;
-            els.tLineH.innerHTML = Array.from({length: ls}, (_, i) => `<div>${i+1}</div>`).join(''); 
-        };
+        const updateLines = () => { let ls = els.jsonEditor.value.split('\n').length || 1; els.tLineH.innerHTML = Array.from({length: ls}, (_, i) => `<div>${i+1}</div>`).join(''); els.bInfo.textContent = ls; };
         
         let liveUpdateTimer;
         els.jsonEditor.addEventListener('input', () => { 
@@ -568,7 +562,7 @@
             } catch(e) { els.errorBox.textContent = e.message; els.errorBox.classList.remove('hidden'); parseAndScrollToError(e); }
         };
 
-        // Завершить редактирование
+        // Завершить редактирование и спасти в Историю
         els.btnSaveJson.onclick = () => {
             vibe();
             try {
@@ -579,12 +573,13 @@
                 let newUrl = `${safeProtocol}://routing/onadd/${encodeB64(JSON.stringify(parsed))}`;
                 updateOutputLinks(newUrl, parsed.Name);
                 pushHist(parsed.Name, JSON.stringify(parsed));
+                
                 els.errorBox.classList.add('hidden'); closeFullscreen(); closeEditor(); hasUnsavedChanges = false;
-                showT("✅ Сохранено"); setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 300);
+                showT("✅ Успешно сохранено"); setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 300);
             } catch(e) { vibe(200); els.errorBox.textContent = "Синтаксис сломан: " + e.message; els.errorBox.classList.remove('hidden'); parseAndScrollToError(e); }
         };
 
-        // --- INPUT PARSER И DRAG & DROP (Из V1) ---
+        // --- ВВОД ФАЙЛА И ПАРСИНГ ---
         document.body.addEventListener('dragover', e => e.preventDefault());
         document.body.addEventListener('drop', e => { e.preventDefault(); if(e.dataTransfer.files.length) { let rd = new FileReader(); rd.onload = ev => { els.srcInput.value = ev.target.result.trim(); handleSrc(); }; rd.readAsText(e.dataTransfer.files[0]); } });
         g('fileInput').onchange = e => { let file = e.target.files[0]; if(!file) return; let rd = new FileReader(); rd.onload = ev => { els.srcInput.value = ev.target.result.trim(); handleSrc(); }; rd.readAsText(file); g('fileInput').value = ''; };
@@ -604,6 +599,7 @@
 
             let jsonStr = null;
             if (val.startsWith('{')) { try { JSON.parse(val); jsonStr = val; } catch(e) {} }
+            
             if (!jsonStr) {
                 let b64 = val.includes('://') ? (val.split('://')[1].split('/onadd/')[1] || val.split('://')[1]) : val;
                 try {
@@ -614,32 +610,41 @@
             }
 
             if(jsonStr) {
-                closeEditor(); closeFullscreen(); hasUnsavedChanges = false; g('searchBar').classList.add('hidden');
-                try {
-                    let json = JSON.parse(jsonStr);
-                    let rawMinified = JSON.stringify(json);
-                    let safeProtocol = currentProtocol === 'custom' ? 'custom' : currentProtocol;
-                    let newUrl = `${safeProtocol}://routing/onadd/${encodeB64(rawMinified)}`;
-                    
-                    els.srcInput.value = newUrl; 
-                    updateOutputLinks(newUrl, json.Name);
-                    
-                    const code = JSON.stringify(json, null, 4);
-                    els.jsonEditor.value = code; lastSavedJson = code; edHist = [code];
-                    updateLines(); els.s2.classList.remove('hidden'); pushHist(json.Name, code);
-                    setTimeout(() => els.s2.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
-                    vibe(80); showT("Распознано успешно!");
-                } catch(e) { vibe(100); showT("Неверный синтаксис внутри конфига", 1); }
+                loadCfg(jsonStr, true);
             } else { if (val.length > 30 && !val.includes(" ")) { vibe(100); showT("Не удалось расшифровать", 1); } }
         }
 
-        // --- СОХРАНЕНИЕ 1: СЖАТИЕ / КОПИРОВАТЬ ---
+        // Централизованная функция загрузки кода в редактор с обеспечением правильного макета (Как в V1)
+        function loadCfg(jsonStr, saveToHistoryFlag = true) {
+            try {
+                // Закрываем редактор кода (возвращаем к виду меню Экспорта)
+                closeEditor(); closeFullscreen(); hasUnsavedChanges = false; g('searchBar').classList.add('hidden');
+                
+                let json = JSON.parse(jsonStr);
+                let rawMinified = JSON.stringify(json);
+                let safeProtocol = currentProtocol === 'custom' ? 'custom' : currentProtocol;
+                let newUrl = `${safeProtocol}://routing/onadd/${encodeB64(rawMinified)}`;
+                
+                els.srcInput.value = newUrl; 
+                updateOutputLinks(newUrl, json.Name);
+                
+                const code = JSON.stringify(json, null, 4);
+                els.jsonEditor.value = code; lastSavedJson = code; edHist = [code];
+                updateLines(); els.s2.classList.remove('hidden'); 
+                
+                if (saveToHistoryFlag) pushHist(json.Name, code);
+                
+                setTimeout(() => els.s2.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+                vibe(80); showT("Распознано успешно!");
+            } catch(e) { vibe(100); showT("Ошибка синтаксиса в JSON", 1); }
+        }
+
+        // --- СОХРАНЕНИЕ: СЖАТИЕ / КОПИРОВАНИЕ / ФАЙЛЫ ---
         els.resOut.onclick = () => { if(els.resOut.value) { els.resOut.select(); copyToC(els.resOut.value); } };
         async function getMini() { try { return `incy-mini://${btoa(String.fromCharCode.apply(null, new Uint8Array(await new Response(new Blob([JSON.stringify(JSON.parse(els.jsonEditor.value))]).stream().pipeThrough(new CompressionStream('deflate-raw'))).arrayBuffer()))).replace(/=+$/,'')}`; } catch(e) { return `incy-mini://${encodeB64(JSON.stringify(JSON.parse(els.jsonEditor.value)))}`; } }
-        g('btnCopyMini').onclick = async () => { vibe(); try { let m = await getMini(); copyToC(m); } catch(e){ showT("Восстановите код",1); } };
+        g('btnCopyMini').onclick = async () => { vibe(); try { let m = await getMini(); copyToC(m); } catch(e){ showT("Проверьте код",1); } };
         g('btnCopyResult').onclick = () => { vibe(); copyToC(els.resOut.value); };
 
-        // Сохранение 2: Экспорт файлов (Из V1)
         g('fileExtSelect').addEventListener('change', (e) => { vibe(); if(e.target.value === 'custom') { g('fileExtSelect').classList.add('hidden'); g('fileExtInput').classList.remove('hidden'); g('fileExtInput').value = '.'; g('fileExtInput').focus(); } });
         g('fileExtInput').addEventListener('blur', (e) => { let val = e.target.value.trim(); if(!val || val === '.') { g('fileExtInput').classList.add('hidden'); g('fileExtSelect').classList.remove('hidden'); g('fileExtSelect').value = '.json'; } });
 
@@ -652,9 +657,8 @@
             a.download = (els.pName.textContent.replace(/[^a-z0-9а-яё-]/gi, '_').toLowerCase() || 'config') + ext; a.click(); showT(`Скачано как ${ext}`);
         };
 
-        // --- УМНАЯ ИСТОРИЯ (SMART HISTORY 2026) ---
+        // --- ИСТОРИЯ КОНФИГОВ (ИСПРАВЛЕННАЯ СВЕРХБЫСТРАЯ ЗАГРУЗКА В РЕДАКТОР) ---
         const getH = () => JSON.parse(localStorage.getItem('incy_history') || '[]'); const setH = d => { localStorage.setItem('incy_history', JSON.stringify(d)); renderHist(); };
-        window.loadIntoEditor = async function(urlStr) { vibe(); els.srcInput.value = urlStr; window.scrollTo({ top: 0, behavior: 'smooth' }); await handleSrc(); els.btnOpenEditor.click(); }; // Из V1
         
         const pushHist = (name, content) => {
             if(!content) return; name = name || "Без имени"; let hist = getH().filter(i => i.name !== name);
@@ -663,7 +667,7 @@
         };
 
         g('histSearch').addEventListener('input', e => renderHist(e.target.value.toLowerCase().trim()));
-        g('btnClearHistory').onclick = () => { if(confirm("Сбросить историю?")){ vibe(); localStorage.removeItem('incy_history'); renderHist(); } };
+        g('btnClearHistory').onclick = () => { if(confirm("Сбросить всю историю?")){ vibe(); localStorage.removeItem('incy_history'); renderHist(); } };
 
         const renderHist = (filt = "") => {
             if(!g('uiH').checked) return;
@@ -677,33 +681,50 @@
                     <div class="history-top"> <div class="history-title" data-act="ren">${i.name} ✏️</div>
                         <div class="history-controls"> <button class="history-btn-small" data-act="up">⬆</button> <button class="history-btn-small" data-act="dn">⬇</button> <button class="history-btn-small" data-act="dup">⧉</button> <button class="history-btn-small" style="color:var(--red-text)" data-act="del">✖</button> </div>
                     </div>
-                    <div style="display:flex;gap:8px;"> <button class="btn-action" style="flex:1.5;background:var(--accent-blue);color:white;border:none;" onclick="location.href='${upUrl}'">🚀 Запуск</button> <button class="btn-action" style="flex:1;" data-act="load">✒️ Редактор</button> <button class="btn-action" style="flex:1;" onclick="copyToC('${upUrl}')">🔗 Copy</button></div>
+                    <div style="display:flex;gap:8px;"> <button class="btn-action" style="flex:1.5;background:var(--accent-blue);color:white;border:none;" onclick="location.href='${upUrl}'">🚀 Запуск</button> 
+                    <button class="btn-action" style="flex:1;" data-act="load">✒️ Редактор</button> 
+                    <button class="btn-action" style="flex:1;" onclick="copyToC('${upUrl}')">🔗 Copy</button></div>
                 </div>`;
             }).join('');
         };
 
+        // Делегирование кликов по Истории
         els.historyList.addEventListener('click', e => {
             let t = e.target.closest('[data-act]'); if(!t) return; vibe(); let aid = Number(t.closest('.history-item').dataset.id);
             let h = getH(), idx = h.findIndex(i=>i.id===aid); if(idx===-1)return; let act = t.dataset.act;
-            if (act==='del') { h.splice(idx,1); showT('Удалено'); } else if(act==='up' && idx>0) { [h[idx], h[idx-1]] = [h[idx-1], h[idx]]; } else if(act==='dn' && idx<h.length-1) { [h[idx], h[idx+1]] = [h[idx+1], h[idx]]; }
-            else if(act==='ren') { let nn=prompt("Имя:",h[idx].name); if(nn&&nn.trim()) h[idx].name=nn.trim(); } else if(act==='load') { loadIntoEditor(h[idx].url); showT('В редакторе'); return; } else if(act==='dup') { let c=JSON.parse(JSON.stringify(h[idx])); c.id=Date.now(); c.name+=' (Copy)'; h.splice(idx+1,0,c); } setH(h);
+            
+            if (act === 'del') { h.splice(idx,1); showT('Удалено'); } 
+            else if(act === 'up' && idx > 0) { [h[idx], h[idx-1]] = [h[idx-1], h[idx]]; } 
+            else if(act === 'dn' && idx < h.length-1) { [h[idx], h[idx+1]] = [h[idx+1], h[idx]]; }
+            else if(act === 'ren') { let nn=prompt("Имя конфига:",h[idx].name); if(nn&&nn.trim()) h[idx].name=nn.trim(); } 
+            else if(act === 'dup') { let c=JSON.parse(JSON.stringify(h[idx])); c.id=Date.now(); c.name+=' (Copy)'; h.splice(idx+1,0,c); } 
+            else if(act === 'load') { 
+                // ИСПРАВЛЕННАЯ ЛОГИКА: Мгновенная загрузка напрямую в активный редактор.
+                loadCfg(h[idx].content, false); // Загружаем JSON. 
+                els.btnOpenEditor.click();      // Автоматически нажимаем "⚙️ Изменить код".
+                showT('Открыто в редакторе'); 
+                return; // Не сохраняем состояние сеттера H
+            } 
+            setH(h);
         });
         renderHist();
 
-        // --- ВИЗУАЛЬНЫЙ ГРАФ ---
+        // --- ВИЗУАЛЬНЫЙ ГРАФ БЛОКОВ ---
         g('btnViewToggle').onclick = function() { vibe(); let a = els.vGraph.classList.toggle('active'); this.textContent = a?'✏️ Редактор':'👁 Визуал'; if(a) { try { els.vGraph.innerHTML = `<div style="font-weight:bold; color:var(--text-main); margin-bottom:8px;">{ Root }</div>` + parseNode(JSON.parse(els.jsonEditor.value)); } catch(e) { els.vGraph.innerHTML = `<div style="color:var(--red-text); padding:20px;">Ошибка: ${e.message}</div>`; } } };
         const parseNode = (o) => { let h = ''; for(let k in o) { let v = o[k]; if(typeof v==='object' && v!==null) { let p = Array.isArray(v)?`[${v.length} эл-тов]`:`{...}`; h += `<div class="vg-node"><div class="vg-key" onclick="this.nextElementSibling.classList.toggle('hidden')">⊖ ${k} <span class="vg-obj">${p}</span></div><div>${parseNode(v)}</div></div>`; }  else h += `<div class="vg-node" style="font-size:13px"><span style="color:var(--text-main);font-weight:bold;">${k}:</span> <span class="vg-val">${v}</span></div>`; } return h; };
 
-        // --- БЭКАП КОНФИГА ---
+        // --- БЭКАП КОНФИГА (.incybackup) ---
         g('btnBackupDump').onclick = () => { vibe(); let w = { hist: getH(), t: localStorage.getItem('incy_t'), ui: { s1: g('uiS1').checked?1:0, h: g('uiH').checked?1:0 } }; let a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(w)], {type:"application/json"})); a.download = `incy_backup.incybackup`; a.click(); showT('Бэкап скачан!'); };
         g('btnBackupLoad').onclick = () => { vibe(); g('backupFile').click(); };
         g('backupFile').onchange = e => { let file = e.target.files[0]; if(!file)return; let rd = new FileReader(); rd.onload = ev => { try { let p = JSON.parse(ev.target.result.trim()); if(p.hist) { setH(p.hist); setTheme(p.t||'default'); if(p.ui) { ['uiS1', 'uiH'].forEach(id => { let key = id.replace('ui', '').toLowerCase(); if(p.ui[key] !== undefined) { g(id).checked = p.ui[key]===1; g(id).dispatchEvent(new Event('change')); } }); } toggleModal('modSettings', false); showT('Восстановлено!'); } } catch(err){ showT('Файл поврежден', 1); } }; rd.readAsText(file); e.target.value=''; };
 
-        // --- CLOUD ШИФРОВАНИЕ AES-256 ---
+        // --- CLOUD ШИФРОВАНИЕ (AES-256) ЗАЩИТА ---
         const deriveK = async(p,s)=>crypto.subtle.deriveKey({name:"PBKDF2",salt:s,iterations:100000,hash:"SHA-256"}, await crypto.subtle.importKey("raw",new TextEncoder().encode(p),{name:"PBKDF2"},0,["deriveKey"]),{name:"AES-GCM",length:256},0,["encrypt","decrypt"]);
         g('btnOpenCloudModal').onclick = () => { vibe(); toggleModal('modalCloud', true); g('shareResultBlock').classList.add('hidden'); };
         g('btnGenerateCloud').onclick = async () => { vibe(); try { JSON.parse(els.jsonEditor.value); let p = g('sharePassword').value || Math.random().toString(36).slice(-8); let salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12)); let enc = await crypto.subtle.encrypt({name: "AES-GCM", iv}, await deriveK(p,salt), new TextEncoder().encode(els.jsonEditor.value)); let su = `${window.location.origin}${window.location.pathname}?sid=${encodeURIComponent(btoa(String.fromCharCode(...new Uint8Array(enc))))}&s=${encodeURIComponent(btoa(String.fromCharCode(...salt)))}&i=${encodeURIComponent(btoa(String.fromCharCode(...iv)))}#${p}`; g('shareUrlOut').value = su; g('shareResultBlock').classList.remove('hidden'); let img = new Image(); img.crossOrigin = "Anonymous"; img.onload = () => { let ctx = g('qrCanvas').getContext('2d'); ctx.canvas.width=200; ctx.canvas.height=200; ctx.clearRect(0,0,200,200); ctx.drawImage(img,0,0,200,200); }; img.src = `https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=${encodeURIComponent(su)}&choe=UTF-8`; showT('Зашифровано AES256!'); } catch(e) { showT('Исправьте JSON перед отправкой', 1); } };
+        
         async function decryptCloud(u) { try { let url=new URL(u), p=url.hash.substring(1), sid=url.searchParams.get('sid'), s=url.searchParams.get('s'), i=url.searchParams.get('i'); if(!p||!sid||!s||!i)return; let dec = await crypto.subtle.decrypt({name:"AES-GCM", iv:Uint8Array.from(atob(i),c=>c.charCodeAt(0))}, await deriveK(p, Uint8Array.from(atob(s),c=>c.charCodeAt(0))), Uint8Array.from(atob(sid),c=>c.charCodeAt(0))); els.srcInput.value = new TextDecoder().decode(dec); handleSrc(); showT('🔓 Облако расшифровано'); } catch(e) { showT('Ссылка или ключ поврежден', 1); els.srcInput.value=''; } }
+        if(window.location.hash && window.location.search.includes('sid=')) decryptCloud(window.location.href);
 
         let toastTimerT; function showT(msg, err=false) { els.toast.textContent=msg; els.toast.className=`toast show ${err?'error':''}`; clearTimeout(toastTimerT); toastTimerT=setTimeout(()=>els.toast.className='toast', 2500); }
         function copyToC(txt) { navigator.clipboard.writeText(txt).then(()=>showT('✅ Скопировано')).catch(()=>{let t=document.createElement("textarea");t.value=txt;document.body.appendChild(t);t.select();try{document.execCommand("copy");showT('✅ Скопировано');}catch(e){showT('Ошибка',1);}document.body.removeChild(t);});}
