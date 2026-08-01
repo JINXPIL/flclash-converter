@@ -7,9 +7,9 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0a0d14" id="theme-color-meta">
     
-    <link rel="manifest" href='data:application/manifest+json;utf8,{"name":"INCY Config Tool","short_name":"INCY","display":"standalone","background_color":"#0a0d14","theme_color":"#3b82f6"}'>
+    <link rel="manifest" href='data:application/manifest+json;utf8,{"name":"INCY Tool","short_name":"INCY","display":"standalone","background_color":"#0a0d14","theme_color":"#3b82f6"}'>
     
-    <title>INCY Config | Ultimate Pro</title>
+    <title>INCY Config | Ultimate V1 + Pro</title>
     
     <style>
         /* ================= ДИНАМИЧЕСКАЯ ТЕМА ================= */
@@ -69,7 +69,8 @@
         .fs-header-info { display: flex; flex-direction: column; min-width: 0; flex: 1; align-items: flex-start; }
         #profileName { color: var(--text-main); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
         
-        .editor-container { display: flex; flex-direction: column; background: var(--bg-body); border-radius: 12px; overflow: hidden; border: 1px solid var(--border-gray); margin-bottom: 16px; height: 420px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.05); position: relative;}
+        #editorBlock { display: flex; flex-direction: column; }
+        .editor-container { display: flex; flex-direction: column; background: var(--bg-body); border-radius: 12px; overflow: hidden; border: 1px solid var(--border-gray); margin: 16px 0; height: 420px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.05); position: relative;}
         
         /* Скроллбар тулбара */
         .toolbar { display: flex; overflow-x: auto; padding: 8px 12px; background: var(--bg-input); border-bottom: 1px solid var(--border-gray); gap: 6px; scroll-behavior: smooth; flex-shrink: 0; }
@@ -79,7 +80,7 @@
         .toolbar-btn:active { background: var(--accent-blue); color: white; border-color: var(--accent-blue);}
         .toolbar-divider { width: 1px; background: var(--border-gray); margin: 0 4px; flex-shrink: 0; }
         
-        .editor-workspace { display: flex; flex: 1; min-height: 0; }
+        .editor-workspace { display: flex; flex: 1; min-height: 0; position: relative;}
         .code-font { font-family: Menlo, Monaco, Consolas, "Courier New", monospace !important; font-size: 13px !important; line-height: 22px !important; }
         
         .line-numbers { background: var(--line-num-bg); border-right: 1px solid var(--border-gray); padding: 16px 8px 80px 8px; color: var(--line-num-color); text-align: right; user-select: none; flex-shrink: 0; overflow-y: scroll; scrollbar-width: none; -ms-overflow-style: none; transition: opacity 0.3s;}
@@ -90,7 +91,7 @@
         .json-textarea { flex: 1; color: var(--code-color); background: transparent; border: none; padding: 16px; padding-bottom: 80px; resize: none; outline: none; min-width: 0; white-space: pre !important; word-wrap: normal !important; overflow: auto; }
         .json-textarea.wrap-text { white-space: pre-wrap !important; word-wrap: break-word !important; }
 
-        .resizer { height: 28px; background: var(--bg-input); border-top: 1px solid var(--border-gray); display: flex; justify-content: center; align-items: center; cursor: ns-resize; flex-shrink: 0; }
+        .resizer { height: 36px; background: var(--bg-input); border-top: 1px solid var(--border-gray); display: flex; justify-content: center; align-items: center; cursor: ns-resize; flex-shrink: 0; }
         .resizer-handle { width: 60px; height: 4px; background: var(--border-gray); border-radius: 2px; }
         
         /* Визуализатор Нод */
@@ -103,12 +104,16 @@
 
         /* Полноэкранный режим */
         .fullscreen { position: fixed; inset: 0; z-index: 1000; border-radius: 0; border: none; display: flex; flex-direction: column; background: var(--bg-body); margin: 0; padding-bottom: env(safe-area-inset-bottom, 0px); }
+        .fullscreen #editorBlock { flex: 1; min-height: 0; display: flex;}
         .fullscreen .editor-container { flex: 1; min-height: 0; margin: 0; border-radius: 0; border-left: none; border-right: none; height: auto !important; box-shadow: none; }
         .fullscreen .editor-workspace { flex: 1; height: auto !important; min-height: 0; display: flex;}
         .fullscreen .resizer { display: none; }
-        .fullscreen .fs-header { padding: 16px; padding-top: max(16px, env(safe-area-inset-top, 20px)); background: var(--bg-card); margin: 0; margin-bottom: 0; flex-shrink: 0; border-bottom: none;}
+        .fullscreen .fs-header { padding: 16px; padding-top: max(16px, env(safe-area-inset-top, 20px)); background: var(--bg-card); margin: 0; flex-shrink: 0; border-bottom: none;}
+        .fullscreen .editor-actions { padding: 12px 16px; margin: 0; background: var(--bg-card); border-top: 1px solid var(--border-gray); flex-shrink: 0;}
+        .fullscreen .error-box { margin: 0 16px; flex-shrink: 0; }
 
         .editor-actions { display: flex; gap: 8px; margin-bottom: 16px; }
+        .error-box { background: var(--red-bg); color: var(--red-text); padding: 8px 16px; font-size: 12px; border-bottom: 1px solid var(--border-gray); font-weight: bold; }
 
         /* Модалки */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 9999; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: 0.2s;}
@@ -157,15 +162,15 @@
     <div class="container">
         <!-- Шапка -->
         <header class="main-header">
-            <button class="icon-btn btn-settings" id="btnSettings" title="Настройки UI">⚙️</button>
+            <button class="icon-btn btn-settings" id="btnSettingsModal" title="Настройки UI">⚙️</button>
             <div class="main-header-content">
                 <h1>INCY <span>Tool</span></h1>
-                <p class="subtitle">Universal Config Engine 🚀</p>
+                <p class="subtitle">Universal Protocol Engine 🚀</p>
             </div>
-            <button class="icon-btn btn-theme" id="btnTheme" title="Тема">🌓</button>
+            <button class="icon-btn btn-theme" id="btnThemeToggle" title="Тема">🌓</button>
         </header>
 
-        <!-- Шаг 1: Исходник (Отключаемый) -->
+        <!-- Шаг 1: Исходник -->
         <div class="card" id="step1-card">
             <div class="step-header">
                 <span class="badge">Шаг 1: Исходник</span>
@@ -173,7 +178,7 @@
                 <button class="btn-action btn-action-blue" onclick="document.getElementById('fileInput').click()">📁 Файл</button>
             </div>
             <div class="input-wrapper">
-                <textarea id="srcInput" class="resizable-box" placeholder="Вставьте ссылку, Base64 или JSON-код..." spellcheck="false"></textarea>
+                <textarea id="srcInput" class="resizable-box" placeholder="Вставьте ссылку, Base64 или JSON-код..." autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false"></textarea>
                 <div class="abs-buttons">
                     <button class="btn-action btn-action-blue" id="btnPaste" style="border:none">Вставить</button>
                     <button class="btn-action btn-action-red" id="btnClear" style="border:none">✕</button>
@@ -181,137 +186,146 @@
             </div>
         </div>
 
-        <!-- Шаг 2: Редактор и Результат -->
-        <div id="step2-card" class="card">
+        <!-- Шаг 2: Вся логика конфига -->
+        <div id="step2-card" class="card hidden">
             
-            <!-- Шапка полноэкранного режима -->
-            <div id="fsHeader" class="fs-header">
+            <!-- Шапка полноэкранного режима (Показывается только когда открыт редактор) -->
+            <div id="fsHeader" class="fs-header hidden">
                 <div class="fs-header-info">
-                    <span class="badge badge-blue">Конфиг • <span id="bdgLinesNum">1</span> строк</span>
-                    <strong id="profileName">New Config</strong>
+                    <span class="badge badge-blue">Шаг 2: Настройка</span>
+                    <strong id="profileName"></strong>
                 </div>
                 <button class="btn-action" id="btnToggleFs">⛶ На весь экран</button>
             </div>
 
-            <!-- Редактор JSON -->
-            <div class="editor-actions" id="saveActionBlock" class="hidden" style="display:none;">
-                <button class="btn-action btn-action-red" id="btnCancelEdit" style="flex: 1; padding: 12px; border-radius: 12px;">❌ Отмена</button>
-                <button class="btn-green" id="btnSaveJson" style="flex: 2; margin: 0; padding:12px !important;">💾 Сохранить Изменения</button>
-            </div>
+            <!-- РЕДАКТОР (Скрыт по умолчанию, как в V1) -->
+            <div id="editorBlock" class="hidden">
+                <div class="editor-container" id="editorContainerTarget">
+                    <!-- Тулбар с кнопками -->
+                    <div class="toolbar">
+                        <button class="toolbar-btn btn-util" id="btnUndo">↶ Undo</button>
+                        <button class="toolbar-btn btn-util" id="btnSearch">🔍 Поиск</button>
+                        <div class="toolbar-divider"></div>
+                        <button class="toolbar-btn" id="btnViewToggle">👁 Визуал</button>
+                        <button class="toolbar-btn" id="btnSnippetsModal">⚡ Шаблоны</button>
+                        <button class="toolbar-btn" style="color:var(--accent-green);" id="btnFormat">🧹 Формат</button>
+                        <div class="toolbar-divider"></div>
+                        <button class="toolbar-btn" id="btnWrapToggle">↩️ Перенос</button>
+                        <button class="toolbar-btn" onclick="document.getElementById('jsonEditor').blur()">⌨️ Скрыть</button>
+                        <div class="toolbar-divider"></div>
+                        <button class="toolbar-btn btn-util" onclick="document.getElementById('jsonEditor').scrollTop=0">⬆</button>
+                        <button class="toolbar-btn btn-util" onclick="document.getElementById('jsonEditor').scrollTop=999999">⬇</button>
+                        <div class="toolbar-divider"></div>
+                        <button class="toolbar-btn" data-insert="  ">Tab</button>
+                        <button class="toolbar-btn" data-wrap-start='"' data-wrap-end='"'>""</button>
+                        <button class="toolbar-btn" data-wrap-start='{' data-wrap-end='}'>{}</button>
+                        <button class="toolbar-btn" data-wrap-start='[' data-wrap-end=']'>[]</button>
+                        <button class="toolbar-btn" data-insert=":">:</button>
+                        <button class="toolbar-btn" data-insert=",">,</button>
+                    </div>
 
-            <div class="editor-container" id="editorContainerTarget">
-                <!-- Тулбар -->
-                <div class="toolbar">
-                    <button class="toolbar-btn btn-util" id="btnUndo">↶ Undo</button>
-                    <button class="toolbar-btn btn-util" id="btnSearch">🔍 Поиск</button>
-                    <div class="toolbar-divider"></div>
-                    <button class="toolbar-btn" id="btnViewToggle">👁 Визуал</button>
-                    <button class="toolbar-btn" id="btnSnippets">⚡ Шаблоны</button>
-                    <button class="toolbar-btn" style="color:var(--accent-green);" id="btnFormat">🧹 Формат</button>
-                    <div class="toolbar-divider"></div>
-                    <button class="toolbar-btn" id="btnWrapToggle">↩️ Перенос</button>
-                    <button class="toolbar-btn" onclick="document.getElementById('jsonEditor').blur()">⌨️ Скрыть</button>
-                    <div class="toolbar-divider"></div>
-                    <!-- Клавиши для удобства на телефоне -->
-                    <button class="toolbar-btn" data-insert="  ">Tab</button>
-                    <button class="toolbar-btn" data-wrap-start='"' data-wrap-end='"'>""</button>
-                    <button class="toolbar-btn" data-wrap-start='{' data-wrap-end='}'>{}</button>
-                    <button class="toolbar-btn" data-wrap-start='[' data-wrap-end=']'>[]</button>
-                    <button class="toolbar-btn" data-insert=":">:</button>
-                    <button class="toolbar-btn" data-insert=",">,</button>
+                    <!-- Строка поиска (Inline) -->
+                    <div id="searchBar" class="hidden" style="display: flex; gap: 8px; padding: 8px 12px; background: var(--bg-card); border-bottom: 1px solid var(--border-gray);">
+                        <input type="text" id="searchInput" placeholder="Текст для поиска..." style="flex: 1; padding: 6px 10px; border-radius: 8px; border: 1px solid var(--border-gray); background: var(--bg-input); color: var(--text-main); font-size: 14px; outline: none; -webkit-appearance: none;">
+                        <button class="btn-action btn-action-blue" id="btnSearchNext">Далее</button>
+                        <button class="btn-action btn-action-red" id="btnSearchClose" style="padding: 8px 12px;">✕</button>
+                    </div>
+
+                    <!-- Рабочая зона -->
+                    <div class="editor-workspace">
+                        <div class="line-numbers code-font" id="lineNumbers"><div>1</div></div>
+                        <textarea id="jsonEditor" class="json-textarea code-font" wrap="off" spellcheck="false" autocapitalize="off" autocorrect="off" autocomplete="off"></textarea>
+                        <div id="visualGraph"></div>
+                    </div>
+                    
+                    <div class="resizer" id="resizer"><div class="resizer-handle"></div></div>
                 </div>
 
-                <!-- Строка поиска (Inline) -->
-                <div id="searchBar" class="hidden" style="display: flex; gap: 8px; padding: 8px 12px; background: var(--bg-card); border-bottom: 1px solid var(--border-gray);">
-                    <input type="text" id="searchInput" placeholder="Текст для поиска..." style="flex: 1; padding: 6px 10px; border-radius: 8px; border: 1px solid var(--border-gray); background: var(--bg-input); color: var(--text-main); font-size: 14px; outline: none; -webkit-appearance: none;">
-                    <button class="btn-action btn-action-blue" id="btnSearchNext">Далее</button>
-                    <button class="btn-action btn-action-red" id="btnSearchClose" style="padding: 8px 12px;">✕</button>
-                </div>
-
-                <!-- Рабочая зона -->
-                <div class="editor-workspace">
-                    <div class="line-numbers code-font" id="lineNumbers"><div>1</div></div>
-                    <textarea id="jsonEditor" class="json-textarea code-font" wrap="off" spellcheck="false" autocapitalize="off" autocorrect="off" autocomplete="off"></textarea>
-                    <div id="visualGraph"></div>
-                </div>
+                <!-- Блок для отображения ошибки -->
+                <div id="errorBox" class="error-box hidden"></div>
                 
-                <!-- Ползунок-ресайзер -->
-                <div class="resizer" id="resizer"><div class="resizer-handle"></div></div>
+                <!-- Те самые кнопки Отмена/Сохранить -->
+                <div class="editor-actions">
+                    <button class="btn-action btn-action-red" id="btnCancelEdit" style="flex: 1; padding: 16px; border-radius: 12px; background: rgba(239, 68, 68, 0.1); border: 1px solid var(--red-text);">❌ Отмена</button>
+                    <button class="btn-green" id="btnSaveJson" style="flex: 2; margin: 0;">💾 Завершить</button>
+                </div>
             </div>
 
-            <!-- БЛОК ПЛАТФОРМ (Из первого файла) -->
-            <div class="platform-box">
-                <div style="display: flex; width: 100%; justify-content: space-between; align-items: center;">
-                    <div style="font-size: 11px; color: var(--text-muted); font-weight: bold; text-transform: uppercase;">Система генерации:</div>
-                    <div class="format-tabs">
-                        <button id="btnProtoIncy" class="format-tab active">INCY</button>
-                        <button id="btnProtoHapp" class="format-tab">HAPP</button>
-                        <button id="btnProtoCustom" class="format-tab">СВОЙ ✍️</button>
+            <!-- РЕЗУЛЬТАТ (Станция экспорта, видна по умолчанию при загрузке, как в V1) -->
+            <div id="resultBlock" style="margin-top: 16px;">
+                
+                <a id="btnDeepLink" class="btn btn-launch" href="#">
+                    <div>🚀 Открыть напрямую в приложении</div>
+                </a>
+
+                <!-- Кнопка, открывающая редактор -->
+                <button id="btnOpenEditor" class="btn-primary" style="margin-bottom: 16px; background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border-gray); box-shadow: none;">⚙️ Изменить код (Live Sync)</button>
+
+                <!-- БЛОК ПЛАТФОРМ -->
+                <div class="platform-box">
+                    <div style="display: flex; width: 100%; justify-content: space-between; align-items: center;">
+                        <div style="font-size: 11px; color: var(--text-muted); font-weight: bold; text-transform: uppercase;">Протокол (Система):</div>
+                        <div class="format-tabs">
+                            <button id="btnProtoIncy" class="format-tab active">INCY</button>
+                            <button id="btnProtoHapp" class="format-tab">HAPP</button>
+                            <button id="btnProtoCustom" class="format-tab">СВОЙ ✍️</button>
+                        </div>
+                    </div>
+                    <div id="customProtoContainer" class="custom-proto-container">
+                        <input type="text" id="customProtoInput" class="custom-proto-input" placeholder="Введите префикс (например: v2rayng)" spellcheck="false" autocomplete="off">
                     </div>
                 </div>
-                <div id="customProtoContainer" class="custom-proto-container">
-                    <input type="text" id="customProtoInput" class="custom-proto-input" placeholder="Префикс (например: v2rayng)" spellcheck="false" autocomplete="off">
+
+                <textarea id="resultOutput" class="resizable-box" readonly placeholder="Здесь будет ПРЯМАЯ ссылка..."></textarea>
+                
+                <div style="font-size: 11px; color: var(--text-muted); text-align: center; margin-bottom: 8px; margin-top: 16px; font-weight: bold; text-transform: uppercase;">Скопировать:</div>
+                <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                    <button class="btn-primary" id="btnCopyMini" style="flex: 1; background: rgba(59,130,246,0.1); border: 1px solid var(--accent-blue); color: var(--accent-blue); font-size: 13px;" title="Только для INCY (Сжимает текст)">🪄 Сжатая (MINI)</button>
+                    <button class="btn-primary" id="btnCopyResult" style="flex: 1; background: var(--bg-input); border: 1px solid var(--border-gray); color: var(--text-main); font-size: 13px;">📋 Полная</button>
                 </div>
-            </div>
+                
+                <button class="btn-primary" id="btnOpenCloudModal" style="box-shadow: 0 0 15px rgba(59,130,246,0.3); margin-bottom: 12px; margin-top: 4px;">☁️ Поделиться (Шифрование AES)</button>
 
-            <!-- РЕЗУЛЬТАТ (Прямая ссылка) -->
-            <textarea id="resultOutput" class="resizable-box" readonly placeholder="Здесь будет ПРЯМАЯ ссылка..."></textarea>
-            
-            <!-- КНОПКИ СКОПИРОВАТЬ И МИНИ (Из 1-го файла) -->
-            <div style="font-size: 11px; color: var(--text-muted); text-align: center; margin-bottom: 8px; margin-top: 16px; font-weight: bold; text-transform: uppercase;">Скопировать ссылку:</div>
-            <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-                <button class="btn-primary" id="btnCopyMini" style="flex: 1; background: rgba(59,130,246,0.1); border: 1px solid var(--accent-blue); color: var(--accent-blue); font-size: 13px;" title="Только для INCY (Сжимает текст)">🪄 Сжатая (MINI)</button>
-                <button class="btn-primary" id="btnCopyResult" style="flex: 1; background: var(--bg-input); border: 1px solid var(--border-gray); color: var(--text-main); font-size: 13px;">📋 Полная</button>
-            </div>
-
-            <!-- Запуск и Облако (Из 2026 файла) -->
-            <a id="btnDeepLink" class="btn btn-launch" href="#">
-                <div>🚀 Открыть ссылку напрямую</div>
-            </a>
-            <button class="btn-primary" id="btnCloud" style="box-shadow: 0 0 15px rgba(59,130,246,0.3); margin-bottom: 16px;">☁️ Поделиться (Шифрование AES)</button>
-
-            <!-- БЛОК ЭКСПОРТА ФАЙЛОВ (.yaml, .txt, .conf) -->
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px; padding-top: 8px; border-top: 1px dashed var(--border-gray);">
-                <div style="font-size: 11px; color: var(--text-muted); font-weight: bold; text-transform: uppercase;">Сохранить конфиг как файл:</div>
-            </div>
-            <div style="display: flex; gap: 8px; align-items: stretch;">
-                <div style="position: relative; display: flex; align-items: stretch;">
-                    <select id="fileExtSelect" class="ext-input ext-select">
-                        <option value=".json" selected>.json</option>
-                        <option value=".txt">.txt</option>
-                        <option value=".yaml">.yaml</option>
-                        <option value=".conf">.conf</option>
-                        <option value=".ini">.ini</option>
-                        <option value="custom">✍️ Свой..</option>
-                    </select>
-                    <input type="text" id="fileExtInput" class="ext-input hidden" placeholder=".ext" spellcheck="false" autocomplete="off" style="text-align: left; padding-left: 12px; width: 100px;">
+                <!-- БЛОК ЭКСПОРТА ФАЙЛОВ -->
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px; padding-top: 8px; border-top: 1px dashed var(--border-gray);">
+                    <div style="font-size: 11px; color: var(--text-muted); font-weight: bold; text-transform: uppercase;">Сохранить как файл:</div>
                 </div>
-                <button class="btn-primary" id="btnDownload" style="flex: 1; background: var(--bg-input); border: 1px solid var(--border-gray); color: var(--text-main); font-size: 13px;">📥 Скачать</button>
-            </div>
+                <div style="display: flex; gap: 8px; align-items: stretch;">
+                    <div style="position: relative; display: flex; align-items: stretch;">
+                        <select id="fileExtSelect" class="ext-input ext-select">
+                            <option value=".json" selected>.json</option>
+                            <option value=".txt">.txt</option>
+                            <option value=".yaml">.yaml</option>
+                            <option value=".conf">.conf</option>
+                            <option value=".ini">.ini</option>
+                            <option value="custom">✍️ Свой..</option>
+                        </select>
+                        <input type="text" id="fileExtInput" class="ext-input hidden" placeholder=".ext" spellcheck="false" autocomplete="off" style="text-align: left; padding-left: 12px; width: 100px;">
+                    </div>
+                    <button class="btn-primary" id="btnDownload" style="flex: 1; background: transparent; border: 1px solid var(--border-gray); color: var(--text-main); font-size: 13px;">📥 Скачать на устройство</button>
+                </div>
 
+            </div>
         </div>
 
-        <!-- ИСТОРИЯ КОНФИГОВ (Smart Version) -->
+        <!-- ИСТОРИЯ КОНФИГОВ -->
         <div id="historyCard" class="card hidden">
             <div class="step-header">
-                <span class="badge">Моя История</span>
-                <button class="btn-action" style="color:var(--red-text); background:transparent;" id="btnCleanHist">Очистить всё</button>
+                <span class="badge">История</span>
+                <button class="btn-action btn-action-red" style="font-size: 11px; padding: 6px 10px;" id="btnClearHistory">Очистить всё</button>
             </div>
             <input type="text" id="histSearch" placeholder="🔍 Найти конфиг..." class="resizable-box" style="margin-bottom: 12px; padding: 10px; min-height: 40px; font-family:inherit;">
             <div id="historyList"></div>
         </div>
     </div>
 
-    <!-- МОДАЛКИ (Взяты целиком из V3 для 2026, но с правками) -->
-    <!-- (Настройки, Шаблоны, Cloud Share - Код модалок скрыт для краткости тут в CSS, но развернут ниже в HTML) -->
-    
-    <div class="modal-overlay" id="modSettings">
+    <!-- МОДАЛКА НАСТРОЕК (Builder) -->
+    <div class="modal-overlay" id="modalSettings">
         <div class="modal-card">
-            <div class="modal-header"> Настройки UI <button class="btn-action" onclick="toggleModal('modSettings')">✕</button> </div>
+            <div class="modal-header"> Настройки UI <button class="btn-action" onclick="toggleModal('modalSettings')">✕</button> </div>
             <div style="font-size:11px; color:var(--text-muted); margin-bottom:6px; font-weight:bold;">МОДУЛИ ИНТЕРФЕЙСА:</div>
-            <div class="setting-row"><label>Исходник (Блок 1)</label><input type="checkbox" id="uiS1" class="toggle-checkbox"></div>
-            <div class="setting-row"><label>Конфиг и Редактор (Блок 2)</label><input type="checkbox" id="uiS2" class="toggle-checkbox"></div>
-            <div class="setting-row"><label>История Конфигов</label><input type="checkbox" id="uiH" class="toggle-checkbox"></div>
+            <div class="setting-row"><label>Показывать Шаг 1</label><input type="checkbox" id="uiS1" class="toggle-checkbox" checked></div>
+            <div class="setting-row"><label>Показывать Историю</label><input type="checkbox" id="uiH" class="toggle-checkbox" checked></div>
             <div style="font-size:11px; color:var(--text-muted); margin:16px 0 6px; font-weight:bold;">ЦВЕТОВЫЕ ТЕМЫ:</div>
             <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom: 16px;">
                 <button class="btn-action" style="flex:1;" onclick="setTheme('default')">Dark</button>
@@ -328,275 +342,371 @@
         </div>
     </div>
 
-    <div class="modal-overlay" id="modSnippets">
+    <!-- МОДАЛКА ШАБЛОНОВ -->
+    <div class="modal-overlay" id="modalSnippets">
         <div class="modal-card">
-            <div class="modal-header"> Шаблоны Кода <button class="btn-action" onclick="toggleModal('modSnippets')">✕</button> </div>
-            <p style="font-size:12px; color:var(--text-muted); margin-bottom: 12px;">Вставятся в место курсора.</p>
-            <div class="setting-row" onclick="insSnip(`\n\u0022dns\u0022: {\n  \u0022servers\u0022: [\u00221.1.1.1\u0022, \u00228.8.8.8\u0022]\n}`)" style="cursor:pointer; display:block;"> <strong style="color:var(--accent-blue);">+ Базовый DNS</strong> </div>
-            <div class="setting-row" onclick="insSnip(`\n\u0022routing\u0022: {\n  \u0022rules\u0022: [ { \u0022domain\u0022: [\u0022geosite:ru\u0022], \u0022outboundTag\u0022: \u0022direct\u0022 } ]\n}`)" style="cursor:pointer; display:block;"> <strong style="color:var(--accent-blue);">+ Routing РФ</strong> </div>
+            <div class="modal-header"> Полезные фрагменты <button class="btn-action" onclick="toggleModal('modalSnippets')">✕</button> </div>
+            <p style="font-size:12px; color:var(--text-muted); margin-bottom: 12px;">Вставятся по курсору.</p>
+            <div class="setting-row" onclick="insSnip(`\n\u0022dns\u0022: {\n  \u0022servers\u0022: [\u00221.1.1.1\u0022, \u00228.8.8.8\u0022]\n}`)" style="cursor:pointer; display:block;"> <strong style="color:var(--accent-blue);">+ Базовый DNS</strong><br><span style="font-size:11px; color:var(--text-muted);">Без утечек</span> </div>
+            <div class="setting-row" onclick="insSnip(`\n\u0022routing\u0022: {\n  \u0022rules\u0022: [ { \u0022domain\u0022: [\u0022geosite:ru\u0022], \u0022outboundTag\u0022: \u0022direct\u0022 } ]\n}`)" style="cursor:pointer; display:block;"> <strong style="color:var(--accent-blue);">+ Routing РФ</strong><br><span style="font-size:11px; color:var(--text-muted);">Обход блокировок</span> </div>
         </div>
     </div>
 
-    <div class="modal-overlay" id="modCloud">
+    <!-- МОДАЛКА ОБЛАКА -->
+    <div class="modal-overlay" id="modalCloud">
         <div class="modal-card">
-            <div class="modal-header"> 🚀 Cloud Share <button class="btn-action" onclick="toggleModal('modCloud')">✕</button> </div>
-            <p style="font-size:12px; color:var(--text-muted); margin-bottom: 12px;">Шифрование (AES-GCM-256). Сайт сгенерирует секретную ссылку.</p>
-            <input type="text" id="sharePass" class="resizable-box" style="margin-bottom:12px; min-height:40px; padding:10px;" placeholder="Пароль защиты (оставьте пустым для авто)">
-            <button class="btn-primary" id="btnGenCloud">🔐 Зашифровать и создать QR</button>
-            <div id="shareRes" class="hidden" style="margin-top:16px;">
+            <div class="modal-header"> 🚀 Cloud Share <button class="btn-action" onclick="toggleModal('modalCloud')">✕</button> </div>
+            <p style="font-size:12px; color:var(--text-muted); margin-bottom: 16px;">Код шифруется ключом AES-GCM-256 в браузере.</p>
+            <input type="text" id="sharePassword" class="resizable-box" style="margin-bottom:12px; min-height:40px; padding:10px;" placeholder="Пароль защиты (можно пустой)">
+            <button class="btn-primary" id="btnGenerateCloud">🔐 Зашифровать</button>
+            <div id="shareResultBlock" class="hidden" style="margin-top:16px;">
                 <canvas id="qrCanvas"></canvas>
-                <input type="text" id="shareUrl" readonly class="resizable-box" style="padding:10px; min-height:40px; text-align:center;">
-                <button class="btn-action" style="width:100%; margin-top:8px;" onclick="copyT(els.shareUrl.value)">📋 Скопировать Ссылку</button>
+                <input type="text" id="shareUrlOut" readonly class="resizable-box" style="padding:10px; min-height:40px; text-align:center;">
+                <button class="btn-action" style="width:100%; margin-top:8px;" onclick="copyToC(document.getElementById('shareUrlOut').value)">📋 Копировать</button>
             </div>
         </div>
     </div>
 
-    <div id="toast" class="toast"></div>
+    <div id="toast" class="toast">Сообщение</div>
 
     <script>
-        // DOM Елементы
+        const vibe = (ms=40) => { if(navigator.vibrate) navigator.vibrate(ms); };
         const g = id => document.getElementById(id);
-        const els = {
-            srcInput: g('srcInput'), jsonEditor: g('jsonEditor'), tLineH: g('lineNumbers'),
-            s1: g('step1-card'), s2: g('step2-card'), bInfo: g('bdgLinesNum'), pName: g('profileName'),
-            vGraph: g('visualGraph'), hCard: g('historyCard'), hList: g('historyList'), shareUrl: g('shareUrl'),
-            toast: g('toast'), resout: g('resultOutput'), dlbtn: g('btnDeepLink'), resizer: g('resizer'), edtTarget: g('editorContainerTarget')
-        };
-        const vibe = (m=40)=>navigator.vibrate&&navigator.vibrate(m);
         const toggleModal = (id, force) => { let el = g(id); if(!el)return; force !== undefined ? el.classList.toggle('active', force) : el.classList.toggle('active'); };
-        const copyT = (t) => { navigator.clipboard.writeText(t).then(()=>showT('✅ Скопировано')).catch(()=>{
-            let temp = document.createElement("textarea"); temp.value = t; document.body.appendChild(temp); temp.select();
-            try { document.execCommand("copy"); showT('✅ Скопировано'); } catch(e) { showT('Ошибка',1); } document.body.removeChild(temp);
-        }); };
-        let toastTimer; const showT = (msg, err=0) => { els.toast.textContent=msg; els.toast.className=`toast show ${err?'error':''}`; clearTimeout(toastTimer); toastTimer=setTimeout(()=>els.toast.className='toast', 2500); };
-        
-        // --- ТЕМЫ И МОДУЛИ ---
+
+        const els = {
+            srcInput: g('srcInput'), btnPaste: g('btnPaste'), btnClear: g('btnClear'),
+            s2: g('step2-card'), fsHeader: g('fsHeader'), pName: g('profileName'), btnToggleFs: g('btnToggleFs'),
+            editorBlock: g('editorBlock'), jsonEditor: g('jsonEditor'), tLineH: g('lineNumbers'), 
+            errorBox: g('errorBox'), btnSaveJson: g('btnSaveJson'), btnCancelEdit: g('btnCancelEdit'),
+            resultBlock: g('resultBlock'), resOut: g('resultOutput'), btnDeepLink: g('btnDeepLink'),
+            btnOpenEditor: g('btnOpenEditor'), btnViewToggle: g('btnViewToggle'), btnFormat: g('btnFormat'),
+            vGraph: g('visualGraph'), resizer: g('resizer'), editorContainerTarget: g('editorContainerTarget'),
+            toast: g('toast'), historyList: g('historyList')
+        };
+
+        let edHist = []; let isFullscreen = false; let currentProtocol = 'incy'; let hasUnsavedChanges = false; let lastSavedJson = '';
+
+        // Восстанавливаем защиту от закрытия вкладки (V1)
+        window.addEventListener('beforeunload', function (e) { if (hasUnsavedChanges) { e.preventDefault(); e.returnValue = 'Остались несохраненные изменения!'; } });
+
+        // --- ТЕМЫ И НАСТРОЙКИ ---
         const setTheme = th => { document.body.className = th!=='default'?`theme-${th}`:''; localStorage.setItem('incy_t', th); };
         setTheme(localStorage.getItem('incy_t') || 'default');
-        g('btnTheme').onclick = () => { vibe(); setTheme(document.body.className.includes('light')?'default':'light'); };
-        g('btnSettings').onclick = () => { vibe(); toggleModal('modSettings', true); };
-        ['uiS1', 'uiS2', 'uiH'].forEach(id => {
+        g('btnThemeToggle').onclick = () => { vibe(); setTheme(document.body.className.includes('light')?'default':'light'); };
+        g('btnSettingsModal').onclick = () => { vibe(); toggleModal('modalSettings', true); };
+        
+        ['uiS1', 'uiH'].forEach(id => {
             let chk = g(id); let s = localStorage.getItem('incy_'+id); chk.checked = s!==null?s==='1':true;
             chk.addEventListener('change', e => {
                 localStorage.setItem('incy_'+id, e.target.checked?'1':'0');
-                if(id==='uiS1') els.s1.classList.toggle('hidden', !e.target.checked);
-                if(id==='uiS2') els.s2.classList.toggle('hidden', !e.target.checked);
-                if(id==='uiH') { if(e.target.checked) renderHist(); else els.hCard.classList.add('hidden'); }
+                if(id==='uiS1') g('step1-card').classList.toggle('hidden', !e.target.checked);
+                if(id==='uiH') { if(e.target.checked) renderHist(); else g('historyCard').classList.add('hidden'); }
             }); chk.dispatchEvent(new Event('change'));
         });
 
-        // --- ИНСТРУМЕНТЫ РЕДАКТОРА (Undo, Fullscreen, Resizer, Search, Toolbar) ---
-        let edHist = [], isFs = false;
-        const saveEdState = v => { if(edHist[edHist.length-1]!==v) { edHist.push(v); if(edHist.length>20) edHist.shift(); }};
-        g('btnUndo').onclick = () => { vibe(); if(edHist.length>1){ edHist.pop(); els.jsonEditor.value = edHist[edHist.length-1]; updateLines(); showT("↶ Отменено"); } else showT("Ничего отменять",1); };
-        
-        g('btnToggleFs').onclick = () => {
-            vibe(); isFs = !isFs;
-            if(isFs) { els.s2.classList.add('fullscreen'); document.body.style.overflow='hidden'; g('btnToggleFs').textContent='↙ Свернуть'; g('btnToggleFs').classList.add('btn-action-red'); } 
-            else { els.s2.classList.remove('fullscreen'); document.body.style.overflow=''; g('btnToggleFs').textContent='⛶ На весь экран'; g('btnToggleFs').classList.remove('btn-action-red'); }
+        const encodeB64 = str => btoa(unescape(encodeURIComponent(str))).replace(/=+$/, '');
+        const decodeB64 = str => { let p = str.length % 4; if(p) str += '='.repeat(4 - p); return decodeURIComponent(escape(atob(str))); };
+
+        // --- ИДЕАЛЬНОЕ ПОВЕДЕНИЕ ВЕРСИИ 1: ОТКРЫТИЕ РЕДАКТОРА ---
+        els.btnOpenEditor.onclick = () => {
+            vibe(); 
+            els.fsHeader.classList.remove('hidden');
+            els.editorBlock.classList.remove('hidden'); 
+            els.resultBlock.classList.add('hidden'); 
+            els.s2.scrollIntoView({ behavior: 'smooth', block: 'start' }); 
+            updateLines();
         };
 
-        // Resizer (Ползунок высоты)
+        function closeEditor() { 
+            els.editorBlock.classList.add('hidden'); 
+            els.fsHeader.classList.add('hidden');
+            els.resultBlock.classList.remove('hidden'); 
+        }
+
+        els.btnCancelEdit.onclick = () => {
+            vibe();
+            els.jsonEditor.value = lastSavedJson;
+            els.jsonEditor.dispatchEvent(new Event('input')); 
+            hasUnsavedChanges = false;
+            closeFullscreen();
+            closeEditor();
+            showT("Изменения отменены");
+        };
+
+        els.btnToggleFs.onclick = () => {
+            vibe(); isFullscreen = !isFullscreen;
+            if(isFullscreen) { els.s2.classList.add('fullscreen'); document.body.style.overflow = 'hidden'; els.btnToggleFs.textContent = '↙ Свернуть'; els.btnToggleFs.classList.add('btn-action-red'); }
+            else { closeFullscreen(); }
+        };
+        function closeFullscreen() { isFullscreen = false; els.s2.classList.remove('fullscreen'); document.body.style.overflow = ''; els.btnToggleFs.textContent = '⛶ На весь экран'; els.btnToggleFs.classList.remove('btn-action-red'); }
+
+        // --- ИНСТРУМЕНТЫ РЕДАКТОРА ---
+        function saveEdState(val) { if(edHist[edHist.length - 1] === val) return; edHist.push(val); if(edHist.length > 20) edHist.shift(); }
+        g('btnUndo').onclick = () => { vibe(); if(edHist.length > 1) { edHist.pop(); els.jsonEditor.value = edHist[edHist.length - 1]; updateLines(); showT("↶ Отменено"); hasUnsavedChanges = true; els.jsonEditor.dispatchEvent(new Event('input')); } else { showT("Дальше отменять некуда", 1); } };
+
+        // Ресайзер
         let isDrag=false, startY=0, startH=0;
-        const initDrag = e => { isDrag=true; startY=e.type.includes('touch')?e.touches[0].clientY:e.clientY; startH=els.edtTarget.offsetHeight; document.body.style.userSelect='none'; };
-        const doDrag = e => { if(!isDrag)return; if(e.cancelable)e.preventDefault(); let currY=e.type.includes('touch')?e.touches[0].clientY:e.clientY; els.edtTarget.style.height=Math.max(150, Math.min(startH+(currY-startY), window.innerHeight*0.8))+'px'; };
+        const initDrag = e => { isDrag=true; startY=e.type.includes('touch')?e.touches[0].clientY:e.clientY; startH=els.editorContainerTarget.offsetHeight; document.body.style.userSelect='none'; };
+        const doDrag = e => { if(!isDrag)return; if(e.cancelable)e.preventDefault(); let currY=e.type.includes('touch')?e.touches[0].clientY:e.clientY; els.editorContainerTarget.style.height=Math.max(150, Math.min(startH+(currY-startY), window.innerHeight*0.8))+'px'; };
         const stopDrag = () => { isDrag=false; document.body.style.userSelect=''; };
         els.resizer.addEventListener('mousedown', initDrag); els.resizer.addEventListener('touchstart', initDrag, {passive:false});
         window.addEventListener('mousemove', doDrag); window.addEventListener('touchmove', doDrag, {passive:false});
         window.addEventListener('mouseup', stopDrag); window.addEventListener('touchend', stopDrag);
 
-        // Кнопки тулбара ([], {}, "")
         document.querySelectorAll('.toolbar-btn[data-wrap-start], .toolbar-btn[data-insert]').forEach(btn => {
             btn.onclick = () => {
-                vibe(); let s=els.jsonEditor.selectionStart, e=els.jsonEditor.selectionEnd, txt=els.jsonEditor.value, sel=txt.substring(s,e);
+                vibe(); let start=els.jsonEditor.selectionStart, end=els.jsonEditor.selectionEnd, txt=els.jsonEditor.value, sel=txt.substring(start,end);
                 let wS=btn.getAttribute('data-wrap-start'), wE=btn.getAttribute('data-wrap-end'), ins=btn.getAttribute('data-insert');
-                if (wS && wE && sel.length>0) els.jsonEditor.setRangeText(wS+sel+wE, s, e, 'select');
-                else if (wS) { els.jsonEditor.setRangeText(wS+wE, s, e, 'end'); els.jsonEditor.setSelectionRange(s+1, s+1); }
-                else if (ins) els.jsonEditor.setRangeText(ins, s, e, 'end');
-                els.jsonEditor.focus(); updateLines();
+                if (wS && wE && sel.length>0) els.jsonEditor.setRangeText(wS+sel+wE, start, end, 'select');
+                else if (wS) { els.jsonEditor.setRangeText(wS+wE, start, end, 'end'); els.jsonEditor.setSelectionRange(start+1, start+1); }
+                else if (ins) els.jsonEditor.setRangeText(ins, start, end, 'end');
+                els.jsonEditor.focus(); updateLines(); saveEdState(els.jsonEditor.value); hasUnsavedChanges = true; els.jsonEditor.dispatchEvent(new Event('input'));
             }
         });
 
-        // Поиск (Inline Search)
-        let lastTerm = "";
+        els.jsonEditor.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault(); let start = this.selectionStart, end = this.selectionEnd, val = this.value;
+                let lineStart = val.substring(0, start).lastIndexOf('\n') + 1;
+                let indent = val.substring(lineStart, start).match(/^\s*/)[0];
+                this.setRangeText('\n' + indent, start, end, 'end');
+                els.jsonEditor.dispatchEvent(new Event('input'));
+            }
+        });
+
+        // Поиск Inline
+        let lastSearchTerm = "";
         g('btnSearch').onclick = () => { vibe(); g('searchBar').classList.toggle('hidden'); if(!g('searchBar').classList.contains('hidden')) g('searchInput').focus(); else els.jsonEditor.focus(); };
         g('btnSearchClose').onclick = () => { vibe(); g('searchBar').classList.add('hidden'); els.jsonEditor.focus(); };
         const doSearch = () => {
             vibe(); let term = g('searchInput').value; if(!term) return;
-            let val = els.jsonEditor.value, start = els.jsonEditor.selectionEnd;
-            if (lastTerm !== term) { start = 0; lastTerm = term; }
-            let idx = val.indexOf(term, start); if (idx === -1 && start > 0) idx = val.indexOf(term, 0); 
+            let val = els.jsonEditor.value, startPos = els.jsonEditor.selectionEnd;
+            if (lastSearchTerm !== term) { startPos = 0; lastSearchTerm = term; }
+            let idx = val.indexOf(term, startPos); if (idx === -1 && startPos > 0) idx = val.indexOf(term, 0); 
             if(idx !== -1) { els.jsonEditor.focus(); els.jsonEditor.setSelectionRange(idx, idx + term.length);
-                let lBefore = val.substring(0, idx).split('\n').length; let scr = Math.max(0, (lBefore - 3) * 22);
-                els.jsonEditor.scrollTop = scr; els.tLineH.scrollTop = scr; lastTerm = term; showT("Найдено!");
+                let linesBefore = val.substring(0, idx).split('\n').length; let scrollPos = Math.max(0, (linesBefore - 3) * 22);
+                els.jsonEditor.scrollTop = scrollPos; els.tLineH.scrollTop = scrollPos; lastSearchTerm = term; showT("Найдено!");
             } else { showT(`"${term}" не найдено`, 1); }
         };
-        g('btnSearchNext').onclick = doSearch; g('searchInput').addEventListener('keypress', e => { if (e.key === 'Enter') doSearch(); });
+        g('btnSearchNext').onclick = doSearch; g('searchInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') doSearch(); });
 
-        // --- ПРОТОКОЛЫ СОЕДИНЕНИЯ (V1 Система INCY/HAPP/СВОЙ) ---
-        let currentProtocol = 'incy';
-        const setProto = (p) => {
-            let isc = p!=='incy' && p!=='happ' && p!=='incy-mini';
-            g('btnProtoIncy').classList.toggle('active', p==='incy' || p==='incy-mini');
-            g('btnProtoHapp').classList.toggle('active', p==='happ');
-            g('btnProtoCustom').classList.toggle('active', isc);
-            if (isc) { currentProtocol = p||'custom'; g('customProtoContainer').classList.add('active'); if(p!=='custom') g('customProtoInput').value=p; } 
-            else { currentProtocol = p==='incy-mini'?'incy':p; g('customProtoContainer').classList.remove('active'); }
-            refreshLink();
+        g('btnSnippetsModal').onclick = () => { vibe(); toggleModal('modalSnippets', true); };
+        const insSnip = (txt) => { vibe(); let start = els.jsonEditor.selectionStart, end = els.jsonEditor.selectionEnd; els.jsonEditor.setRangeText(txt, start, end, 'end'); toggleModal('modalSnippets', false); els.jsonEditor.focus(); updateLines(); refreshLinks(); };
+
+        // --- PROTOCOLS ---
+        const setProtocol = (proto) => {
+            let isCustom = proto !== 'incy' && proto !== 'happ' && proto !== 'incy-mini';
+            g('btnProtoIncy').classList.toggle('active', proto === 'incy' || proto === 'incy-mini');
+            g('btnProtoHapp').classList.toggle('active', proto === 'happ');
+            g('btnProtoCustom').classList.toggle('active', isCustom);
+            if (isCustom) { currentProtocol = proto || 'custom'; g('customProtoContainer').classList.add('active'); if(proto !== 'custom') g('customProtoInput').value = proto; } 
+            else { currentProtocol = proto === 'incy-mini' ? 'incy' : proto; g('customProtoContainer').classList.remove('active'); }
         };
-        g('btnProtoIncy').onclick = () => { vibe(); setProto('incy'); };
-        g('btnProtoHapp').onclick = () => { vibe(); setProto('happ'); };
-        g('btnProtoCustom').onclick = () => { vibe(); setProto(g('customProtoInput').value||'custom'); g('customProtoInput').focus(); };
-        g('customProtoInput').addEventListener('input', (e) => { currentProtocol = e.target.value.replace(/[^a-zA-Z0-9-]/g, '').toLowerCase() || 'custom'; refreshLink(); });
+        g('btnProtoIncy').onclick = () => { vibe(); setProtocol('incy'); refreshLinks(); };
+        g('btnProtoHapp').onclick = () => { vibe(); setProtocol('happ'); refreshLinks(); };
+        g('btnProtoCustom').onclick = () => { vibe(); setProtocol(g('customProtoInput').value || 'custom'); g('customProtoInput').focus(); refreshLinks(); };
+        g('customProtoInput').addEventListener('input', (e) => { currentProtocol = e.target.value.replace(/[^a-zA-Z0-9-]/g, '').toLowerCase() || 'custom'; refreshLinks(); });
 
-        const b64e = str => btoa(unescape(encodeURIComponent(str))).replace(/=+$/, '');
-        const refreshLink = () => {
+        function refreshLinks() {
             try {
                 let parsed = JSON.parse(els.jsonEditor.value);
-                let raw = JSON.stringify(parsed);
-                let pSafe = currentProtocol==='custom'?'custom':currentProtocol;
-                let uri = `${pSafe}://routing/onadd/${b64e(raw)}`;
-                els.resout.value = uri; els.dlbtn.href = uri;
+                let rawMinified = JSON.stringify(parsed);
+                let safeProtocol = currentProtocol === 'custom' ? 'custom' : currentProtocol;
+                let newUrl = `${safeProtocol}://routing/onadd/${encodeB64(rawMinified)}`;
+                updateOutputLinks(newUrl, parsed.Name);
+                els.errorBox.classList.add('hidden'); [...els.tLineH.children].forEach(d => d.classList.remove('error'));
             } catch(e) {}
-        };
-        els.resout.onclick = () => { els.resout.select(); copyT(els.resout.value); };
-
-        async function getMini() {
-            try { return `incy-mini://${btoa(String.fromCharCode.apply(null, new Uint8Array(await new Response(new Blob([JSON.stringify(JSON.parse(els.jsonEditor.value))]).stream().pipeThrough(new CompressionStream('deflate-raw'))).arrayBuffer()))).replace(/=+$/,'')}`; }
-            catch(e) { return `incy-mini://${b64e(JSON.stringify(JSON.parse(els.jsonEditor.value)))}`; }
         }
-        g('btnCopyMini').onclick = async () => { vibe(); try { let m = await getMini(); copyT(m); } catch(e){ showT("Почините JSON",1); } };
-        g('btnCopyResult').onclick = () => { vibe(); copyT(els.resout.value); };
 
-        // --- LINTER, СОХРАНЕНИЕ ФАЙЛОВ (.YAML,.TXT), И РЕДАКТОР ---
-        const defaultJson = '{\n    "Name": "New Config"\n}';
-        const linter = () => {
-            let val = els.jsonEditor.value; els.jsonEditor.style.borderColor = ''; [...els.tLineH.children].forEach(d => d.classList.remove('error'));
-            try { if(val.trim()!=='') JSON.parse(val); return true; } catch(e) {
-                els.jsonEditor.style.borderColor = 'var(--red-text)';
-                let match = e.message.match(/line (\d+)/) || e.message.match(/position (\d+)/);
-                if (match) { let ls = e.message.includes('line') ? parseInt(match[1]) : val.substring(0, parseInt(match[1])).split('\n').length; if(els.tLineH.children[ls-1]) els.tLineH.children[ls-1].classList.add('error'); showT(`Ошибка на строке: ${ls}`, 1); } 
-                else { showT('Сломанный JSON!', 1); } return false;
-            }
-        };
+        // Фишка V1: анимация моргания фона ссылки
+        function updateOutputLinks(urlStr, name) {
+            let safeProtocol = currentProtocol === 'custom' ? 'custom' : currentProtocol; urlStr = urlStr.replace(/^([a-zA-Z0-9-]+):\/\//i, `${safeProtocol}://`);
+            els.resOut.style.backgroundColor = 'var(--bg-card)'; setTimeout(() => els.resOut.style.backgroundColor = '', 200);
+            els.resOut.value = urlStr; els.btnDeepLink.href = urlStr; els.pName.textContent = name || "Без имени";
+        }
+
+        // --- LINTER & РЕДАКТОР ---
+        function parseAndScrollToError(e) {
+            let msg = e.message; let matchPos = msg.match(/position (\d+)/); let matchLine = msg.match(/line (\d+) column (\d+)/); 
+            let lineNum = 1; let charIdx = 0;
+            if (matchPos && matchPos[1]) {
+                charIdx = parseInt(matchPos[1]);
+                lineNum = els.jsonEditor.value.substring(0, charIdx).split('\n').length;
+                els.jsonEditor.focus(); els.jsonEditor.setSelectionRange(charIdx, charIdx + 1);
+            } else if (matchLine && matchLine[1]) { lineNum = parseInt(matchLine[1]); }
+            [...els.tLineH.children].forEach(d => d.classList.remove('error'));
+            if(els.tLineH.children[lineNum-1]) els.tLineH.children[lineNum-1].classList.add('error');
+            
+            els.jsonEditor.scrollTop = Math.max(0, (lineNum - 3) * 22); els.tLineH.scrollTop = els.jsonEditor.scrollTop; 
+            showT("➡️ Ошибка на строке " + lineNum, 1);
+        }
 
         const updateLines = () => { 
             let ls = els.jsonEditor.value.split('\n').length || 1;
             els.tLineH.innerHTML = Array.from({length: ls}, (_, i) => `<div>${i+1}</div>`).join(''); 
-            els.bInfo.textContent = ls;
-            saveEdState(els.jsonEditor.value);
-            if(els.jsonEditor.value.length > 5) localStorage.setItem('incy_draft', els.jsonEditor.value);
-            refreshLink();
         };
-        els.jsonEditor.addEventListener('input', () => { updateLines(); if (els.vGraph.classList.contains('active')) buildG(); });
-        els.jsonEditor.addEventListener('scroll', () => els.tLineH.scrollTop = els.jsonEditor.scrollTop, {passive:true});
-        g('btnWrapToggle').onclick = function() { vibe(); els.jsonEditor.classList.toggle('wrap-text'); els.tLineH.style.opacity = els.jsonEditor.classList.contains('wrap-text')?'0.3':'1'; };
         
-        g('btnFormat').onclick = () => { vibe(); if(!linter()) return; els.jsonEditor.value = JSON.stringify(JSON.parse(els.jsonEditor.value), null, 4); updateLines(); showT('✨ Отформатировано'); if(els.vGraph.classList.contains('active')) buildG(); };
+        let liveUpdateTimer;
+        els.jsonEditor.addEventListener('input', () => { 
+            hasUnsavedChanges = true; updateLines(); saveEdState(els.jsonEditor.value); if (els.vGraph.classList.contains('active')) buildG();
+            clearTimeout(liveUpdateTimer);
+            liveUpdateTimer = setTimeout(() => {
+                refreshLinks();
+                try { JSON.parse(els.jsonEditor.value); els.errorBox.classList.add('hidden'); [...els.tLineH.children].forEach(d => d.classList.remove('error')); } 
+                catch(e) { els.errorBox.textContent = "Синтаксис сломан: " + e.message; els.errorBox.classList.remove('hidden'); }
+            }, 300);
+        });
+        els.jsonEditor.addEventListener('scroll', () => { els.tLineH.scrollTop = els.jsonEditor.scrollTop; }, { passive: true });
+        
+        g('btnWrapToggle').onclick = function() { vibe(); els.jsonEditor.classList.toggle('wrap-text'); els.tLineH.style.opacity = els.jsonEditor.classList.contains('wrap-text')?'0.3':'1'; };
+        els.btnFormat.onclick = () => {
+            vibe(); try {
+                let formatted = JSON.stringify(JSON.parse(els.jsonEditor.value), null, 4);
+                if(els.jsonEditor.value !== formatted) { els.jsonEditor.value = formatted; saveEdState(formatted); hasUnsavedChanges = true;}
+                els.errorBox.classList.add('hidden'); [...els.tLineH.children].forEach(d => d.classList.remove('error')); updateLines(); showT('✨ Отформатировано'); if(els.vGraph.classList.contains('active')) buildG();
+            } catch(e) { els.errorBox.textContent = e.message; els.errorBox.classList.remove('hidden'); parseAndScrollToError(e); }
+        };
 
-        // Сохранение в файл с выбором расширения
+        // Завершить редактирование
+        els.btnSaveJson.onclick = () => {
+            vibe();
+            try {
+                let parsed = JSON.parse(els.jsonEditor.value);
+                els.jsonEditor.value = JSON.stringify(parsed, null, 4); 
+                lastSavedJson = els.jsonEditor.value;
+                let safeProtocol = currentProtocol === 'custom' ? 'custom' : currentProtocol;
+                let newUrl = `${safeProtocol}://routing/onadd/${encodeB64(JSON.stringify(parsed))}`;
+                updateOutputLinks(newUrl, parsed.Name);
+                pushHist(parsed.Name, JSON.stringify(parsed));
+                els.errorBox.classList.add('hidden'); closeFullscreen(); closeEditor(); hasUnsavedChanges = false;
+                showT("✅ Сохранено"); setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 300);
+            } catch(e) { vibe(200); els.errorBox.textContent = "Синтаксис сломан: " + e.message; els.errorBox.classList.remove('hidden'); parseAndScrollToError(e); }
+        };
+
+        // --- INPUT PARSER И DRAG & DROP (Из V1) ---
+        document.body.addEventListener('dragover', e => e.preventDefault());
+        document.body.addEventListener('drop', e => { e.preventDefault(); if(e.dataTransfer.files.length) { let rd = new FileReader(); rd.onload = ev => { els.srcInput.value = ev.target.result.trim(); handleSrc(); }; rd.readAsText(e.dataTransfer.files[0]); } });
+        g('fileInput').onchange = e => { let file = e.target.files[0]; if(!file) return; let rd = new FileReader(); rd.onload = ev => { els.srcInput.value = ev.target.result.trim(); handleSrc(); }; rd.readAsText(file); g('fileInput').value = ''; };
+
+        els.btnPaste.onclick = async () => { try{ els.srcInput.value = await navigator.clipboard.readText(); handleSrc(); } catch(e){} };
+        els.btnClear.onclick = () => { vibe(); els.srcInput.value=''; els.jsonEditor.value=''; els.resOut.value=''; els.s2.classList.add('hidden'); closeFullscreen(); closeEditor(); hasUnsavedChanges=false; g('searchBar').classList.add('hidden'); edHist=[]; };
+
+        let parseTimer; els.srcInput.addEventListener('input', () => { clearTimeout(parseTimer); parseTimer = setTimeout(handleSrc, 400); });
+
+        async function handleSrc() {
+            let val = els.srcInput.value.trim(); if(!val) { els.btnClear.onclick(); return; }
+            if(val.includes('#') && val.length > 50) return decryptCloud(val); 
+
+            let protoMatch = val.match(/^([a-zA-Z0-9-]+):\/\//i);
+            let detectedProto = protoMatch ? protoMatch[1].toLowerCase() : 'incy';
+            if (detectedProto === 'happ') setProtocol('happ'); else if (detectedProto === 'incy' || detectedProto === 'incy-mini') setProtocol('incy'); else setProtocol(detectedProto);
+
+            let jsonStr = null;
+            if (val.startsWith('{')) { try { JSON.parse(val); jsonStr = val; } catch(e) {} }
+            if (!jsonStr) {
+                let b64 = val.includes('://') ? (val.split('://')[1].split('/onadd/')[1] || val.split('://')[1]) : val;
+                try {
+                    let bytes = new Uint8Array(atob(b64.padEnd(b64.length + (4 - b64.length % 4) % 4, '=')).split('').map(c=>c.charCodeAt(0)));
+                    let decomp = await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).text().catch(()=>null);
+                    jsonStr = decomp || decodeURIComponent(escape(atob(b64)));
+                } catch(e) {}
+            }
+
+            if(jsonStr) {
+                closeEditor(); closeFullscreen(); hasUnsavedChanges = false; g('searchBar').classList.add('hidden');
+                try {
+                    let json = JSON.parse(jsonStr);
+                    let rawMinified = JSON.stringify(json);
+                    let safeProtocol = currentProtocol === 'custom' ? 'custom' : currentProtocol;
+                    let newUrl = `${safeProtocol}://routing/onadd/${encodeB64(rawMinified)}`;
+                    
+                    els.srcInput.value = newUrl; 
+                    updateOutputLinks(newUrl, json.Name);
+                    
+                    const code = JSON.stringify(json, null, 4);
+                    els.jsonEditor.value = code; lastSavedJson = code; edHist = [code];
+                    updateLines(); els.s2.classList.remove('hidden'); pushHist(json.Name, code);
+                    setTimeout(() => els.s2.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+                    vibe(80); showT("Распознано успешно!");
+                } catch(e) { vibe(100); showT("Неверный синтаксис внутри конфига", 1); }
+            } else { if (val.length > 30 && !val.includes(" ")) { vibe(100); showT("Не удалось расшифровать", 1); } }
+        }
+
+        // --- СОХРАНЕНИЕ 1: СЖАТИЕ / КОПИРОВАТЬ ---
+        els.resOut.onclick = () => { if(els.resOut.value) { els.resOut.select(); copyToC(els.resOut.value); } };
+        async function getMini() { try { return `incy-mini://${btoa(String.fromCharCode.apply(null, new Uint8Array(await new Response(new Blob([JSON.stringify(JSON.parse(els.jsonEditor.value))]).stream().pipeThrough(new CompressionStream('deflate-raw'))).arrayBuffer()))).replace(/=+$/,'')}`; } catch(e) { return `incy-mini://${encodeB64(JSON.stringify(JSON.parse(els.jsonEditor.value)))}`; } }
+        g('btnCopyMini').onclick = async () => { vibe(); try { let m = await getMini(); copyToC(m); } catch(e){ showT("Восстановите код",1); } };
+        g('btnCopyResult').onclick = () => { vibe(); copyToC(els.resOut.value); };
+
+        // Сохранение 2: Экспорт файлов (Из V1)
         g('fileExtSelect').addEventListener('change', (e) => { vibe(); if(e.target.value === 'custom') { g('fileExtSelect').classList.add('hidden'); g('fileExtInput').classList.remove('hidden'); g('fileExtInput').value = '.'; g('fileExtInput').focus(); } });
         g('fileExtInput').addEventListener('blur', (e) => { let val = e.target.value.trim(); if(!val || val === '.') { g('fileExtInput').classList.add('hidden'); g('fileExtSelect').classList.remove('hidden'); g('fileExtSelect').value = '.json'; } });
 
         g('btnDownload').onclick = () => { 
-            vibe(); let t = els.jsonEditor.value; if(!t) return;
+            vibe(); let text = els.jsonEditor.value; if(!text) return;
             let ext = g('fileExtSelect').classList.contains('hidden') ? g('fileExtInput').value.trim() : g('fileExtSelect').value;
             if (!ext.startsWith('.')) ext = '.' + ext; if (ext === '.') ext = '.json';
             let mType = "application/octet-stream"; if (ext === '.json') mType = "application/json;charset=utf-8"; else if (ext === '.txt') mType = "text/plain;charset=utf-8";
-            let blob = new Blob([t], {type: mType}), a = document.createElement("a"); a.href = URL.createObjectURL(blob); 
+            let blob = new Blob([text], {type: mType}); let a = document.createElement("a"); a.href = URL.createObjectURL(blob); 
             a.download = (els.pName.textContent.replace(/[^a-z0-9а-яё-]/gi, '_').toLowerCase() || 'config') + ext; a.click(); showT(`Скачано как ${ext}`);
         };
 
-        // --- ВЕЛИКИЙ ПАРСЕР, СОСТОЯНИЯ И ОЧИСТКА ---
-        window.onload = () => {
-            let draft = localStorage.getItem('incy_draft');
-            if(draft && !window.location.hash) { try { els.jsonEditor.value = draft; els.pName.textContent = JSON.parse(draft).Name||'Черновик'; updateLines(); } catch(e) {} } 
-            else if (!window.location.hash) { els.jsonEditor.value = defaultJson; els.pName.textContent = 'New Config'; updateLines(); }
-            saveEdState(els.jsonEditor.value); renderHist();
+        // --- УМНАЯ ИСТОРИЯ (SMART HISTORY 2026) ---
+        const getH = () => JSON.parse(localStorage.getItem('incy_history') || '[]'); const setH = d => { localStorage.setItem('incy_history', JSON.stringify(d)); renderHist(); };
+        window.loadIntoEditor = async function(urlStr) { vibe(); els.srcInput.value = urlStr; window.scrollTo({ top: 0, behavior: 'smooth' }); await handleSrc(); els.btnOpenEditor.click(); }; // Из V1
+        
+        const pushHist = (name, content) => {
+            if(!content) return; name = name || "Без имени"; let hist = getH().filter(i => i.name !== name);
+            hist.unshift({ id: Date.now(), name: name, url: `incy://routing/onadd/${encodeB64(JSON.stringify(JSON.parse(content)))}`, content: content });
+            if(hist.length > 20) hist.pop(); setH(hist);
         };
 
-        g('btnPaste').onclick = async () => { try{ els.srcInput.value = await navigator.clipboard.readText(); handleSrc(); } catch(e){} };
-        g('btnClear').onclick = () => { vibe(); els.srcInput.value=''; loadCfg(defaultJson, false); localStorage.removeItem('incy_draft'); showT('Сброшено'); edHist=[]; saveEdState(defaultJson);};
-
-        let parseTimer; els.srcInput.addEventListener('input', () => { clearTimeout(parseTimer); parseTimer = setTimeout(handleSrc, 400); });
-        
-        async function handleSrc() {
-            let v = els.srcInput.value.trim(); if(!v) return;
-            // Проверка протокола (INCY/HAPP/MINI)
-            let match = v.match(/^([a-zA-Z0-9-]+):\/\//i);
-            if(match) { let pt = match[1].toLowerCase(); if(pt==='happ') setProto('happ'); else if(pt==='incy'||pt==='incy-mini') setProto('incy'); else setProto(pt); }
-            if(v.includes('#') && v.length > 50) return decryptCloud(v); 
-            
-            let b64 = v.includes('://') ? (v.split('://')[1].split('/onadd/')[1] || v.split('://')[1]) : v;
-            try {
-                let bytes = new Uint8Array(atob(b64.padEnd(b64.length + (4 - b64.length % 4) % 4, '=')).split('').map(c=>c.charCodeAt(0)));
-                let decomp = await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).text().catch(()=>null);
-                loadCfg(decomp || decodeURIComponent(escape(atob(b64))));
-            } catch(e) { try { loadCfg(v); } catch(ex){} }
-        }
-
-        function loadCfg(str, sHist = true) {
-            try {
-                let o = JSON.parse(str), frm = JSON.stringify(o, null, 4), n = o.Name||'Config';
-                els.jsonEditor.value = frm; els.pName.textContent = n; 
-                if(els.s2.classList.contains('hidden')) { g('uiS2').checked = true; g('uiS2').dispatchEvent(new Event('change')); }
-                els.s2.scrollIntoView({behavior:'smooth'});
-                updateLines(); linter();
-                if(sHist) { pushHist(n, frm); showT('Успешно Распознано!'); els.srcInput.value=''; }
-            } catch(e) { showT('Сломанный JSON в исходнике', 1); }
-        }
-
-        // --- УМНАЯ ИСТОРИЯ ---
-        const getH = () => JSON.parse(localStorage.getItem('incy_hist') || '[]'); const setH = d => { localStorage.setItem('incy_hist', JSON.stringify(d)); renderHist(); };
-        const pushHist = (n, c) => { let h = getH().filter(i=>i.n!==n).filter(i=>i.n!=='New Config' && i.n!=='Черновик'); h.unshift({id:Date.now(), n, c}); setH(h.slice(0,30)); };
-        
-        // Кнопка сохранения в блок 2 (как старое "Завершить")
-        g('btnSaveJson').onclick = () => { vibe(); try{ let p=JSON.parse(els.jsonEditor.value); pushHist(p.Name||'Config', JSON.stringify(p,null,4)); els.pName.textContent=p.Name; showT("✅ Изменения сохранены в Историю"); }catch(e){showT("Нельзя сохранить: Ошибка синтаксиса",1);} };
-        g('btnCancelEdit').onclick = () => { vibe(); let ls = localStorage.getItem('incy_draft') || defaultJson; loadCfg(ls, false); showT("Откат к черновику"); };
-
         g('histSearch').addEventListener('input', e => renderHist(e.target.value.toLowerCase().trim()));
-        g('btnCleanHist').onclick = () => { if(confirm("Сбросить историю?")){ vibe(); localStorage.removeItem('incy_hist'); renderHist(); } };
+        g('btnClearHistory').onclick = () => { if(confirm("Сбросить историю?")){ vibe(); localStorage.removeItem('incy_history'); renderHist(); } };
 
         const renderHist = (filt = "") => {
             if(!g('uiH').checked) return;
-            let hist = getH(); if(!hist.length) { els.hCard.classList.add('hidden'); return; }
-            els.hCard.classList.remove('hidden');
-            let data = filt ? hist.filter(i=>i.n.toLowerCase().includes(filt)) : hist;
+            let hist = getH(); if(!hist.length) { g('historyCard').classList.add('hidden'); return; }
+            g('historyCard').classList.remove('hidden');
+            let data = filt ? hist.filter(i=>i.name.toLowerCase().includes(filt)) : hist;
             
-            els.hList.innerHTML = data.map(i => {
-                let rawB64 = btoa(JSON.stringify(JSON.parse(i.c))).replace(/=+$/,'');
+            els.historyList.innerHTML = data.map(i => {
+                let upUrl = i.url; try { upUrl = `incy://routing/onadd/${encodeB64(JSON.stringify(JSON.parse(i.content)))}`; } catch(e){}
                 return `<div class="history-item" data-id="${i.id}">
-                    <div class="history-top"> <div class="history-title" data-act="ren">${i.n} ✏️</div>
+                    <div class="history-top"> <div class="history-title" data-act="ren">${i.name} ✏️</div>
                         <div class="history-controls"> <button class="history-btn-small" data-act="up">⬆</button> <button class="history-btn-small" data-act="dn">⬇</button> <button class="history-btn-small" data-act="dup">⧉</button> <button class="history-btn-small" style="color:var(--red-text)" data-act="del">✖</button> </div>
                     </div>
-                    <div style="display:flex;gap:8px;"> <button class="btn-action" style="flex:1.5;background:var(--accent-blue);color:white;border:none;" onclick="location.href='incy://routing/onadd/${rawB64}'">🚀 Запуск</button> <button class="btn-action" style="flex:1;" data-act="load">✒️ Редактор</button> <button class="btn-action" style="flex:1;" onclick="copyT('incy://routing/onadd/${rawB64}')">🔗 Copy</button></div>
+                    <div style="display:flex;gap:8px;"> <button class="btn-action" style="flex:1.5;background:var(--accent-blue);color:white;border:none;" onclick="location.href='${upUrl}'">🚀 Запуск</button> <button class="btn-action" style="flex:1;" data-act="load">✒️ Редактор</button> <button class="btn-action" style="flex:1;" onclick="copyToC('${upUrl}')">🔗 Copy</button></div>
                 </div>`;
             }).join('');
         };
 
-        els.hList.addEventListener('click', e => {
+        els.historyList.addEventListener('click', e => {
             let t = e.target.closest('[data-act]'); if(!t) return; vibe(); let aid = Number(t.closest('.history-item').dataset.id);
             let h = getH(), idx = h.findIndex(i=>i.id===aid); if(idx===-1)return; let act = t.dataset.act;
             if (act==='del') { h.splice(idx,1); showT('Удалено'); } else if(act==='up' && idx>0) { [h[idx], h[idx-1]] = [h[idx-1], h[idx]]; } else if(act==='dn' && idx<h.length-1) { [h[idx], h[idx+1]] = [h[idx+1], h[idx]]; }
-            else if(act==='ren') { let nn=prompt("Имя:",h[idx].n); if(nn&&nn.trim()) h[idx].n=nn.trim(); } else if(act==='load') { loadCfg(h[idx].c, false); showT('Открыто'); return; } else if(act==='dup') { let c=JSON.parse(JSON.stringify(h[idx])); c.id=Date.now(); c.n+=' (Copy)'; h.splice(idx+1,0,c); } setH(h);
+            else if(act==='ren') { let nn=prompt("Имя:",h[idx].name); if(nn&&nn.trim()) h[idx].name=nn.trim(); } else if(act==='load') { loadIntoEditor(h[idx].url); showT('В редакторе'); return; } else if(act==='dup') { let c=JSON.parse(JSON.stringify(h[idx])); c.id=Date.now(); c.name+=' (Copy)'; h.splice(idx+1,0,c); } setH(h);
         });
+        renderHist();
 
-        // --- ВИЗУАЛЬНЫЙ ГРАФ, ШАБЛОНЫ, БЭКАП, КЛАУД (Без изменений с V3, они идеальны) ---
-        g('btnSnippets').onclick = () => { vibe(); toggleModal('modSnippets', true); };
-        const insSnip = (t) => { vibe(); let s=els.jsonEditor.selectionStart, e=els.jsonEditor.selectionEnd; els.jsonEditor.setRangeText(t, s, e, 'end'); toggleModal('modSnippets', false); els.jsonEditor.focus(); updateLines(); };
-        
-        g('btnViewToggle').onclick = function() { vibe(); let a = els.vGraph.classList.toggle('active'); this.textContent = a?'✏️ Редактировать':'👁 Визуал'; if(a && linter()) { try { els.vGraph.innerHTML = `<div style="font-weight:bold; color:var(--text-main); margin-bottom:8px;">{ Root }</div>` + parseNode(JSON.parse(els.jsonEditor.value)); } catch(e) { els.vGraph.innerHTML = `<div style="color:var(--red-text); padding:20px;">Ошибка: ${e.message}</div>`; } } };
+        // --- ВИЗУАЛЬНЫЙ ГРАФ ---
+        g('btnViewToggle').onclick = function() { vibe(); let a = els.vGraph.classList.toggle('active'); this.textContent = a?'✏️ Редактор':'👁 Визуал'; if(a) { try { els.vGraph.innerHTML = `<div style="font-weight:bold; color:var(--text-main); margin-bottom:8px;">{ Root }</div>` + parseNode(JSON.parse(els.jsonEditor.value)); } catch(e) { els.vGraph.innerHTML = `<div style="color:var(--red-text); padding:20px;">Ошибка: ${e.message}</div>`; } } };
         const parseNode = (o) => { let h = ''; for(let k in o) { let v = o[k]; if(typeof v==='object' && v!==null) { let p = Array.isArray(v)?`[${v.length} эл-тов]`:`{...}`; h += `<div class="vg-node"><div class="vg-key" onclick="this.nextElementSibling.classList.toggle('hidden')">⊖ ${k} <span class="vg-obj">${p}</span></div><div>${parseNode(v)}</div></div>`; }  else h += `<div class="vg-node" style="font-size:13px"><span style="color:var(--text-main);font-weight:bold;">${k}:</span> <span class="vg-val">${v}</span></div>`; } return h; };
 
-        g('btnBackupDump').onclick = () => { vibe(); let w = { hist: getH(), t: localStorage.getItem('incy_t'), ui: { s1: g('uiS1').checked?1:0, s2: g('uiS2').checked?1:0, h: g('uiH').checked?1:0 } }; let a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(w)], {type:"application/json"})); a.download = `incy_backup.incybackup`; a.click(); showT('Бэкап скачан!'); };
+        // --- БЭКАП КОНФИГА ---
+        g('btnBackupDump').onclick = () => { vibe(); let w = { hist: getH(), t: localStorage.getItem('incy_t'), ui: { s1: g('uiS1').checked?1:0, h: g('uiH').checked?1:0 } }; let a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(w)], {type:"application/json"})); a.download = `incy_backup.incybackup`; a.click(); showT('Бэкап скачан!'); };
         g('btnBackupLoad').onclick = () => { vibe(); g('backupFile').click(); };
-        g('backupFile').onchange = e => { let file = e.target.files[0]; if(!file)return; let rd = new FileReader(); rd.onload = ev => { try { let p = JSON.parse(ev.target.result.trim()); if(p.hist) { setH(p.hist); setTheme(p.t||'default'); if(p.ui) { ['uiS1', 'uiS2', 'uiH'].forEach(id => { let key = id.replace('ui', '').toLowerCase(); if(p.ui[key] !== undefined) { g(id).checked = p.ui[key]===1; g(id).dispatchEvent(new Event('change')); } }); } toggleModal('modSettings', false); showT('Восстановлено!'); } } catch(err){ showT('Файл поврежден', 1); } }; rd.readAsText(file); e.target.value=''; };
+        g('backupFile').onchange = e => { let file = e.target.files[0]; if(!file)return; let rd = new FileReader(); rd.onload = ev => { try { let p = JSON.parse(ev.target.result.trim()); if(p.hist) { setH(p.hist); setTheme(p.t||'default'); if(p.ui) { ['uiS1', 'uiH'].forEach(id => { let key = id.replace('ui', '').toLowerCase(); if(p.ui[key] !== undefined) { g(id).checked = p.ui[key]===1; g(id).dispatchEvent(new Event('change')); } }); } toggleModal('modSettings', false); showT('Восстановлено!'); } } catch(err){ showT('Файл поврежден', 1); } }; rd.readAsText(file); e.target.value=''; };
 
+        // --- CLOUD ШИФРОВАНИЕ AES-256 ---
         const deriveK = async(p,s)=>crypto.subtle.deriveKey({name:"PBKDF2",salt:s,iterations:100000,hash:"SHA-256"}, await crypto.subtle.importKey("raw",new TextEncoder().encode(p),{name:"PBKDF2"},0,["deriveKey"]),{name:"AES-GCM",length:256},0,["encrypt","decrypt"]);
-        g('btnCloud').onclick = () => { vibe(); toggleModal('modCloud', true); g('shareRes').classList.add('hidden'); };
-        g('btnGenCloud').onclick = async () => { vibe(); if(!linter()) return; try { let p = g('sharePass').value || Math.random().toString(36).slice(-8); let salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12)); let enc = await crypto.subtle.encrypt({name: "AES-GCM", iv}, await deriveK(p,salt), new TextEncoder().encode(els.jsonEditor.value)); let su = `${window.location.origin}${window.location.pathname}?sid=${encodeURIComponent(btoa(String.fromCharCode(...new Uint8Array(enc))))}&s=${encodeURIComponent(btoa(String.fromCharCode(...salt)))}&i=${encodeURIComponent(btoa(String.fromCharCode(...iv)))}#${p}`; els.shareUrl.value = su; g('shareRes').classList.remove('hidden'); let img = new Image(); img.crossOrigin = "Anonymous"; img.onload = () => { let ctx = g('qrCanvas').getContext('2d'); ctx.canvas.width=200; ctx.canvas.height=200; ctx.clearRect(0,0,200,200); ctx.drawImage(img,0,0,200,200); }; img.src = `https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=${encodeURIComponent(su)}&choe=UTF-8`; showT('Зашифровано AES256!'); } catch(e) { showT('Ошибка шифрования', 1); } };
-        async function decryptCloud(u) { try { let url=new URL(u), p=url.hash.substring(1), sid=url.searchParams.get('sid'), s=url.searchParams.get('s'), i=url.searchParams.get('i'); if(!p||!sid||!s||!i)return; let dec = await crypto.subtle.decrypt({name:"AES-GCM", iv:Uint8Array.from(atob(i),c=>c.charCodeAt(0))}, await deriveK(p, Uint8Array.from(atob(s),c=>c.charCodeAt(0))), Uint8Array.from(atob(sid),c=>c.charCodeAt(0))); loadCfg(new TextDecoder().decode(dec), false); showT('🔓 Безопасно загружено'); } catch(e) { showT('Ключ поврежден', 1); els.srcInput.value=''; } }
-        if(window.location.hash && window.location.search.includes('sid=')) decryptCloud(window.location.href);
+        g('btnOpenCloudModal').onclick = () => { vibe(); toggleModal('modalCloud', true); g('shareResultBlock').classList.add('hidden'); };
+        g('btnGenerateCloud').onclick = async () => { vibe(); try { JSON.parse(els.jsonEditor.value); let p = g('sharePassword').value || Math.random().toString(36).slice(-8); let salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12)); let enc = await crypto.subtle.encrypt({name: "AES-GCM", iv}, await deriveK(p,salt), new TextEncoder().encode(els.jsonEditor.value)); let su = `${window.location.origin}${window.location.pathname}?sid=${encodeURIComponent(btoa(String.fromCharCode(...new Uint8Array(enc))))}&s=${encodeURIComponent(btoa(String.fromCharCode(...salt)))}&i=${encodeURIComponent(btoa(String.fromCharCode(...iv)))}#${p}`; g('shareUrlOut').value = su; g('shareResultBlock').classList.remove('hidden'); let img = new Image(); img.crossOrigin = "Anonymous"; img.onload = () => { let ctx = g('qrCanvas').getContext('2d'); ctx.canvas.width=200; ctx.canvas.height=200; ctx.clearRect(0,0,200,200); ctx.drawImage(img,0,0,200,200); }; img.src = `https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=${encodeURIComponent(su)}&choe=UTF-8`; showT('Зашифровано AES256!'); } catch(e) { showT('Исправьте JSON перед отправкой', 1); } };
+        async function decryptCloud(u) { try { let url=new URL(u), p=url.hash.substring(1), sid=url.searchParams.get('sid'), s=url.searchParams.get('s'), i=url.searchParams.get('i'); if(!p||!sid||!s||!i)return; let dec = await crypto.subtle.decrypt({name:"AES-GCM", iv:Uint8Array.from(atob(i),c=>c.charCodeAt(0))}, await deriveK(p, Uint8Array.from(atob(s),c=>c.charCodeAt(0))), Uint8Array.from(atob(sid),c=>c.charCodeAt(0))); els.srcInput.value = new TextDecoder().decode(dec); handleSrc(); showT('🔓 Облако расшифровано'); } catch(e) { showT('Ссылка или ключ поврежден', 1); els.srcInput.value=''; } }
+
+        let toastTimerT; function showT(msg, err=false) { els.toast.textContent=msg; els.toast.className=`toast show ${err?'error':''}`; clearTimeout(toastTimerT); toastTimerT=setTimeout(()=>els.toast.className='toast', 2500); }
+        function copyToC(txt) { navigator.clipboard.writeText(txt).then(()=>showT('✅ Скопировано')).catch(()=>{let t=document.createElement("textarea");t.value=txt;document.body.appendChild(t);t.select();try{document.execCommand("copy");showT('✅ Скопировано');}catch(e){showT('Ошибка',1);}document.body.removeChild(t);});}
     </script>
 </body>
 </html>
