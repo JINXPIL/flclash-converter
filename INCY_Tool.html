@@ -61,8 +61,7 @@
         .input-wrapper { position: relative; display: flex; flex-direction: column;}
         .resizable-box { width: 100%; background: var(--bg-input); border: 1px solid var(--border-gray); border-radius: 12px; padding: 16px; font-family: monospace; font-size: 13px; outline: none; white-space: pre-wrap; transition: 0.3s border; min-height: 150px; color: var(--code-color); resize: vertical;}
         .resizable-box:focus { border-color: var(--accent-blue); }
-        #srcInput { padding-bottom: 48px; }
-        #resultOutput { color: var(--accent-green); border-color: rgba(16,185,129,0.3); background: var(--line-num-bg); cursor: pointer; padding-bottom: 16px; min-height:100px; transition: 0.2s all;}
+        #resultOutput { color: var(--accent-green); border-color: rgba(16,185,129,0.3); background: var(--bg-body); cursor: pointer; padding-bottom: 16px; min-height:100px; transition: 0.2s all;}
         
         .abs-buttons { position: absolute; bottom: 8px; right: 8px; display: flex; gap: 6px; }
         .fs-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; border-bottom: 1px solid var(--border-gray); padding-bottom: 12px; margin-bottom: 16px;}
@@ -128,7 +127,7 @@
         .toast.show { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
         .toast.error { background: #ef4444; color: white; border-color: #b91c1c; }
 
-        /* История (Smart) */
+        /* История */
         .history-item { padding: 14px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-gray); margin-bottom: 10px; display: flex; flex-direction: column; gap: 12px; position: relative;}
         .history-top { display: flex; justify-content: space-between; align-items: flex-start;}
         .history-title { font-size: 15px; font-weight: bold; cursor: pointer; word-break: break-all; opacity: 0.9;}
@@ -189,7 +188,6 @@
         <!-- Шаг 2: Вся логика конфига -->
         <div id="step2-card" class="card hidden">
             
-            <!-- Шапка полноэкранного режима (Показывается при активном редакторе) -->
             <div id="fsHeader" class="fs-header hidden">
                 <div class="fs-header-info">
                     <span class="badge badge-blue">Конфиг • <span id="bdgLinesNum">1</span> строк</span>
@@ -241,17 +239,17 @@
                     <div class="resizer" id="resizer"><div class="resizer-handle"></div></div>
                 </div>
 
-                <!-- Блок для отображения ошибки -->
+                <!-- Блок для ошибки -->
                 <div id="errorBox" class="error-box hidden"></div>
                 
-                <!-- Те самые кнопки Отмена/Сохранить (Как в V1) -->
+                <!-- Кнопки Отмена/Сохранить (Как в V1) -->
                 <div class="editor-actions">
                     <button class="btn-action btn-action-red" id="btnCancelEdit" style="flex: 1; padding: 16px; border-radius: 12px; background: rgba(239, 68, 68, 0.1); border: 1px solid var(--red-text);">❌ Отмена</button>
                     <button class="btn-green" id="btnSaveJson" style="flex: 2; margin: 0;">💾 Завершить</button>
                 </div>
             </div>
 
-            <!-- РЕЗУЛЬТАТ (Станция экспорта, видна по умолчанию при загрузке) -->
+            <!-- РЕЗУЛЬТАТ (Станция экспорта, видна по умолчанию) -->
             <div id="resultBlock" style="margin-top: 16px;">
                 
                 <a id="btnDeepLink" class="btn btn-launch" href="#">
@@ -657,8 +655,16 @@
             a.download = (els.pName.textContent.replace(/[^a-z0-9а-яё-]/gi, '_').toLowerCase() || 'config') + ext; a.click(); showT(`Скачано как ${ext}`);
         };
 
-        // --- ИСТОРИЯ КОНФИГОВ (ИСПРАВЛЕННАЯ СВЕРХБЫСТРАЯ ЗАГРУЗКА В РЕДАКТОР) ---
-        const getH = () => JSON.parse(localStorage.getItem('incy_history') || '[]'); const setH = d => { localStorage.setItem('incy_history', JSON.stringify(d)); renderHist(); };
+        // --- УМНАЯ ИСТОРИЯ КОНФИГОВ И 100% БЕЗОТКАЗНАЯ МИГРАЦИЯ ДАННЫХ ---
+        // Функция чтения истории САМА чинит сломанные/старые конфиги (добавляет ID)
+        const getH = () => { 
+            let h = JSON.parse(localStorage.getItem('incy_history') || '[]'); 
+            let needsFix = false;
+            h.forEach(i => { if (!i.id) { i.id = i.timestamp || Math.floor(Math.random() * 1000000000); needsFix = true; } });
+            if(needsFix) localStorage.setItem('incy_history', JSON.stringify(h));
+            return h;
+        };
+        const setH = d => { localStorage.setItem('incy_history', JSON.stringify(d)); renderHist(); };
         
         const pushHist = (name, content) => {
             if(!content) return; name = name || "Без имени"; let hist = getH().filter(i => i.name !== name);
@@ -688,10 +694,21 @@
             }).join('');
         };
 
-        // Делегирование кликов по Истории
-        els.historyList.addEventListener('click', e => {
-            let t = e.target.closest('[data-act]'); if(!t) return; vibe(); let aid = Number(t.closest('.history-item').dataset.id);
-            let h = getH(), idx = h.findIndex(i=>i.id===aid); if(idx===-1)return; let act = t.dataset.act;
+        // Делегирование кликов по Истории (ЗАГРУЗКА В РЕДАКТОР СТАБИЛИЗИРОВАНА)
+        els.historyList.addEventListener('click', async e => {
+            let t = e.target.closest('[data-act]'); if(!t) return; vibe(); 
+            let aid = Number(t.closest('.history-item').dataset.id);
+            let h = getH();
+            
+            // Если вдруг ID не сошелся (очень маловероятно после миграции), ищем по имени как fallback
+            let idx = h.findIndex(i=>i.id===aid); 
+            if(idx === -1) {
+                let fallbackName = t.closest('.history-item').querySelector('.history-title').textContent.replace(' ✏️','').trim();
+                idx = h.findIndex(i=>i.name === fallbackName);
+            }
+            if(idx === -1) return; 
+            
+            let act = t.dataset.act;
             
             if (act === 'del') { h.splice(idx,1); showT('Удалено'); } 
             else if(act === 'up' && idx > 0) { [h[idx], h[idx-1]] = [h[idx-1], h[idx]]; } 
@@ -699,11 +716,18 @@
             else if(act === 'ren') { let nn=prompt("Имя конфига:",h[idx].name); if(nn&&nn.trim()) h[idx].name=nn.trim(); } 
             else if(act === 'dup') { let c=JSON.parse(JSON.stringify(h[idx])); c.id=Date.now(); c.name+=' (Copy)'; h.splice(idx+1,0,c); } 
             else if(act === 'load') { 
-                // ИСПРАВЛЕННАЯ ЛОГИКА: Мгновенная загрузка напрямую в активный редактор.
-                loadCfg(h[idx].content, false); // Загружаем JSON. 
-                els.btnOpenEditor.click();      // Автоматически нажимаем "⚙️ Изменить код".
+                // МОЩНАЯ ПРОВЕРКА ДЛЯ ВАШИХ СТАРЫХ КОНФИГОВ
+                if (h[idx].content) {
+                    loadCfg(h[idx].content, false); 
+                    els.btnOpenEditor.click();      
+                } else if (h[idx].url) {
+                    // Фолбэк: если это ДРЕВНИЙ конфиг (только URL, без JSON внутри)
+                    els.srcInput.value = h[idx].url;
+                    await handleSrc();
+                    els.btnOpenEditor.click();
+                }
                 showT('Открыто в редакторе'); 
-                return; // Не сохраняем состояние сеттера H
+                return; // Выходим из функции, чтобы не вызывать setH(h) и не перерисовывать список
             } 
             setH(h);
         });
