@@ -4,11 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#0a0d14" id="theme-color-meta">
     
-    <title>INCY Config | Ultimate</title>
+    <title>INCY Config | Pro 2026</title>
     
     <style>
         /* ================= ДИНАМИЧЕСКАЯ ТЕМА ================= */
@@ -16,749 +14,490 @@
             --bg-body: #0a0d14; --bg-card: #111827; --bg-input: #1f2937;
             --border-gray: #374151; --accent-blue: #3b82f6; --accent-green: #10b981;
             --text-main: #e5e7eb; --text-muted: #9ca3af;
-            --red-bg: rgba(239, 68, 68, 0.2); --red-text: #f87171;
+            --red-text: #f87171; --red-bg: rgba(239, 68, 68, 0.2);
             --code-color: #60a5fa; --line-num-bg: #0d1117; --line-num-color: #6b7280;
-            --header-text: #ffffff;
         }
 
-        :root.light-theme {
-            --bg-body: #f3f4f6; --bg-card: #ffffff; --bg-input: #ffffff;
-            --border-gray: #d1d5db; --accent-blue: #2563eb; --accent-green: #059669;
-            --text-main: #111827; --text-muted: #6b7280;
-            --red-bg: rgba(239, 68, 68, 0.1); --red-text: #dc2626;
-            --code-color: #0366d6; --line-num-bg: #f9fafb; --line-num-color: #9ca3af;
-            --header-text: #111827;
-        }
+        body.theme-light { --bg-body:#f3f4f6; --bg-card:#ffffff; --bg-input:#ffffff; --border-gray:#d1d5db; --accent-blue:#2563eb; --accent-green:#059669; --text-main:#111827; --text-muted:#6b7280; --code-color:#0366d6; --line-num-bg:#f9fafb;}
+        body.theme-dracula { --bg-body:#282a36; --bg-card:#44475a; --bg-input:#282a36; --border-gray:#6272a4; --accent-blue:#bd93f9; --accent-green:#50fa7b; --text-main:#f8f8f2; --code-color:#ff79c6; }
+        body.theme-cyberpunk { --bg-body:#fcee09; --bg-card:#111111; --bg-input:#222222; --border-gray:#0bcada; --accent-blue:#0bcada; --accent-green:#ff003c; --text-main:#fcee09; --text-muted:#888888; --line-num-bg:#000000; --code-color: #0bcada;}
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent;}
-        body { background-color: var(--bg-body); color: var(--text-main); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; justify-content: center; padding: 16px; padding-bottom: 80px; min-height: 100vh; transition: background-color 0.3s; }
+        body { background-color: var(--bg-body); color: var(--text-main); font-family: -apple-system, sans-serif; display: flex; justify-content: center; padding: 16px; padding-bottom: 80px; min-height: 100vh; transition: 0.3s; }
         .container { width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 24px; }
         .hidden { display: none !important; }
 
         .main-header { display: flex; justify-content: space-between; align-items: center; position: relative;}
         .main-header-content { flex: 1; text-align: center; }
-        h1 { font-size: 28px; font-weight: 800; color: var(--header-text); margin-bottom: 4px; transition: color 0.3s;}
+        h1 { font-size: 28px; font-weight: 800; color: var(--text-main); margin-bottom: 4px; }
         h1 span { color: var(--accent-blue); }
         .subtitle { font-size: 14px; color: var(--text-muted); margin-bottom: 12px;}
 
-        .btn-theme { background: var(--bg-card); border: 1px solid var(--border-gray); font-size: 20px; padding: 8px; border-radius: 50%; color: var(--text-main); cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); position: absolute; right: 0; top: 0;}
+        .icon-btn { background: var(--bg-card); border: 1px solid var(--border-gray); font-size: 20px; padding: 8px; border-radius: 50%; color: var(--text-main); cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); position: absolute; top: 0;}
+        .btn-settings { left: 0; font-size: 18px; }
+        .btn-theme { right: 0; }
 
-        .card { background: var(--bg-card); border: 1px solid var(--border-gray); border-radius: 16px; padding: 20px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); transition: background-color 0.3s, border-color 0.3s;}
+        .card { background: var(--bg-card); border: 1px solid var(--border-gray); border-radius: 16px; padding: 20px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); transition: 0.3s;}
         .step-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-        .badge { background: var(--bg-input); color: var(--text-muted); font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 999px; text-transform: uppercase; border: 1px solid var(--border-gray); letter-spacing: 0.05em; flex-shrink: 0;}
+        .badge { background: var(--bg-input); color: var(--text-muted); font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 999px; text-transform: uppercase; border: 1px solid var(--border-gray); flex-shrink: 0;}
         .badge-blue { background: rgba(59, 130, 246, 0.1); color: var(--accent-blue); border-color: rgba(59, 130, 246, 0.3); margin-bottom: 6px; display: inline-block; }
 
-        button, .btn { cursor: pointer; border: none; font-family: inherit; font-weight: bold; transition: 0.1s transform; outline: none; display: flex; align-items: center; justify-content: center; text-decoration: none;}
+        button, .btn { cursor: pointer; border: none; font-weight: bold; transition: 0.1s transform; display: flex; align-items: center; justify-content: center; text-decoration: none;}
         button:active, .btn:active { transform: scale(0.95); }
         .btn-action { background: var(--bg-input); border: 1px solid var(--border-gray); color: var(--text-main); border-radius: 8px; padding: 8px 14px; font-size: 13px; }
-        .btn-action-blue { background: var(--bg-input); color: var(--accent-blue); border-color: rgba(59,130,246,0.3); }
-        .btn-action-blue:active { background: var(--accent-blue); color: white;}
-        .btn-action-red { color: var(--red-text); }
-        .btn-action-red:active { background: var(--red-text); color: white; }
-        .btn-util { background: var(--bg-card); }
-        
+        .btn-action-blue { color: var(--accent-blue); border-color: rgba(59,130,246,0.3); }
         .btn-primary { width: 100%; padding: 16px; background: var(--accent-blue); color: white; font-size: 15px; border-radius: 12px; box-shadow: 0 0 15px rgba(59,130,246,0.3); }
-        .btn-green { padding: 16px !important; background: rgba(16, 185, 129, 0.1); border: 1px solid var(--accent-green); color: var(--accent-green); font-size: 14px; border-radius: 12px; width: 100%;}
-        
-        a.btn-launch { background: linear-gradient(135deg, var(--accent-blue), #2563eb); color: white; box-shadow: 0 5px 15px rgba(59,130,246,0.4); font-size: 16px; margin-bottom: 16px; padding: 16px; border-radius: 12px; text-decoration: none; display: flex; flex-direction: column; align-items: center; }
         
         .input-wrapper { position: relative; display: flex; flex-direction: column;}
-        .resizable-box { width: 100%; background: var(--bg-input); border: 1px solid var(--border-gray); border-radius: 12px; padding: 16px; font-family: monospace; font-size: 13px; outline: none; white-space: pre-wrap; transition: 0.3s border; min-height: 150px; resize: vertical; color: var(--code-color);}
+        .resizable-box { width: 100%; background: var(--bg-input); border: 1px solid var(--border-gray); border-radius: 12px; padding: 16px; font-family: monospace; font-size: 13px; outline: none; white-space: pre-wrap; transition: 0.3s; color: var(--code-color);}
         .resizable-box:focus { border-color: var(--accent-blue); }
-        #srcInput { padding-bottom: 48px; }
-        #resultOutput { color: var(--accent-green); border-color: rgba(16,185,129,0.3); background: #0a0d14; cursor: pointer; padding-bottom: 16px; min-height:100px; transition: 0.2s all;}
-        
-        .abs-buttons { position: absolute; bottom: 8px; right: 8px; display: flex; gap: 6px; }
-        .fs-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; border-bottom: 1px solid var(--border-gray); padding-bottom: 12px;}
-        .fs-header-info { display: flex; flex-direction: column; min-width: 0; flex: 1; align-items: flex-start; }
-        #profileName { color: var(--text-main); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
-        
-        #editorBlock { display: flex; flex-direction: column; }
-        .editor-container { display: flex; flex-direction: column; background: var(--bg-body); border-radius: 12px; overflow: hidden; border: 1px solid var(--border-gray); margin: 16px 0; height: 420px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.05); }
-        .toolbar { display: flex; overflow-x: auto; padding: 8px 12px; background: var(--bg-input); border-bottom: 1px solid var(--border-gray); gap: 6px; scroll-behavior: smooth; flex-shrink: 0; }
+
+        .editor-container { display: flex; flex-direction: column; background: var(--bg-body); border-radius: 12px; overflow: hidden; border: 1px solid var(--border-gray); margin: 16px 0; height: 420px; position: relative;}
+        .toolbar { display: flex; overflow-x: auto; padding: 8px 12px; background: var(--bg-input); border-bottom: 1px solid var(--border-gray); gap: 6px; flex-shrink: 0; }
         .toolbar::-webkit-scrollbar { display: none; }
         .toolbar-btn { background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-gray); padding: 6px 14px; border-radius: 6px; font-family: monospace; font-size: 14px; flex-shrink: 0; }
-        .toolbar-btn:active { background: var(--accent-blue); color: white; border-color: var(--accent-blue);}
-        .toolbar-divider { width: 1px; background: var(--border-gray); margin: 0 4px; flex-shrink: 0; }
+        .toolbar-btn:active { background: var(--accent-blue); color: white; }
         
-        .editor-workspace { display: flex; flex: 1; min-height: 0; }
+        .editor-workspace { display: flex; flex: 1; min-height: 0; position: relative;}
         .code-font { font-family: Menlo, Monaco, Consolas, "Courier New", monospace !important; font-size: 13px !important; line-height: 22px !important; }
-        
-        .line-numbers { background: var(--line-num-bg); border-right: 1px solid var(--border-gray); padding: 16px 8px 80px 8px; color: var(--line-num-color); text-align: right; user-select: none; flex-shrink: 0; overflow-y: scroll; scrollbar-width: none; -ms-overflow-style: none; }
-        .line-numbers::-webkit-scrollbar { display: none; }
-        .line-numbers div { height: 22px !important; display: flex; align-items: center; justify-content: flex-end;}
-        
-        .json-textarea { flex: 1; color: var(--code-color); background: transparent; border: none; padding: 16px; padding-bottom: 80px; resize: none; outline: none; min-width: 0; white-space: pre !important; word-wrap: normal !important; overflow: auto; will-change: transform; transform: translateZ(0); }
+        .line-numbers { background: var(--line-num-bg); border-right: 1px solid var(--border-gray); padding: 16px 8px 80px 8px; color: var(--line-num-color); text-align: right; user-select: none; overflow: hidden; }
+        .json-textarea { flex: 1; color: var(--code-color); background: transparent; border: none; padding: 16px; padding-bottom: 80px; outline: none; white-space: pre !important; overflow: auto; }
+        .json-textarea.wrap-text { white-space: pre-wrap !important; }
 
-        .resizer { height: 36px; background: var(--bg-input); border-top: 1px solid var(--border-gray); display: flex; justify-content: center; align-items: center; cursor: ns-resize; flex-shrink: 0; }
-        .resizer-handle { width: 60px; height: 4px; background: var(--border-gray); border-radius: 2px; }
+        /* ВИЗУАЛЬНЫЙ ГРАФ (LIVE NODE VIEW) */
+        #visualGraph { background: var(--bg-body); overflow: auto; padding: 20px; font-family: sans-serif; position: absolute; inset: 0; z-index: 10; display: none; flex-direction: column; gap: 8px;}
+        #visualGraph.active { display: flex; }
+        .vg-node { border-left: 2px solid var(--border-gray); padding-left: 12px; margin-left: 12px; margin-top: 4px; }
+        .vg-key { color: var(--accent-blue); font-weight: bold; font-size: 13px; cursor: pointer; }
+        .vg-val { color: var(--accent-green); font-family: monospace; font-size: 12px; word-break: break-all;}
+        .vg-obj { color: var(--text-muted); font-size: 11px; margin-left: 4px; }
+
+        /* Модальные окна */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 9999; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: 0.2s;}
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .modal-card { background: var(--bg-card); width: 90%; max-width: 400px; border-radius: 16px; border: 1px solid var(--border-gray); padding: 20px; transform: translateY(20px); transition: 0.2s; max-height: 80vh; overflow-y: auto;}
+        .modal-overlay.active .modal-card { transform: translateY(0); }
+        .modal-header { font-size: 18px; font-weight: bold; margin-bottom: 16px; display: flex; justify-content: space-between;}
         
-        .fullscreen { position: fixed; inset: 0; z-index: 1000; border-radius: 0; border: none; display: flex; flex-direction: column; background: var(--bg-body); margin: 0; padding-bottom: env(safe-area-inset-bottom, 0px); }
-        .fullscreen #editorBlock { flex: 1; min-height: 0; }
-        .fullscreen .editor-container { flex: 1; min-height: 0; margin: 0; border-radius: 0; border-left: none; border-right: none; height: auto !important; box-shadow: none; }
-        .fullscreen .editor-workspace { flex: 1; height: auto !important; min-height: 0; display: flex;}
-        .fullscreen .resizer { display: none; }
-        .fullscreen .fs-header { padding: 16px; padding-top: max(16px, env(safe-area-inset-top, 20px)); background: var(--bg-card); margin: 0; flex-shrink: 0;}
-        .fullscreen .editor-actions { padding: 12px 16px; margin: 0; background: var(--bg-card); border-top: 1px solid var(--border-gray); flex-shrink: 0;}
-        .fullscreen .error-box { margin: 0 16px; flex-shrink: 0; }
+        .setting-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 8px; background: var(--bg-input); border-radius: 8px; border: 1px solid var(--border-gray);}
+        .toggle-checkbox { width: 24px; height: 24px; accent-color: var(--accent-blue); cursor: pointer;}
+        
+        #qrCanvas { background: white; padding: 12px; border-radius: 12px; margin: 0 auto 16px; display: block; border: 2px solid var(--border-gray); max-width: 100%; height: auto;}
 
-        .editor-actions { display: flex; gap: 8px; margin-bottom: 16px; }
-
-        .toast { position: fixed; top: max(20px, env(safe-area-inset-top, 20px)); left: 50%; transform: translate(-50%, -20px); opacity: 0; background: var(--bg-input); border: 1px solid var(--border-gray); color: var(--text-main); padding: 12px 24px; border-radius: 12px; font-size: 14px; font-weight: bold; pointer-events: none; transition: 0.3s; z-index: 9999; box-shadow: 0 10px 25px rgba(0,0,0,0.5); text-align: center; max-width: 90%;}
+        .toast { position: fixed; top: 30px; left: 50%; transform: translate(-50%, -20px); opacity: 0; background: var(--bg-input); border: 1px solid var(--accent-blue); color: var(--text-main); padding: 12px 24px; border-radius: 12px; font-weight: bold; transition: 0.3s; z-index: 10000; box-shadow: 0 10px 25px rgba(0,0,0,0.5); pointer-events: none; }
         .toast.show { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
-        .toast.error { background: #ef4444; color: white; border-color: #b91c1c; }
-        .error-box { background: var(--red-bg); color: var(--red-text); padding: 8px 16px; font-size: 12px; border-bottom: 1px solid var(--red-border); font-weight: bold; }
+        .toast.error { border-color: var(--red-text); color: var(--red-text); }
         
-        .history-item { background: var(--bg-card); border: 1px solid var(--border-gray); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 12px; position: relative;}
-        .history-info { display: flex; flex-direction: column; padding-right: 20px;}
-        .history-name { font-size: 14px; font-weight: bold; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .history-row { display: flex; gap: 8px; width: 100%; justify-content: space-between;}
-
-        .btn-delete-hist { position: absolute; right: 10px; top: 10px; background: transparent; border: none; font-size: 16px; color: var(--text-muted); cursor: pointer;}
-        .btn-delete-hist:active { color: var(--red-text); transform: scale(0.9);}
-
-        .platform-box { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; margin-bottom: 12px; background: var(--bg-input); padding: 8px 12px; border-radius: 12px; border: 1px solid var(--border-gray); }
-        .format-tabs { display: flex; background: var(--bg-body); border-radius: 8px; padding: 3px; border: 1px solid var(--border-gray); }
-        .format-tab { background: transparent; color: var(--text-muted); border-radius: 6px; padding: 6px 12px; font-size: 12px; transition: 0.2s; border: none; font-weight: bold;}
-        .format-tab.active { background: var(--accent-blue); color: white; }
+        /* ИСТОРИЯ КОНФИГОВ (NEW UI) */
+        .history-item { padding: 14px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-gray); margin-bottom: 10px; display: flex; flex-direction: column; gap: 12px;}
+        .history-top { display: flex; justify-content: space-between; align-items: flex-start;}
+        .history-title { font-size: 15px; font-weight: bold; color: var(--text-main); display: flex; align-items: center; gap: 8px; cursor: pointer; word-break: break-all;}
+        .history-title-icon { font-size: 12px; opacity: 0.5; transition: 0.2s; }
+        .history-title:hover .history-title-icon { opacity: 1; color: var(--accent-blue); }
         
-        .custom-proto-container { width: 100%; margin-top: 10px; display: none; margin-bottom: 2px; }
-        @keyframes slide-down { 0% { opacity: 0; transform: translateY(-5px); } 100% { opacity: 1; transform: translateY(0); } }
-        .custom-proto-container.active { display: block; animation: slide-down 0.2s ease-out; }
-        .custom-proto-input { width: 100%; background: var(--bg-body); border: 1px solid var(--border-gray); border-radius: 8px; padding: 10px 12px; font-family: monospace; font-size: 13px; color: var(--text-main); outline: none; transition: 0.2s;}
-        .custom-proto-input:focus { border-color: var(--accent-blue); }
-
-        .ext-input {
-            background: var(--bg-input); border: 1px solid var(--border-gray); border-radius: 12px; 
-            padding: 12px 8px; font-family: monospace; font-size: 14px; color: var(--text-main); 
-            outline: none; transition: 0.2s; text-align: center; font-weight: bold; width: 100px; flex-shrink: 0;
-        }
-        .ext-input:focus { border-color: var(--accent-blue); }
+        .history-controls { display: flex; gap: 4px; background: var(--bg-input); border-radius: 8px; padding: 2px; border: 1px solid var(--border-gray);}
+        .history-btn-small { background: transparent; color: var(--text-muted); border: none; padding: 4px 8px; font-size: 14px; cursor: pointer; border-radius: 6px;}
+        .history-btn-small:hover { background: var(--bg-card); color: var(--text-main); }
+        .history-btn-del:hover { color: var(--red-text); }
         
-        .ext-select {
-            appearance: none; -webkit-appearance: none;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-            background-repeat: no-repeat; background-position: right 8px center; background-size: 16px;
-            padding-right: 24px; cursor: pointer; color: var(--accent-blue);
-        }
-
-        ::selection { background: var(--accent-blue); color: white; }
+        .history-row { display: flex; gap: 8px; width: 100%; }
+        #historySearch { width: 100%; background: var(--bg-input); border: 1px solid var(--border-gray); color: var(--text-main); padding: 10px 14px; border-radius: 8px; outline: none; margin-bottom: 16px; font-size: 14px;}
+        #historySearch:focus { border-color: var(--accent-blue); }
     </style>
 </head>
 <body>
 
     <div class="container">
         <header class="main-header">
+            <button class="icon-btn btn-settings" id="btnSettingsModal" title="Настройки UI">⚙️</button>
             <div class="main-header-content">
                 <h1>INCY <span>Tool</span></h1>
-                <p class="subtitle">Universal Protocol Engine 🚀</p>
+                <p class="subtitle">Cloud & Flex Engine 🚀</p>
             </div>
-            <button class="btn-theme" id="btnThemeToggle" title="Сменить тему">🌓</button>
+            <button class="icon-btn btn-theme" id="btnThemeToggle" title="Быстрая смена темы">🌓</button>
         </header>
 
         <!-- Шаг 1 -->
-        <div class="card">
+        <div class="card" id="step1-card">
             <div class="step-header">
                 <span class="badge">Шаг 1: Исходник</span>
                 <input type="file" id="fileInput" class="hidden">
                 <button class="btn-action btn-action-blue" onclick="document.getElementById('fileInput').click()">📁 Файл</button>
             </div>
-            
             <div class="input-wrapper">
-                <textarea id="srcInput" class="resizable-box" placeholder="Вставьте ссылку, Base64 или просто чистый JSON-код..." 
-                          autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false"></textarea>
-                <div class="abs-buttons">
-                    <button class="btn-action btn-action-blue" id="btnPaste" style="border:none">Вставить</button>
-                    <button class="btn-action btn-action-red" id="btnClear" style="border:none">✕</button>
+                <textarea id="srcInput" class="resizable-box" placeholder="Вставьте ссылку, Base64 или JSON..." spellcheck="false" style="min-height: 120px;"></textarea>
+                <div style="position: absolute; bottom: 8px; right: 8px; display: flex; gap: 6px;">
+                    <button class="btn-action btn-action-blue" id="btnPaste">Вставить</button>
+                    <button class="btn-action" id="btnClear">✕</button>
                 </div>
             </div>
         </div>
 
         <!-- Шаг 2 -->
         <div id="step2-card" class="card hidden">
-            <div id="fsHeader" class="fs-header hidden">
-                <div class="fs-header-info">
-                    <span class="badge badge-blue">Шаг 2: Настройка</span>
-                    <strong id="profileName"></strong>
-                </div>
-                <button class="btn-action" id="btnToggleFs">⛶ На весь экран</button>
+            <div class="step-header">
+                <span class="badge badge-blue" id="editorBadgeInfo">Конфиг</span>
+                <strong id="profileName" style="font-size:13px; text-align:right;"></strong>
             </div>
 
-            <!-- Редактор JSON -->
-            <div id="editorBlock" class="hidden">
-                <div class="editor-container" id="editorContainerTarget">
+            <div class="editor-container">
+                <div class="toolbar">
+                    <button class="toolbar-btn" id="btnViewToggle">👁 Визуал</button>
+                    <button class="toolbar-btn" id="btnSnippetsModal">⚡ Шаблоны</button>
+                    <button class="toolbar-btn" style="color:var(--accent-green);" id="btnFormat">🧹 Формат</button>
+                    <div style="width:1px; background:var(--border-gray); margin:0 4px;"></div>
+                    <button class="toolbar-btn" id="btnWrapToggle">↩️ Перенос</button>
+                    <button class="toolbar-btn" data-trigger="auto" title="Для мобилок: Убрать фокус">⌨️</button>
+                </div>
+
+                <div class="editor-workspace">
+                    <div class="line-numbers code-font" id="lineNumbers">1</div>
+                    <textarea id="jsonEditor" class="json-textarea code-font" wrap="off" spellcheck="false"></textarea>
                     
-                    <div class="toolbar">
-                        <button class="toolbar-btn btn-util" id="btnUndo">↶ Undo</button>
-                        <button class="toolbar-btn btn-util" id="btnSearch">🔍 Поиск</button>
-                        <div class="toolbar-divider"></div>
-                        <button class="toolbar-btn btn-util" onclick="document.getElementById('jsonEditor').scrollTop=0">⬆</button>
-                        <button class="toolbar-btn btn-util" onclick="document.getElementById('jsonEditor').scrollTop=999999">⬇</button>
-                        <div class="toolbar-divider"></div>
-                        <button class="toolbar-btn" data-insert="  ">Tab</button>
-                        <button class="toolbar-btn" data-wrap-start='"' data-wrap-end='"'>""</button>
-                        <button class="toolbar-btn" data-wrap-start='{' data-wrap-end='}'>{}</button>
-                        <button class="toolbar-btn" data-wrap-start='[' data-wrap-end=']'>[]</button>
-                        <button class="toolbar-btn" data-insert=":">:</button>
-                        <button class="toolbar-btn" data-insert=",">,</button>
-                        <div class="toolbar-divider"></div>
-                        <button class="toolbar-btn" style="color:var(--accent-green); background: rgba(16, 185, 129, 0.1);" id="btnFormat">🧹 Формат</button>
-                    </div>
-
-                    <div class="editor-workspace" id="editorWorkspace">
-                        <div class="line-numbers code-font" id="lineNumbers">1</div>
-                        <textarea id="jsonEditor" class="json-textarea code-font" wrap="off" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false"></textarea>
-                    </div>
-                    <div class="resizer" id="resizer"><div class="resizer-handle"></div></div>
-                </div>
-                
-                <div id="errorBox" class="error-box hidden"></div>
-                
-                <div class="editor-actions">
-                    <button class="btn-action btn-action-red" id="btnCancelEdit" style="flex: 1; padding: 16px; border-radius: 12px; background: rgba(239, 68, 68, 0.1); border: 1px solid var(--red-text);">❌ Отмена</button>
-                    <button class="btn-green" id="btnSaveJson" style="flex: 2; margin: 0;">💾 Завершить</button>
+                    <div id="visualGraph"></div>
                 </div>
             </div>
 
-            <div id="resultBlock" style="margin-top: 16px;">
-                <a id="btnDeepLink" class="btn btn-launch" href="#">
-                    <div>🚀 Открыть напрямую в приложении</div>
-                </a>
-
-                <button id="btnOpenEditor" class="btn-primary" style="margin-bottom: 16px; background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border-gray); box-shadow: none;">⚙️ Изменить код (Live Sync)</button>
-
-                <!-- БЛОК ПЛАТФОРМ -->
-                <div class="platform-box">
-                    <div style="display: flex; width: 100%; justify-content: space-between; align-items: center;">
-                        <div style="font-size: 11px; color: var(--text-muted); font-weight: bold; text-transform: uppercase;">Протокол (Система):</div>
-                        <div class="format-tabs">
-                            <button id="btnProtoIncy" class="format-tab active">INCY</button>
-                            <button id="btnProtoHapp" class="format-tab">HAPP</button>
-                            <button id="btnProtoCustom" class="format-tab">СВОЙ ✍️</button>
-                        </div>
-                    </div>
-                    <div id="customProtoContainer" class="custom-proto-container">
-                        <input type="text" id="customProtoInput" class="custom-proto-input" placeholder="Введите префикс (например: v2rayng)" spellcheck="false" autocomplete="off">
-                    </div>
-                </div>
-
-                <textarea id="resultOutput" class="resizable-box" readonly placeholder="Здесь будет ПРЯМАЯ ссылка..." title="Нажмите, чтобы скопировать"></textarea>
-                
-                <div style="font-size: 11px; color: var(--text-muted); text-align: center; margin-bottom: 8px; margin-top: 16px; font-weight: bold; text-transform: uppercase;">Скопировать:</div>
-                <div style="display: flex; gap: 8px; margin-bottom: 8px;">
-                    <button class="btn-primary" id="btnCopyMini" style="flex: 1; background: rgba(59,130,246,0.1); border: 1px solid var(--accent-blue); color: var(--accent-blue); font-size: 13px;" title="Только для INCY (Сжимает текст в 5 раз)">🪄 Сжатая (MINI)</button>
-                    <button class="btn-primary" id="btnCopyResult" style="flex: 1; background: var(--bg-input); border: 1px solid var(--border-gray); color: var(--text-main); font-size: 13px;">📋 Полная</button>
-                </div>
-                
-                <!-- БЛОК СОХРАНЕНИЯ ФАЙЛОВ -->
-                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px; padding-top: 8px; border-top: 1px dashed var(--border-gray);">
-                    <div style="font-size: 11px; color: var(--text-muted); font-weight: bold; text-transform: uppercase;">Сохранить как файл:</div>
-                </div>
-                <div style="display: flex; gap: 8px; align-items: stretch;">
-                    <div style="position: relative; display: flex; align-items: stretch;">
-                        <select id="fileExtSelect" class="ext-input ext-select">
-                            <option value=".json" selected>.json</option>
-                            <option value=".txt">.txt</option>
-                            <option value=".yaml">.yaml</option>
-                            <option value=".conf">.conf</option>
-                            <option value=".ini">.ini</option>
-                            <option value="custom">✍️ Свой..</option>
-                        </select>
-                        <input type="text" id="fileExtInput" class="ext-input hidden" placeholder=".ext" spellcheck="false" autocomplete="off" style="text-align: left; padding-left: 12px; width: 100px;">
-                    </div>
-                    <button class="btn-primary" id="btnDownload" style="flex: 1; background: transparent; border: 1px solid var(--border-gray); color: var(--text-main); font-size: 13px;">📥 Скачать на устройство</button>
-                </div>
-
+            <div style="display:flex; gap:8px; margin-top:16px;">
+                <button class="btn-primary" id="btnExportFile" style="flex:1; background:var(--bg-input); border:1px solid var(--border-gray); color:var(--text-main);">📥 Скачать .json</button>
+                <button class="btn-primary" id="btnOpenCloudModal" style="flex:1; box-shadow:0 0 15px rgba(59,130,246,0.3);">☁️ Поделиться</button>
             </div>
+            
+            <a id="btnDeepLink" class="btn btn-action" style="margin-top:12px; padding:12px; background:var(--accent-green); color:white; border:none; border-radius:12px;" href="#">🚀 Открыть ссылку (Launch)</a>
         </div>
 
+        <!-- ИСТОРИЯ КОНФИГОВ -->
         <div id="historyCard" class="card hidden">
             <div class="step-header">
-                <span class="badge">История</span>
-                <button class="btn-action btn-action-red" style="font-size: 11px; padding: 6px 10px;" id="btnClearHistory">Очистить всё</button>
+                <span class="badge">Моя История</span>
+                <button class="btn-action" style="color:var(--red-text); background:transparent;" id="btnClearHistory">Очистить всё</button>
             </div>
+            
+            <input type="text" id="historySearch" placeholder="🔍 Найти конфиг по имени..." autocomplete="off" spellcheck="false">
             <div id="historyList"></div>
+        </div>
+    </div>
+
+    <!-- МОДАЛКИ (Настройки, Шаблоны, Cloud) Оставлены без изменений, как в предыдущей версии, для экономии места визуально -->
+    <!-- НАСТРОЙКИ UI -->
+    <div class="modal-overlay" id="modalSettings">
+        <div class="modal-card">
+            <div class="modal-header"> Настройки UI <button class="btn-action" onclick="els.modalSettings.classList.remove('active')">✕</button> </div>
+            <div style="font-size:12px; color:var(--text-muted); margin-bottom: 6px; text-transform:uppercase; font-weight:bold;">Модули:</div>
+            <div class="setting-row"> <label for="toggleStep1">Показывать Шаг 1</label> <input type="checkbox" id="toggleStep1" class="toggle-checkbox" checked> </div>
+            <div class="setting-row"> <label for="toggleHistory">Показывать Историю</label> <input type="checkbox" id="toggleHistory" class="toggle-checkbox" checked> </div>
+            <div style="font-size:12px; color:var(--text-muted); margin: 16px 0 6px; text-transform:uppercase; font-weight:bold;">Темы:</div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button class="btn-action" onclick="applyTheme('default')" style="flex:1">Default</button>
+                <button class="btn-action" onclick="applyTheme('light')" style="flex:1; background:#f3f4f6; color:#111;">Light</button>
+                <button class="btn-action" onclick="applyTheme('dracula')" style="flex:1; background:#282a36; color:#bd93f9;">Dracula</button>
+                <button class="btn-action" onclick="applyTheme('cyberpunk')" style="flex:1; background:#fcee09; color:#111;">Cyberpunk</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ШАБЛОНЫ -->
+    <div class="modal-overlay" id="modalSnippets">
+        <div class="modal-card">
+            <div class="modal-header"> Полезные фрагменты <button class="btn-action" onclick="els.modalSnippets.classList.remove('active')">✕</button> </div>
+            <p style="font-size:12px; color:var(--text-muted); margin-bottom: 12px;">Вставятся на место курсора.</p>
+            <div class="setting-row" onclick="insertSnippet(snippets.dns)" style="cursor:pointer; flex-direction:column; align-items:flex-start;">
+                <strong style="color:var(--accent-blue);">+ DNS (Анти-утечка)</strong> <span style="font-size:11px; color:var(--text-muted);">Базовый блок DNS</span>
+            </div>
+            <div class="setting-row" onclick="insertSnippet(snippets.routing)" style="cursor:pointer; flex-direction:column; align-items:flex-start;">
+                <strong style="color:var(--accent-blue);">+ Routing: Bypass RU</strong> <span style="font-size:11px; color:var(--text-muted);">Обход РФ блокировок</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- CLOUD E2E -->
+    <div class="modal-overlay" id="modalCloud">
+        <div class="modal-card">
+            <div class="modal-header"> 🚀 Cloud Share <button class="btn-action" onclick="els.modalCloud.classList.remove('active')">✕</button> </div>
+            <p style="font-size:12px; color:var(--text-muted); margin-bottom: 16px;">Браузер шифрует код ключом AES-GCM-256. В ссылке нет прямых данных.</p>
+            <input type="text" id="sharePassword" class="resizable-box" style="padding:10px; min-height:40px; margin-bottom:12px;" placeholder="Секретный пароль (опционально)">
+            <button class="btn-primary" id="btnGenerateCloud" style="margin-bottom:16px;">🔐 Зашифровать</button>
+            
+            <div id="shareResultBlock" class="hidden">
+                <canvas id="qrCanvas"></canvas>
+                <input type="text" id="shareUrlOut" readonly class="resizable-box" style="padding:10px; min-height:40px; text-align:center;">
+                <button class="btn-action" style="width:100%; margin-top:8px;" onclick="copyToC(els.shareUrlOut.value)">📋 Скопировать</button>
+            </div>
         </div>
     </div>
 
     <div id="toast" class="toast">Сообщение</div>
 
     <script>
-        const vibe = (ms = 40) => { if (navigator.vibrate) navigator.vibrate(ms); };
-
+        const vibe = (m=40)=>navigator.vibrate&&navigator.vibrate(m);
         const els = {
-            srcInput: document.getElementById('srcInput'), fileInput: document.getElementById('fileInput'),
-            btnPaste: document.getElementById('btnPaste'), btnClear: document.getElementById('btnClear'),
-            step2Card: document.getElementById('step2-card'), fsHeader: document.getElementById('fsHeader'),
-            profileName: document.getElementById('profileName'), btnToggleFs: document.getElementById('btnToggleFs'),
-            editorBlock: document.getElementById('editorBlock'), jsonEditor: document.getElementById('jsonEditor'),
-            lineNumbers: document.getElementById('lineNumbers'), editorWorkspace: document.getElementById('editorWorkspace'),
-            editorContainerTarget: document.getElementById('editorContainerTarget'),
-            resizer: document.getElementById('resizer'), btnFormat: document.getElementById('btnFormat'),
-            errorBox: document.getElementById('errorBox'), btnSaveJson: document.getElementById('btnSaveJson'),
-            resultBlock: document.getElementById('resultBlock'), resultOutput: document.getElementById('resultOutput'),
-            btnCopyResult: document.getElementById('btnCopyResult'), btnCopyMini: document.getElementById('btnCopyMini'),
-            btnDownload: document.getElementById('btnDownload'), 
-            fileExtSelect: document.getElementById('fileExtSelect'), fileExtInput: document.getElementById('fileExtInput'),
-            btnUndo: document.getElementById('btnUndo'), btnSearch: document.getElementById('btnSearch'), 
-            historyCard: document.getElementById('historyCard'), historyList: document.getElementById('historyList'), 
-            btnClearHistory: document.getElementById('btnClearHistory'), toast: document.getElementById('toast'), 
-            btnDeepLink: document.getElementById('btnDeepLink'), toolbarBtns: document.querySelectorAll('.toolbar-btn'),
-            btnProtoIncy: document.getElementById('btnProtoIncy'), btnProtoHapp: document.getElementById('btnProtoHapp'),
-            btnProtoCustom: document.getElementById('btnProtoCustom'), 
-            customProtoContainer: document.getElementById('customProtoContainer'), 
-            customProtoInput: document.getElementById('customProtoInput'), 
-            btnThemeToggle: document.getElementById('btnThemeToggle'),
-            btnOpenEditor: document.getElementById('btnOpenEditor'), btnCancelEdit: document.getElementById('btnCancelEdit')
+            srcInput: document.getElementById('srcInput'), btnPaste: document.getElementById('btnPaste'), btnClear: document.getElementById('btnClear'),
+            step1: document.getElementById('step1-card'), step2: document.getElementById('step2-card'),
+            jsonEditor: document.getElementById('jsonEditor'), lineNumbers: document.getElementById('lineNumbers'), editorBadgeInfo: document.getElementById('editorBadgeInfo'),
+            btnFormat: document.getElementById('btnFormat'), btnWrapToggle: document.getElementById('btnWrapToggle'), 
+            toast: document.getElementById('toast'), profileName: document.getElementById('profileName'),
+            btnExportFile: document.getElementById('btnExportFile'), btnDeepLink: document.getElementById('btnDeepLink'),
+            visualGraph: document.getElementById('visualGraph'), btnViewToggle: document.getElementById('btnViewToggle'),
+            modalSettings: document.getElementById('modalSettings'), modalSnippets: document.getElementById('modalSnippets'), modalCloud: document.getElementById('modalCloud'),
+            sharePassword: document.getElementById('sharePassword'), shareUrlOut: document.getElementById('shareUrlOut'),
+            historyList: document.getElementById('historyList'), historyCard: document.getElementById('historyCard'), historySearch: document.getElementById('historySearch')
         };
 
-        let editorHistory = [];
-        let isFullscreen = false;
-        let currentProtocol = 'incy';
-        let hasUnsavedChanges = false;
-        let lastSavedJson = ''; 
-
-        // Тема
-        const savedTheme = localStorage.getItem('incy_theme') || 'dark';
-        if (savedTheme === 'light') { document.documentElement.classList.add('light-theme'); updateThemeMeta('#f3f4f6');}
+        // --- ТЕМЫ И НАСТРОЙКИ ---
+        function applyTheme(th) { document.body.className = ''; if(th !== 'default') document.body.classList.add(`theme-${th}`); localStorage.setItem('incy_theme', th); }
+        applyTheme(localStorage.getItem('incy_theme') || 'default');
         
-        els.btnThemeToggle.onclick = () => {
-            vibe(); document.documentElement.classList.toggle('light-theme');
-            let isLight = document.documentElement.classList.contains('light-theme');
-            localStorage.setItem('incy_theme', isLight ? 'light' : 'dark');
-            updateThemeMeta(isLight ? '#f3f4f6' : '#0a0d14');
-        };
-        function updateThemeMeta(color) { let meta = document.getElementById('theme-color-meta'); if(meta) meta.content = color; }
-
-        window.addEventListener('beforeunload', function (e) { if (hasUnsavedChanges) { e.preventDefault(); e.returnValue = 'Остались несохраненные изменения!'; } });
-
-        const encodeBase64 = str => btoa(unescape(encodeURIComponent(str))).replace(/=+$/, '');
-        const decodeBase64 = str => { let p = str.length % 4; if(p) str += '='.repeat(4 - p); return decodeURIComponent(escape(atob(str))); };
-
-        // === ОМНИ-ПАРСЕР ===
-        async function UniversalDecode(inputStr) {
-            let b64 = inputStr.trim().replace(/\s+/g, '');
-            if(b64.includes('://')) {
-                let p = b64.split('://')[1];
-                if(p.includes('/onadd/')) b64 = p.split('/onadd/')[1]; else b64 = p;
-            }
-            if(!b64) return null;
-            let pad = b64.length % 4; if(pad) b64 += '='.repeat(4 - pad);
-            let binary; try { binary = atob(b64); } catch(e) { return null; }
-            let bytes = new Uint8Array(binary.length); for(let i=0; i<binary.length; i++) bytes[i] = binary.charCodeAt(i);
-
-            async function attempt(algo) { try { const str = new Blob([bytes]).stream().pipeThrough(new DecompressionStream(algo)); return await new Response(str).text(); } catch(e) { return null; } }
-            if (typeof DecompressionStream !== 'undefined') {
-                let r = await attempt('deflate-raw'); if(r && r.includes('"Name"')) return r;
-                r = await attempt('gzip'); if(r && r.includes('"Name"')) return r;
-                r = await attempt('deflate'); if(r && r.includes('"Name"')) return r;
-            }
-            try { let r = decodeURIComponent(escape(binary)); if(r.includes('"Name"')) return r; } catch(e) {}
-            return null;
-        }
-
-        async function compressToMini(jsonStr) {
-            if (typeof CompressionStream === 'undefined') return `incy-mini://${encodeBase64(jsonStr)}`;
-            try {
-                const stream = new Blob([jsonStr]).stream().pipeThrough(new CompressionStream('deflate-raw'));
-                const buffer = await new Response(stream).arrayBuffer();
-                const bytes = new Uint8Array(buffer);
-                let binary = ''; for (let i = 0; i < bytes.length; i+=1000) binary += String.fromCharCode.apply(null, bytes.subarray(i, i+1000));
-                return `incy-mini://${btoa(binary).replace(/=+$/, '')}`;
-            } catch(e) { return `incy-mini://${encodeBase64(jsonStr)}`; }
-        }
-
-        const setProtocol = (proto) => {
-            let isCustom = proto !== 'incy' && proto !== 'happ' && proto !== 'incy-mini';
-            
-            els.btnProtoIncy.classList.toggle('active', proto === 'incy' || proto === 'incy-mini');
-            els.btnProtoHapp.classList.toggle('active', proto === 'happ');
-            els.btnProtoCustom.classList.toggle('active', isCustom);
-            
-            if (isCustom) {
-                currentProtocol = proto || 'custom';
-                els.customProtoContainer.classList.add('active');
-                if(proto !== 'custom') els.customProtoInput.value = proto;
-            } else {
-                currentProtocol = proto === 'incy-mini' ? 'incy' : proto;
-                els.customProtoContainer.classList.remove('active');
-            }
+        document.getElementById('btnThemeToggle').onclick = () => { vibe(); applyTheme(document.body.className.includes('light') ? 'default' : 'light'); };
+        document.getElementById('btnSettingsModal').onclick = () => { vibe(); els.modalSettings.classList.add('active'); };
+        document.getElementById('toggleStep1').onchange = (e) => els.step1.classList.toggle('hidden', !e.target.checked);
+        document.getElementById('toggleHistory').onchange = (e) => {
+            if(!e.target.checked) els.historyCard.classList.add('hidden');
+            else loadHistory();
         };
 
-        els.btnProtoIncy.onclick = () => { vibe(); setProtocol('incy'); refreshLinkFromEditor(); };
-        els.btnProtoHapp.onclick = () => { vibe(); setProtocol('happ'); refreshLinkFromEditor(); };
-        els.btnProtoCustom.onclick = () => { vibe(); setProtocol(els.customProtoInput.value || 'custom'); els.customProtoInput.focus(); refreshLinkFromEditor(); };
+        // --- Вставка с клавиатуры (Скрыть клаву) ---
+        document.querySelector('[data-trigger="auto"]').onclick = () => { vibe(); els.jsonEditor.blur(); }
 
-        els.customProtoInput.addEventListener('input', (e) => {
-            currentProtocol = e.target.value.replace(/[^a-zA-Z0-9-]/g, '').toLowerCase() || 'custom';
-            refreshLinkFromEditor(); 
-        });
-
-        function refreshLinkFromEditor() {
-            try {
-                let parsed = JSON.parse(els.jsonEditor.value);
-                let rawMinified = JSON.stringify(parsed);
-                let safeProtocol = currentProtocol === 'custom' ? 'custom' : currentProtocol;
-                let newUrl = `${safeProtocol}://routing/onadd/${encodeBase64(rawMinified)}`;
-                updateOutputLinks(newUrl, parsed.Name);
-                els.errorBox.classList.add('hidden'); 
-            } catch(e) {}
-        }
-
-        function updateOutputLinks(urlStr, name) {
-            let safeProtocol = currentProtocol === 'custom' ? 'custom' : currentProtocol;
-            urlStr = urlStr.replace(/^([a-zA-Z0-9-]+):\/\//i, `${safeProtocol}://`);
-            
-            els.resultOutput.style.backgroundColor = 'var(--bg-card)';
-            setTimeout(() => els.resultOutput.style.backgroundColor = '', 200);
-
-            els.resultOutput.value = urlStr; els.btnDeepLink.href = urlStr; els.profileName.textContent = name || "Без имени";
-        }
-
-        els.btnDeepLink.onclick = () => { vibe(); showToast("Открытие...", false); };
-
-        function saveEditorState(val) {
-            if(editorHistory[editorHistory.length - 1] === val) return;
-            editorHistory.push(val); if(editorHistory.length > 20) editorHistory.shift();
-        }
-        
-        window.loadIntoEditor = async function(url) {
-            vibe(); els.srcInput.value = url; window.scrollTo({ top: 0, behavior: 'smooth' });
-            await processInput();
-            openEditor(); 
-            showToast("Загружено в редактор");
-        }
-
-        els.jsonEditor.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                let start = this.selectionStart, end = this.selectionEnd, val = this.value;
-                let lineStart = val.substring(0, start).lastIndexOf('\n') + 1;
-                let indent = val.substring(lineStart, start).match(/^\s*/)[0];
-                this.setRangeText('\n' + indent, start, end, 'end');
-                els.jsonEditor.dispatchEvent(new Event('input'));
-            }
-        });
-
-        document.body.addEventListener('dragover', e => e.preventDefault());
-        document.body.addEventListener('drop', e => { e.preventDefault(); if(e.dataTransfer.files.length) { let rd = new FileReader(); rd.onload = ev => { els.srcInput.value = ev.target.result.trim(); processInput(); }; rd.readAsText(e.dataTransfer.files[0]); } });
-
-        els.resultOutput.onclick = () => { 
-            if(els.resultOutput.value) {
-                els.resultOutput.select(); 
-                copyToClipboard(els.resultOutput.value); 
-            }
-        };
-
-        els.btnUndo.onclick = () => {
-            vibe(); if(editorHistory.length > 1) { 
-                editorHistory.pop(); els.jsonEditor.value = editorHistory[editorHistory.length - 1]; 
-                updateLineNumbers(); showToast("↶ Отменено"); hasUnsavedChanges = true;
-                els.jsonEditor.dispatchEvent(new Event('input')); 
-            } else { showToast("Дальше отменять некуда", true); }
-        };
-
-        els.btnSearch.onclick = () => {
-            vibe(); let term = prompt("🔍 Что найти в коде?"); if(!term) return;
-            let val = els.jsonEditor.value, startPos = els.jsonEditor.selectionEnd;
-            let idx = val.indexOf(term, startPos); if(idx === -1) idx = val.indexOf(term); 
-            if(idx !== -1) {
-                els.jsonEditor.focus(); els.jsonEditor.setSelectionRange(idx, idx + term.length);
-                let linesBefore = val.substring(0, idx).split('\n').length; els.jsonEditor.scrollTop = Math.max(0, (linesBefore - 3) * 22); showToast("Найдено!");
-            } else { vibe(100); showToast(`"${term}" не найдено`, true); }
-        };
-
-        let toastTimer;
-        function showToast(msg, isError = false) {
-            els.toast.textContent = msg; els.toast.className = `toast show ${isError ? 'error' : ''}`;
-            clearTimeout(toastTimer); toastTimer = setTimeout(() => els.toast.className = 'toast', 2500);
-        }
-
-        function copyToClipboard(text) { vibe(); if (navigator.clipboard) { navigator.clipboard.writeText(text).then(() => showToast('✅ Скопировано!')).catch(() => fallbackCopy(text)); } else { fallbackCopy(text); } }
-        function fallbackCopy(text) { let temp = document.createElement("textarea"); temp.value = text; document.body.appendChild(temp); temp.select(); try { document.execCommand("copy"); showToast('✅ Скопировано!'); } catch(err) { showToast('Ошибка копирования', true); } document.body.removeChild(temp); }
-
-        els.btnCopyMini.onclick = async () => { vibe(); try { const miniUrl = await compressToMini(JSON.stringify(JSON.parse(els.jsonEditor.value))); if(miniUrl) { copyToClipboard(miniUrl); showToast("Короткая ссылка скопирована!"); } } catch(e) { showToast("Сначала восстановите код", true); } };
-
-        els.btnClear.onclick = () => { vibe(); els.srcInput.value = ''; els.resultOutput.value = ''; els.jsonEditor.value = ''; editorHistory = []; els.step2Card.classList.add('hidden'); closeFullscreen(); closeEditor(); hasUnsavedChanges = false;};
-        els.btnPaste.onclick = async () => { vibe(); try { const text = await navigator.clipboard.readText(); if(text) { els.srcInput.value = text; processInput(); } } catch(e) { els.srcInput.focus(); showToast("Тапните системную кнопку Вставить", true); } };
-
-        let inputTimer;
-        els.srcInput.addEventListener('input', () => { clearTimeout(inputTimer); inputTimer = setTimeout(processInput, 400); });
-
-        async function processInput() {
-            let val = els.srcInput.value.trim();
-            if(!val) { els.btnClear.onclick(); return; }
-
-            let protoMatch = val.match(/^([a-zA-Z0-9-]+):\/\//i);
-            let detectedProto = protoMatch ? protoMatch[1].toLowerCase() : 'incy';
-
-            if (detectedProto === 'happ') setProtocol('happ');
-            else if (detectedProto === 'incy' || detectedProto === 'incy-mini') setProtocol('incy');
-            else setProtocol(detectedProto);
-
-            let jsonStr = null;
-
-            if (val.startsWith('{')) {
-                try { JSON.parse(val); jsonStr = val; } catch(e) {}
-            }
-
-            if (!jsonStr) {
-                if (val.toLowerCase().startsWith('incy-mini://')) { jsonStr = await decompressFromMini(val);
-                } else { jsonStr = await UniversalDecode(val); }
-            }
-
-            if(jsonStr) {
-                closeEditor(); closeFullscreen(); hasUnsavedChanges = false;
-
+        // --- АВТОСОХРАНЕНИЕ / ЧЕРНОВИК ---
+        function saveDraft() { if(els.jsonEditor.value.length > 10) localStorage.setItem('incy_draft', els.jsonEditor.value); }
+        window.addEventListener('load', () => {
+            let draft = localStorage.getItem('incy_draft');
+            if(draft && draft.length > 20 && !window.location.hash) {
                 try {
-                    let json = JSON.parse(jsonStr);
-                    let rawMinified = JSON.stringify(json);
-                    
-                    let safeProtocol = currentProtocol === 'custom' ? 'custom' : currentProtocol;
-                    let newUrl = `${safeProtocol}://routing/onadd/${encodeBase64(rawMinified)}`;
-                    
-                    els.srcInput.value = newUrl; 
-                    updateOutputLinks(newUrl, json.Name);
-                    
-                    const code = JSON.stringify(json, null, 4);
-                    els.jsonEditor.value = code; 
-                    lastSavedJson = code; 
-                    editorHistory = [code];
-                    
-                    updateLineNumbers();
-                    els.step2Card.classList.remove('hidden'); 
-                    saveToHistory(json.Name, newUrl);
-                    
-                    setTimeout(() => els.step2Card.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
-                    vibe(80); showToast("Распознано успешно!");
-                } catch(e) { vibe(100); showToast("Неверный синтаксис внутри конфига", true); }
-            } else {
-                if (val.length > 30 && !val.includes(" ")) { vibe(100); showToast("Не удалось расшифровать", true); }
+                    let parsed = JSON.parse(draft);
+                    els.jsonEditor.value = draft;
+                    els.profileName.textContent = parsed.Name || 'Draft';
+                    els.step2.classList.remove('hidden'); updateLines(); refreshLinks();
+                    showToast('Восстановлен черновик 📝');
+                } catch(e) {}
             }
+        });
+
+        const snippets = {
+            dns: `\n"dns": {\n    "servers": [\n        "https+local://1.1.1.1/dns-query",\n        "8.8.8.8"\n    ]\n}`,
+            routing: `\n"routing": {\n    "domainStrategy": "IPIfNonMatch",\n    "rules": [\n        {\n            "type": "field",\n            "domain": ["geosite:ru"],\n            "outboundTag": "direct"\n        }\n    ]\n}`
+        };
+        document.getElementById('btnSnippetsModal').onclick = () => { vibe(); els.modalSnippets.classList.add('active'); };
+        function insertSnippet(txt) {
+            vibe(); let start = els.jsonEditor.selectionStart, end = els.jsonEditor.selectionEnd;
+            els.jsonEditor.setRangeText(txt, start, end, 'end');
+            els.modalSnippets.classList.remove('active'); els.jsonEditor.focus(); updateLines(); refreshLinks();
         }
 
-        els.fileInput.onchange = e => { let file = e.target.files[0]; if(!file) return; let reader = new FileReader(); reader.onload = ev => { els.srcInput.value = ev.target.result.trim(); processInput(); }; reader.readAsText(file); els.fileInput.value = ''; };
-
-        els.btnOpenEditor.onclick = () => {
-            vibe(); 
-            els.fsHeader.classList.remove('hidden');
-            els.editorBlock.classList.remove('hidden'); 
-            els.resultBlock.classList.add('hidden'); 
-            els.step2Card.scrollIntoView({ behavior: 'smooth', block: 'start' }); 
-            updateLineNumbers();
-        };
-
-        function closeEditor() { 
-            els.editorBlock.classList.add('hidden'); 
-            els.fsHeader.classList.add('hidden');
-            els.resultBlock.classList.remove('hidden'); 
+        // --- ЛОГИКА РЕДАКТОРА ---
+        function updateLines() { 
+            let lines = els.jsonEditor.value.split('\n').length || 1;
+            els.lineNumbers.innerHTML = Array.from({length: lines}, (_, i) => `<div>${i+1}</div>`).join(''); 
+            els.editorBadgeInfo.textContent = `Конфиг • ${lines} строк`;
+            saveDraft();
         }
-
-        els.btnCancelEdit.onclick = () => {
-            vibe();
-            els.jsonEditor.value = lastSavedJson;
-            els.jsonEditor.dispatchEvent(new Event('input')); 
-            hasUnsavedChanges = false;
-            closeFullscreen();
-            closeEditor();
-            showToast("Изменения отменены");
-        };
-
-        els.btnToggleFs.onclick = () => {
-            vibe();
-            isFullscreen = !isFullscreen;
-            if(isFullscreen) { els.step2Card.classList.add('fullscreen'); document.body.style.overflow = 'hidden'; els.btnToggleFs.textContent = '↙ Свернуть'; els.btnToggleFs.classList.add('btn-action-red');
-            } else { closeFullscreen(); }
-        };
-        function closeFullscreen() { isFullscreen = false; els.step2Card.classList.remove('fullscreen'); document.body.style.overflow = ''; els.btnToggleFs.textContent = '⛶ На весь экран'; els.btnToggleFs.classList.remove('btn-action-red'); }
-
-        function updateLineNumbers() { let lines = els.jsonEditor.value.split('\n').length || 1; els.lineNumbers.innerHTML = Array.from({length: lines}, (_, i) => `<div>${i+1}</div>`).join(''); }
+        els.jsonEditor.addEventListener('input', () => { updateLines(); buildGraph(); refreshLinks(); });
+        els.jsonEditor.addEventListener('scroll', () => els.lineNumbers.scrollTop = els.jsonEditor.scrollTop, {passive:true});
         
-        let liveUpdateTimer;
-        els.jsonEditor.addEventListener('input', () => { 
-            hasUnsavedChanges = true; 
-            updateLineNumbers(); 
-            saveEditorState(els.jsonEditor.value); 
+        els.btnWrapToggle.onclick = function() { vibe(); els.jsonEditor.classList.toggle('wrap-text'); els.lineNumbers.style.opacity = els.jsonEditor.classList.contains('wrap-text') ? '0.3' : '1'; };
+        els.btnFormat.onclick = () => { vibe(); try { els.jsonEditor.value = JSON.stringify(JSON.parse(els.jsonEditor.value), null, 4); updateLines(); showToast('✨ Отформатировано'); buildGraph(); refreshLinks(); } catch(e) { showToast('Синтаксическая ошибка!', true); } };
+
+        // --- ВИЗУАЛЬНЫЙ ГРАФ ---
+        let viewMode = 'code';
+        els.btnViewToggle.onclick = () => {
+            vibe(); viewMode = viewMode === 'code' ? 'graph' : 'code';
+            els.btnViewToggle.textContent = viewMode === 'code' ? '👁 Визуал' : '✏️ Код';
+            els.visualGraph.classList.toggle('active', viewMode === 'graph');
+            if(viewMode === 'graph') buildGraph();
+        };
+
+        function buildGraph() {
+            if(!els.visualGraph.classList.contains('active')) return;
+            try { els.visualGraph.innerHTML = `<div style="font-weight:bold; color:var(--text-main); margin-bottom:8px;">{ Root }</div>` + createNodeHtml(JSON.parse(els.jsonEditor.value)); }
+            catch(e) { els.visualGraph.innerHTML = `<div style="color:var(--red-text); padding:20px;">ОШИБКА JSON: ${e.message}</div>`; }
+        }
+        function createNodeHtml(obj) {
+            let html = '';
+            for(let key in obj) {
+                let val = obj[key];
+                if(typeof val === 'object' && val !== null) {
+                    let peek = Array.isArray(val) ? `[${val.length} элементов]` : `{...}`;
+                    html += `<div class="vg-node"> <div class="vg-key" onclick="this.nextElementSibling.classList.toggle('hidden')">⊖ ${key} <span class="vg-obj">${peek}</span></div> <div>${createNodeHtml(val)}</div> </div>`;
+                } else { html += `<div class="vg-node"><span style="color:var(--text-main); font-size:13px; font-weight:bold;">${key}:</span> <span class="vg-val">${val}</span></div>`; }
+            } return html;
+        }
+
+        // --- ПАРСЕР И ОСНОВНАЯ ЛОГИКА ---
+        const b64e = str => btoa(unescape(encodeURIComponent(str))).replace(/=+$/, '');
+        els.btnPaste.onclick = async () => { try{ els.srcInput.value = await navigator.clipboard.readText(); processInput(); } catch(e){} };
+        els.btnClear.onclick = () => { els.srcInput.value=''; els.jsonEditor.value=''; els.step2.classList.add('hidden'); localStorage.removeItem('incy_draft');};
+        
+        let parseTimer;
+        els.srcInput.addEventListener('input', () => { clearTimeout(parseTimer); parseTimer = setTimeout(processInput, 400); });
+        
+        async function processInput() {
+            let val = els.srcInput.value.trim(); if(!val) return;
+            if(val.includes('#') && val.length > 50) return tryDecryptCloudLink(val); 
             
-            clearTimeout(liveUpdateTimer);
-            liveUpdateTimer = setTimeout(() => {
-                refreshLinkFromEditor();
-                try { JSON.parse(els.jsonEditor.value); } catch(e) {
-                    els.errorBox.textContent = "Синтаксис сломан: " + e.message; 
-                    els.errorBox.classList.remove('hidden');
-                }
-            }, 300);
-        });
-
-        els.jsonEditor.addEventListener('scroll', () => { els.lineNumbers.scrollTop = els.jsonEditor.scrollTop; }, { passive: true });
-
-        els.toolbarBtns.forEach(btn => {
-            btn.onclick = () => {
-                vibe(); 
-                let start = els.jsonEditor.selectionStart, end = els.jsonEditor.selectionEnd;
-                let text = els.jsonEditor.value;
-                let selected = text.substring(start, end);
-                
-                let wrapStart = btn.getAttribute('data-wrap-start');
-                let wrapEnd = btn.getAttribute('data-wrap-end');
-                let insert = btn.getAttribute('data-insert');
-
-                if (wrapStart && wrapEnd && selected.length > 0) {
-                    els.jsonEditor.setRangeText(wrapStart + selected + wrapEnd, start, end, 'select');
-                } else if (wrapStart) { 
-                    els.jsonEditor.setRangeText(wrapStart + wrapEnd, start, end, 'end');
-                    els.jsonEditor.setSelectionRange(start + 1, start + 1); 
-                } else if (insert) { els.jsonEditor.setRangeText(insert, start, end, 'end'); }
-                
-                els.jsonEditor.focus(); updateLineNumbers(); saveEditorState(els.jsonEditor.value); hasUnsavedChanges = true;
-                els.jsonEditor.dispatchEvent(new Event('input'));
-            }
-        });
-
-        els.btnFormat.onclick = () => {
-            vibe();
+            let b64 = val.includes('://') ? (val.split('://')[1].split('/onadd/')[1] || val.split('://')[1]) : val;
             try {
-                let formatted = JSON.stringify(JSON.parse(els.jsonEditor.value), null, 4);
-                if(els.jsonEditor.value !== formatted) { els.jsonEditor.value = formatted; saveEditorState(formatted); hasUnsavedChanges = true;}
-                els.errorBox.classList.add('hidden'); updateLineNumbers(); showToast('✨ Отформатировано');
-            } catch(e) { vibe(100); els.errorBox.textContent = e.message; els.errorBox.classList.remove('hidden'); parseAndScrollToError(e); }
-        };
-
-        function parseAndScrollToError(e) {
-            let msg = e.message;
-            let matchPos = msg.match(/position (\d+)/);
-            let matchLine = msg.match(/line (\d+) column (\d+)/); 
-            
-            let lineNum = 1; let charIdx = 0;
-            if (matchPos && matchPos[1]) {
-                charIdx = parseInt(matchPos[1]);
-                lineNum = els.jsonEditor.value.substring(0, charIdx).split('\n').length;
-                els.jsonEditor.focus(); els.jsonEditor.setSelectionRange(charIdx, charIdx + 1);
-            } else if (matchLine && matchLine[1]) { lineNum = parseInt(matchLine[1]); }
-            
-            els.jsonEditor.scrollTop = Math.max(0, (lineNum - 3) * 22);
-            els.lineNumbers.scrollTop = els.jsonEditor.scrollTop; 
-            showToast("➡️ Ошибка локализована (строка " + lineNum + ")", true);
+                let bytes = new Uint8Array(atob(b64.padEnd(b64.length + (4 - b64.length % 4) % 4, '=')).split('').map(c=>c.charCodeAt(0)));
+                let decomp = await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).text().catch(()=>null);
+                loadToEditor(decomp || decodeURIComponent(escape(atob(b64))));
+            } catch(e) { try { loadToEditor(val); } catch(ex){} }
         }
 
-        els.btnSaveJson.onclick = () => {
-            vibe();
+        function loadToEditor(jsonStr, saveHistoryFlag = true) {
             try {
-                let parsed = JSON.parse(els.jsonEditor.value);
-                els.jsonEditor.value = JSON.stringify(parsed, null, 4); 
-                lastSavedJson = els.jsonEditor.value;
+                let parsed = JSON.parse(jsonStr);
+                let formatted = JSON.stringify(parsed, null, 4);
+                els.jsonEditor.value = formatted;
+                let cname = parsed.Name || 'Config';
+                els.profileName.textContent = cname;
+                els.step2.classList.remove('hidden'); els.step2.scrollIntoView({behavior:'smooth'});
                 
-                let rawMinified = JSON.stringify(parsed);
-                let safeProtocol = currentProtocol === 'custom' ? 'custom' : currentProtocol;
-                let newUrl = `${safeProtocol}://routing/onadd/${encodeBase64(rawMinified)}`;
+                updateLines(); refreshLinks(); buildGraph();
                 
-                updateOutputLinks(newUrl, parsed.Name);
-                saveToHistory(parsed.Name, newUrl);
-                
-                els.errorBox.classList.add('hidden'); closeFullscreen(); closeEditor(); hasUnsavedChanges = false;
-                
-                showToast("✅ Сохранено в историю"); setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 300);
-            } catch(e) { vibe(200); els.errorBox.textContent = "Синтаксис сломан: " + e.message; els.errorBox.classList.remove('hidden'); parseAndScrollToError(e); }
+                if (saveHistoryFlag) { saveToHistory(cname, formatted); showToast('Распознано!'); }
+            } catch(e) { showToast('Сломанный JSON!', true); }
+        }
+        
+        function refreshLinks() {
+            try {
+                let minified = JSON.stringify(JSON.parse(els.jsonEditor.value));
+                els.btnDeepLink.href = `incy://routing/onadd/${b64e(minified)}`;
+            } catch(e){}
+        }
+
+        els.btnExportFile.onclick = () => {
+            let blob = new Blob([els.jsonEditor.value], {type:"application/json;charset=utf-8"});
+            let a = document.createElement("a"); a.href = URL.createObjectURL(blob); 
+            a.download = (els.profileName.textContent || 'config') + ".json"; a.click(); showToast('Скачано!');
         };
 
-        // --- ИСПРАВЛЕННАЯ ЛОГИКА ВЫБОРА ФОРМАТА ДЛЯ СКАЧИВАНИЯ ---
-        els.fileExtSelect.addEventListener('change', (e) => {
-            vibe();
-            if(e.target.value === 'custom') {
-                els.fileExtSelect.classList.add('hidden');
-                els.fileExtInput.classList.remove('hidden');
-                els.fileExtInput.value = '.';
-                els.fileExtInput.focus();
-            }
-        });
-
-        els.fileExtInput.addEventListener('blur', (e) => {
-            let val = e.target.value.trim();
-            if(!val || val === '.') {
-                els.fileExtInput.classList.add('hidden');
-                els.fileExtSelect.classList.remove('hidden');
-                els.fileExtSelect.value = '.json';
-            }
-        });
-
-        els.btnDownload.onclick = () => { 
-            vibe(); 
-            let text = els.jsonEditor.value;
-            if(!text) return showToast("Нет текста для сохранения", true);
-            
-            // Получаем расширение
-            let ext = els.fileExtSelect.classList.contains('hidden') 
-                ? els.fileExtInput.value.trim() 
-                : els.fileExtSelect.value;
-                
-            if (!ext.startsWith('.')) ext = '.' + ext;
-            if (ext === '.') ext = '.json'; // Фолбэк
-
-            // ФОРСИРУЕМ BINARY СКАЧИВАНИЕ: Браузер НЕ будет лепить .txt к нашим форматам
-            let mType = "application/octet-stream";
-            if (ext === '.json') mType = "application/json;charset=utf-8";
-            else if (ext === '.txt') mType = "text/plain;charset=utf-8";
-            
-            let blob = new Blob([text], {type: mType}); 
-            let a = document.createElement("a"); 
-            a.href = URL.createObjectURL(blob); 
-            
-            let baseName = (els.profileName.textContent.replace(/[^a-z0-9а-яё-]/gi, '_').toLowerCase() || 'config');
-            a.download = baseName + ext; 
-            a.click(); 
-            URL.revokeObjectURL(a.href);
-            showToast(`Скачано как ${ext}`);
-        };
-
-        els.btnCopyResult.onclick = () => { if(els.resultOutput.value) { els.resultOutput.select(); copyToClipboard(els.resultOutput.value); } };
-
-        let isDragging = false, startY = 0, startH = 0;
-        function initDrag(e) { isDragging = true; startY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY; startH = els.editorContainerTarget.offsetHeight; document.body.style.userSelect = 'none'; }
-        function doDrag(e) { if(!isDragging) return; if(e.cancelable) e.preventDefault(); let currentY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY; els.editorContainerTarget.style.height = Math.max(150, Math.min(startH + (currentY - startY), window.innerHeight * 0.7)) + 'px'; }
-        function stopDrag() { isDragging = false; document.body.style.userSelect = ''; }
+        // --- ADVANCED УПРАВЛЕНИЕ ИСТОРИЕЙ (SMART HISTORY 2026) ---
+        function getHist() { return JSON.parse(localStorage.getItem('incy_history') || '[]'); }
+        function setHist(h) { localStorage.setItem('incy_history', JSON.stringify(h)); loadHistory(); }
         
-        els.resizer.addEventListener('mousedown', initDrag); els.resizer.addEventListener('touchstart', initDrag, {passive: false});
-        window.addEventListener('mousemove', doDrag); window.addEventListener('touchmove', doDrag, {passive: false});
-        window.addEventListener('mouseup', stopDrag); window.addEventListener('touchend', stopDrag);
-
-        function loadHistory() { renderHistory(JSON.parse(localStorage.getItem('incy_history') || '[]')); }
-        
-        function saveToHistory(name, url) {
-            if(!url) return;
-            name = name || "Без имени";
-            let hist = JSON.parse(localStorage.getItem('incy_history') || '[]');
+        function saveToHistory(name, jsonContent) {
+            let hist = getHist();
+            // Удаляем старый такой же, ставим наверх
             hist = hist.filter(i => i.name !== name);
-            hist.unshift({ name: name, url, timestamp: Date.now() });
-            if(hist.length > 20) hist.pop();
-            localStorage.setItem('incy_history', JSON.stringify(hist)); renderHistory(hist);
+            hist.unshift({ id: Date.now(), name: name, content: jsonContent });
+            if(hist.length > 30) hist.pop(); // Лимит 30
+            setHist(hist);
         }
 
-        window.deleteHistoryItem = function(index) {
-            vibe(); let hist = JSON.parse(localStorage.getItem('incy_history') || '[]');
-            hist.splice(index, 1); localStorage.setItem('incy_history', JSON.stringify(hist)); renderHistory(hist); showToast("Удалено");
-        }
+        window.actionHistory = function(action, id) {
+            vibe(); let hist = getHist();
+            let idx = hist.findIndex(i => i.id === id);
+            if(idx === -1) return;
+
+            if (action === 'delete') {
+                hist.splice(idx, 1);
+                showToast("Удалено");
+            } else if (action === 'up') {
+                if(idx > 0) { let temp = hist[idx]; hist[idx] = hist[idx-1]; hist[idx-1] = temp; }
+            } else if (action === 'down') {
+                if(idx < hist.length - 1) { let temp = hist[idx]; hist[idx] = hist[idx+1]; hist[idx+1] = temp; }
+            } else if (action === 'rename') {
+                let newName = prompt("Введите новое имя:", hist[idx].name);
+                if (newName && newName.trim() !== "") hist[idx].name = newName.trim();
+            } else if (action === 'duplicate') {
+                let clone = JSON.parse(JSON.stringify(hist[idx]));
+                clone.id = Date.now();
+                clone.name = clone.name + " (Копия)";
+                hist.splice(idx + 1, 0, clone); // Вставляем после текущего
+                showToast("Сделан дубликат!");
+            } else if (action === 'load') {
+                loadToEditor(hist[idx].content, false);
+                showToast("Загружено в редактор");
+                return; // Не делаем setHist, чтобы не моргал UI
+            }
+            setHist(hist);
+        };
+
+        els.btnClearHistory.onclick = () => { if(confirm("Очистить всю историю?")) { vibe(); localStorage.removeItem('incy_history'); loadHistory(); } };
         
-        function renderHistory(hist) {
+        // Поиск по истории
+        els.historySearch.addEventListener('input', () => loadHistory(els.historySearch.value.trim().toLowerCase()));
+
+        function loadHistory(filterText = "") {
+            let hist = getHist();
+            if(!els.historySearch && !document.getElementById('toggleHistory').checked) return;
+            
             if(hist.length === 0) { els.historyCard.classList.add('hidden'); return; }
             els.historyCard.classList.remove('hidden');
-            els.historyList.innerHTML = hist.map((item, idx) => `
+
+            let filtered = hist.filter(item => item.name.toLowerCase().includes(filterText));
+
+            els.historyList.innerHTML = filtered.map((item) => {
+                let miniLink = `incy://routing/onadd/${b64e(JSON.stringify(JSON.parse(item.content)))}`;
+                return `
                 <div class="history-item">
-                    <button class="btn-delete-hist" onclick="deleteHistoryItem(${idx})" title="Удалить">✖</button>
-                    <div class="history-info">
-                        <span class="history-name">${item.name}</span>
-                        <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">${new Date(item.timestamp).toLocaleString()}</div>
+                    <div class="history-top">
+                        <div class="history-title" onclick="actionHistory('rename', ${item.id})" title="Нажмите, чтобы переименовать">
+                            ${item.name} <span class="history-title-icon">✏️</span>
+                        </div>
+                        <div class="history-controls">
+                            <button class="history-btn-small" onclick="actionHistory('up', ${item.id})" title="Вверх">⬆</button>
+                            <button class="history-btn-small" onclick="actionHistory('down', ${item.id})" title="Вниз">⬇</button>
+                            <button class="history-btn-small" onclick="actionHistory('duplicate', ${item.id})" title="Дублировать (Создать форк)">⧉</button>
+                            <button class="history-btn-small history-btn-del" onclick="actionHistory('delete', ${item.id})" title="Удалить">✖</button>
+                        </div>
                     </div>
+                    
                     <div class="history-row">
-                        <a href="${item.url}" class="btn btn-action" style="flex: 1.5; background:var(--accent-blue); border:none; color:white; text-decoration:none;" title="Запустить">🚀 Запуск</a>
-                        <button class="btn-action btn-util" style="flex: 2;" onclick="loadIntoEditor('${item.url}')">✏️ В редактор</button>
-                        <button class="btn-action btn-util" style="flex: 1;" onclick="copyToClipboard('${item.url}')">📋</button>
+                        <button class="btn-action" style="flex:1.5; background:var(--accent-blue); color:white; border:none;" onclick="location.href='${miniLink}'">🚀 Запуск</button>
+                        <button class="btn-action" style="flex:1;" onclick="actionHistory('load', ${item.id})">Изменить</button>
+                        <button class="btn-action" style="flex:1;" onclick="copyToC('${miniLink}')">🔗 Скопировать</button>
                     </div>
-                </div>
-            `).join('');
+                </div>`;
+            }).join('');
         }
-        els.btnClearHistory.onclick = () => { vibe(); localStorage.removeItem('incy_history'); renderHistory([]); showToast("Кэш очищен"); };
 
         loadHistory();
+
+        // --- CЛУЖЕБНЫЕ (QR / Cloud) ---
+        const deriveKey = async (pass, salt) => {
+            let pKey = await crypto.subtle.importKey("raw", new TextEncoder().encode(pass), {name:"PBKDF2"}, false, ["deriveKey"]);
+            return crypto.subtle.deriveKey({name:"PBKDF2", salt, iterations:100000, hash:"SHA-256"}, pKey, {name:"AES-GCM", length:256}, false, ["encrypt", "decrypt"]);
+        };
+
+        document.getElementById('btnOpenCloudModal').onclick = () => { vibe(); document.getElementById('shareResultBlock').classList.add('hidden'); els.modalCloud.classList.add('active'); };
+        document.getElementById('btnGenerateCloud').onclick = async () => {
+            vibe(); try {
+                document.getElementById('btnGenerateCloud').textContent = 'Шифруем...';
+                let pass = els.sharePassword.value || Math.random().toString(36).slice(-8);
+                let salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12));
+                let key = await deriveKey(pass, salt);
+                let encrypted = await crypto.subtle.encrypt({name: "AES-GCM", iv}, key, new TextEncoder().encode(els.jsonEditor.value));
+                let c = window.btoa(String.fromCharCode(...new Uint8Array(encrypted))), 
+                    s = window.btoa(String.fromCharCode(...salt)), 
+                    i = window.btoa(String.fromCharCode(...iv));
+                
+                let shareLink = `${window.location.origin}${window.location.pathname}?sid=${encodeURIComponent(c)}&s=${encodeURIComponent(s)}&i=${encodeURIComponent(i)}#${pass}`;
+                els.shareUrlOut.value = shareLink;
+                
+                let img = new Image(); img.crossOrigin = "Anonymous";
+                img.onload = () => { let ctx = document.getElementById('qrCanvas').getContext('2d'); ctx.canvas.width=200; ctx.canvas.height=200; ctx.clearRect(0,0,200,200); ctx.drawImage(img, 0, 0, 200, 200); };
+                img.src = `https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=${encodeURIComponent(shareLink)}&choe=UTF-8`;
+                
+                document.getElementById('shareResultBlock').classList.remove('hidden');
+                document.getElementById('btnGenerateCloud').textContent = '🔐 Зашифровать';
+                showToast('Зашифровано ключом!');
+            } catch (e) { document.getElementById('btnGenerateCloud').textContent = 'Ошибка'; showToast(e.message, true); }
+        };
+
+        async function tryDecryptCloudLink(urlStr) {
+            try {
+                let url = new URL(urlStr); let pass = url.hash.substring(1);
+                let sid = url.searchParams.get('sid'), s = url.searchParams.get('s'), i = url.searchParams.get('i');
+                if(!pass || !sid || !s || !i) return;
+                let k = await deriveKey(pass, Uint8Array.from(atob(s), c => c.charCodeAt(0)));
+                let dec = await crypto.subtle.decrypt({name: "AES-GCM", iv: Uint8Array.from(atob(i), c => c.charCodeAt(0))}, k, Uint8Array.from(atob(sid), c => c.charCodeAt(0)));
+                loadToEditor(new TextDecoder().decode(dec)); showToast('🔓 Расшифровано!');
+            } catch(e) { showToast('Неверный ключ', true); }
+        }
+        if(window.location.hash && window.location.search.includes('sid=')) tryDecryptCloudLink(window.location.href);
+
+        function copyToC(txt) { navigator.clipboard.writeText(txt).then(()=>showToast('✅ Скопировано')).catch(()=>showToast('Ошибка копирования',true)); }
+        function showToast(msg, err=false) { els.toast.textContent=msg; els.toast.className=`toast show ${err?'error':''}`; setTimeout(()=>els.toast.className='toast', 2500); }
     </script>
 </body>
 </html>
