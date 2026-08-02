@@ -31,14 +31,15 @@
         .container { width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 20px; }
         .hidden { display: none !important; }
 
-        .main-header { display: flex; justify-content: space-between; align-items: center; position: relative;}
-        .main-header-content { flex: 1; text-align: center; }
+        .main-header { display: flex; justify-content: center; align-items: center; position: relative;}
+        .main-header-content { text-align: center; }
         h1 { font-size: 28px; font-weight: 800; color: var(--header-text); margin-bottom: 4px; transition: color 0.3s;}
         h1 span { color: var(--accent-blue); }
         .subtitle { font-size: 14px; color: var(--text-muted); margin-bottom: 12px;}
 
         .icon-btn { background: var(--bg-card); border: 1px solid var(--border-gray); font-size: 20px; padding: 8px; border-radius: 50%; color: var(--text-main); cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); position: absolute; top: 0;}
         .btn-settings { left: 0; font-size: 18px; } .btn-theme { right: 0; }
+        .btn-plugins { left: 50px; font-size: 18px; }
 
         .card { background: var(--bg-card); border: 1px solid var(--border-gray); border-radius: 16px; padding: 20px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); transition: background-color 0.3s, border-color 0.3s;}
         .step-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
@@ -100,7 +101,7 @@
         .vg-val { color: var(--accent-green); font-family: monospace; font-size: 12px; word-break: break-all;}
         .vg-obj { color: var(--text-muted); font-size: 11px; margin-left: 4px; }
 
-        /* Полноэкранный режим - работает идеально и сохраняет кнопки */
+        /* Полноэкранный режим */
         .fullscreen { position: fixed; inset: 0; z-index: 1000; border-radius: 0; border: none; display: flex; flex-direction: column; background: var(--bg-body); margin: 0; padding-bottom: env(safe-area-inset-bottom, 0px); }
         .fullscreen .editor-container { flex: 1; min-height: 0; margin: 0; border-radius: 0; border-left: none; border-right: none; height: auto !important; box-shadow: none; margin-bottom: 16px;}
         .fullscreen .editor-workspace { flex: 1; height: auto !important; min-height: 0; display: flex;}
@@ -121,7 +122,7 @@
         .setting-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 8px; background: var(--bg-input); border-radius: 8px; border: 1px solid var(--border-gray);}
         #qrCanvas { background: white; padding: 12px; border-radius: 12px; margin: 0 auto 16px; display: block; border: 2px solid var(--border-gray); max-width: 100%;}
         
-        .toast { position: fixed; top: max(20px, env(safe-area-inset-top, 20px)); left: 50%; transform: translate(-50%, -20px); opacity: 0; background: var(--bg-input); border: 1px solid var(--border-gray); color: var(--text-main); padding: 12px 24px; border-radius: 12px; font-size: 14px; font-weight: bold; pointer-events: none; transition: 0.3s; z-index: 9999; box-shadow: 0 10px 25px rgba(0,0,0,0.5); text-align: center; max-width: 90%;}
+        .toast { position: fixed; top: max(20px, env(safe-area-inset-top, 20px)); left: 50%; transform: translate(-50%, -20px); opacity: 0; background: var(--bg-input); border: 1px solid var(--border-gray); color: var(--text-main); padding: 12px 24px; border-radius: 12px; font-size: 14px; font-weight: bold; pointer-events: none; transition: 0.3s; z-index: 10000; box-shadow: 0 10px 25px rgba(0,0,0,0.5); text-align: center; max-width: 90%;}
         .toast.show { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
         .toast.error { background: #ef4444; color: white; border-color: #b91c1c; }
 
@@ -159,15 +160,16 @@
     <div class="container">
         <!-- Шапка -->
         <header class="main-header">
-            <button class="icon-btn btn-settings" id="btnSettingsModal" title="Настройки">⚙️</button>
+            <button class="icon-btn btn-settings" id="btnSettingsModal" title="Настройки Конструктора">⚙️</button>
+            <button class="icon-btn btn-plugins" id="btnPluginsModal" title="Подключить плагины форматов">🧩</button>
             <div class="main-header-content">
                 <h1>INCY <span>Tool</span></h1>
-                <p class="subtitle">Universal Protocol Engine 🚀</p>
+                <p class="subtitle">Universal Config Engine 🚀</p>
             </div>
-            <button class="icon-btn btn-theme" id="btnThemeToggle" title="Тема">🌓</button>
+            <button class="icon-btn btn-theme" id="btnThemeToggle" title="Сменить Тему">🌓</button>
         </header>
 
-        <!-- Шаг 1: Исходник (Спокойно отключается в настройках) -->
+        <!-- Шаг 1: Исходник -->
         <div class="card" id="step1-card">
             <div class="step-header">
                 <span class="badge">Шаг 1: Исходник</span>
@@ -175,7 +177,7 @@
                 <button class="btn-action btn-action-blue" onclick="document.getElementById('fileInput').click()">📁 Файл</button>
             </div>
             <div class="input-wrapper">
-                <textarea id="srcInput" class="resizable-box" placeholder="Вставьте ссылку, Base64 или JSON-код..." autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" style="padding-bottom: 50px;"></textarea>
+                <textarea id="srcInput" class="resizable-box" placeholder="Вставьте ссылку, Base64, JSON или кастомный формат..." autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" style="padding-bottom: 50px;"></textarea>
                 <div class="abs-buttons">
                     <button class="btn-action btn-action-blue" id="btnPaste" style="border:none">📋 Вставить</button>
                     <!-- Кнопка ручного распознавания! -->
@@ -185,7 +187,7 @@
             </div>
         </div>
 
-        <!-- РЕДАКТОР КОДА (Теперь это отдельный самостоятельный блок) -->
+        <!-- РЕДАКТОР КОДА (Независимый блок) -->
         <div id="editorBlockWrapper" class="card">
             
             <div id="fsHeader" class="fs-header">
@@ -318,13 +320,14 @@
         <div class="modal-card">
             <div class="modal-header"> Настройки Конструктора <button class="btn-action" onclick="toggleModal('modalSettings')">✕</button> </div>
             
-            <div style="font-size:11px; color:var(--text-muted); margin-bottom:6px; font-weight:bold;">МОДУЛИ ИНТЕРФЕЙСА:</div>
-            <div class="setting-row"><label>Шаг 1: Блок Исходника</label><input type="checkbox" id="uiS1" class="toggle-checkbox" checked></div>
-            <div class="setting-row"><label>Шаг 2: Редактор Кода</label><input type="checkbox" id="uiS2" class="toggle-checkbox" checked></div>
-            <div class="setting-row"><label>Шаг 3: Меню Экспорта</label><input type="checkbox" id="uiExp" class="toggle-checkbox" checked></div>
-            <div class="setting-row"><label>История Конфигов</label><input type="checkbox" id="uiH" class="toggle-checkbox" checked></div>
-            
-            <div style="font-size:11px; color:var(--text-muted); margin:16px 0 6px; font-weight:bold;">ПОВЕДЕНИЕ:</div>
+            <div style="font-size:11px; color:var(--text-muted); margin-bottom:6px; font-weight:bold;">ПРАВИЛА КОДА И ПОВЕДЕНИЕ:</div>
+            <div class="setting-row">
+                <div>
+                    <label style="display:block; margin-bottom:2px; font-weight:bold;">Проверять синтаксис (Linter)</label>
+                    <span style="font-size:10px; color:var(--text-muted);">Отключите, если используете сторонние форматы (YAML/XML)</span>
+                </div>
+                <input type="checkbox" id="uiLinter" class="toggle-checkbox" checked>
+            </div>
             <div class="setting-row">
                 <div>
                     <label style="display:block; margin-bottom:2px;">Авто-Распознавание</label>
@@ -333,6 +336,12 @@
                 <input type="checkbox" id="uiAutoParse" class="toggle-checkbox" checked>
             </div>
 
+            <div style="font-size:11px; color:var(--text-muted); margin:16px 0 6px; font-weight:bold;">МОДУЛИ ИНТЕРФЕЙСА:</div>
+            <div class="setting-row"><label>Шаг 1: Блок Исходника</label><input type="checkbox" id="uiS1" class="toggle-checkbox" checked></div>
+            <div class="setting-row"><label>Шаг 2: Редактор Кода</label><input type="checkbox" id="uiS2" class="toggle-checkbox" checked></div>
+            <div class="setting-row"><label>Шаг 3: Меню Экспорта</label><input type="checkbox" id="uiExp" class="toggle-checkbox" checked></div>
+            <div class="setting-row"><label>История Конфигов</label><input type="checkbox" id="uiH" class="toggle-checkbox" checked></div>
+            
             <div style="font-size:11px; color:var(--text-muted); margin:16px 0 6px; font-weight:bold;">ЦВЕТОВЫЕ ТЕМЫ:</div>
             <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom: 16px;">
                 <button class="btn-action" style="flex:1;" onclick="setTheme('default')">Dark</button>
@@ -340,6 +349,7 @@
                 <button class="btn-action" style="flex:1; background:#282a36; color:#bd93f9;" onclick="setTheme('dracula')">Drac</button>
                 <button class="btn-action" style="flex:1; background:#fcee09; color:#111;" onclick="setTheme('cyberpunk')">Cyber</button>
             </div>
+            
             <div style="font-size:11px; color:var(--text-muted); margin-bottom:6px; font-weight:bold;">БЭКАП РАБОЧЕГО МЕСТА:</div>
             <div style="display:flex; gap:8px;">
                 <button class="btn-action" style="flex:1; background:var(--accent-blue); color:white; border:none;" id="btnBackupDump">💾 Выгрузить (.zip)</button>
@@ -349,13 +359,29 @@
         </div>
     </div>
 
-    <!-- МОДАЛКА ШАБЛОНОВ -->
+    <!-- МОДАЛКА ПЛАГИНОВ (НОВАЯ ФИЧА!) -->
+    <div class="modal-overlay" id="modalPlugins">
+        <div class="modal-card">
+            <div class="modal-header"> 🧩 Менеджер Плагинов <button class="btn-action" onclick="toggleModal('modalPlugins')">✕</button> </div>
+            <p style="font-size:12px; color:var(--text-muted); margin-bottom: 16px;">
+                Вы можете установить сторонние проверки форматов (например YAML или кастомные форматы) через JS-скрипт с интернета. Скрипт сохраняется в память браузера навсегда.
+            </p>
+            <div style="display:flex; gap:8px; margin-bottom:16px;">
+                <input type="text" id="pluginUrl" class="resizable-box" style="padding:10px; min-height:40px; font-size:12px;" placeholder="URL скрипта (.js)">
+                <button class="btn-green" id="btnInstallPlugin" style="padding:10px !important; width:auto;">💾 Загрузить</button>
+            </div>
+            <div style="font-size:11px; color:var(--text-muted); margin-bottom:6px; font-weight:bold;">УСТАНОВЛЕННЫЕ:</div>
+            <div id="pluginsList"></div>
+        </div>
+    </div>
+
+    <!-- МОДАЛКА ШАБЛОНОВ (ВЕРСИЯ С ИСПРАВЛЕНИЕМ СТРОК) -->
     <div class="modal-overlay" id="modalSnippets">
         <div class="modal-card">
             <div class="modal-header"> Шаблоны Кода <button class="btn-action" onclick="toggleModal('modalSnippets')">✕</button> </div>
             <p style="font-size:12px; color:var(--text-muted); margin-bottom: 12px;">Шаблон вставится в место, где стоит курсор.</p>
-            <div class="setting-row" onclick="insSnip(`\n\u0022dns\u0022: {\n  \u0022servers\u0022: [\n    \u0022https+local://1.1.1.1/dns-query\u0022,\n    \u00228.8.8.8\u0022\n  ]\n}`)" style="cursor:pointer; display:block;"> <strong style="color:var(--accent-blue);">+ Базовый DNS</strong><br><span style="font-size:11px; color:var(--text-muted);">Без утечек</span> </div>
-            <div class="setting-row" onclick="insSnip(`\n\u0022routing\u0022: {\n  \u0022domainStrategy\u0022: \u0022IPIfNonMatch\u0022,\n  \u0022rules\u0022: [\n    {\n      \u0022type\u0022: \u0022field\u0022,\n      \u0022domain\u0022: [\u0022geosite:ru\u0022],\n      \u0022outboundTag\u0022: \u0022direct\u0022\n    }\n  ]\n}`)" style="cursor:pointer; display:block;"> <strong style="color:var(--accent-blue);">+ Routing РФ</strong><br><span style="font-size:11px; color:var(--text-muted);">Обход блокировок</span> </div>
+            <div class="setting-row" onclick="window.insSnip('dns')" style="cursor:pointer; display:block;"> <strong style="color:var(--accent-blue);">+ Базовый DNS</strong><br><span style="font-size:11px; color:var(--text-muted);">Без утечек</span> </div>
+            <div class="setting-row" onclick="window.insSnip('routing')" style="cursor:pointer; display:block;"> <strong style="color:var(--accent-blue);">+ Routing РФ</strong><br><span style="font-size:11px; color:var(--text-muted);">Обход блокировок</span> </div>
         </div>
     </div>
 
@@ -401,7 +427,7 @@
         g('btnThemeToggle').onclick = () => { vibe(); setTheme(document.body.className.includes('light')?'default':'light'); };
         g('btnSettingsModal').onclick = () => { vibe(); toggleModal('modalSettings', true); };
         
-        ['uiS1', 'uiS2', 'uiExp', 'uiH', 'uiAutoParse'].forEach(id => {
+        ['uiS1', 'uiS2', 'uiExp', 'uiH', 'uiAutoParse', 'uiLinter'].forEach(id => {
             let chk = g(id); let s = localStorage.getItem('incy_'+id); chk.checked = s!==null?s==='1':true;
             chk.addEventListener('change', e => {
                 localStorage.setItem('incy_'+id, e.target.checked?'1':'0');
@@ -409,8 +435,53 @@
                 if(id==='uiS2') els.editorBlockWrapper.classList.toggle('hidden', !e.target.checked);
                 if(id==='uiExp') g('resultBlockWrapper').classList.toggle('hidden', !e.target.checked);
                 if(id==='uiH') { if(e.target.checked) renderHist(); else g('historyCard').classList.add('hidden'); }
+                if(id==='uiLinter') { linter(); } // Прогоняем линтер при смене (стирает ошибки если выключен)
             }); chk.dispatchEvent(new Event('change'));
         });
+
+        // --- ПЛАГИНЫ (РАСШИРЕНИЯ С ИНТЕРНЕТА) ---
+        g('btnPluginsModal').onclick = () => { vibe(); toggleModal('modalPlugins', true); renderPlugins(); };
+        
+        const loadPluginsCore = () => {
+            let plugs = JSON.parse(localStorage.getItem('incy_plugins') || '[]');
+            plugs.forEach(p => {
+                try { window.eval(p.code); } catch(e) { console.error("Ошибка в плагине", p.url); }
+            });
+        };
+        // Вызываем сразу при старте
+        loadPluginsCore();
+
+        const renderPlugins = () => {
+            let plugs = JSON.parse(localStorage.getItem('incy_plugins') || '[]');
+            if(plugs.length === 0) { g('pluginsList').innerHTML = '<div style="font-size:12px; color:var(--text-muted);">Плагинов нет.</div>'; return; }
+            g('pluginsList').innerHTML = plugs.map(p => `
+                <div class="setting-row">
+                    <div style="font-size:11px; max-width:80%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--code-color);" title="${p.url}">${p.url}</div>
+                    <button class="btn-action btn-action-red" onclick="window.delPlugin(${p.id})">✖</button>
+                </div>
+            `).join('');
+        };
+
+        g('btnInstallPlugin').onclick = async () => {
+            let url = g('pluginUrl').value.trim(); if(!url) return;
+            try {
+                vibe(); g('btnInstallPlugin').textContent = '...';
+                let res = await fetch(url); let code = await res.text();
+                let plugs = JSON.parse(localStorage.getItem('incy_plugins') || '[]');
+                plugs.push({id: Date.now(), url: url, code: code});
+                localStorage.setItem('incy_plugins', JSON.stringify(plugs));
+                try { window.eval(code); showT('Плагин запущен!'); } catch(e) { showT('Ошибка кода плагина', 1); }
+                g('pluginUrl').value = ''; renderPlugins(); g('btnInstallPlugin').textContent = '💾 Загрузить';
+            } catch(e) { showT('Ошибка сети / CORS', 1); g('btnInstallPlugin').textContent = '💾 Загрузить'; }
+        };
+
+        window.delPlugin = (id) => {
+            let plugs = JSON.parse(localStorage.getItem('incy_plugins') || '[]');
+            plugs = plugs.filter(p => p.id !== id);
+            localStorage.setItem('incy_plugins', JSON.stringify(plugs));
+            renderPlugins(); showT('Удалено. Обновите страницу!');
+        };
+
 
         const encodeB64 = str => btoa(unescape(encodeURIComponent(str))).replace(/=+$/, '');
         const decodeB64 = str => { let p = str.length % 4; if(p) str += '='.repeat(4 - p); return decodeURIComponent(escape(atob(str))); };
@@ -471,8 +542,24 @@
         };
         g('btnSearchNext').onclick = doSearch; g('searchInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') doSearch(); });
 
+        // --- ИСПРАВЛЕННЫЕ ШАБЛОНЫ (SNIPPETS) ---
+        const snippetsDictionary = {
+            dns: `\n"dns": {\n  "servers": [\n    "https+local://1.1.1.1/dns-query",\n    "8.8.8.8"\n  ]\n}`,
+            routing: `\n"routing": {\n  "domainStrategy": "IPIfNonMatch",\n  "rules": [\n    {\n      "type": "field",\n      "domain": ["geosite:ru"],\n      "outboundTag": "direct"\n    }\n  ]\n}`
+        };
+
         g('btnSnippetsModal').onclick = () => { vibe(); toggleModal('modalSnippets', true); };
-        const insSnip = (txt) => { vibe(); let start = els.jsonEditor.selectionStart, end = els.jsonEditor.selectionEnd; els.jsonEditor.setRangeText(txt, start, end, 'end'); toggleModal('modalSnippets', false); els.jsonEditor.focus(); updateLines(); refreshLinks(); };
+        window.insSnip = (key) => { 
+            vibe(); 
+            let txt = snippetsDictionary[key];
+            if(!txt) return;
+            let start = els.jsonEditor.selectionStart, end = els.jsonEditor.selectionEnd; 
+            els.jsonEditor.setRangeText(txt, start, end, 'end'); 
+            toggleModal('modalSnippets', false); 
+            els.jsonEditor.focus(); 
+            updateLines(); 
+            els.jsonEditor.dispatchEvent(new Event('input')); 
+        };
 
         // --- ВЫБОР ПРОТОКОЛА И ССЫЛКИ ---
         const setProtocol = (p) => {
@@ -495,7 +582,7 @@
                 let safeProtocol = currentProtocol === 'custom' ? 'custom' : currentProtocol;
                 let newUrl = `${safeProtocol}://routing/onadd/${encodeB64(rawMinified)}`;
                 updateOutputLinks(newUrl, parsed.Name);
-                els.errorBox.classList.add('hidden'); [...els.tLineH.children].forEach(d => d.classList.remove('error'));
+                if(g('uiLinter').checked) { els.errorBox.classList.add('hidden'); [...els.tLineH.children].forEach(d => d.classList.remove('error')); }
             } catch(e) {}
         }
 
@@ -505,7 +592,7 @@
             els.resOut.value = urlStr; els.btnDeepLink.href = urlStr; els.pName.textContent = name || "Без имени";
         }
 
-        // --- УМНЫЙ LINTER ---
+        // --- УМНЫЙ LINTER ОШИБОК И ПЛАГИНЫ ФОРМАТИРОВАНИЯ ---
         function parseAndScrollToError(e) {
             let msg = e.message; let matchPos = msg.match(/position (\d+)/); let matchLine = msg.match(/line (\d+) column (\d+)/); 
             let lineNum = 1; let charIdx = 0;
@@ -521,6 +608,42 @@
             showT("➡️ Ошибка на строке " + lineNum, 1);
         }
 
+        const linter = () => {
+            let val = els.jsonEditor.value;
+            els.jsonEditor.style.borderColor = ''; [...els.tLineH.children].forEach(d => d.classList.remove('error')); els.errorBox.classList.add('hidden');
+            
+            // Если выключено пользователем
+            if(!g('uiLinter').checked) return true;
+
+            // Если есть плагин Линтера с интернета
+            if(window.INCY_CUSTOM_LINTER) {
+                let res = window.INCY_CUSTOM_LINTER(val);
+                if(res && res.error) {
+                    showT(res.error, 1); els.jsonEditor.style.borderColor = 'var(--red-text)';
+                    if(res.line && els.tLineH.children[res.line-1]) els.tLineH.children[res.line-1].classList.add('error');
+                    els.errorBox.textContent = "Ошибка плагина: " + res.error; els.errorBox.classList.remove('hidden');
+                    return false;
+                }
+                return true;
+            }
+
+            // Стандартный JSON Linter
+            try { 
+                if(val.trim() !== '') JSON.parse(val); 
+                return true; 
+            } catch(e) {
+                els.jsonEditor.style.borderColor = 'var(--red-text)';
+                els.errorBox.textContent = "Синтаксис сломан: " + e.message; els.errorBox.classList.remove('hidden');
+                
+                let matchPos = e.message.match(/position (\d+)/); let matchLine = e.message.match(/line (\d+) column (\d+)/);
+                if (matchPos || matchLine) {
+                    let ls = matchLine ? parseInt(matchLine[1]) : val.substring(0, parseInt(matchPos[1])).split('\n').length;
+                    if(els.tLineH.children[ls-1]) els.tLineH.children[ls-1].classList.add('error');
+                }
+                return false;
+            }
+        };
+
         const updateLines = () => { let ls = els.jsonEditor.value.split('\n').length || 1; els.tLineH.innerHTML = Array.from({length: ls}, (_, i) => `<div>${i+1}</div>`).join(''); els.bdgLines.textContent = ls; };
         
         let liveUpdateTimer;
@@ -531,19 +654,26 @@
             clearTimeout(liveUpdateTimer);
             liveUpdateTimer = setTimeout(() => {
                 refreshLinks();
-                try { JSON.parse(els.jsonEditor.value); els.errorBox.classList.add('hidden'); [...els.tLineH.children].forEach(d => d.classList.remove('error')); } 
-                catch(e) { els.errorBox.textContent = "Синтаксис сломан: " + e.message; els.errorBox.classList.remove('hidden'); }
+                linter();
             }, 300);
         });
         els.jsonEditor.addEventListener('scroll', () => { els.tLineH.scrollTop = els.jsonEditor.scrollTop; }, { passive: true });
         
         g('btnWrapToggle').onclick = function() { vibe(); els.jsonEditor.classList.toggle('wrap-text'); els.tLineH.style.opacity = els.jsonEditor.classList.contains('wrap-text')?'0.3':'1'; };
+        
         els.btnFormat.onclick = () => {
-            vibe(); try {
+            vibe(); 
+            // Плагин Форматирования
+            if(window.INCY_CUSTOM_FORMATTER) {
+                try { els.jsonEditor.value = window.INCY_CUSTOM_FORMATTER(els.jsonEditor.value); updateLines(); showT('✨ Отформатировано (Плагином)'); return; } catch(e){}
+            }
+
+            if(g('uiLinter').checked && !linter()) { parseAndScrollToError(new Error(els.errorBox.textContent)); return; }
+            try {
                 let formatted = JSON.stringify(JSON.parse(els.jsonEditor.value), null, 4);
                 if(els.jsonEditor.value !== formatted) { els.jsonEditor.value = formatted; saveEdState(formatted); hasUnsavedChanges = true; els.jsonEditor.dispatchEvent(new Event('input'))}
                 els.errorBox.classList.add('hidden'); [...els.tLineH.children].forEach(d => d.classList.remove('error')); updateLines(); showT('✨ Отформатировано'); if(els.vGraph.classList.contains('active')) buildG();
-            } catch(e) { els.errorBox.textContent = e.message; els.errorBox.classList.remove('hidden'); parseAndScrollToError(e); }
+            } catch(e) { if(g('uiLinter').checked) { els.errorBox.textContent = e.message; els.errorBox.classList.remove('hidden'); parseAndScrollToError(e); } else { showT('Форматирование невозможно (JSON сломан)',1); } }
         };
 
         // ОТКАТ И СОХРАНЕНИЕ
@@ -557,18 +687,24 @@
 
         els.btnSaveJson.onclick = () => {
             vibe();
+            // Если включен строгий режим и есть ошибка - не сохраняем
+            if (g('uiLinter').checked && !linter()) {
+                showT("Исправьте ошибки перед сохранением!", 1); return;
+            }
             try {
-                let parsed = JSON.parse(els.jsonEditor.value);
-                els.jsonEditor.value = JSON.stringify(parsed, null, 4); 
+                let cname = "Config";
+                // Попытаемся достать Name, если это валидный JSON
+                try { let p = JSON.parse(els.jsonEditor.value); if(p.Name) cname = p.Name; } catch(e){}
+
                 lastSavedJson = els.jsonEditor.value;
-                let safeProtocol = currentProtocol === 'custom' ? 'custom' : currentProtocol;
-                let newUrl = `${safeProtocol}://routing/onadd/${encodeB64(JSON.stringify(parsed))}`;
-                updateOutputLinks(newUrl, parsed.Name);
-                pushHist(parsed.Name, JSON.stringify(parsed));
+                
+                // Прокидываем в облако/линки
+                refreshLinks();
+                pushHist(cname, els.jsonEditor.value);
                 
                 els.errorBox.classList.add('hidden'); hasUnsavedChanges = false;
                 showT("✅ Сохранено в Историю");
-            } catch(e) { vibe(200); els.errorBox.textContent = "Синтаксис сломан: " + e.message; els.errorBox.classList.remove('hidden'); parseAndScrollToError(e); }
+            } catch(e) {}
         };
 
         // --- ВВОД ФАЙЛА И ПАРСИНГ ---
@@ -597,6 +733,12 @@
             let detectedProto = protoMatch ? protoMatch[1].toLowerCase() : 'incy';
             if (detectedProto === 'happ') setProtocol('happ'); else if (detectedProto === 'incy' || detectedProto === 'incy-mini') setProtocol('incy'); else setProtocol(detectedProto);
 
+            // Если есть внешний плагин Парсер
+            if (window.INCY_CUSTOM_PARSER) {
+                let pRes = window.INCY_CUSTOM_PARSER(val);
+                if (pRes) { loadCfg(pRes, true); return; }
+            }
+
             let jsonStr = null;
             if (val.startsWith('{')) { try { JSON.parse(val); jsonStr = val; } catch(e) {} }
             
@@ -615,19 +757,14 @@
         }
 
         // Загрузка кода и синхронизация блоков
-        function loadCfg(jsonStr, saveToHistoryFlag = true) {
+        function loadCfg(codeStr, saveToHistoryFlag = true) {
             try {
                 g('searchBar').classList.add('hidden');
                 
-                let json = JSON.parse(jsonStr);
-                let rawMinified = JSON.stringify(json);
-                let safeProtocol = currentProtocol === 'custom' ? 'custom' : currentProtocol;
-                let newUrl = `${safeProtocol}://routing/onadd/${encodeB64(rawMinified)}`;
+                let cn = "New Config";
+                try { let j = JSON.parse(codeStr); if(j.Name) cn = j.Name; } catch(e){}
                 
-                updateOutputLinks(newUrl, json.Name);
-                
-                const code = JSON.stringify(json, null, 4);
-                els.jsonEditor.value = code; lastSavedJson = code; edHist = [code];
+                els.jsonEditor.value = codeStr; lastSavedJson = codeStr; edHist = [codeStr];
                 
                 // Если юзер скрыл Редактор, но что-то спарсил - включить!
                 if (els.editorBlockWrapper.classList.contains('hidden') && saveToHistoryFlag) {
@@ -637,18 +774,18 @@
                 updateLines(); els.jsonEditor.dispatchEvent(new Event('input'));
                 
                 if (saveToHistoryFlag) { 
-                    pushHist(json.Name, code); 
+                    pushHist(cn, codeStr); 
                     showT("Успешно Распознано!"); 
                     els.editorBlockWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' }); 
                     els.srcInput.value = ''; // Чистим поле ввода после успеха
                 }
-            } catch(e) { vibe(100); showT("Сломанный JSON внутри", 1); }
+            } catch(e) { vibe(100); showT("Ошибка загрузки в редактор", 1); }
         }
 
         window.onload = () => {
             let draft = localStorage.getItem('incy_draft');
             if(draft && draft.length > 20 && !window.location.hash) { 
-                try { let p = JSON.parse(draft); els.jsonEditor.value = draft; els.pName.textContent = p.Name||'Черновик'; updateLines(); } catch(e) {} 
+                try { let p = JSON.parse(draft); els.jsonEditor.value = draft; els.pName.textContent = p.Name||'Черновик'; updateLines(); } catch(e) { els.jsonEditor.value = draft; els.pName.textContent = 'Черновик (Raw)'; updateLines(); } 
             } else if (!window.location.hash) { 
                 els.jsonEditor.value = defaultJsonTemplate; els.pName.textContent = 'New Config'; updateLines(); refreshLinks();
             }
@@ -657,7 +794,7 @@
 
         // --- СОХРАНЕНИЕ: СЖАТИЕ / КОПИРОВАНИЕ / ФАЙЛЫ ---
         els.resOut.onclick = () => { if(els.resOut.value) { els.resOut.select(); copyToC(els.resOut.value); } };
-        async function getMini() { try { return `incy-mini://${btoa(String.fromCharCode.apply(null, new Uint8Array(await new Response(new Blob([JSON.stringify(JSON.parse(els.jsonEditor.value))]).stream().pipeThrough(new CompressionStream('deflate-raw'))).arrayBuffer()))).replace(/=+$/,'')}`; } catch(e) { return `incy-mini://${encodeB64(JSON.stringify(JSON.parse(els.jsonEditor.value)))}`; } }
+        async function getMini() { try { return `incy-mini://${btoa(String.fromCharCode.apply(null, new Uint8Array(await new Response(new Blob([JSON.stringify(JSON.parse(els.jsonEditor.value))]).stream().pipeThrough(new CompressionStream('deflate-raw'))).arrayBuffer()))).replace(/=+$/,'')}`; } catch(e) { return `incy-mini://${encodeB64(els.jsonEditor.value)}`; } }
         g('btnCopyMini').onclick = async () => { vibe(); try { let m = await getMini(); copyToC(m); } catch(e){ showT("Проверьте код",1); } };
         g('btnCopyResult').onclick = () => { vibe(); copyToC(els.resOut.value); };
 
@@ -673,7 +810,7 @@
             a.download = (els.pName.textContent.replace(/[^a-z0-9а-яё-]/gi, '_').toLowerCase() || 'config') + ext; a.click(); showT(`Скачано как ${ext}`);
         };
 
-        // --- УМНАЯ ИСТОРИЯ КОНФИГОВ И 100% БЕЗОТКАЗНАЯ МИГРАЦИЯ ДАННЫХ ---
+        // --- УМНАЯ ИСТОРИЯ КОНФИГОВ И БЕЗОТКАЗНАЯ РАБОТА ---
         const getH = () => { 
             let h = JSON.parse(localStorage.getItem('incy_history') || '[]'); 
             let needsFix = false;
@@ -685,8 +822,9 @@
         
         const pushHist = (name, content) => {
             if(!content) return; name = name || "Без имени"; let hist = getH().filter(i => i.name !== name);
-            hist.unshift({ id: Date.now(), name: name, url: `incy://routing/onadd/${encodeB64(JSON.stringify(JSON.parse(content)))}`, content: content });
-            if(hist.length > 20) hist.pop(); setH(hist);
+            let nUrl = ""; try { nUrl = `incy://routing/onadd/${encodeB64(JSON.stringify(JSON.parse(content)))}`; } catch(e){ nUrl = `incy://routing/onadd/${encodeB64(content)}`;}
+            hist.unshift({ id: Date.now(), name: name, url: nUrl, content: content });
+            if(hist.length > 30) hist.pop(); setH(hist);
         };
 
         g('histSearch').addEventListener('input', e => renderHist(e.target.value.toLowerCase().trim()));
@@ -699,7 +837,7 @@
             let data = filt ? hist.filter(i=>i.name.toLowerCase().includes(filt)) : hist;
             
             els.historyList.innerHTML = data.map(i => {
-                let upUrl = i.url; try { upUrl = `incy://routing/onadd/${encodeB64(JSON.stringify(JSON.parse(i.content)))}`; } catch(e){}
+                let upUrl = i.url; try { upUrl = `incy://routing/onadd/${encodeB64(JSON.stringify(JSON.parse(i.content)))}`; } catch(e){upUrl = `incy://routing/onadd/${encodeB64(i.content)}`;}
                 return `<div class="history-item" data-id="${i.id}">
                     <div class="history-top"> <div class="history-title" data-act="ren">${i.name} ✏️</div>
                         <div class="history-controls"> <button class="history-btn-small" data-act="up">⬆</button> <button class="history-btn-small" data-act="dn">⬇</button> <button class="history-btn-small" data-act="dup">⧉</button> <button class="history-btn-small" style="color:var(--red-text)" data-act="del">✖</button> </div>
@@ -711,7 +849,6 @@
             }).join('');
         };
 
-        // Делегирование кликов по Истории
         els.historyList.addEventListener('click', async e => {
             let t = e.target.closest('[data-act]'); if(!t) return; vibe(); 
             let aid = Number(t.closest('.history-item').dataset.id);
@@ -741,18 +878,18 @@
         });
 
         // --- ВИЗУАЛЬНЫЙ ГРАФ БЛОКОВ ---
-        g('btnViewToggle').onclick = function() { vibe(); let a = els.vGraph.classList.toggle('active'); this.textContent = a?'✏️ Редактор':'👁 Визуал'; if(a) { try { els.vGraph.innerHTML = `<div style="font-weight:bold; color:var(--text-main); margin-bottom:8px;">{ Root }</div>` + parseNode(JSON.parse(els.jsonEditor.value)); } catch(e) { els.vGraph.innerHTML = `<div style="color:var(--red-text); padding:20px;">Ошибка: ${e.message}</div>`; } } };
+        g('btnViewToggle').onclick = function() { vibe(); let a = els.vGraph.classList.toggle('active'); this.textContent = a?'✏️ Редактор':'👁 Визуал'; if(a) { try { els.vGraph.innerHTML = `<div style="font-weight:bold; color:var(--text-main); margin-bottom:8px;">{ Root }</div>` + parseNode(JSON.parse(els.jsonEditor.value)); } catch(e) { els.vGraph.innerHTML = `<div style="color:var(--red-text); padding:20px;">Для визуала нужен валидный JSON: ${e.message}</div>`; } } };
         const parseNode = (o) => { let h = ''; for(let k in o) { let v = o[k]; if(typeof v==='object' && v!==null) { let p = Array.isArray(v)?`[${v.length} эл-тов]`:`{...}`; h += `<div class="vg-node"><div class="vg-key" onclick="this.nextElementSibling.classList.toggle('hidden')">⊖ ${k} <span class="vg-obj">${p}</span></div><div>${parseNode(v)}</div></div>`; }  else h += `<div class="vg-node" style="font-size:13px"><span style="color:var(--text-main);font-weight:bold;">${k}:</span> <span class="vg-val">${v}</span></div>`; } return h; };
 
         // --- БЭКАП КОНФИГА (.incybackup) ---
-        g('btnBackupDump').onclick = () => { vibe(); let w = { hist: getH(), t: localStorage.getItem('incy_t'), ui: { s1: g('uiS1').checked?1:0, s2: g('uiS2').checked?1:0, exp: g('uiExp').checked?1:0, h: g('uiH').checked?1:0, auto: g('uiAutoParse').checked?1:0 } }; let a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(w)], {type:"application/json"})); a.download = `incy_backup.incybackup`; a.click(); showT('Бэкап скачан!'); };
+        g('btnBackupDump').onclick = () => { vibe(); let w = { hist: getH(), t: localStorage.getItem('incy_t'), ui: { s1: g('uiS1').checked?1:0, s2: g('uiS2').checked?1:0, exp: g('uiExp').checked?1:0, h: g('uiH').checked?1:0, auto: g('uiAutoParse').checked?1:0, lin: g('uiLinter').checked?1:0 }, plugs: JSON.parse(localStorage.getItem('incy_plugins')||'[]') }; let a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(w)], {type:"application/json"})); a.download = `incy_backup.incybackup`; a.click(); showT('Бэкап скачан!'); };
         g('btnBackupLoad').onclick = () => { vibe(); g('backupFile').click(); };
-        g('backupFile').onchange = e => { let file = e.target.files[0]; if(!file)return; let rd = new FileReader(); rd.onload = ev => { try { let p = JSON.parse(ev.target.result.trim()); if(p.hist) { setH(p.hist); setTheme(p.t||'default'); if(p.ui) { ['uiS1', 'uiS2', 'uiExp', 'uiH', 'uiAutoParse'].forEach(id => { let key = id.replace('ui', '').toLowerCase(); if(p.ui[key] !== undefined) { g(id).checked = p.ui[key]===1; g(id).dispatchEvent(new Event('change')); } }); } toggleModal('modSettings', false); showT('Восстановлено!'); } } catch(err){ showT('Файл поврежден', 1); } }; rd.readAsText(file); e.target.value=''; };
+        g('backupFile').onchange = e => { let file = e.target.files[0]; if(!file)return; let rd = new FileReader(); rd.onload = ev => { try { let p = JSON.parse(ev.target.result.trim()); if(p.hist) { setH(p.hist); setTheme(p.t||'default'); if(p.plugs) { localStorage.setItem('incy_plugins', JSON.stringify(p.plugs)); loadPluginsCore(); } if(p.ui) { ['uiS1', 'uiS2', 'uiExp', 'uiH', 'uiAutoParse', 'uiLinter'].forEach(id => { let key = id.replace('ui', ''); key = key==='Linter'?'lin':key.toLowerCase(); if(p.ui[key] !== undefined) { g(id).checked = p.ui[key]===1; g(id).dispatchEvent(new Event('change')); } }); } toggleModal('modSettings', false); showT('Восстановлено!'); } } catch(err){ showT('Файл поврежден', 1); } }; rd.readAsText(file); e.target.value=''; };
 
         // --- CLOUD ШИФРОВАНИЕ (AES-256) ЗАЩИТА ---
         const deriveK = async(p,s)=>crypto.subtle.deriveKey({name:"PBKDF2",salt:s,iterations:100000,hash:"SHA-256"}, await crypto.subtle.importKey("raw",new TextEncoder().encode(p),{name:"PBKDF2"},0,["deriveKey"]),{name:"AES-GCM",length:256},0,["encrypt","decrypt"]);
         g('btnOpenCloudModal').onclick = () => { vibe(); toggleModal('modalCloud', true); g('shareResultBlock').classList.add('hidden'); };
-        g('btnGenerateCloud').onclick = async () => { vibe(); try { JSON.parse(els.jsonEditor.value); let p = g('sharePassword').value || Math.random().toString(36).slice(-8); let salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12)); let enc = await crypto.subtle.encrypt({name: "AES-GCM", iv}, await deriveK(p,salt), new TextEncoder().encode(els.jsonEditor.value)); let su = `${window.location.origin}${window.location.pathname}?sid=${encodeURIComponent(btoa(String.fromCharCode(...new Uint8Array(enc))))}&s=${encodeURIComponent(btoa(String.fromCharCode(...salt)))}&i=${encodeURIComponent(btoa(String.fromCharCode(...iv)))}#${p}`; g('shareUrlOut').value = su; g('shareResultBlock').classList.remove('hidden'); let img = new Image(); img.crossOrigin = "Anonymous"; img.onload = () => { let ctx = g('qrCanvas').getContext('2d'); ctx.canvas.width=200; ctx.canvas.height=200; ctx.clearRect(0,0,200,200); ctx.drawImage(img,0,0,200,200); }; img.src = `https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=${encodeURIComponent(su)}&choe=UTF-8`; showT('Зашифровано AES256!'); } catch(e) { showT('Исправьте JSON перед отправкой', 1); } };
+        g('btnGenerateCloud').onclick = async () => { vibe(); if(g('uiLinter').checked && !linter()) {showT('Исправьте код',1); return;} try { let p = g('sharePassword').value || Math.random().toString(36).slice(-8); let salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12)); let enc = await crypto.subtle.encrypt({name: "AES-GCM", iv}, await deriveK(p,salt), new TextEncoder().encode(els.jsonEditor.value)); let su = `${window.location.origin}${window.location.pathname}?sid=${encodeURIComponent(btoa(String.fromCharCode(...new Uint8Array(enc))))}&s=${encodeURIComponent(btoa(String.fromCharCode(...salt)))}&i=${encodeURIComponent(btoa(String.fromCharCode(...iv)))}#${p}`; g('shareUrlOut').value = su; g('shareResultBlock').classList.remove('hidden'); let img = new Image(); img.crossOrigin = "Anonymous"; img.onload = () => { let ctx = g('qrCanvas').getContext('2d'); ctx.canvas.width=200; ctx.canvas.height=200; ctx.clearRect(0,0,200,200); ctx.drawImage(img,0,0,200,200); }; img.src = `https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=${encodeURIComponent(su)}&choe=UTF-8`; showT('Зашифровано AES256!'); } catch(e) { showT('Ошибка шифрования', 1); } };
         
         async function decryptCloud(u) { try { let url=new URL(u), p=url.hash.substring(1), sid=url.searchParams.get('sid'), s=url.searchParams.get('s'), i=url.searchParams.get('i'); if(!p||!sid||!s||!i)return; let dec = await crypto.subtle.decrypt({name:"AES-GCM", iv:Uint8Array.from(atob(i),c=>c.charCodeAt(0))}, await deriveK(p, Uint8Array.from(atob(s),c=>c.charCodeAt(0))), Uint8Array.from(atob(sid),c=>c.charCodeAt(0))); els.srcInput.value = new TextDecoder().decode(dec); handleSrc(); showT('🔓 Облако расшифровано'); } catch(e) { showT('Ссылка или ключ поврежден', 1); els.srcInput.value=''; } }
         if(window.location.hash && window.location.search.includes('sid=')) decryptCloud(window.location.href);
