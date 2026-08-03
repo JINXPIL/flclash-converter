@@ -37,11 +37,12 @@
         h1 span { color: var(--accent-blue); }
         .subtitle { font-size: 14px; color: var(--text-muted); margin-bottom: 12px;}
 
-        .icon-btn { background: var(--bg-card); border: 1px solid var(--border-gray); font-size: 20px; padding: 8px; border-radius: 50%; color: var(--text-main); cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); position: absolute; top: 0;}
-        .btn-settings { left: 0; font-size: 18px; } 
-        .btn-plugins  { left: 50px; font-size: 18px; }
+        .icon-btn { background: var(--bg-card); border: 1px solid var(--border-gray); font-size: 20px; padding: 8px; border-radius: 50%; color: var(--text-main); cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); position: absolute; top: 0; display:flex; justify-content:center; align-items:center; width:40px; height:40px;}
+        .icon-btn:active { transform: scale(0.9); }
+        .btn-settings { left: 0; } 
+        .btn-plugins  { left: 52px; }
         .btn-theme    { right: 0; }
-        .btn-palette  { right: 50px; font-size: 18px; }
+        .btn-palette  { right: 52px; }
 
         .card { background: var(--bg-card); border: 1px solid var(--border-gray); border-radius: 16px; padding: 20px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); transition: background-color 0.3s, border-color 0.3s;}
         .step-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
@@ -118,7 +119,7 @@
         /* Модалки */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 9999; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: 0.2s;}
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
-        .modal-card { background: var(--bg-card); width: 90%; max-width: 400px; border-radius: 16px; border: 1px solid var(--border-gray); padding: 20px; transform: translateY(20px); transition: 0.2s; max-height: 85vh; overflow-y: auto;}
+        .modal-card { background: var(--bg-card); width: 90%; max-width: 420px; border-radius: 16px; border: 1px solid var(--border-gray); padding: 20px; transform: translateY(20px); transition: 0.2s; max-height: 85vh; overflow-y: auto;}
         .modal-overlay.active .modal-card { transform: translateY(0); }
         .modal-header { font-size: 18px; font-weight: bold; margin-bottom: 16px; display: flex; justify-content: space-between;}
         .setting-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 8px; background: var(--bg-input); border-radius: 8px; border: 1px solid var(--border-gray);}
@@ -157,10 +158,19 @@
         ::selection { background: var(--accent-blue); color: white; }
         
         /* THEME BUILDER CSS */
-        .color-picker-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 13px;}
+        .color-picker-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 13px; color: var(--text-main);}
+        .color-picker-row span { font-weight: bold; }
         .color-picker { border: none; width: 32px; height: 32px; border-radius: 4px; cursor: pointer; padding: 0; background: transparent; }
         .color-picker::-webkit-color-swatch-wrapper { padding: 0; }
         .color-picker::-webkit-color-swatch { border: 1px solid var(--border-gray); border-radius: 4px; }
+        
+        /* Сетка тем */
+        .theme-grid { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; padding-top: 4px; scrollbar-width: none; }
+        .theme-grid::-webkit-scrollbar { display: none; }
+        .th-btn { flex-shrink: 0; background: var(--bg-input); border: 2px solid var(--bg-input); border-radius: 8px; padding: 8px 14px; font-weight: bold; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px;}
+        .th-btn.active { border-color: var(--accent-blue); box-shadow: 0 0 10px rgba(59,130,246,0.3);}
+        .th-btn-del { font-size: 12px; color: var(--red-text); margin-left: auto; cursor: pointer; background: rgba(239,68,68,0.1); border-radius: 4px; padding: 2px 4px;}
+        .th-color-dot { width: 12px; height: 12px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); }
     </style>
 </head>
 <body>
@@ -168,13 +178,13 @@
     <div class="container">
         <!-- Шапка -->
         <header class="main-header">
-            <button class="icon-btn btn-settings" id="btnSettingsModal" title="Настройки Конструктора">⚙️</button>
-            <button class="icon-btn btn-plugins" id="btnPluginsModal" title="Подключить плагины форматов">🧩</button>
+            <button class="icon-btn btn-settings" id="btnSettingsModal" title="Настройки">⚙️</button>
+            <button class="icon-btn btn-plugins" id="btnPluginsModal" title="Плагины">🧩</button>
             <div class="main-header-content">
                 <h1>INCY <span>Tool</span></h1>
-                <p class="subtitle">Universal Config Engine 🚀</p>
+                <p class="subtitle">Absolute Engine 🚀</p>
             </div>
-            <button class="icon-btn btn-palette" id="btnThemeBuilder" title="Создать свою Тему">🎨</button>
+            <button class="icon-btn btn-palette" id="btnThemeBuilder" title="Коллекция Тем">🎨</button>
             <button class="icon-btn btn-theme" id="btnThemeToggle" title="Сменить Тему">🌓</button>
         </header>
 
@@ -186,9 +196,10 @@
                 <button class="btn-action btn-action-blue" onclick="document.getElementById('fileInput').click()">📁 Файл</button>
             </div>
             <div class="input-wrapper">
-                <textarea id="srcInput" class="resizable-box" placeholder="Вставьте ссылку, Base64, JSON или кастомный формат..." autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" style="padding-bottom: 50px;"></textarea>
+                <textarea id="srcInput" class="resizable-box" placeholder="Вставьте ссылку, Base64, JSON или свой формат..." autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" style="padding-bottom: 50px;"></textarea>
                 <div class="abs-buttons">
                     <button class="btn-action btn-action-blue" id="btnPaste" style="border:none">📋 Вставить</button>
+                    <!-- Кнопка ручного распознавания -->
                     <button class="btn-action btn-action-green" id="btnParseManually" style="border:none" title="Ручное распознавание">🔄 Распознать</button>
                     <button class="btn-action btn-action-red" id="btnClear" style="border:none" title="Очистить Поле">✕</button>
                 </div>
@@ -250,7 +261,7 @@
             <div id="errorBox" class="error-box hidden"></div>
             
             <div class="editor-actions">
-                <button class="btn-action btn-action-red" id="btnCancelEdit" style="flex: 1; padding: 16px; border-radius: 12px; background: rgba(239, 68, 68, 0.1); border: 1px solid var(--red-text);" title="Откатиться к последнему сохраненному">❌ Откатить</button>
+                <button class="btn-action btn-action-red" id="btnCancelEdit" style="flex: 1; padding: 16px; border-radius: 12px; background: rgba(239, 68, 68, 0.1); border: 1px solid var(--red-text);" title="Откатиться к последнему">❌ Откатить</button>
                 <button class="btn-green" id="btnSaveJson" style="flex: 2; margin: 0;" title="Сохранить в Историю и обновить ссылки">💾 Сохранить</button>
             </div>
         </div>
@@ -284,7 +295,7 @@
             
             <div style="font-size: 11px; color: var(--text-muted); text-align: center; margin-bottom: 8px; margin-top: 16px; font-weight: bold; text-transform: uppercase;">Скопировать:</div>
             <div style="display: flex; gap: 8px; margin-bottom: 8px;">
-                <button class="btn-primary" id="btnCopyMini" style="flex: 1; background: rgba(59,130,246,0.1); border: 1px solid var(--accent-blue); color: var(--accent-blue); font-size: 13px;" title="Только для INCY (Сжимает текст)">🪄 Сжатая (MINI)</button>
+                <button class="btn-primary" id="btnCopyMini" style="flex: 1; background: rgba(59,130,246,0.1); border: 1px solid var(--accent-blue); color: var(--accent-blue); font-size: 13px;" title="Только для INCY">🪄 Сжатая (MINI)</button>
                 <button class="btn-primary" id="btnCopyResult" style="flex: 1; background: var(--bg-input); border: 1px solid var(--border-gray); color: var(--text-main); font-size: 13px;">📋 Полная</button>
             </div>
             
@@ -324,7 +335,7 @@
     <!-- МОДАЛКА НАСТРОЕК UI -->
     <div class="modal-overlay" id="modalSettings">
         <div class="modal-card">
-            <div class="modal-header"> Настройки Конструктора <button class="btn-action" onclick="toggleModal('modalSettings')">✕</button> </div>
+            <div class="modal-header"> Настройки UI <button class="btn-action" onclick="toggleModal('modalSettings')">✕</button> </div>
             
             <div style="font-size:11px; color:var(--text-muted); margin-bottom:6px; font-weight:bold;">МОДУЛИ ПРОВЕРОК:</div>
             <div class="setting-row">
@@ -357,34 +368,40 @@
         </div>
     </div>
 
-    <!-- НОВАЯ МОДАЛКА: THEME BUILDER (Меню Тем) -->
+    <!-- НОВАЯ МОДАЛКА: THEME BUILDER (Свои темы и загрузка) -->
     <div class="modal-overlay" id="modalThemeBuilder">
         <div class="modal-card">
-            <div class="modal-header"> 🎨 Дизайн и Темы <button class="btn-action" onclick="toggleModal('modalThemeBuilder')">✕</button> </div>
+            <div class="modal-header"> 🎨 Мои Темы <button class="btn-action" onclick="toggleModal('modalThemeBuilder')">✕</button> </div>
             
-            <div style="font-size:11px; color:var(--text-muted); margin-bottom:6px; font-weight:bold;">СТАНДАРТНЫЕ ПРЕСЕТЫ:</div>
-            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom: 16px;">
-                <button class="btn-action" style="flex:1;" onclick="setTheme('default')">Dark</button>
-                <button class="btn-action" style="flex:1; background:#f3f4f6; color:#111;" onclick="setTheme('light')">Light</button>
-                <button class="btn-action" style="flex:1; background:#282a36; color:#bd93f9;" onclick="setTheme('dracula')">Drac</button>
-                <button class="btn-action" style="flex:1; background:#fcee09; color:#111;" onclick="setTheme('cyberpunk')">Cyber</button>
+            <div style="font-size:11px; color:var(--text-muted); margin-bottom:6px; font-weight:bold;">КОЛЛЕКЦИИ (ПРЕСЕТЫ И СОХРАНЁННЫЕ):</div>
+            <div class="theme-grid" id="themesGrid">
+                <!-- Сюда вставятся базовые и кастомные темы -->
             </div>
 
-            <div style="font-size:11px; color:var(--text-muted); margin-bottom:12px; font-weight:bold;">МОЯ ТЕМА (CUSTOM):</div>
-            <div style="background:var(--bg-input); padding: 12px; border-radius: 12px; border: 1px solid var(--border-gray); margin-bottom: 16px;">
-                <div class="color-picker-row"> <span>Главный Фон</span> <input type="color" class="color-picker" id="cp_bg_body" value="#0a0d14"> </div>
-                <div class="color-picker-row"> <span>Фон Блоков (Карточки)</span> <input type="color" class="color-picker" id="cp_bg_card" value="#111827"> </div>
-                <div class="color-picker-row"> <span>Основной Текст</span> <input type="color" class="color-picker" id="cp_text_main" value="#e5e7eb"> </div>
-                <div class="color-picker-row"> <span>Акцент (Кнопки)</span> <input type="color" class="color-picker" id="cp_accent_blue" value="#3b82f6"> </div>
-                <div class="color-picker-row"> <span>Цвет Кода (JSON)</span> <input type="color" class="color-picker" id="cp_code_color" value="#60a5fa"> </div>
+            <div style="font-size:11px; color:var(--text-muted); margin:12px 0 6px; font-weight:bold;">КОНСТРУКТОР ТЕКУЩЕЙ ТЕМЫ:</div>
+            <div style="background:var(--bg-input); padding: 12px; border-radius: 12px; border: 1px solid var(--border-gray); margin-bottom: 12px;">
+                <div class="color-picker-row"> <span>Главный Фон</span> <input type="color" class="color-picker" id="cpCbg" value="#0a0d14"> </div>
+                <div class="color-picker-row"> <span>Фон Карточек</span> <input type="color" class="color-picker" id="cpCcrd" value="#111827"> </div>
+                <div class="color-picker-row"> <span>Текст основной</span> <input type="color" class="color-picker" id="cpCtx" value="#e5e7eb"> </div>
+                <div class="color-picker-row"> <span>Акцент (Кнопки)</span> <input type="color" class="color-picker" id="cpCacc" value="#3b82f6"> </div>
+                <div class="color-picker-row"> <span>Цвет JSON</span> <input type="color" class="color-picker" id="cpCcode" value="#60a5fa"> </div>
                 
-                <button class="btn-green" style="margin-top: 12px;" onclick="applyAndSaveCustomTheme()">✅ Применить мою тему</button>
+                <div style="display:flex; gap:8px; margin-top: 12px;">
+                    <input type="text" id="newThemeName" class="resizable-box" style="padding:10px; min-height:0; flex:1;" placeholder="Имя для сохранения">
+                    <button class="btn-green" style="padding:10px !important;" onclick="saveCustomThemeToCollection()">➕ Сохранить</button>
+                    <button class="btn-action" style="padding:10px !important;" onclick="applyColorsLive()" title="Примерить не сохраняя">👀</button>
+                </div>
             </div>
 
-            <div style="display:flex; gap:8px;">
-                <button class="btn-action" style="flex:1;" onclick="exportCustomTheme()">🔗 Копировать тему</button>
-                <button class="btn-action" style="flex:1;" onclick="importCustomTheme()">📋 Вставить тему</button>
+            <div style="font-size:11px; color:var(--text-muted); margin-bottom:6px; font-weight:bold;">ЗАГРУЗИТЬ ТЕМУ (.INCYTHEME):</div>
+            <div style="display:flex; gap:8px; margin-bottom: 12px;">
+                <input type="text" id="themeUrlInput" class="resizable-box" style="padding:10px; min-height:0; flex:1;" placeholder="URL (GitHub/Pastebin)">
+                <button class="btn-primary" style="width:auto; padding:10px;" onclick="loadThemeFromURL()">📥 URL</button>
+                <button class="btn-action" style="padding:10px;" onclick="g('themeFileInput').click()">📂 Файл</button>
+                <input type="file" id="themeFileInput" class="hidden" accept=".json,.incytheme">
             </div>
+            
+            <button class="btn-action" style="width:100%; border-color:var(--border-gray);" onclick="exportCurrentThemeAsFile()">📤 Скачать текущую тему как файл</button>
         </div>
     </div>
 
@@ -406,7 +423,7 @@
     <div class="modal-overlay" id="modalSnippets">
         <div class="modal-card">
             <div class="modal-header"> Шаблоны Кода <button class="btn-action" onclick="toggleModal('modalSnippets')">✕</button> </div>
-            <p style="font-size:12px; color:var(--text-muted); margin-bottom: 12px;">Шаблон вставится туда, где мигает курсор.</p>
+            <p style="font-size:12px; color:var(--text-muted); margin-bottom: 12px;">Шаблон вставится туда, где мигает курсор в редакторе.</p>
             <div class="setting-row" onclick="window.insSnip('dns')" style="cursor:pointer; display:block;"> <strong style="color:var(--accent-blue);">+ Базовый DNS</strong><br><span style="font-size:11px; color:var(--text-muted);">Стандартные DNS Google + Local</span> </div>
             <div class="setting-row" onclick="window.insSnip('routing')" style="cursor:pointer; display:block;"> <strong style="color:var(--accent-blue);">+ Routing: Блокировка РФ</strong><br><span style="font-size:11px; color:var(--text-muted);">Обход блокировок (geosite:ru)</span> </div>
         </div>
@@ -416,7 +433,7 @@
     <div class="modal-overlay" id="modalCloud">
         <div class="modal-card">
             <div class="modal-header"> 🚀 Cloud Share <button class="btn-action" onclick="toggleModal('modalCloud')">✕</button> </div>
-            <p style="font-size:12px; color:var(--text-muted); margin-bottom: 16px;">Код надёжно шифруется ключом AES-GCM-256 прямо в памяти браузера.</p>
+            <p style="font-size:12px; color:var(--text-muted); margin-bottom: 16px;">Ваш конфиг надёжно зашифруется стандартом AES-GCM-256 прямо на телефоне. Сервера увидят лишь бинарный мусор.</p>
             <input type="text" id="sharePassword" class="resizable-box" style="margin-bottom:12px; min-height:40px; padding:10px;" placeholder="Пароль защиты (можно пустой)">
             <button class="btn-primary" id="btnGenerateCloud">🔐 Зашифровать</button>
             <div id="shareResultBlock" class="hidden" style="margin-top:16px;">
@@ -448,19 +465,8 @@
 
         window.addEventListener('beforeunload', function (e) { if (hasUnsavedChanges) { e.preventDefault(); e.returnValue = 'Остались несохраненные изменения!'; } });
 
-        // --- УПРАВЛЕНИЕ МОДУЛЯМИ И ПОВЕДЕНИЕМ ---
-        const setTheme = th => { 
-            document.body.className = ''; 
-            document.documentElement.style = ''; // Очищаем кастом
-            if(th !== 'default' && th !== 'custom') document.body.classList.add(`theme-${th}`);
-            if(th === 'custom') { document.body.classList.add(`theme-custom`); loadAndApplyCustomTheme(); }
-            localStorage.setItem('incy_t', th); 
-        };
-
-        g('btnThemeToggle').onclick = () => { vibe(); setTheme(document.body.className.includes('light')?'default':'light'); };
+        // --- УПРАВЛЕНИЕ МОДУЛЯМИ (БАЗОВЫЕ НАСТРОЙКИ) ---
         g('btnSettingsModal').onclick = () => { vibe(); toggleModal('modalSettings', true); };
-        g('btnThemeBuilder').onclick = () => { vibe(); toggleModal('modalThemeBuilder', true); loadPickers(); };
-        
         ['uiS1', 'uiS2', 'uiExp', 'uiH', 'uiAutoParse', 'uiLinter'].forEach(id => {
             let chk = g(id); let s = localStorage.getItem('incy_'+id); chk.checked = s!==null?s==='1':true;
             chk.addEventListener('change', e => {
@@ -473,60 +479,113 @@
             }); chk.dispatchEvent(new Event('change'));
         });
 
-        // --- THEME BUILDER (Свои темы) ---
-        function applyAndSaveCustomTheme() {
-            vibe();
-            let themeObj = {
-                '--bg-body': g('cp_bg_body').value,
-                '--bg-card': g('cp_bg_card').value,
-                '--bg-input': g('cp_bg_body').value, // Связываем для гармонии (или можно добавить еще пикер)
-                '--text-main': g('cp_text_main').value,
-                '--accent-blue': g('cp_accent_blue').value,
-                '--code-color': g('cp_code_color').value,
-                '--border-gray': '#374151',
-                '--line-num-bg': g('cp_bg_card').value
-            };
-            localStorage.setItem('incy_custom_theme', JSON.stringify(themeObj));
-            setTheme('custom');
-            toggleModal('modalThemeBuilder', false);
-            showT('✅ Тема применена!');
-        }
+        // --- THEME ENGINE (МЕНЕДЖЕР ТЕМ 2026 И ИМПОРТ/ЭКСПОРТ) ---
+        const THEMES = {
+            base: [
+                {id: 'default', name: 'Dark', c: '#0a0d14'}, {id: 'light', name: 'Light', c: '#f3f4f6'},
+                {id: 'dracula', name: 'Drac', c: '#282a36'}, {id: 'cyberpunk', name: 'Cyber', c: '#fcee09'}
+            ],
+            user: JSON.parse(localStorage.getItem('incy_user_themes') || '[]'),
+            save() { localStorage.setItem('incy_user_themes', JSON.stringify(this.user)); renderThemeGrid(); },
+            add(name, colors) { this.user.push({id: 't_'+Date.now(), name, colors}); this.save(); },
+            del(id) { this.user = this.user.filter(t=>t.id!==id); this.save(); },
+            get(id) { return this.user.find(t=>t.id===id); }
+        };
 
-        function loadAndApplyCustomTheme() {
-            let saved = localStorage.getItem('incy_custom_theme');
-            if(saved) {
-                let themeObj = JSON.parse(saved);
-                for(let key in themeObj) document.documentElement.style.setProperty(key, themeObj[key]);
+        const setTheme = th => { 
+            document.body.className = ''; document.documentElement.style = ''; // Reset
+            let uTh = THEMES.get(th);
+            if(uTh) {
+                for(let k in uTh.colors) document.documentElement.style.setProperty(k, uTh.colors[k]);
+                syncPickers(uTh.colors);
+            } else if (th !== 'default') {
+                document.body.classList.add(`theme-${th}`);
+                syncPickers(); // Reset pickers visual
             }
-        }
+            localStorage.setItem('incy_t', th); 
+            renderThemeGrid();
+        };
 
-        function loadPickers() {
-            let saved = localStorage.getItem('incy_custom_theme');
-            if(saved) {
-                let themeObj = JSON.parse(saved);
-                if(themeObj['--bg-body']) g('cp_bg_body').value = themeObj['--bg-body'];
-                if(themeObj['--bg-card']) g('cp_bg_card').value = themeObj['--bg-card'];
-                if(themeObj['--text-main']) g('cp_text_main').value = themeObj['--text-main'];
-                if(themeObj['--accent-blue']) g('cp_accent_blue').value = themeObj['--accent-blue'];
-                if(themeObj['--code-color']) g('cp_code_color').value = themeObj['--code-color'];
-            }
-        }
-
-        function exportCustomTheme() { vibe(); copyToC(localStorage.getItem('incy_custom_theme') || '{}'); showT('Дизайн скопирован в буфер!'); }
-        function importCustomTheme() {
-            vibe();
-            let json = prompt("Вставьте код кастомной темы:");
-            if(json) {
-                try {
-                    let obj = JSON.parse(json); if(!obj['--bg-body']) throw new Error();
-                    localStorage.setItem('incy_custom_theme', json);
-                    setTheme('custom'); loadPickers(); showT('Дизайн установлен!');
-                } catch(e) { showT('Неверный код темы', 1); }
-            }
-        }
+        // Запуск темы при старте
         setTheme(localStorage.getItem('incy_t') || 'default');
 
-        // --- ПЛАГИНЫ ---
+        g('btnThemeToggle').onclick = () => { vibe(); setTheme(document.body.className.includes('light')?'default':'light'); };
+        g('btnThemeBuilder').onclick = () => { vibe(); toggleModal('modalThemeBuilder', true); renderThemeGrid(); };
+
+        function renderThemeGrid() {
+            let curr = localStorage.getItem('incy_t') || 'default';
+            let html = THEMES.base.map(t => 
+                `<button class="th-btn ${curr===t.id?'active':''}" onclick="setTheme('${t.id}')">
+                    <div class="th-color-dot" style="background:${t.c};"></div> ${t.name}
+                 </button>`
+            ).join('');
+            
+            html += THEMES.user.map(t => 
+                `<div class="th-btn ${curr===t.id?'active':''}">
+                    <div class="th-color-dot" style="background:${t.colors['--bg-body']};" onclick="setTheme('${t.id}')"></div> 
+                    <span onclick="setTheme('${t.id}')">${t.name}</span>
+                    <span class="th-btn-del" onclick="window.delThemeObj('${t.id}')" title="Удалить">✖</span>
+                </div>`
+            ).join('');
+            
+            g('themesGrid').innerHTML = html;
+        }
+
+        window.delThemeObj = (id) => { vibe(); THEMES.del(id); if(localStorage.getItem('incy_t')===id) setTheme('default'); };
+
+        function syncPickers(colorsObj) {
+            if(!colorsObj) return;
+            if(colorsObj['--bg-body']) g('cpCbg').value = colorsObj['--bg-body'];
+            if(colorsObj['--bg-card']) g('cpCcrd').value = colorsObj['--bg-card'];
+            if(colorsObj['--text-main']) g('cpCtx').value = colorsObj['--text-main'];
+            if(colorsObj['--accent-blue']) g('cpCacc').value = colorsObj['--accent-blue'];
+            if(colorsObj['--code-color']) g('cpCcode').value = colorsObj['--code-color'];
+        }
+
+        function getColorsFromPickers() {
+            return {
+                '--bg-body': g('cpCbg').value, '--bg-input': g('cpCbg').value,
+                '--bg-card': g('cpCcrd').value, '--line-num-bg': g('cpCcrd').value,
+                '--text-main': g('cpCtx').value,
+                '--accent-blue': g('cpCacc').value, '--accent-green': g('cpCacc').value,
+                '--code-color': g('cpCcode').value, '--border-gray': '#374151'
+            };
+        }
+
+        window.applyColorsLive = () => { vibe(); let c = getColorsFromPickers(); document.body.className=''; for(let k in c) document.documentElement.style.setProperty(k, c[k]); };
+        window.saveCustomThemeToCollection = () => {
+            vibe(); let n = g('newThemeName').value.trim() || 'My Theme ' + (THEMES.user.length+1);
+            let c = getColorsFromPickers(); THEMES.add(n, c); g('newThemeName').value = '';
+            setTheme(THEMES.user[THEMES.user.length-1].id); showT('Тема сохранена в коллекции!');
+        };
+
+        // Экспорт / Импорт Тем
+        window.exportCurrentThemeAsFile = () => {
+            vibe(); let curr = localStorage.getItem('incy_t') || 'default';
+            let th = THEMES.get(curr);
+            if(!th) { showT('Сохраните тему в коллекцию перед выгрузкой', 1); return; }
+            let blob = new Blob([JSON.stringify(th, null, 2)], {type: "application/json"});
+            let a = document.createElement("a"); a.href = URL.createObjectURL(blob); 
+            a.download = `${th.name.replace(/\s+/g, '_')}.incytheme`; a.click(); showT('Тема скачана!');
+        };
+
+        g('themeFileInput').onchange = e => {
+            let f = e.target.files[0]; if(!f) return; let rd = new FileReader();
+            rd.onload = ev => {
+                try { let j=JSON.parse(ev.target.result); if(j.colors && j.name) { THEMES.add(j.name, j.colors); showT('Тема добавлена!'); } else throw 1; } 
+                catch(err){ showT('Файл поврежден', 1); }
+            }; rd.readAsText(f); e.target.value='';
+        };
+
+        window.loadThemeFromURL = async () => {
+            let u = g('themeUrlInput').value.trim(); if(!u) return; vibe();
+            try {
+                let r = await fetch(u); let j = await r.json();
+                if(j.name && j.colors) { THEMES.add(j.name, j.colors); showT('Тема из сети загружена!'); g('themeUrlInput').value=''; } else throw 1;
+            } catch(e) { showT('Ошибка валидации URL JSON темы', 1); }
+        };
+
+        // --- ПЛАГИНЫ (РАСШИРЕНИЯ С ИНТЕРНЕТА) ---
         g('btnPluginsModal').onclick = () => { vibe(); toggleModal('modalPlugins', true); renderPlugins(); };
         
         const loadPluginsCore = () => {
@@ -593,10 +652,7 @@
         };
 
         g('btnViewToggle').onclick = function() { 
-            vibe(); 
-            let a = els.vGraph.classList.toggle('active'); 
-            this.textContent = a ? '✏️ Редактор' : '👁 Визуал'; 
-            if(a) buildG(); 
+            vibe(); let a = els.vGraph.classList.toggle('active'); this.textContent = a ? '✏️ Редактор' : '👁 Визуал'; if(a) buildG(); 
         };
 
         function parseAndScrollToError(e) {
@@ -618,7 +674,6 @@
         const linter = () => {
             let val = els.jsonEditor.value;
             els.jsonEditor.style.borderColor = ''; [...els.tLineH.children].forEach(d => d.classList.remove('error')); els.errorBox.classList.add('hidden');
-            
             if(!g('uiLinter').checked) return true;
 
             if(window.INCY_CUSTOM_LINTER) {
@@ -631,57 +686,30 @@
                 }
                 return true;
             }
-
-            try { 
-                if(val.trim() !== '') JSON.parse(val); 
-                return true; 
-            } catch(e) {
-                els.jsonEditor.style.borderColor = 'var(--red-text)';
-                els.errorBox.textContent = "Синтаксис сломан: " + e.message; els.errorBox.classList.remove('hidden');
-                
+            try { if(val.trim() !== '') JSON.parse(val); return true; } catch(e) {
+                els.jsonEditor.style.borderColor = 'var(--red-text)'; els.errorBox.textContent = "Синтаксис сломан: " + e.message; els.errorBox.classList.remove('hidden');
                 let matchPos = e.message.match(/position (\d+)/); let matchLine = e.message.match(/line (\d+) column (\d+)/);
                 if (matchPos || matchLine) {
                     let ls = matchLine ? parseInt(matchLine[1]) : val.substring(0, parseInt(matchPos[1])).split('\n').length;
                     if(els.tLineH.children[ls-1]) els.tLineH.children[ls-1].classList.add('error');
-                }
-                return false;
+                } return false;
             }
         };
 
-        // --- ИНСТРУМЕНТЫ РЕДАКТОРА (ИДЕАЛЬНЫЙ UNDO И ОТКАТ) ---
-        // Сохраняем состояние только когда юзер ДЕЛАЕТ ПАУЗУ или жмет кнопки тулбара (чтобы Ундо работал блочно)
-        function saveEdState(val) { 
-            if(edHist[edHist.length - 1] === val) return; 
-            edHist.push(val); 
-            if(edHist.length > 30) edHist.shift(); 
-        }
+        // --- ИНСТРУМЕНТЫ РЕДАКТОРА (UNDO И ОТКАТ) ---
+        function saveEdState(val) { if(edHist[edHist.length - 1] === val) return; edHist.push(val); if(edHist.length > 30) edHist.shift(); }
         
         g('btnUndo').onclick = () => { 
             vibe(); 
             if(edHist.length > 1) { 
-                edHist.pop(); // удаляем текущее
-                els.jsonEditor.value = edHist[edHist.length - 1]; // возвращаемся к предыдущему
-                updateLines(); 
-                showT("↶ Отменено"); 
-                hasUnsavedChanges = true; 
-                // Обновляем визуал без триггера `input`, чтобы не сбить историю
-                if (els.vGraph.classList.contains('active')) buildG();
-                linter(); refreshLinks();
-            } else { 
-                showT("Дальше отменять некуда", 1); 
-            } 
+                edHist.pop(); els.jsonEditor.value = edHist[edHist.length - 1]; updateLines(); showT("↶ Отменено"); hasUnsavedChanges = true; 
+                if (els.vGraph.classList.contains('active')) buildG(); linter(); refreshLinks();
+            } else { showT("Дальше отменять некуда", 1); } 
         };
 
         els.btnCancelEdit.onclick = () => {
-            vibe();
-            els.jsonEditor.value = lastSavedJson; // Откат к последнему ПРЯМО сохраненному состоянию (Кнопкой Завершить)
-            updateLines();
-            saveEdState(els.jsonEditor.value); // Записываем в Undo
-            if (els.vGraph.classList.contains('active')) buildG();
-            linter();
-            refreshLinks();
-            hasUnsavedChanges = false;
-            showT("🔙 Откатили к сохранённому");
+            vibe(); els.jsonEditor.value = lastSavedJson; updateLines(); saveEdState(els.jsonEditor.value);
+            if (els.vGraph.classList.contains('active')) buildG(); linter(); refreshLinks(); hasUnsavedChanges = false; showT("🔙 Откатили к сохранённому");
         };
 
         els.btnToggleFs.onclick = () => {
@@ -706,18 +734,15 @@
                 if (wS && wE && sel.length>0) els.jsonEditor.setRangeText(wS+sel+wE, start, end, 'select');
                 else if (wS) { els.jsonEditor.setRangeText(wS+wE, start, end, 'end'); els.jsonEditor.setSelectionRange(start+1, start+1); }
                 else if (ins) els.jsonEditor.setRangeText(ins, start, end, 'end');
-                els.jsonEditor.focus(); updateLines(); saveEdState(els.jsonEditor.value); hasUnsavedChanges = true; 
-                linter(); refreshLinks();
+                els.jsonEditor.focus(); updateLines(); saveEdState(els.jsonEditor.value); hasUnsavedChanges = true; linter(); refreshLinks();
             }
         });
 
         els.jsonEditor.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault(); let start = this.selectionStart, end = this.selectionEnd, val = this.value;
-                let lineStart = val.substring(0, start).lastIndexOf('\n') + 1;
-                let indent = val.substring(lineStart, start).match(/^\s*/)[0];
-                this.setRangeText('\n' + indent, start, end, 'end');
-                updateLines(); saveEdState(els.jsonEditor.value); linter();
+                let lineStart = val.substring(0, start).lastIndexOf('\n') + 1; let indent = val.substring(lineStart, start).match(/^\s*/)[0];
+                this.setRangeText('\n' + indent, start, end, 'end'); updateLines(); saveEdState(els.jsonEditor.value); linter();
             }
         });
 
@@ -736,7 +761,6 @@
         };
         g('btnSearchNext').onclick = doSearch; g('searchInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') doSearch(); });
 
-        // --- ИСПРАВЛЕННЫЕ ШАБЛОНЫ (SNIPPETS) ---
         const snippetsDictionary = {
             dns: `\n"dns": {\n  "servers": [\n    "https+local://1.1.1.1/dns-query",\n    "8.8.8.8"\n  ]\n}`,
             routing: `\n"routing": {\n  "domainStrategy": "IPIfNonMatch",\n  "rules": [\n    {\n      "type": "field",\n      "domain": ["geosite:ru"],\n      "outboundTag": "direct"\n    }\n  ]\n}`
@@ -744,17 +768,11 @@
 
         g('btnSnippetsModal').onclick = () => { vibe(); toggleModal('modalSnippets', true); };
         window.insSnip = (key) => { 
-            vibe(); 
-            let txt = snippetsDictionary[key];
-            if(!txt) return;
-            let start = els.jsonEditor.selectionStart, end = els.jsonEditor.selectionEnd; 
-            els.jsonEditor.setRangeText(txt, start, end, 'end'); 
-            toggleModal('modalSnippets', false); 
-            els.jsonEditor.focus(); 
-            updateLines(); saveEdState(els.jsonEditor.value); linter(); refreshLinks();
+            vibe(); let txt = snippetsDictionary[key]; if(!txt) return; let start = els.jsonEditor.selectionStart, end = els.jsonEditor.selectionEnd; 
+            els.jsonEditor.setRangeText(txt, start, end, 'end'); toggleModal('modalSnippets', false); els.jsonEditor.focus(); updateLines(); saveEdState(els.jsonEditor.value); linter(); refreshLinks();
         };
 
-        // --- ВЫБОР ПРОТОКОЛА И ССЫЛКИ ---
+        // --- ВЫБОР ПРОТОКОЛА ---
         const setProtocol = (p) => {
             let isC = p !== 'incy' && p !== 'happ' && p !== 'incy-mini';
             g('btnProtoIncy').classList.toggle('active', p === 'incy' || p === 'incy-mini');
@@ -775,35 +793,26 @@
                 let safeProtocol = currentProtocol === 'custom' ? 'custom' : currentProtocol;
                 let newUrl = `${safeProtocol}://routing/onadd/${encodeB64(rawMinified)}`;
                 updateOutputLinks(newUrl, parsed.Name);
-                if(g('uiLinter').checked) { els.errorBox.classList.add('hidden'); [...els.tLineH.children].forEach(d => d.classList.remove('error')); }
             } catch(e) {}
         }
-
         function updateOutputLinks(urlStr, name) {
             let safeProtocol = currentProtocol === 'custom' ? 'custom' : currentProtocol; urlStr = urlStr.replace(/^([a-zA-Z0-9-]+):\/\//i, `${safeProtocol}://`);
             els.resOut.style.backgroundColor = 'var(--bg-card)'; setTimeout(() => els.resOut.style.backgroundColor = '', 200);
             els.resOut.value = urlStr; els.btnDeepLink.href = urlStr; els.pName.textContent = name || "Без имени";
         }
 
-
         const updateLines = () => { let ls = els.jsonEditor.value.split('\n').length || 1; els.tLineH.innerHTML = Array.from({length: ls}, (_, i) => `<div>${i+1}</div>`).join(''); els.bdgLines.textContent = ls; };
         
         let liveUpdateTimer, typedDebounce;
         els.jsonEditor.addEventListener('input', () => { 
-            hasUnsavedChanges = true; 
-            updateLines(); 
-            if (els.vGraph.classList.contains('active')) buildG();
+            hasUnsavedChanges = true; updateLines(); if (els.vGraph.classList.contains('active')) buildG();
             if(els.jsonEditor.value.length > 5) localStorage.setItem('incy_draft', els.jsonEditor.value);
 
-            // Сохраняем состояние для UNDO только когда юзер перестал печатать (Умный блок)
             clearTimeout(typedDebounce);
             typedDebounce = setTimeout(() => { saveEdState(els.jsonEditor.value); }, 600);
 
             clearTimeout(liveUpdateTimer);
-            liveUpdateTimer = setTimeout(() => {
-                linter();
-                refreshLinks();
-            }, 300);
+            liveUpdateTimer = setTimeout(() => { linter(); refreshLinks(); }, 300);
         });
         els.jsonEditor.addEventListener('scroll', () => { els.tLineH.scrollTop = els.jsonEditor.scrollTop; }, { passive: true });
         
@@ -811,72 +820,46 @@
         
         els.btnFormat.onclick = () => {
             vibe(); 
-            if(window.INCY_CUSTOM_FORMATTER) {
-                try { els.jsonEditor.value = window.INCY_CUSTOM_FORMATTER(els.jsonEditor.value); updateLines(); showT('✨ Отформатировано (Плагином)'); return; } catch(e){}
-            }
-
+            if(window.INCY_CUSTOM_FORMATTER) { try { els.jsonEditor.value = window.INCY_CUSTOM_FORMATTER(els.jsonEditor.value); updateLines(); showT('✨ Отформатировано (Плагином)'); return; } catch(e){} }
             if(g('uiLinter').checked && !linter()) { parseAndScrollToError(new Error(els.errorBox.textContent)); return; }
             try {
                 let formatted = JSON.stringify(JSON.parse(els.jsonEditor.value), null, 4);
-                if(els.jsonEditor.value !== formatted) { 
-                    els.jsonEditor.value = formatted; 
-                    saveEdState(formatted); 
-                    hasUnsavedChanges = true; 
-                }
+                if(els.jsonEditor.value !== formatted) { els.jsonEditor.value = formatted; saveEdState(formatted); hasUnsavedChanges = true; }
                 els.errorBox.classList.add('hidden'); [...els.tLineH.children].forEach(d => d.classList.remove('error')); updateLines(); showT('✨ Отформатировано'); if(els.vGraph.classList.contains('active')) buildG();
             } catch(e) { if(g('uiLinter').checked) { els.errorBox.textContent = e.message; els.errorBox.classList.remove('hidden'); parseAndScrollToError(e); } else { showT('Форматирование невозможно (JSON сломан)',1); } }
         };
 
         els.btnSaveJson.onclick = () => {
-            vibe();
-            if (g('uiLinter').checked && !linter()) { showT("Исправьте ошибки перед сохранением!", 1); return; }
+            vibe(); if (g('uiLinter').checked && !linter()) { showT("Исправьте ошибки перед сохранением!", 1); return; }
             try {
-                let cname = "Config";
-                try { let p = JSON.parse(els.jsonEditor.value); if(p.Name) cname = p.Name; } catch(e){}
-
-                lastSavedJson = els.jsonEditor.value;
-                
-                refreshLinks();
-                pushHist(cname, els.jsonEditor.value);
-                
-                els.errorBox.classList.add('hidden'); hasUnsavedChanges = false;
+                let cname = "Config"; try { let p = JSON.parse(els.jsonEditor.value); if(p.Name) cname = p.Name; } catch(e){}
+                lastSavedJson = els.jsonEditor.value; refreshLinks(); pushHist(cname, els.jsonEditor.value); els.errorBox.classList.add('hidden'); hasUnsavedChanges = false;
                 showT("✅ Сохранено в Историю");
             } catch(e) {}
         };
 
         // --- ВВОД ФАЙЛА И ПАРСИНГ ---
-        document.body.addEventListener('dragover', e => e.preventDefault());
-        document.body.addEventListener('drop', e => { e.preventDefault(); if(e.dataTransfer.files.length) { let rd = new FileReader(); rd.onload = ev => { els.srcInput.value = ev.target.result.trim(); handleSrc(); }; rd.readAsText(e.dataTransfer.files[0]); } });
+        document.body.addEventListener('dragover', e => e.preventDefault()); document.body.addEventListener('drop', e => { e.preventDefault(); if(e.dataTransfer.files.length) { let rd = new FileReader(); rd.onload = ev => { els.srcInput.value = ev.target.result.trim(); handleSrc(); }; rd.readAsText(e.dataTransfer.files[0]); } });
         g('fileInput').onchange = e => { let file = e.target.files[0]; if(!file) return; let rd = new FileReader(); rd.onload = ev => { els.srcInput.value = ev.target.result.trim(); handleSrc(); }; rd.readAsText(file); g('fileInput').value = ''; };
 
         els.btnPaste.onclick = async () => { try{ els.srcInput.value = await navigator.clipboard.readText(); handleSrc(); } catch(e){} };
-        
         els.btnClear.onclick = () => { vibe(); els.srcInput.value=''; loadCfg(defaultJsonTemplate, false); showT('Очищено'); edHist=[]; };
 
-        let parseTimer; 
-        els.srcInput.addEventListener('input', () => { 
-            if(g('uiAutoParse').checked) {
-                clearTimeout(parseTimer); parseTimer = setTimeout(handleSrc, 400); 
-            }
-        });
+        let parseTimer; els.srcInput.addEventListener('input', () => { if(g('uiAutoParse').checked) { clearTimeout(parseTimer); parseTimer = setTimeout(handleSrc, 400); } });
         els.btnParseManually.onclick = () => { vibe(); handleSrc(); };
 
         async function handleSrc() {
-            let val = els.srcInput.value.trim(); if(!val) { return; }
+            let val = els.srcInput.value.trim(); if(!val) return;
             if(val.includes('#') && val.length > 50 && val.includes('sid=')) return decryptCloud(val); 
 
             let protoMatch = val.match(/^([a-zA-Z0-9-]+):\/\//i);
             let detectedProto = protoMatch ? protoMatch[1].toLowerCase() : 'incy';
             if (detectedProto === 'happ') setProtocol('happ'); else if (detectedProto === 'incy' || detectedProto === 'incy-mini') setProtocol('incy'); else setProtocol(detectedProto);
 
-            if (window.INCY_CUSTOM_PARSER) {
-                let pRes = window.INCY_CUSTOM_PARSER(val);
-                if (pRes) { loadCfg(pRes, true); return; }
-            }
+            if (window.INCY_CUSTOM_PARSER) { let pRes = window.INCY_CUSTOM_PARSER(val); if (pRes) { loadCfg(pRes, true); return; } }
 
             let jsonStr = null;
             if (val.startsWith('{')) { try { JSON.parse(val); jsonStr = val; } catch(e) {} }
-            
             if (!jsonStr) {
                 let b64 = val.includes('://') ? (val.split('://')[1].split('/onadd/')[1] || val.split('://')[1]) : val;
                 try {
@@ -885,33 +868,18 @@
                     jsonStr = decomp || decodeURIComponent(escape(atob(b64)));
                 } catch(e) {}
             }
-
-            if(jsonStr) {
-                loadCfg(jsonStr, true);
-            } else { if (val.length > 30 && !val.includes(" ")) { vibe(100); showT("ФОРМАТ НЕ РАСПОЗНАН", 1); } }
+            if(jsonStr) { loadCfg(jsonStr, true); } else { if (val.length > 30 && !val.includes(" ")) { vibe(100); showT("ФОРМАТ НЕ РАСПОЗНАН", 1); } }
         }
 
         function loadCfg(codeStr, saveToHistoryFlag = true) {
             try {
                 g('searchBar').classList.add('hidden');
-                
-                let cn = "New Config";
-                try { let j = JSON.parse(codeStr); if(j.Name) cn = j.Name; } catch(e){}
-                
+                let cn = "New Config"; try { let j = JSON.parse(codeStr); if(j.Name) cn = j.Name; } catch(e){}
                 els.jsonEditor.value = codeStr; lastSavedJson = codeStr; edHist = [codeStr];
                 
-                if (els.editorBlockWrapper.classList.contains('hidden') && saveToHistoryFlag) {
-                    g('uiS2').checked = true; g('uiS2').dispatchEvent(new Event('change'));
-                }
-                
+                if (els.editorBlockWrapper.classList.contains('hidden') && saveToHistoryFlag) { g('uiS2').checked = true; g('uiS2').dispatchEvent(new Event('change')); }
                 updateLines(); linter(); refreshLinks();
-                
-                if (saveToHistoryFlag) { 
-                    pushHist(cn, codeStr); 
-                    showT("Успешно Распознано!"); 
-                    els.editorBlockWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' }); 
-                    els.srcInput.value = ''; // Чистим поле ввода после успеха
-                }
+                if (saveToHistoryFlag) { pushHist(cn, codeStr); showT("Успешно Распознано!"); els.editorBlockWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' }); els.srcInput.value = ''; }
             } catch(e) { vibe(100); showT("Ошибка загрузки в редактор", 1); }
         }
 
@@ -919,9 +887,7 @@
             let draft = localStorage.getItem('incy_draft');
             if(draft && draft.length > 20 && !window.location.hash) { 
                 try { let p = JSON.parse(draft); els.jsonEditor.value = draft; els.pName.textContent = p.Name||'Черновик'; updateLines(); refreshLinks(); } catch(e) { els.jsonEditor.value = draft; els.pName.textContent = 'Черновик (Raw)'; updateLines(); } 
-            } else if (!window.location.hash) { 
-                els.jsonEditor.value = defaultJsonTemplate; els.pName.textContent = 'New Config'; updateLines(); refreshLinks();
-            }
+            } else if (!window.location.hash) { els.jsonEditor.value = defaultJsonTemplate; els.pName.textContent = 'New Config'; updateLines(); refreshLinks(); }
             saveEdState(els.jsonEditor.value); renderHist();
         };
 
@@ -945,19 +911,16 @@
 
         // --- УМНАЯ ИСТОРИЯ ---
         const getH = () => { 
-            let h = JSON.parse(localStorage.getItem('incy_history') || '[]'); 
-            let needsFix = false;
+            let h = JSON.parse(localStorage.getItem('incy_history') || '[]'); let needsFix = false;
             h.forEach(i => { if (!i.id) { i.id = i.timestamp || Math.floor(Math.random() * 1000000000); needsFix = true; } });
-            if(needsFix) localStorage.setItem('incy_history', JSON.stringify(h));
-            return h;
+            if(needsFix) localStorage.setItem('incy_history', JSON.stringify(h)); return h;
         };
         const setH = d => { localStorage.setItem('incy_history', JSON.stringify(d)); renderHist(); };
         
         const pushHist = (name, content) => {
             if(!content) return; name = name || "Без имени"; let hist = getH().filter(i => i.name !== name);
             let nUrl = ""; try { nUrl = `incy://routing/onadd/${encodeB64(JSON.stringify(JSON.parse(content)))}`; } catch(e){ nUrl = `incy://routing/onadd/${encodeB64(content)}`;}
-            hist.unshift({ id: Date.now(), name: name, url: nUrl, content: content });
-            if(hist.length > 30) hist.pop(); setH(hist);
+            hist.unshift({ id: Date.now(), name: name, url: nUrl, content: content }); if(hist.length > 30) hist.pop(); setH(hist);
         };
 
         g('histSearch').addEventListener('input', e => renderHist(e.target.value.toLowerCase().trim()));
@@ -966,19 +929,10 @@
         const renderHist = (filt = "") => {
             if(!g('uiH').checked) return;
             let hist = getH(); if(!hist.length) { g('historyCard').classList.add('hidden'); return; }
-            g('historyCard').classList.remove('hidden');
-            let data = filt ? hist.filter(i=>i.name.toLowerCase().includes(filt)) : hist;
-            
+            g('historyCard').classList.remove('hidden'); let data = filt ? hist.filter(i=>i.name.toLowerCase().includes(filt)) : hist;
             els.historyList.innerHTML = data.map(i => {
                 let upUrl = i.url; try { upUrl = `incy://routing/onadd/${encodeB64(JSON.stringify(JSON.parse(i.content)))}`; } catch(e){upUrl = `incy://routing/onadd/${encodeB64(i.content)}`;}
-                return `<div class="history-item" data-id="${i.id}">
-                    <div class="history-top"> <div class="history-title" data-act="ren">${i.name} ✏️</div>
-                        <div class="history-controls"> <button class="history-btn-small" data-act="up">⬆</button> <button class="history-btn-small" data-act="dn">⬇</button> <button class="history-btn-small" data-act="dup">⧉</button> <button class="history-btn-small" style="color:var(--red-text)" data-act="del">✖</button> </div>
-                    </div>
-                    <div style="display:flex;gap:8px;"> <button class="btn-action" style="flex:1.5;background:var(--accent-blue);color:white;border:none;" onclick="location.href='${upUrl}'">🚀 Запуск</button> 
-                    <button class="btn-action" style="flex:1;" data-act="load">✒️ Редактор</button> 
-                    <button class="btn-action" style="flex:1;" onclick="copyToC('${upUrl}')">🔗 Copy</button></div>
-                </div>`;
+                return `<div class="history-item" data-id="${i.id}"><div class="history-top"> <div class="history-title" data-act="ren">${i.name} ✏️</div><div class="history-controls"> <button class="history-btn-small" data-act="up">⬆</button> <button class="history-btn-small" data-act="dn">⬇</button> <button class="history-btn-small" data-act="dup">⧉</button> <button class="history-btn-small" style="color:var(--red-text)" data-act="del">✖</button> </div></div><div style="display:flex;gap:8px;"> <button class="btn-action" style="flex:1.5;background:var(--accent-blue);color:white;border:none;" onclick="location.href='${upUrl}'">🚀 Запуск</button> <button class="btn-action" style="flex:1;" data-act="load">✒️ Редактор</button> <button class="btn-action" style="flex:1;" onclick="copyToC('${upUrl}')">🔗 Copy</button></div></div>`;
             }).join('');
         };
 
@@ -987,29 +941,22 @@
             let aid = Number(t.closest('.history-item').dataset.id); let h = getH();
             let idx = h.findIndex(i=>i.id===aid); 
             if(idx === -1) { let fallbackName = t.closest('.history-item').querySelector('.history-title').textContent.replace(' ✏️','').trim(); idx = h.findIndex(i=>i.name === fallbackName); }
-            if(idx === -1) return; 
-            
-            let act = t.dataset.act;
+            if(idx === -1) return; let act = t.dataset.act;
             if (act === 'del') { h.splice(idx,1); showT('Удалено'); } 
             else if(act === 'up' && idx > 0) { [h[idx], h[idx-1]] = [h[idx-1], h[idx]]; } 
             else if(act === 'dn' && idx < h.length-1) { [h[idx], h[idx+1]] = [h[idx+1], h[idx]]; }
             else if(act === 'ren') { let nn=prompt("Имя конфига:",h[idx].name); if(nn&&nn.trim()) h[idx].name=nn.trim(); } 
             else if(act === 'dup') { let c=JSON.parse(JSON.stringify(h[idx])); c.id=Date.now(); c.name+=' (Copy)'; h.splice(idx+1,0,c); } 
             else if(act === 'load') { 
-                if (h[idx].content) {
-                    loadCfg(h[idx].content, false); els.editorBlockWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                } else if (h[idx].url) { els.srcInput.value = h[idx].url; await handleSrc(); }
+                if (h[idx].content) { loadCfg(h[idx].content, false); els.editorBlockWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' }); } else if (h[idx].url) { els.srcInput.value = h[idx].url; await handleSrc(); }
                 showT('Открыто в редакторе'); return; 
-            } 
-            setH(h);
+            } setH(h);
         });
 
-        // --- БЭКАП КОНФИГА (.incybackup) ---
-        g('btnBackupDump').onclick = () => { vibe(); let w = { hist: getH(), t: localStorage.getItem('incy_t'), tObj: localStorage.getItem('incy_custom_theme'), ui: { s1: g('uiS1').checked?1:0, s2: g('uiS2').checked?1:0, exp: g('uiExp').checked?1:0, h: g('uiH').checked?1:0, auto: g('uiAutoParse').checked?1:0, lin: g('uiLinter').checked?1:0 }, plugs: JSON.parse(localStorage.getItem('incy_plugins')||'[]') }; let a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(w)], {type:"application/json"})); a.download = `incy_backup.incybackup`; a.click(); showT('Бэкап скачан!'); };
+        g('btnBackupDump').onclick = () => { vibe(); let w = { hist: getH(), t: localStorage.getItem('incy_t'), tObj: localStorage.getItem('incy_user_themes'), ui: { s1: g('uiS1').checked?1:0, s2: g('uiS2').checked?1:0, exp: g('uiExp').checked?1:0, h: g('uiH').checked?1:0, auto: g('uiAutoParse').checked?1:0, lin: g('uiLinter').checked?1:0 }, plugs: JSON.parse(localStorage.getItem('incy_plugins')||'[]') }; let a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(w)], {type:"application/json"})); a.download = `incy_backup.incybackup`; a.click(); showT('Бэкап скачан!'); };
         g('btnBackupLoad').onclick = () => { vibe(); g('backupFile').click(); };
-        g('backupFile').onchange = e => { let file = e.target.files[0]; if(!file)return; let rd = new FileReader(); rd.onload = ev => { try { let p = JSON.parse(ev.target.result.trim()); if(p.hist) { setH(p.hist); if(p.tObj) localStorage.setItem('incy_custom_theme', p.tObj); setTheme(p.t||'default'); if(p.plugs) { localStorage.setItem('incy_plugins', JSON.stringify(p.plugs)); loadPluginsCore(); } if(p.ui) { ['uiS1', 'uiS2', 'uiExp', 'uiH', 'uiAutoParse', 'uiLinter'].forEach(id => { let key = id.replace('ui', ''); key = key==='Linter'?'lin':key.toLowerCase(); if(p.ui[key] !== undefined) { g(id).checked = p.ui[key]===1; g(id).dispatchEvent(new Event('change')); } }); } toggleModal('modSettings', false); showT('Восстановлено!'); } } catch(err){ showT('Файл поврежден', 1); } }; rd.readAsText(file); e.target.value=''; };
+        g('backupFile').onchange = e => { let file = e.target.files[0]; if(!file)return; let rd = new FileReader(); rd.onload = ev => { try { let p = JSON.parse(ev.target.result.trim()); if(p.hist) { setH(p.hist); if(p.tObj) localStorage.setItem('incy_user_themes', p.tObj); setTheme(p.t||'default'); if(p.plugs) { localStorage.setItem('incy_plugins', JSON.stringify(p.plugs)); loadPluginsCore(); } if(p.ui) { ['uiS1', 'uiS2', 'uiExp', 'uiH', 'uiAutoParse', 'uiLinter'].forEach(id => { let key = id.replace('ui', ''); key = key==='Linter'?'lin':key.toLowerCase(); if(p.ui[key] !== undefined) { g(id).checked = p.ui[key]===1; g(id).dispatchEvent(new Event('change')); } }); } toggleModal('modSettings', false); showT('Восстановлено!'); } } catch(err){ showT('Файл поврежден', 1); } }; rd.readAsText(file); e.target.value=''; };
 
-        // --- CLOUD ШИФРОВАНИЕ ---
         const deriveK = async(p,s)=>crypto.subtle.deriveKey({name:"PBKDF2",salt:s,iterations:100000,hash:"SHA-256"}, await crypto.subtle.importKey("raw",new TextEncoder().encode(p),{name:"PBKDF2"},0,["deriveKey"]),{name:"AES-GCM",length:256},0,["encrypt","decrypt"]);
         g('btnOpenCloudModal').onclick = () => { vibe(); toggleModal('modalCloud', true); g('shareResultBlock').classList.add('hidden'); };
         g('btnGenerateCloud').onclick = async () => { vibe(); if(g('uiLinter').checked && !linter()) {showT('Исправьте код',1); return;} try { let p = g('sharePassword').value || Math.random().toString(36).slice(-8); let salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12)); let enc = await crypto.subtle.encrypt({name: "AES-GCM", iv}, await deriveK(p,salt), new TextEncoder().encode(els.jsonEditor.value)); let su = `${window.location.origin}${window.location.pathname}?sid=${encodeURIComponent(btoa(String.fromCharCode(...new Uint8Array(enc))))}&s=${encodeURIComponent(btoa(String.fromCharCode(...salt)))}&i=${encodeURIComponent(btoa(String.fromCharCode(...iv)))}#${p}`; g('shareUrlOut').value = su; g('shareResultBlock').classList.remove('hidden'); let img = new Image(); img.crossOrigin = "Anonymous"; img.onload = () => { let ctx = g('qrCanvas').getContext('2d'); ctx.canvas.width=200; ctx.canvas.height=200; ctx.clearRect(0,0,200,200); ctx.drawImage(img,0,0,200,200); }; img.src = `https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=${encodeURIComponent(su)}&choe=UTF-8`; showT('Зашифровано AES256!'); } catch(e) { showT('Ошибка шифрования', 1); } };
