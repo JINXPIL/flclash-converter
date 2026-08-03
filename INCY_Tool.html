@@ -38,8 +38,10 @@
         .subtitle { font-size: 14px; color: var(--text-muted); margin-bottom: 12px;}
 
         .icon-btn { background: var(--bg-card); border: 1px solid var(--border-gray); font-size: 20px; padding: 8px; border-radius: 50%; color: var(--text-main); cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); position: absolute; top: 0;}
-        .btn-settings { left: 0; font-size: 18px; } .btn-theme { right: 0; }
-        .btn-plugins { left: 50px; font-size: 18px; }
+        .btn-settings { left: 0; font-size: 18px; } 
+        .btn-plugins  { left: 50px; font-size: 18px; }
+        .btn-theme    { right: 0; }
+        .btn-palette  { right: 50px; font-size: 18px; }
 
         .card { background: var(--bg-card); border: 1px solid var(--border-gray); border-radius: 16px; padding: 20px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); transition: background-color 0.3s, border-color 0.3s;}
         .step-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
@@ -122,7 +124,7 @@
         .setting-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 8px; background: var(--bg-input); border-radius: 8px; border: 1px solid var(--border-gray);}
         #qrCanvas { background: white; padding: 12px; border-radius: 12px; margin: 0 auto 16px; display: block; border: 2px solid var(--border-gray); max-width: 100%;}
         
-        .toast { position: fixed; top: max(20px, env(safe-area-inset-top, 20px)); left: 50%; transform: translate(-50%, -20px); opacity: 0; background: var(--bg-input); border: 1px solid var(--border-gray); color: var(--text-main); padding: 12px 24px; border-radius: 12px; font-size: 14px; font-weight: bold; pointer-events: none; transition: 0.3s; z-index: 9999; box-shadow: 0 10px 25px rgba(0,0,0,0.5); text-align: center; max-width: 90%;}
+        .toast { position: fixed; top: max(20px, env(safe-area-inset-top, 20px)); left: 50%; transform: translate(-50%, -20px); opacity: 0; background: var(--bg-input); border: 1px solid var(--border-gray); color: var(--text-main); padding: 12px 24px; border-radius: 12px; font-size: 14px; font-weight: bold; pointer-events: none; transition: 0.3s; z-index: 10000; box-shadow: 0 10px 25px rgba(0,0,0,0.5); text-align: center; max-width: 90%;}
         .toast.show { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
         .toast.error { background: #ef4444; color: white; border-color: #b91c1c; }
 
@@ -153,6 +155,12 @@
         .ext-select { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 8px center; background-size: 16px; padding-right: 24px; cursor: pointer; color: var(--accent-blue); }
 
         ::selection { background: var(--accent-blue); color: white; }
+        
+        /* THEME BUILDER CSS */
+        .color-picker-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 13px;}
+        .color-picker { border: none; width: 32px; height: 32px; border-radius: 4px; cursor: pointer; padding: 0; background: transparent; }
+        .color-picker::-webkit-color-swatch-wrapper { padding: 0; }
+        .color-picker::-webkit-color-swatch { border: 1px solid var(--border-gray); border-radius: 4px; }
     </style>
 </head>
 <body>
@@ -160,16 +168,17 @@
     <div class="container">
         <!-- Шапка -->
         <header class="main-header">
-            <button class="icon-btn btn-settings" id="btnSettingsModal" title="Настройки">⚙️</button>
-            <button class="icon-btn btn-plugins" id="btnPluginsModal" title="Плагины форматов">🧩</button>
+            <button class="icon-btn btn-settings" id="btnSettingsModal" title="Настройки Конструктора">⚙️</button>
+            <button class="icon-btn btn-plugins" id="btnPluginsModal" title="Подключить плагины форматов">🧩</button>
             <div class="main-header-content">
                 <h1>INCY <span>Tool</span></h1>
                 <p class="subtitle">Universal Config Engine 🚀</p>
             </div>
+            <button class="icon-btn btn-palette" id="btnThemeBuilder" title="Создать свою Тему">🎨</button>
             <button class="icon-btn btn-theme" id="btnThemeToggle" title="Сменить Тему">🌓</button>
         </header>
 
-        <!-- Шаг 1 -->
+        <!-- Шаг 1: Исходник -->
         <div class="card" id="step1-card">
             <div class="step-header">
                 <span class="badge">Шаг 1: Исходник</span>
@@ -177,11 +186,11 @@
                 <button class="btn-action btn-action-blue" onclick="document.getElementById('fileInput').click()">📁 Файл</button>
             </div>
             <div class="input-wrapper">
-                <textarea id="srcInput" class="resizable-box" placeholder="Вставьте ссылку, Base64, JSON..." autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" style="padding-bottom: 50px;"></textarea>
+                <textarea id="srcInput" class="resizable-box" placeholder="Вставьте ссылку, Base64, JSON или кастомный формат..." autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" style="padding-bottom: 50px;"></textarea>
                 <div class="abs-buttons">
                     <button class="btn-action btn-action-blue" id="btnPaste" style="border:none">📋 Вставить</button>
-                    <button class="btn-action btn-action-green" id="btnParseManually" style="border:none" title="Распознать">🔄 Распознать</button>
-                    <button class="btn-action btn-action-red" id="btnClear" style="border:none" title="Очистить">✕</button>
+                    <button class="btn-action btn-action-green" id="btnParseManually" style="border:none" title="Ручное распознавание">🔄 Распознать</button>
+                    <button class="btn-action btn-action-red" id="btnClear" style="border:none" title="Очистить Поле">✕</button>
                 </div>
             </div>
         </div>
@@ -232,20 +241,17 @@
                 <div class="editor-workspace">
                     <div class="line-numbers code-font" id="lineNumbers"><div>1</div></div>
                     <textarea id="jsonEditor" class="json-textarea code-font" wrap="off" spellcheck="false" autocapitalize="off" autocorrect="off" autocomplete="off"></textarea>
-                    <!-- Блок Визуала -->
                     <div id="visualGraph"></div>
                 </div>
                 
                 <div class="resizer" id="resizer"><div class="resizer-handle"></div></div>
             </div>
 
-            <!-- Блок для ошибки -->
             <div id="errorBox" class="error-box hidden"></div>
             
-            <!-- Кнопки Отмена/Сохранить -->
             <div class="editor-actions">
-                <button class="btn-action btn-action-red" id="btnCancelEdit" style="flex: 1; padding: 16px; border-radius: 12px; background: rgba(239, 68, 68, 0.1); border: 1px solid var(--red-text);" title="Откатиться">❌ Откатить</button>
-                <button class="btn-green" id="btnSaveJson" style="flex: 2; margin: 0;" title="Сохранить в Историю">💾 Сохранить</button>
+                <button class="btn-action btn-action-red" id="btnCancelEdit" style="flex: 1; padding: 16px; border-radius: 12px; background: rgba(239, 68, 68, 0.1); border: 1px solid var(--red-text);" title="Откатиться к последнему сохраненному">❌ Откатить</button>
+                <button class="btn-green" id="btnSaveJson" style="flex: 2; margin: 0;" title="Сохранить в Историю и обновить ссылки">💾 Сохранить</button>
             </div>
         </div>
 
@@ -270,7 +276,7 @@
                     </div>
                 </div>
                 <div id="customProtoContainer" class="custom-proto-container">
-                    <input type="text" id="customProtoInput" class="custom-proto-input" placeholder="Префикс (v2rayng)" spellcheck="false" autocomplete="off">
+                    <input type="text" id="customProtoInput" class="custom-proto-input" placeholder="Введите префикс (например: v2rayng)" spellcheck="false" autocomplete="off">
                 </div>
             </div>
 
@@ -278,7 +284,7 @@
             
             <div style="font-size: 11px; color: var(--text-muted); text-align: center; margin-bottom: 8px; margin-top: 16px; font-weight: bold; text-transform: uppercase;">Скопировать:</div>
             <div style="display: flex; gap: 8px; margin-bottom: 8px;">
-                <button class="btn-primary" id="btnCopyMini" style="flex: 1; background: rgba(59,130,246,0.1); border: 1px solid var(--accent-blue); color: var(--accent-blue); font-size: 13px;" title="Только для INCY">🪄 Сжатая (MINI)</button>
+                <button class="btn-primary" id="btnCopyMini" style="flex: 1; background: rgba(59,130,246,0.1); border: 1px solid var(--accent-blue); color: var(--accent-blue); font-size: 13px;" title="Только для INCY (Сжимает текст)">🪄 Сжатая (MINI)</button>
                 <button class="btn-primary" id="btnCopyResult" style="flex: 1; background: var(--bg-input); border: 1px solid var(--border-gray); color: var(--text-main); font-size: 13px;">📋 Полная</button>
             </div>
             
@@ -315,23 +321,23 @@
         </div>
     </div>
 
-    <!-- МОДАЛКА НАСТРОЕК -->
+    <!-- МОДАЛКА НАСТРОЕК UI -->
     <div class="modal-overlay" id="modalSettings">
         <div class="modal-card">
-            <div class="modal-header"> Настройки UI <button class="btn-action" onclick="toggleModal('modalSettings')">✕</button> </div>
+            <div class="modal-header"> Настройки Конструктора <button class="btn-action" onclick="toggleModal('modalSettings')">✕</button> </div>
             
             <div style="font-size:11px; color:var(--text-muted); margin-bottom:6px; font-weight:bold;">МОДУЛИ ПРОВЕРОК:</div>
             <div class="setting-row">
                 <div>
                     <label style="display:block; margin-bottom:2px; font-weight:bold;">Проверять синтаксис (Linter)</label>
-                    <span style="font-size:10px; color:var(--text-muted);">Отключите, если используете сторонние форматы (YAML/XML)</span>
+                    <span style="font-size:10px; color:var(--text-muted);">Отключите, если используете YAML/XML</span>
                 </div>
                 <input type="checkbox" id="uiLinter" class="toggle-checkbox" checked>
             </div>
             <div class="setting-row">
                 <div>
                     <label style="display:block; margin-bottom:2px;">Авто-Распознавание</label>
-                    <span style="font-size:10px; color:var(--text-muted);">Парсить ссылу мгновенно при вставке</span>
+                    <span style="font-size:10px; color:var(--text-muted);">Парсить ссылку мгновенно при вставке</span>
                 </div>
                 <input type="checkbox" id="uiAutoParse" class="toggle-checkbox" checked>
             </div>
@@ -342,14 +348,7 @@
             <div class="setting-row"><label>Шаг 3: Экспорт</label><input type="checkbox" id="uiExp" class="toggle-checkbox" checked></div>
             <div class="setting-row"><label>История</label><input type="checkbox" id="uiH" class="toggle-checkbox" checked></div>
             
-            <div style="font-size:11px; color:var(--text-muted); margin:16px 0 6px; font-weight:bold;">ТЕМЫ (БЭКАП/ВЫБОР):</div>
-            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom: 16px;">
-                <button class="btn-action" style="flex:1;" onclick="setTheme('default')">Dark</button>
-                <button class="btn-action" style="flex:1; background:#f3f4f6; color:#111;" onclick="setTheme('light')">Light</button>
-                <button class="btn-action" style="flex:1; background:#282a36; color:#bd93f9;" onclick="setTheme('dracula')">Drac</button>
-                <button class="btn-action" style="flex:1; background:#fcee09; color:#111;" onclick="setTheme('cyberpunk')">Cyber</button>
-            </div>
-            
+            <div style="font-size:11px; color:var(--text-muted); margin:16px 0 6px; font-weight:bold;">БЭКАП РАБОЧЕГО МЕСТА:</div>
             <div style="display:flex; gap:8px;">
                 <button class="btn-action" style="flex:1; background:var(--accent-blue); color:white; border:none;" id="btnBackupDump">💾 Выгрузить (.zip)</button>
                 <button class="btn-action" style="flex:1;" id="btnBackupLoad">📂 Загрузить</button>
@@ -358,16 +357,45 @@
         </div>
     </div>
 
+    <!-- НОВАЯ МОДАЛКА: THEME BUILDER (Меню Тем) -->
+    <div class="modal-overlay" id="modalThemeBuilder">
+        <div class="modal-card">
+            <div class="modal-header"> 🎨 Дизайн и Темы <button class="btn-action" onclick="toggleModal('modalThemeBuilder')">✕</button> </div>
+            
+            <div style="font-size:11px; color:var(--text-muted); margin-bottom:6px; font-weight:bold;">СТАНДАРТНЫЕ ПРЕСЕТЫ:</div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom: 16px;">
+                <button class="btn-action" style="flex:1;" onclick="setTheme('default')">Dark</button>
+                <button class="btn-action" style="flex:1; background:#f3f4f6; color:#111;" onclick="setTheme('light')">Light</button>
+                <button class="btn-action" style="flex:1; background:#282a36; color:#bd93f9;" onclick="setTheme('dracula')">Drac</button>
+                <button class="btn-action" style="flex:1; background:#fcee09; color:#111;" onclick="setTheme('cyberpunk')">Cyber</button>
+            </div>
+
+            <div style="font-size:11px; color:var(--text-muted); margin-bottom:12px; font-weight:bold;">МОЯ ТЕМА (CUSTOM):</div>
+            <div style="background:var(--bg-input); padding: 12px; border-radius: 12px; border: 1px solid var(--border-gray); margin-bottom: 16px;">
+                <div class="color-picker-row"> <span>Главный Фон</span> <input type="color" class="color-picker" id="cp_bg_body" value="#0a0d14"> </div>
+                <div class="color-picker-row"> <span>Фон Блоков (Карточки)</span> <input type="color" class="color-picker" id="cp_bg_card" value="#111827"> </div>
+                <div class="color-picker-row"> <span>Основной Текст</span> <input type="color" class="color-picker" id="cp_text_main" value="#e5e7eb"> </div>
+                <div class="color-picker-row"> <span>Акцент (Кнопки)</span> <input type="color" class="color-picker" id="cp_accent_blue" value="#3b82f6"> </div>
+                <div class="color-picker-row"> <span>Цвет Кода (JSON)</span> <input type="color" class="color-picker" id="cp_code_color" value="#60a5fa"> </div>
+                
+                <button class="btn-green" style="margin-top: 12px;" onclick="applyAndSaveCustomTheme()">✅ Применить мою тему</button>
+            </div>
+
+            <div style="display:flex; gap:8px;">
+                <button class="btn-action" style="flex:1;" onclick="exportCustomTheme()">🔗 Копировать тему</button>
+                <button class="btn-action" style="flex:1;" onclick="importCustomTheme()">📋 Вставить тему</button>
+            </div>
+        </div>
+    </div>
+
     <!-- МОДАЛКА ПЛАГИНОВ -->
     <div class="modal-overlay" id="modalPlugins">
         <div class="modal-card">
             <div class="modal-header"> 🧩 Плагины (Extensions) <button class="btn-action" onclick="toggleModal('modalPlugins')">✕</button> </div>
-            <p style="font-size:12px; color:var(--text-muted); margin-bottom: 16px;">
-                Здесь можно установить сторонние JS-скрипты, чтобы научить редактор понимать и проверять YAML, XML и другие форматы.
-            </p>
+            <p style="font-size:12px; color:var(--text-muted); margin-bottom: 16px;"> Установите JS-скрипт с интернета, чтобы редактор начал понимать YAML, XML и другие форматы. </p>
             <div style="display:flex; gap:8px; margin-bottom:16px;">
-                <input type="text" id="pluginUrl" class="resizable-box" style="padding:10px; min-height:40px; font-size:12px;" placeholder="Вставьте прямую ссылку на .js скрипт">
-                <button class="btn-green" id="btnInstallPlugin" style="padding:10px !important; width:auto;">💾 Загрузить</button>
+                <input type="text" id="pluginUrl" class="resizable-box" style="padding:10px; min-height:40px; font-size:12px;" placeholder="Прямая ссылка на .js скрипт">
+                <button class="btn-green" id="btnInstallPlugin" style="padding:10px !important; width:auto;">💾</button>
             </div>
             <div style="font-size:11px; color:var(--text-muted); margin-bottom:6px; font-weight:bold;">УСТАНОВЛЕННО:</div>
             <div id="pluginsList"></div>
@@ -378,9 +406,9 @@
     <div class="modal-overlay" id="modalSnippets">
         <div class="modal-card">
             <div class="modal-header"> Шаблоны Кода <button class="btn-action" onclick="toggleModal('modalSnippets')">✕</button> </div>
-            <p style="font-size:12px; color:var(--text-muted); margin-bottom: 12px;">Шаблон вставится туда, где мигает курсор в редакторе.</p>
-            <div class="setting-row" onclick="window.insSnip('dns')" style="cursor:pointer; display:block;"> <strong style="color:var(--accent-blue);">+ Базовый DNS</strong><br><span style="font-size:11px; color:var(--text-muted);">Стандартные DNS Google и Cloudflare без утечек</span> </div>
-            <div class="setting-row" onclick="window.insSnip('routing')" style="cursor:pointer; display:block;"> <strong style="color:var(--accent-blue);">+ Routing: Блокировка РФ</strong><br><span style="font-size:11px; color:var(--text-muted);">Обход блокировок для RU-сегмента</span> </div>
+            <p style="font-size:12px; color:var(--text-muted); margin-bottom: 12px;">Шаблон вставится туда, где мигает курсор.</p>
+            <div class="setting-row" onclick="window.insSnip('dns')" style="cursor:pointer; display:block;"> <strong style="color:var(--accent-blue);">+ Базовый DNS</strong><br><span style="font-size:11px; color:var(--text-muted);">Стандартные DNS Google + Local</span> </div>
+            <div class="setting-row" onclick="window.insSnip('routing')" style="cursor:pointer; display:block;"> <strong style="color:var(--accent-blue);">+ Routing: Блокировка РФ</strong><br><span style="font-size:11px; color:var(--text-muted);">Обход блокировок (geosite:ru)</span> </div>
         </div>
     </div>
 
@@ -388,7 +416,7 @@
     <div class="modal-overlay" id="modalCloud">
         <div class="modal-card">
             <div class="modal-header"> 🚀 Cloud Share <button class="btn-action" onclick="toggleModal('modalCloud')">✕</button> </div>
-            <p style="font-size:12px; color:var(--text-muted); margin-bottom: 16px;">Ваш конфиг надёжно зашифруется стандартом AES-GCM-256 прямо на телефоне. Сервера увидят лишь бинарный мусор.</p>
+            <p style="font-size:12px; color:var(--text-muted); margin-bottom: 16px;">Код надёжно шифруется ключом AES-GCM-256 прямо в памяти браузера.</p>
             <input type="text" id="sharePassword" class="resizable-box" style="margin-bottom:12px; min-height:40px; padding:10px;" placeholder="Пароль защиты (можно пустой)">
             <button class="btn-primary" id="btnGenerateCloud">🔐 Зашифровать</button>
             <div id="shareResultBlock" class="hidden" style="margin-top:16px;">
@@ -421,10 +449,17 @@
         window.addEventListener('beforeunload', function (e) { if (hasUnsavedChanges) { e.preventDefault(); e.returnValue = 'Остались несохраненные изменения!'; } });
 
         // --- УПРАВЛЕНИЕ МОДУЛЯМИ И ПОВЕДЕНИЕМ ---
-        const setTheme = th => { document.body.className = th!=='default'?`theme-${th}`:''; localStorage.setItem('incy_t', th); };
-        setTheme(localStorage.getItem('incy_t') || 'default');
+        const setTheme = th => { 
+            document.body.className = ''; 
+            document.documentElement.style = ''; // Очищаем кастом
+            if(th !== 'default' && th !== 'custom') document.body.classList.add(`theme-${th}`);
+            if(th === 'custom') { document.body.classList.add(`theme-custom`); loadAndApplyCustomTheme(); }
+            localStorage.setItem('incy_t', th); 
+        };
+
         g('btnThemeToggle').onclick = () => { vibe(); setTheme(document.body.className.includes('light')?'default':'light'); };
         g('btnSettingsModal').onclick = () => { vibe(); toggleModal('modalSettings', true); };
+        g('btnThemeBuilder').onclick = () => { vibe(); toggleModal('modalThemeBuilder', true); loadPickers(); };
         
         ['uiS1', 'uiS2', 'uiExp', 'uiH', 'uiAutoParse', 'uiLinter'].forEach(id => {
             let chk = g(id); let s = localStorage.getItem('incy_'+id); chk.checked = s!==null?s==='1':true;
@@ -438,14 +473,66 @@
             }); chk.dispatchEvent(new Event('change'));
         });
 
-        // --- ПЛАГИНЫ (РАСШИРЕНИЯ С ИНТЕРНЕТА) ---
+        // --- THEME BUILDER (Свои темы) ---
+        function applyAndSaveCustomTheme() {
+            vibe();
+            let themeObj = {
+                '--bg-body': g('cp_bg_body').value,
+                '--bg-card': g('cp_bg_card').value,
+                '--bg-input': g('cp_bg_body').value, // Связываем для гармонии (или можно добавить еще пикер)
+                '--text-main': g('cp_text_main').value,
+                '--accent-blue': g('cp_accent_blue').value,
+                '--code-color': g('cp_code_color').value,
+                '--border-gray': '#374151',
+                '--line-num-bg': g('cp_bg_card').value
+            };
+            localStorage.setItem('incy_custom_theme', JSON.stringify(themeObj));
+            setTheme('custom');
+            toggleModal('modalThemeBuilder', false);
+            showT('✅ Тема применена!');
+        }
+
+        function loadAndApplyCustomTheme() {
+            let saved = localStorage.getItem('incy_custom_theme');
+            if(saved) {
+                let themeObj = JSON.parse(saved);
+                for(let key in themeObj) document.documentElement.style.setProperty(key, themeObj[key]);
+            }
+        }
+
+        function loadPickers() {
+            let saved = localStorage.getItem('incy_custom_theme');
+            if(saved) {
+                let themeObj = JSON.parse(saved);
+                if(themeObj['--bg-body']) g('cp_bg_body').value = themeObj['--bg-body'];
+                if(themeObj['--bg-card']) g('cp_bg_card').value = themeObj['--bg-card'];
+                if(themeObj['--text-main']) g('cp_text_main').value = themeObj['--text-main'];
+                if(themeObj['--accent-blue']) g('cp_accent_blue').value = themeObj['--accent-blue'];
+                if(themeObj['--code-color']) g('cp_code_color').value = themeObj['--code-color'];
+            }
+        }
+
+        function exportCustomTheme() { vibe(); copyToC(localStorage.getItem('incy_custom_theme') || '{}'); showT('Дизайн скопирован в буфер!'); }
+        function importCustomTheme() {
+            vibe();
+            let json = prompt("Вставьте код кастомной темы:");
+            if(json) {
+                try {
+                    let obj = JSON.parse(json); if(!obj['--bg-body']) throw new Error();
+                    localStorage.setItem('incy_custom_theme', json);
+                    setTheme('custom'); loadPickers(); showT('Дизайн установлен!');
+                } catch(e) { showT('Неверный код темы', 1); }
+            }
+        }
+        setTheme(localStorage.getItem('incy_t') || 'default');
+
+        // --- ПЛАГИНЫ ---
         g('btnPluginsModal').onclick = () => { vibe(); toggleModal('modalPlugins', true); renderPlugins(); };
         
         const loadPluginsCore = () => {
             let plugs = JSON.parse(localStorage.getItem('incy_plugins') || '[]');
             plugs.forEach(p => { try { window.eval(p.code); } catch(e) { console.error("Ошибка в плагине", p.url); } });
         };
-        // Вызываем загрузку плагинов при старте страницы
         loadPluginsCore();
 
         const renderPlugins = () => {
@@ -468,9 +555,9 @@
                 plugs.push({id: Date.now(), url: url, code: code});
                 localStorage.setItem('incy_plugins', JSON.stringify(plugs));
                 try { window.eval(code); showT('Плагин запущен!'); } catch(e) { showT('Ошибка кода плагина', 1); }
-                g('pluginUrl').value = ''; renderPlugins(); g('btnInstallPlugin').textContent = '💾 Загрузить';
-                linter(); // Пропускаем проверку заново
-            } catch(e) { showT('Ошибка сервера (CORS)', 1); g('btnInstallPlugin').textContent = '💾 Загрузить'; }
+                g('pluginUrl').value = ''; renderPlugins(); g('btnInstallPlugin').textContent = '💾';
+                linter();
+            } catch(e) { showT('Ошибка сервера (CORS)', 1); g('btnInstallPlugin').textContent = '💾'; }
         };
 
         window.delPlugin = (id) => {
@@ -483,9 +570,7 @@
         const encodeB64 = str => btoa(unescape(encodeURIComponent(str))).replace(/=+$/, '');
         const decodeB64 = str => { let p = str.length % 4; if(p) str += '='.repeat(4 - p); return decodeURIComponent(escape(atob(str))); };
 
-        // --- ВЕЛИКИЙ LINTER / ВИЗУАЛЬНЫЙ ГРАФ / ОТКАТ ОШИБКИ ---
-        
-        // Эти 2 функции должны быть объявлены заранее, чтобы "Откатить/Визуал" не падали:
+        // --- ВЕЛИКИЙ LINTER / ВИЗУАЛЬНЫЙ ГРАФ ---
         const parseNode = (o) => { 
             let h = ''; 
             for(let k in o) { 
@@ -507,7 +592,6 @@
             }
         };
 
-        // Кнопка переключения Визуала
         g('btnViewToggle').onclick = function() { 
             vibe(); 
             let a = els.vGraph.classList.toggle('active'); 
@@ -535,10 +619,8 @@
             let val = els.jsonEditor.value;
             els.jsonEditor.style.borderColor = ''; [...els.tLineH.children].forEach(d => d.classList.remove('error')); els.errorBox.classList.add('hidden');
             
-            // Если ВЫКЛЮЧЕНО
             if(!g('uiLinter').checked) return true;
 
-            // Если ПЛАГИН
             if(window.INCY_CUSTOM_LINTER) {
                 let res = window.INCY_CUSTOM_LINTER(val);
                 if(res && res.error) {
@@ -550,7 +632,6 @@
                 return true;
             }
 
-            // Стандарт
             try { 
                 if(val.trim() !== '') JSON.parse(val); 
                 return true; 
@@ -567,19 +648,25 @@
             }
         };
 
-        // --- ИНСТРУМЕНТЫ РЕДАКТОРА (Undo, Resizer, Сниппеты) ---
-        function saveEdState(val) { if(edHist[edHist.length - 1] === val) return; edHist.push(val); if(edHist.length > 20) edHist.shift(); }
+        // --- ИНСТРУМЕНТЫ РЕДАКТОРА (ИДЕАЛЬНЫЙ UNDO И ОТКАТ) ---
+        // Сохраняем состояние только когда юзер ДЕЛАЕТ ПАУЗУ или жмет кнопки тулбара (чтобы Ундо работал блочно)
+        function saveEdState(val) { 
+            if(edHist[edHist.length - 1] === val) return; 
+            edHist.push(val); 
+            if(edHist.length > 30) edHist.shift(); 
+        }
         
         g('btnUndo').onclick = () => { 
             vibe(); 
             if(edHist.length > 1) { 
-                edHist.pop(); 
-                els.jsonEditor.value = edHist[edHist.length - 1]; 
+                edHist.pop(); // удаляем текущее
+                els.jsonEditor.value = edHist[edHist.length - 1]; // возвращаемся к предыдущему
                 updateLines(); 
                 showT("↶ Отменено"); 
                 hasUnsavedChanges = true; 
-                // Не используем dispatchEvent чтобы не перетирать edHist снова
+                // Обновляем визуал без триггера `input`, чтобы не сбить историю
                 if (els.vGraph.classList.contains('active')) buildG();
+                linter(); refreshLinks();
             } else { 
                 showT("Дальше отменять некуда", 1); 
             } 
@@ -587,13 +674,14 @@
 
         els.btnCancelEdit.onclick = () => {
             vibe();
-            els.jsonEditor.value = lastSavedJson; // Откат к последнему сохраненному состоянию
+            els.jsonEditor.value = lastSavedJson; // Откат к последнему ПРЯМО сохраненному состоянию (Кнопкой Завершить)
             updateLines();
+            saveEdState(els.jsonEditor.value); // Записываем в Undo
             if (els.vGraph.classList.contains('active')) buildG();
             linter();
             refreshLinks();
             hasUnsavedChanges = false;
-            showT("🔙 Откат к сохранённому");
+            showT("🔙 Откатили к сохранённому");
         };
 
         els.btnToggleFs.onclick = () => {
@@ -687,6 +775,7 @@
                 let safeProtocol = currentProtocol === 'custom' ? 'custom' : currentProtocol;
                 let newUrl = `${safeProtocol}://routing/onadd/${encodeB64(rawMinified)}`;
                 updateOutputLinks(newUrl, parsed.Name);
+                if(g('uiLinter').checked) { els.errorBox.classList.add('hidden'); [...els.tLineH.children].forEach(d => d.classList.remove('error')); }
             } catch(e) {}
         }
 
@@ -699,14 +788,16 @@
 
         const updateLines = () => { let ls = els.jsonEditor.value.split('\n').length || 1; els.tLineH.innerHTML = Array.from({length: ls}, (_, i) => `<div>${i+1}</div>`).join(''); els.bdgLines.textContent = ls; };
         
-        let liveUpdateTimer;
+        let liveUpdateTimer, typedDebounce;
         els.jsonEditor.addEventListener('input', () => { 
             hasUnsavedChanges = true; 
             updateLines(); 
-            saveEdState(els.jsonEditor.value); 
             if (els.vGraph.classList.contains('active')) buildG();
-            
             if(els.jsonEditor.value.length > 5) localStorage.setItem('incy_draft', els.jsonEditor.value);
+
+            // Сохраняем состояние для UNDO только когда юзер перестал печатать (Умный блок)
+            clearTimeout(typedDebounce);
+            typedDebounce = setTimeout(() => { saveEdState(els.jsonEditor.value); }, 600);
 
             clearTimeout(liveUpdateTimer);
             liveUpdateTimer = setTimeout(() => {
@@ -720,7 +811,6 @@
         
         els.btnFormat.onclick = () => {
             vibe(); 
-            // Плагин Форматирования
             if(window.INCY_CUSTOM_FORMATTER) {
                 try { els.jsonEditor.value = window.INCY_CUSTOM_FORMATTER(els.jsonEditor.value); updateLines(); showT('✨ Отформатировано (Плагином)'); return; } catch(e){}
             }
@@ -739,9 +829,7 @@
 
         els.btnSaveJson.onclick = () => {
             vibe();
-            if (g('uiLinter').checked && !linter()) {
-                showT("Исправьте ошибки перед сохранением!", 1); return;
-            }
+            if (g('uiLinter').checked && !linter()) { showT("Исправьте ошибки перед сохранением!", 1); return; }
             try {
                 let cname = "Config";
                 try { let p = JSON.parse(els.jsonEditor.value); if(p.Name) cname = p.Name; } catch(e){}
@@ -822,7 +910,7 @@
                     pushHist(cn, codeStr); 
                     showT("Успешно Распознано!"); 
                     els.editorBlockWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' }); 
-                    els.srcInput.value = ''; 
+                    els.srcInput.value = ''; // Чистим поле ввода после успеха
                 }
             } catch(e) { vibe(100); showT("Ошибка загрузки в редактор", 1); }
         }
@@ -855,7 +943,7 @@
             a.download = (els.pName.textContent.replace(/[^a-z0-9а-яё-]/gi, '_').toLowerCase() || 'config') + ext; a.click(); showT(`Скачано как ${ext}`);
         };
 
-        // --- УМНАЯ ИСТОРИЯ КОНФИГОВ И БЕЗОТКАЗНАЯ РАБОТА ---
+        // --- УМНАЯ ИСТОРИЯ ---
         const getH = () => { 
             let h = JSON.parse(localStorage.getItem('incy_history') || '[]'); 
             let needsFix = false;
@@ -896,8 +984,7 @@
 
         els.historyList.addEventListener('click', async e => {
             let t = e.target.closest('[data-act]'); if(!t) return; vibe(); 
-            let aid = Number(t.closest('.history-item').dataset.id);
-            let h = getH();
+            let aid = Number(t.closest('.history-item').dataset.id); let h = getH();
             let idx = h.findIndex(i=>i.id===aid); 
             if(idx === -1) { let fallbackName = t.closest('.history-item').querySelector('.history-title').textContent.replace(' ✏️','').trim(); idx = h.findIndex(i=>i.name === fallbackName); }
             if(idx === -1) return; 
@@ -910,28 +997,22 @@
             else if(act === 'dup') { let c=JSON.parse(JSON.stringify(h[idx])); c.id=Date.now(); c.name+=' (Copy)'; h.splice(idx+1,0,c); } 
             else if(act === 'load') { 
                 if (h[idx].content) {
-                    loadCfg(h[idx].content, false); 
-                    els.editorBlockWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                } else if (h[idx].url) {
-                    els.srcInput.value = h[idx].url;
-                    await handleSrc();
-                }
-                showT('Открыто в редакторе'); 
-                return; 
+                    loadCfg(h[idx].content, false); els.editorBlockWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } else if (h[idx].url) { els.srcInput.value = h[idx].url; await handleSrc(); }
+                showT('Открыто в редакторе'); return; 
             } 
             setH(h);
         });
 
         // --- БЭКАП КОНФИГА (.incybackup) ---
-        g('btnBackupDump').onclick = () => { vibe(); let w = { hist: getH(), t: localStorage.getItem('incy_t'), ui: { s1: g('uiS1').checked?1:0, s2: g('uiS2').checked?1:0, exp: g('uiExp').checked?1:0, h: g('uiH').checked?1:0, auto: g('uiAutoParse').checked?1:0, lin: g('uiLinter').checked?1:0 }, plugs: JSON.parse(localStorage.getItem('incy_plugins')||'[]') }; let a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(w)], {type:"application/json"})); a.download = `incy_backup.incybackup`; a.click(); showT('Бэкап скачан!'); };
+        g('btnBackupDump').onclick = () => { vibe(); let w = { hist: getH(), t: localStorage.getItem('incy_t'), tObj: localStorage.getItem('incy_custom_theme'), ui: { s1: g('uiS1').checked?1:0, s2: g('uiS2').checked?1:0, exp: g('uiExp').checked?1:0, h: g('uiH').checked?1:0, auto: g('uiAutoParse').checked?1:0, lin: g('uiLinter').checked?1:0 }, plugs: JSON.parse(localStorage.getItem('incy_plugins')||'[]') }; let a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(w)], {type:"application/json"})); a.download = `incy_backup.incybackup`; a.click(); showT('Бэкап скачан!'); };
         g('btnBackupLoad').onclick = () => { vibe(); g('backupFile').click(); };
-        g('backupFile').onchange = e => { let file = e.target.files[0]; if(!file)return; let rd = new FileReader(); rd.onload = ev => { try { let p = JSON.parse(ev.target.result.trim()); if(p.hist) { setH(p.hist); setTheme(p.t||'default'); if(p.plugs) { localStorage.setItem('incy_plugins', JSON.stringify(p.plugs)); loadPluginsCore(); } if(p.ui) { ['uiS1', 'uiS2', 'uiExp', 'uiH', 'uiAutoParse', 'uiLinter'].forEach(id => { let key = id.replace('ui', ''); key = key==='Linter'?'lin':key.toLowerCase(); if(p.ui[key] !== undefined) { g(id).checked = p.ui[key]===1; g(id).dispatchEvent(new Event('change')); } }); } toggleModal('modSettings', false); showT('Восстановлено!'); } } catch(err){ showT('Файл поврежден', 1); } }; rd.readAsText(file); e.target.value=''; };
+        g('backupFile').onchange = e => { let file = e.target.files[0]; if(!file)return; let rd = new FileReader(); rd.onload = ev => { try { let p = JSON.parse(ev.target.result.trim()); if(p.hist) { setH(p.hist); if(p.tObj) localStorage.setItem('incy_custom_theme', p.tObj); setTheme(p.t||'default'); if(p.plugs) { localStorage.setItem('incy_plugins', JSON.stringify(p.plugs)); loadPluginsCore(); } if(p.ui) { ['uiS1', 'uiS2', 'uiExp', 'uiH', 'uiAutoParse', 'uiLinter'].forEach(id => { let key = id.replace('ui', ''); key = key==='Linter'?'lin':key.toLowerCase(); if(p.ui[key] !== undefined) { g(id).checked = p.ui[key]===1; g(id).dispatchEvent(new Event('change')); } }); } toggleModal('modSettings', false); showT('Восстановлено!'); } } catch(err){ showT('Файл поврежден', 1); } }; rd.readAsText(file); e.target.value=''; };
 
-        // --- CLOUD ШИФРОВАНИЕ (AES-256) ЗАЩИТА ---
+        // --- CLOUD ШИФРОВАНИЕ ---
         const deriveK = async(p,s)=>crypto.subtle.deriveKey({name:"PBKDF2",salt:s,iterations:100000,hash:"SHA-256"}, await crypto.subtle.importKey("raw",new TextEncoder().encode(p),{name:"PBKDF2"},0,["deriveKey"]),{name:"AES-GCM",length:256},0,["encrypt","decrypt"]);
         g('btnOpenCloudModal').onclick = () => { vibe(); toggleModal('modalCloud', true); g('shareResultBlock').classList.add('hidden'); };
         g('btnGenerateCloud').onclick = async () => { vibe(); if(g('uiLinter').checked && !linter()) {showT('Исправьте код',1); return;} try { let p = g('sharePassword').value || Math.random().toString(36).slice(-8); let salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12)); let enc = await crypto.subtle.encrypt({name: "AES-GCM", iv}, await deriveK(p,salt), new TextEncoder().encode(els.jsonEditor.value)); let su = `${window.location.origin}${window.location.pathname}?sid=${encodeURIComponent(btoa(String.fromCharCode(...new Uint8Array(enc))))}&s=${encodeURIComponent(btoa(String.fromCharCode(...salt)))}&i=${encodeURIComponent(btoa(String.fromCharCode(...iv)))}#${p}`; g('shareUrlOut').value = su; g('shareResultBlock').classList.remove('hidden'); let img = new Image(); img.crossOrigin = "Anonymous"; img.onload = () => { let ctx = g('qrCanvas').getContext('2d'); ctx.canvas.width=200; ctx.canvas.height=200; ctx.clearRect(0,0,200,200); ctx.drawImage(img,0,0,200,200); }; img.src = `https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=${encodeURIComponent(su)}&choe=UTF-8`; showT('Зашифровано AES256!'); } catch(e) { showT('Ошибка шифрования', 1); } };
-        
         async function decryptCloud(u) { try { let url=new URL(u), p=url.hash.substring(1), sid=url.searchParams.get('sid'), s=url.searchParams.get('s'), i=url.searchParams.get('i'); if(!p||!sid||!s||!i)return; let dec = await crypto.subtle.decrypt({name:"AES-GCM", iv:Uint8Array.from(atob(i),c=>c.charCodeAt(0))}, await deriveK(p, Uint8Array.from(atob(s),c=>c.charCodeAt(0))), Uint8Array.from(atob(sid),c=>c.charCodeAt(0))); els.srcInput.value = new TextDecoder().decode(dec); handleSrc(); showT('🔓 Облако расшифровано'); } catch(e) { showT('Ссылка или ключ поврежден', 1); els.srcInput.value=''; } }
         if(window.location.hash && window.location.search.includes('sid=')) decryptCloud(window.location.href);
 
