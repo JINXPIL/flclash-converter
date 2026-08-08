@@ -18,28 +18,65 @@ jobs:
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
 
-      - name: ⚙️ Build Happ & Incy Configs and Deeplinks
+      - name: ⚙️ Build Configs, Deeplinks & Update HTML
         shell: bash
         run: |
           set -euo pipefail
           
           NOW_EPOCH="$(date -u +%s)"
           
-          # 1. Обновляем время
+          # 1. Обновляем время в исходном HAPP/DEFAULT.json
           tmp="$(mktemp)"
           jq --arg ts "$NOW_EPOCH" '.LastUpdated = $ts' HAPP/DEFAULT.json > "$tmp"
           mv "$tmp" HAPP/DEFAULT.json
           
-          # 2. Создаем папку INCY и копируем JSON
+          # 2. Создаем папки
           mkdir -p INCY
+          mkdir -p Throne
+          
+          # 3. Копируем JSON для INCY
           cp HAPP/DEFAULT.json INCY/DEFAULT.json
           
-          # 3. Кодируем в Base64
-          BASE64=$(jq -c . HAPP/DEFAULT.json | base64 -w 0)
+          # 4. Кодируем HAPP/INCY в Base64
+          HAPP_BASE64=$(jq -c . HAPP/DEFAULT.json | base64 -w 0)
           
-          # 4. СОЗДАЕМ ФАЙЛЫ С ТВОИМИ ИМЕНАМИ!
-          printf 'happ://routing/onadd/%s\n' "$BASE64" > HAPP/HAPP_INSTALL.DEEPLINK
-          printf 'incy://routing/onadd/%s\n' "$BASE64" > INCY/INCY_INSTALL.DEEPLINK
+          # 5. Создаем файлы DEEPLINK
+          printf 'happ://routing/onadd/%s\n' "$HAPP_BASE64" > HAPP/HAPP_INSTALL.DEEPLINK
+          printf 'incy://routing/onadd/%s\n' "$HAPP_BASE64" > INCY/INCY_INSTALL.DEEPLINK
+          
+          # 6. КОНВЕРТАЦИЯ В THRONE
+          jq -c '{
+            default_outbound: "proxy",
+            kind: "throne-route-profile",
+            name: .Name,
+            rules: [
+              { action: "hijack-dns", name: "Route DNS", protocol: "dns", type: "custom" },
+              { action: "route", domain: [.DirectSites[]? | select(startswith("domain:")) | sub("domain:"; "")], ip_cidr: [.DirectIp[]? | select(test("^[0-9a-fA-F.:/]+$"))], name: "Simple Address Bypass", outbound: "direct", type: "simple_address_bypass" },
+              { action: "reject", domain: [.BlockSites[]? | select(startswith("domain:")) | sub("domain:"; "")], name: "Simple Address Block", type: "simple_address_block" },
+              { action: "route", domain: [.ProxySites[]? | select(startswith("domain:")) | sub("domain:"; "")], name: "Simple Address Proxy", outbound: "proxy", type: "simple_address_proxy" }
+            ],
+            v: 1
+          }' HAPP/DEFAULT.json > Throne/throne_temp.json
+
+          THRONE_BASE64=$(cat Throne/throne_temp.json | base64 -w 0)
+          printf 'throne://route/%s\n' "$THRONE_BASE64" > Throne/Throne_INSTALL.DEEPLINK
+          rm Throne/throne_temp.json
+
+          # 7. 🔥 ОБНОВЛЕНИЕ ССЫЛОК В HTML ФАЙЛАХ 🔥
+          # Ищем старые Base64 ссылки и заменяем на новые во всех HTML инструментах
+          if [ -f "INCY_Tool.html" ]; then
+            sed -i -E 's|happ://routing/onadd/[A-Za-z0-9+/=]+|happ://routing/onadd/'"$HAPP_BASE64"'|g' INCY_Tool.html
+            sed -i -E 's|incy://routing/onadd/[A-Za-z0-9+/=]+|incy://routing/onadd/'"$HAPP_BASE64"'|g' INCY_Tool.html
+            sed -i -E 's|throne://route/[A-Za-z0-9+/=]+|throne://route/'"$THRONE_BASE64"'|g' INCY_Tool.html
+          fi
+          
+          if [ -f "happ.html" ]; then
+            sed -i -E 's|happ://routing/onadd/[A-Za-z0-9+/=]+|happ://routing/onadd/'"$HAPP_BASE64"'|g' happ.html
+          fi
+
+          if [ -f "incy.html" ]; then
+            sed -i -E 's|incy://routing/onadd/[A-Za-z0-9+/=]+|incy://routing/onadd/'"$HAPP_BASE64"'|g' incy.html
+          fi
 
       - name: 🚀 Commit and push changes
         shell: bash
@@ -49,12 +86,13 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
-          git add HAPP/ INCY/
+          # Добавляем все измененные папки и HTML-файлы
+          git add HAPP/ INCY/ Throne/ *.html
           
           if git diff --cached --quiet; then
             echo "No changes to commit."
             exit 0
           fi
           
-          git commit -m "⚡ Auto-update Happ & Incy configs [$(date -u +%Y-%m-%d %H:%M)]"
+          git commit -m "⚡ Auto-update Configs & HTML Deeplinks [$(date -u +%Y-%m-%d %H:%M)]"
           git push
