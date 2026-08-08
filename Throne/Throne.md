@@ -1,5 +1,4 @@
 ---
-```markdown
 <p align="center">
   <a href="Throne.en.md">🇺🇸 English</a> •
   <a href="Throne.md"><b>🇷🇺 Русский</b></a> •
