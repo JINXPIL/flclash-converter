@@ -1,3 +1,17 @@
+---
+
+### 🇷🇺 1. Русский (`Throne.md`)
+
+```markdown
+<p align="center">
+  <a href="Throne.en.md">🇺🇸 English</a> •
+  <a href="Throne.md"><b>🇷🇺 Русский</b></a> •
+  <a href="Throne.zh.md">🇨🇳 简体中文</a> •
+  <a href="Throne.zh-TW.md">🇹🇼 繁體中文</a> •
+  <a href="Throne.fa.md">🇮🇷 فارسی</a> •
+  <a href="Throne.es.md">🇪🇸 Español</a>
+</p>
+
 # 👑 Профиль маршрутизации Throne (NekoRay / NekoBox)
 
 В этой папке находится готовый профиль маршрутизации для клиентов на базе ядра Sing-box / Xray (**Throne, NekoRay, NekoBox**). 
@@ -859,3 +873,5 @@ domain:log.tiktokv.com
 > **Что будет с остальными сайтами?**
 > Если вы откроете сайт, которого нет ни в одном из списков выше (например, любой неизвестный или новый зарубежный ресурс), сработает встроенное правило **«Outbound по умолчанию: proxy»**, и этот сайт безопасно откроется через ваш VPN.
 ```
+
+---
