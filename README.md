@@ -26,7 +26,7 @@
 
 <p align="center">
   <b>Экстремально мощный и 100% локальный веб-инструмент для управления гигантскими базами прокси-серверов.</b><br>
-  <i>Парсинг, конвертация и глубокая оптимизация конфигураций для FlClash, Exclave, Sing-box, Clash Meta, а также мобильная PWA-среда для INCY / HAPP.</i>
+  <i>Парсинг, конвертация и глубокая оптимизация конфигураций для FlClash, Exclave, Sing-box, Clash Meta, Throne, а также мобильная PWA-среда для INCY / HAPP.</i>
 </p>
 
 <p align="center">
@@ -91,6 +91,7 @@
 
 ### 🔥 Что нового в версии 17.05 ULTRA? (The HighLoad Perfection)
 
+* 👑 **Интеграция с Throne:** Добавлена поддержка создания и размещения зашифрованных профилей маршрутизации (`throne://`) для современного десктопного клиента Throne.
 * 🌐 **Глобальное расширение протоколов:** Добавлена полная поддержка парсинга **VMess, Hysteria2 (hy2), Shadowsocks (SS) и ShadowsocksR (SSR)**.
 * 🚀 **Экстремальная производительность (HighLoad):** Внедрен асинхронный чанкинг и `Set`-словари. Виртуализация DOM позволяет загружать и очищать от дублей **250 000+ узлов** за миллисекунды без зависания браузера.
 * 🛡️ **Бронебойный санитайзер YAML:** Индустриальный Face-Control. Скрипт автоматически уничтожает мусор из паблик-листов (невидимые ASCII-символы, фейковые шифры `2022-blake3`, пустые пароли) и гарантирует 100% стабильный импорт в Mihomo.
@@ -124,7 +125,15 @@
 <thead><tr><th align="left">Платформа</th><th align="left">Конфигурация</th><th align="left">Ссылка для импорта</th></tr></thead>
 <tbody>
 <tr>
-  <td><b>Happ (Routing)</b></td>
+  <td>👑 <b>Throne</b><br><i>(Desktop Client)</i></td>
+  <td>Идеальное разделение трафика (Госуслуги, банки РФ напрямую, заблокированное — через VPN). Вшит блокировщик рекламы.</td>
+  <td>
+    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/Throne/Throne_INSTALL.DEEPLINK">⚡ Скопировать Deeplink</a><br>
+    <a href="https://github.com/JINXPIL/flclash-converter/tree/main/Throne">📄 Просмотр описания</a>
+  </td>
+</tr>
+<tr>
+  <td>📱 <b>Happ (Routing)</b></td>
   <td>Оптимизировано для Крыма, СевГУ, вшит AdBlock</td>
   <td>
     <a href="https://jinxpil.github.io/flclash-converter/happ.html">⚡ Быстрая установка (1 клик)</a><br>
@@ -132,7 +141,7 @@
   </td>
 </tr>
 <tr>
-  <td><b>INCY (Routing)</b></td>
+  <td>📱 <b>INCY (Routing)</b></td>
   <td>Оптимизировано для Крыма, СевГУ, вшит AdBlock</td>
   <td>
     <a href="https://jinxpil.github.io/flclash-converter/incy.html">⚡ Быстрая установка (1 клик)</a><br>
@@ -140,7 +149,7 @@
   </td>
 </tr>
 <tr>
-  <td><b>Mihomo / Clash Meta</b></td>
+  <td>⚙️ <b>Mihomo / Clash Meta</b></td>
   <td>v79.0 Ultimate (Защита от DPI-анализаторов, строгий TLS)</td>
   <td><a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/MIHOMO/ULTIMATE.yml">🔗 Импорт YML Конфига</a></td>
 </tr>
@@ -164,7 +173,7 @@
 <tbody>
 <tr>
   <td>🔴 <b>BLOCK (Блокировка)</b></td>
-  <td>Реклама, трекеры, телеметрия (экономим трафик сервера и батарею устройства)</td>
+  <td>Реклама, трекеры, телеметрия (экономим трафик сервера и ресурсы устройства)</td>
 </tr>
 <tr>
   <td>🟢 <b>DIRECT (Напрямую)</b></td>
@@ -199,7 +208,20 @@
 
 ---
 > [!NOTE]
-> Такие популярные клиенты, как **NekoBox** и **NekoRay**, на текущий момент считаются устаревшими. Рекомендуется переходить на актуальные и оптимизированные аналоги под современные ядра **sing-box** и **Xray**.
+> Такие некогда популярные клиенты, как **NekoBox** и **NekoRay**, на текущий момент считаются устаревшими. Рекомендуется переходить на актуальные оптимизированные аналоги (например, кроссплатформенный клиент **Throne**) под современные ядра **sing-box** и **Xray**.
+
+<details>
+<summary><b>💻 Desktop (Win/Mac/Linux)</b></summary>
+
+* [Throne](https://github.com/throneproj/Throne) — 👑 Мощный современный наследник NekoRay с расширенным функционалом и кроссплатформенностью. **(Рекомендуем)**
+* [Happ](https://www.happ.su/main) — Кроссплатформенная десктопная версия.
+* [v2RayTun](https://v2raytun.com/) — Высокоскоростной и безопасный клиент на базе ядра Xray Core.
+* [v2rayN](https://github.com/2dust/v2rayN) — Мощный настраиваемый клиент для Windows.
+* [FlClash](https://github.com/chen08209/FlClash) — Минималистичный и быстрый GUI.
+* [Karing](https://github.com/KaringX/karing)
+* [Clash Verge Rev](https://github.com/clash-verge-rev/clash-verge-rev)
+* ~~[NekoRay](https://github.com/MatsuriDayo/nekoray)~~ *(Устарел, используйте Throne)*
+</details>
 
 <details>
 <summary><b>🤖 Android</b></summary>
@@ -230,18 +252,6 @@
 * [V2Lite VPN](https://apps.apple.com/us/app/v2lite-vpn-super-vpn-proxy/id6444585377)
 </details>
 
-<details>
-<summary><b>💻 Desktop (Win/Mac/Linux)</b></summary>
-
-* [v2RayTun](https://v2raytun.com/) — Высокоскоростной и безопасный клиент на базе ядра Xray Core.
-* [Happ](https://www.happ.su/main) — Кроссплатформенная десктопная версия.
-* [v2rayN](https://github.com/2dust/v2rayN) — Мощный настраиваемый клиент для Windows.
-* [FlClash](https://github.com/chen08209/FlClash) — Минималистичный и быстрый GUI.
-* [Karing](https://github.com/KaringX/karing)
-* [Clash Verge Rev](https://github.com/clash-verge-rev/clash-verge-rev)
-* ~~[NekoRay](https://github.com/MatsuriDayo/nekoray)~~ *(Устарел)*
-</details>
-
 ---
 
 ### 🛡️ Альтернативные инструменты (DPI Bypass & Proxy)
@@ -258,6 +268,6 @@
 
 ### ⭐ Поддержка проекта
 
-**Если Network Builder ULTRA или мобильный INCY Tool помогли вам, не забудьте поставить звезду! Это очень мотивирует развивать проект дальше.** :star2:
+**Если Network Builder ULTRA, мобильный INCY Tool или наши профили помогли вам, не забудьте поставить звезду! Это очень мотивирует развивать проект дальше.** :star2:
 
 [![Star History Chart](https://api.star-history.com/svg?repos=JINXPIL/flclash-converter&type=Date)](https://star-history.com/#JINXPIL/flclash-converter&Date)
