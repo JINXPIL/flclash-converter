@@ -1,7 +1,4 @@
 ---
-
-### 🇷🇺 1. Русский (`Throne.md`)
-
 ```markdown
 <p align="center">
   <a href="Throne.en.md">🇺🇸 English</a> •
