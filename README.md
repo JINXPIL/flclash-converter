@@ -129,7 +129,7 @@
   <td>Идеальное разделение трафика (Госуслуги, банки РФ напрямую, заблокированное — через VPN). Вшит блокировщик рекламы.</td>
   <td>
     <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/Throne/Throne_INSTALL.DEEPLINK">⚡ Скопировать Deeplink</a><br>
-    <a href="https://github.com/JINXPIL/flclash-converter/tree/main/Throne">📄 Просмотр описания</a>
+    <a href="https://github.com/JINXPIL/flclash-converter/blob/main/Throne/Throne.md">📄 Просмотр описания</a>
   </td>
 </tr>
 <tr>
