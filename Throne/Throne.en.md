@@ -870,4 +870,3 @@ domain:log.tiktokv.com
 > [!NOTE]
 > **What happens to other sites?**
 > If you open a site that is not in any of the lists above (for example, any unknown or new foreign resource), the built-in rule **"Default outbound: proxy"** will trigger, and this site will safely open through your VPN.
-```
