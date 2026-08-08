@@ -62,13 +62,8 @@ jobs:
           printf 'throne://route/%s\n' "$THRONE_BASE64" > Throne/Throne_INSTALL.DEEPLINK
           rm Throne/throne_temp.json
 
-          # 7. 🔥 ОБНОВЛЕНИЕ ССЫЛОК В HTML ФАЙЛАХ 🔥
-          # Ищем старые Base64 ссылки и заменяем на новые во всех HTML инструментах
-          if [ -f "INCY_Tool.html" ]; then
-            sed -i -E 's|happ://routing/onadd/[A-Za-z0-9+/=]+|happ://routing/onadd/'"$HAPP_BASE64"'|g' INCY_Tool.html
-            sed -i -E 's|incy://routing/onadd/[A-Za-z0-9+/=]+|incy://routing/onadd/'"$HAPP_BASE64"'|g' INCY_Tool.html
-            sed -i -E 's|throne://route/[A-Za-z0-9+/=]+|throne://route/'"$THRONE_BASE64"'|g' INCY_Tool.html
-          fi
+          # 7. 🔥 ОБНОВЛЕНИЕ ССЫЛОК ТОЛЬКО НА СТАТИЧНЫХ СТРАНИЦАХ 🔥
+          # Мы больше не трогаем INCY_Tool.html, чтобы не сломать его JavaScript-логику!
           
           if [ -f "happ.html" ]; then
             sed -i -E 's|happ://routing/onadd/[A-Za-z0-9+/=]+|happ://routing/onadd/'"$HAPP_BASE64"'|g' happ.html
@@ -86,8 +81,8 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
-          # Добавляем все измененные папки и HTML-файлы
-          git add HAPP/ INCY/ Throne/ *.html
+          # Индексируем изменения
+          git add HAPP/ INCY/ Throne/ happ.html incy.html
           
           if git diff --cached --quiet; then
             echo "No changes to commit."
