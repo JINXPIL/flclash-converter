@@ -273,7 +273,7 @@
             <div id="errorBox" class="error-box hidden"></div>
             
             <div class="editor-actions">
-                <button class="btn-action btn-action-red" id="btnCancelEdit" style="flex: 1; padding: 16px; border-radius: 12px; background: rgba(239, 68, 68, 0.1); border: 1px solid var(--red-text);" title="Откатиться к последнему">❌ Откатить</button>
+                <button class="btn-action btn-action-red" id="btnCancelEdit" style="flex: 1; padding: 16px; border-radius: 12px; background: rgba(239, 68, 68, 0.1); border: 1px solid var(--red-text);" title="Отменить изменения">❌ Отмена</button>
                 <button class="btn-green" id="btnSaveJson" style="flex: 2; margin: 0;" title="Сохранить в Историю и обновить ссылки">💾 Сохранить</button>
             </div>
         </div>
@@ -906,7 +906,6 @@
             let jsonStr = null;
             if (val.startsWith('{')) { try { JSON.parse(val); jsonStr = val; } catch(e) {} }
             if (!jsonStr) {
-                // Поддержка обеих ссылок: /onadd/ и /add/
                 let b64 = val.includes('://') ? (val.split('://')[1].split(/\/onadd\/|\/add\//)[1] || val.split('://')[1]) : val;
                 try {
                     let bytes = new Uint8Array(atob(b64.padEnd(b64.length + (4 - b64.length % 4) % 4, '=')).split('').map(c=>c.charCodeAt(0)));
@@ -917,15 +916,27 @@
             if(jsonStr) { loadCfg(jsonStr, true); } else { if (val.length > 30 && !val.includes(" ")) { vibe(100); showT("ФОРМАТ НЕ РАСПОЗНАН", 1); } }
         }
 
+        // ====== ФИКС ФОРМАТИРОВАНИЯ ИМПОРТИРОВАННОГО КОДА ======
         function loadCfg(codeStr, saveToHistoryFlag = true) {
             try {
                 g('searchBar').classList.add('hidden');
-                let cn = "New Config"; try { let j = JSON.parse(codeStr); if(j.Name) cn = j.Name; } catch(e){}
-                els.jsonEditor.value = codeStr; lastSavedJson = codeStr; edHist = [codeStr];
+                let cn = "New Config"; 
+                let formattedStr = codeStr;
+                
+                // Пробуем распарсить и сразу красиво отформатировать JSON
+                try { 
+                    let j = JSON.parse(codeStr); 
+                    if(j.Name) cn = j.Name; 
+                    formattedStr = JSON.stringify(j, null, 4); // <- Вот эта магия разворачивает сжатый код
+                } catch(e){}
+                
+                els.jsonEditor.value = formattedStr; 
+                lastSavedJson = formattedStr; 
+                edHist = [formattedStr];
                 
                 if (els.editorBlockWrapper.classList.contains('hidden') && saveToHistoryFlag) { g('uiS2').checked = true; g('uiS2').dispatchEvent(new Event('change')); }
                 updateLines(); linter(); refreshLinks();
-                if (saveToHistoryFlag) { pushHist(cn, codeStr); showT("Успешно Распознано!"); els.editorBlockWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' }); els.srcInput.value = ''; }
+                if (saveToHistoryFlag) { pushHist(cn, formattedStr); showT("Успешно Распознано!"); els.editorBlockWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' }); els.srcInput.value = ''; }
             } catch(e) { vibe(100); showT("Ошибка загрузки в редактор", 1); }
         }
 
