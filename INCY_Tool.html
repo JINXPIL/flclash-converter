@@ -71,8 +71,12 @@
         .abs-buttons { position: absolute; bottom: 8px; right: 8px; display: flex; gap: 6px; }
         .fs-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; border-bottom: 1px solid var(--border-gray); padding-bottom: 12px; margin-bottom: 16px;}
         .fs-header-info { display: flex; flex-direction: column; min-width: 0; flex: 1; align-items: flex-start; }
-        #profileName { color: var(--text-main); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
         
+        /* Ввод имени конфигурации */
+        #profileNameInput { background: transparent; border: 1px dashed transparent; color: var(--text-main); font-size: 14px; font-weight: bold; font-family: inherit; outline: none; width: 100%; padding: 2px 4px; border-radius: 6px; transition: 0.2s; margin-left: -4px; max-width: 100%; text-overflow: ellipsis; }
+        #profileNameInput:focus { border-color: var(--accent-blue); background: var(--bg-input); }
+        #profileNameInput:hover:not(:focus) { border-color: var(--border-gray); background: var(--bg-input); }
+
         #editorBlockWrapper { display: flex; flex-direction: column;}
         .editor-container { display: flex; flex-direction: column; background: var(--bg-body); border-radius: 12px; overflow: hidden; border: 1px solid var(--border-gray); margin-bottom: 16px; height: 400px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.05); position: relative;}
         
@@ -128,6 +132,14 @@
         .toast { position: fixed; top: max(20px, env(safe-area-inset-top, 20px)); left: 50%; transform: translate(-50%, -20px); opacity: 0; background: var(--bg-input); border: 1px solid var(--border-gray); color: var(--text-main); padding: 12px 24px; border-radius: 12px; font-size: 14px; font-weight: bold; pointer-events: none; transition: 0.3s; z-index: 10000; box-shadow: 0 10px 25px rgba(0,0,0,0.5); text-align: center; max-width: 90%;}
         .toast.show { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
         .toast.error { background: #ef4444; color: white; border-color: #b91c1c; }
+
+        /* Переключатель (Toggle) */
+        .switch { position: relative; display: inline-block; width: 40px; height: 22px; flex-shrink: 0;}
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border-gray); transition: .3s; border-radius: 22px; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--accent-blue); }
+        input:checked + .slider:before { transform: translateX(18px); }
 
         /* История */
         .history-item { padding: 14px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-gray); margin-bottom: 10px; display: flex; flex-direction: column; gap: 12px; position: relative;}
@@ -212,7 +224,7 @@
             <div id="fsHeader" class="fs-header">
                 <div class="fs-header-info">
                     <span class="badge badge-blue">Редактор • <span id="bdgLinesNum">1</span> строк</span>
-                    <strong id="profileName">New Config</strong>
+                    <input type="text" id="profileNameInput" value="New Config" title="Нажмите, чтобы изменить имя конфига" spellcheck="false">
                 </div>
                 <button class="btn-action" id="btnToggleFs">⛶ На весь экран</button>
             </div>
@@ -289,6 +301,15 @@
                 <div id="customProtoContainer" class="custom-proto-container">
                     <input type="text" id="customProtoInput" class="custom-proto-input" placeholder="Введите префикс (например: v2rayng)" spellcheck="false" autocomplete="off">
                 </div>
+            </div>
+
+            <!-- АВТО-АКТИВАЦИЯ (onadd / add) -->
+            <div class="setting-row" style="margin-bottom: 12px; margin-top: 12px; padding: 12px;">
+                <div style="font-size: 13px; font-weight: bold;">Авто-активация (onadd)</div>
+                <label class="switch">
+                    <input type="checkbox" id="autoActivateToggle" checked>
+                    <span class="slider"></span>
+                </label>
             </div>
 
             <textarea id="resultOutput" class="resizable-box" readonly placeholder="Здесь будет ПРЯМАЯ ссылка..."></textarea>
@@ -453,7 +474,7 @@
 
         const els = {
             srcInput: g('srcInput'), btnPaste: g('btnPaste'), btnClear: g('btnClear'), btnParseManually: g('btnParseManually'),
-            editorBlockWrapper: g('editorBlockWrapper'), fsHeader: g('fsHeader'), pName: g('profileName'), btnToggleFs: g('btnToggleFs'), bdgLines: g('bdgLinesNum'),
+            editorBlockWrapper: g('editorBlockWrapper'), fsHeader: g('fsHeader'), pName: g('profileNameInput'), btnToggleFs: g('btnToggleFs'), bdgLines: g('bdgLinesNum'),
             jsonEditor: g('jsonEditor'), tLineH: g('lineNumbers'), errorBox: g('errorBox'), btnSaveJson: g('btnSaveJson'), btnCancelEdit: g('btnCancelEdit'),
             resultBlockWrapper: g('resultBlockWrapper'), resOut: g('resultOutput'), btnDeepLink: g('btnDeepLink'),
             btnViewToggle: g('btnViewToggle'), btnFormat: g('btnFormat'), vGraph: g('visualGraph'), resizer: g('resizer'), editorContainerTarget: g('editorContainerTarget'),
@@ -772,7 +793,7 @@
             els.jsonEditor.setRangeText(txt, start, end, 'end'); toggleModal('modalSnippets', false); els.jsonEditor.focus(); updateLines(); saveEdState(els.jsonEditor.value); linter(); refreshLinks();
         };
 
-        // --- ВЫБОР ПРОТОКОЛА ---
+        // --- ВЫБОР ПРОТОКОЛА И АВТО-АКТИВАЦИЯ ---
         const setProtocol = (p) => {
             let isC = p !== 'incy' && p !== 'happ' && p !== 'incy-mini';
             g('btnProtoIncy').classList.toggle('active', p === 'incy' || p === 'incy-mini');
@@ -785,20 +806,44 @@
         g('btnProtoHapp').onclick = () => { vibe(); setProtocol('happ'); refreshLinks(); };
         g('btnProtoCustom').onclick = () => { vibe(); setProtocol(g('customProtoInput').value || 'custom'); g('customProtoInput').focus(); refreshLinks(); };
         g('customProtoInput').addEventListener('input', (e) => { currentProtocol = e.target.value.replace(/[^a-zA-Z0-9-]/g, '').toLowerCase() || 'custom'; refreshLinks(); });
+        
+        g('autoActivateToggle').addEventListener('change', () => { vibe(); refreshLinks(); });
+
+        // --- РЕДАКТИРОВАНИЕ ИМЕНИ ---
+        els.pName.addEventListener('change', (e) => {
+            vibe();
+            let newName = e.target.value.trim();
+            if (!newName) return;
+            try {
+                let j = JSON.parse(els.jsonEditor.value);
+                j.Name = newName;
+                let formatted = JSON.stringify(j, null, els.jsonEditor.classList.contains('wrap-text') ? 0 : 4);
+                els.jsonEditor.value = formatted;
+                updateLines();
+                saveEdState(formatted);
+                linter();
+                refreshLinks();
+                hasUnsavedChanges = true;
+                showT("Имя обновлено!");
+            } catch (err) {
+                showT("Исправьте ошибки JSON перед переименованием", 1);
+            }
+        });
 
         function refreshLinks() {
             try {
                 let parsed = JSON.parse(els.jsonEditor.value);
                 let rawMinified = JSON.stringify(parsed);
                 let safeProtocol = currentProtocol === 'custom' ? 'custom' : currentProtocol;
-                let newUrl = `${safeProtocol}://routing/onadd/${encodeB64(rawMinified)}`;
+                let mode = g('autoActivateToggle').checked ? 'onadd' : 'add';
+                let newUrl = `${safeProtocol}://routing/${mode}/${encodeB64(rawMinified)}`;
                 updateOutputLinks(newUrl, parsed.Name);
             } catch(e) {}
         }
         function updateOutputLinks(urlStr, name) {
             let safeProtocol = currentProtocol === 'custom' ? 'custom' : currentProtocol; urlStr = urlStr.replace(/^([a-zA-Z0-9-]+):\/\//i, `${safeProtocol}://`);
             els.resOut.style.backgroundColor = 'var(--bg-card)'; setTimeout(() => els.resOut.style.backgroundColor = '', 200);
-            els.resOut.value = urlStr; els.btnDeepLink.href = urlStr; els.pName.textContent = name || "Без имени";
+            els.resOut.value = urlStr; els.btnDeepLink.href = urlStr; els.pName.value = name || "Без имени";
         }
 
         const updateLines = () => { let ls = els.jsonEditor.value.split('\n').length || 1; els.tLineH.innerHTML = Array.from({length: ls}, (_, i) => `<div>${i+1}</div>`).join(''); els.bdgLines.textContent = ls; };
@@ -861,7 +906,8 @@
             let jsonStr = null;
             if (val.startsWith('{')) { try { JSON.parse(val); jsonStr = val; } catch(e) {} }
             if (!jsonStr) {
-                let b64 = val.includes('://') ? (val.split('://')[1].split('/onadd/')[1] || val.split('://')[1]) : val;
+                // Поддержка обеих ссылок: /onadd/ и /add/
+                let b64 = val.includes('://') ? (val.split('://')[1].split(/\/onadd\/|\/add\//)[1] || val.split('://')[1]) : val;
                 try {
                     let bytes = new Uint8Array(atob(b64.padEnd(b64.length + (4 - b64.length % 4) % 4, '=')).split('').map(c=>c.charCodeAt(0)));
                     let decomp = await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).text().catch(()=>null);
@@ -886,8 +932,8 @@
         window.onload = () => {
             let draft = localStorage.getItem('incy_draft');
             if(draft && draft.length > 20 && !window.location.hash) { 
-                try { let p = JSON.parse(draft); els.jsonEditor.value = draft; els.pName.textContent = p.Name||'Черновик'; updateLines(); refreshLinks(); } catch(e) { els.jsonEditor.value = draft; els.pName.textContent = 'Черновик (Raw)'; updateLines(); } 
-            } else if (!window.location.hash) { els.jsonEditor.value = defaultJsonTemplate; els.pName.textContent = 'New Config'; updateLines(); refreshLinks(); }
+                try { let p = JSON.parse(draft); els.jsonEditor.value = draft; els.pName.value = p.Name||'Черновик'; updateLines(); refreshLinks(); } catch(e) { els.jsonEditor.value = draft; els.pName.value = 'Черновик (Raw)'; updateLines(); } 
+            } else if (!window.location.hash) { els.jsonEditor.value = defaultJsonTemplate; els.pName.value = 'New Config'; updateLines(); refreshLinks(); }
             saveEdState(els.jsonEditor.value); renderHist();
         };
 
@@ -906,7 +952,7 @@
             if (!ext.startsWith('.')) ext = '.' + ext; if (ext === '.') ext = '.json';
             let mType = "application/octet-stream"; if (ext === '.json') mType = "application/json;charset=utf-8"; else if (ext === '.txt') mType = "text/plain;charset=utf-8";
             let blob = new Blob([text], {type: mType}); let a = document.createElement("a"); a.href = URL.createObjectURL(blob); 
-            a.download = (els.pName.textContent.replace(/[^a-z0-9а-яё-]/gi, '_').toLowerCase() || 'config') + ext; a.click(); showT(`Скачано как ${ext}`);
+            a.download = (els.pName.value.replace(/[^a-z0-9а-яё-]/gi, '_').toLowerCase() || 'config') + ext; a.click(); showT(`Скачано как ${ext}`);
         };
 
         // --- УМНАЯ ИСТОРИЯ ---
@@ -919,7 +965,8 @@
         
         const pushHist = (name, content) => {
             if(!content) return; name = name || "Без имени"; let hist = getH().filter(i => i.name !== name);
-            let nUrl = ""; try { nUrl = `incy://routing/onadd/${encodeB64(JSON.stringify(JSON.parse(content)))}`; } catch(e){ nUrl = `incy://routing/onadd/${encodeB64(content)}`;}
+            let mode = g('autoActivateToggle').checked ? 'onadd' : 'add';
+            let nUrl = ""; try { nUrl = `incy://routing/${mode}/${encodeB64(JSON.stringify(JSON.parse(content)))}`; } catch(e){ nUrl = `incy://routing/${mode}/${encodeB64(content)}`;}
             hist.unshift({ id: Date.now(), name: name, url: nUrl, content: content }); if(hist.length > 30) hist.pop(); setH(hist);
         };
 
@@ -931,7 +978,8 @@
             let hist = getH(); if(!hist.length) { g('historyCard').classList.add('hidden'); return; }
             g('historyCard').classList.remove('hidden'); let data = filt ? hist.filter(i=>i.name.toLowerCase().includes(filt)) : hist;
             els.historyList.innerHTML = data.map(i => {
-                let upUrl = i.url; try { upUrl = `incy://routing/onadd/${encodeB64(JSON.stringify(JSON.parse(i.content)))}`; } catch(e){upUrl = `incy://routing/onadd/${encodeB64(i.content)}`;}
+                let mode = g('autoActivateToggle').checked ? 'onadd' : 'add';
+                let upUrl = i.url; try { upUrl = `incy://routing/${mode}/${encodeB64(JSON.stringify(JSON.parse(i.content)))}`; } catch(e){upUrl = `incy://routing/${mode}/${encodeB64(i.content)}`;}
                 return `<div class="history-item" data-id="${i.id}"><div class="history-top"> <div class="history-title" data-act="ren">${i.name} ✏️</div><div class="history-controls"> <button class="history-btn-small" data-act="up">⬆</button> <button class="history-btn-small" data-act="dn">⬇</button> <button class="history-btn-small" data-act="dup">⧉</button> <button class="history-btn-small" style="color:var(--red-text)" data-act="del">✖</button> </div></div><div style="display:flex;gap:8px;"> <button class="btn-action" style="flex:1.5;background:var(--accent-blue);color:white;border:none;" onclick="location.href='${upUrl}'">🚀 Запуск</button> <button class="btn-action" style="flex:1;" data-act="load">✒️ Редактор</button> <button class="btn-action" style="flex:1;" onclick="copyToC('${upUrl}')">🔗 Copy</button></div></div>`;
             }).join('');
         };
