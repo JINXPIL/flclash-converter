@@ -298,14 +298,33 @@
                         <button id="btnProtoCustom" class="format-tab">СВОЙ ✍️</button>
                     </div>
                 </div>
+                
+                <!-- ПРОДВИНУТЫЙ КОНСТРУКТОР КАСТОМНОГО ПРЕДФИКСА -->
                 <div id="customProtoContainer" class="custom-proto-container">
-                    <input type="text" id="customProtoInput" class="custom-proto-input" placeholder="Введите префикс (например: v2rayng)" spellcheck="false" autocomplete="off">
+                    <input type="text" id="customProtoInput" class="custom-proto-input" placeholder="Базовый префикс (напр: throne, clash)" spellcheck="false" autocomplete="off" style="margin-bottom: 8px;">
+                    
+                    <div style="background: var(--bg-body); border: 1px solid var(--border-gray); border-radius: 8px; padding: 10px;">
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: bold; color: var(--text-main); cursor: pointer; margin-bottom: 8px;">
+                            <input type="checkbox" id="customUseToggle" checked style="width: 14px; height: 14px; accent-color: var(--accent-blue);">
+                            Разрешить тумблер команд
+                        </label>
+                        <div id="customCommandsBox" style="display: flex; gap: 8px; transition: 0.2s;">
+                            <div style="flex: 1;">
+                                <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 4px; padding-left: 2px;">Команда (Выкл)</div>
+                                <input type="text" id="customCmdManual" class="custom-proto-input" style="font-size: 12px; padding: 6px 10px;" placeholder="напр: route">
+                            </div>
+                            <div style="flex: 1;">
+                                <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 4px; padding-left: 2px;">Команда (Вкл)</div>
+                                <input type="text" id="customCmdAuto" class="custom-proto-input" style="font-size: 12px; padding: 6px 10px;" placeholder="напр: onadd">
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- АВТО-АКТИВАЦИЯ (onadd / add) -->
-            <div class="setting-row" style="margin-bottom: 12px; margin-top: 12px; padding: 12px;">
-                <div style="font-size: 13px; font-weight: bold;">Авто-активация (onadd)</div>
+            <!-- АВТО-АКТИВАЦИЯ (Общий тумблер) -->
+            <div id="autoActivateContainer" class="setting-row" style="margin-bottom: 12px; margin-top: 12px; padding: 12px;">
+                <div style="font-size: 13px; font-weight: bold; word-break: break-all; padding-right: 8px;" id="toggleLabel">Авто-активация (onadd)</div>
                 <label class="switch">
                     <input type="checkbox" id="autoActivateToggle" checked>
                     <span class="slider"></span>
@@ -500,7 +519,7 @@
             }); chk.dispatchEvent(new Event('change'));
         });
 
-        // --- THEME ENGINE (МЕНЕДЖЕР ТЕМ 2026 И ИМПОРТ/ЭКСПОРТ) ---
+        // --- THEME ENGINE ---
         const THEMES = {
             base: [
                 {id: 'default', name: 'Dark', c: '#0a0d14'}, {id: 'light', name: 'Light', c: '#f3f4f6'},
@@ -514,22 +533,20 @@
         };
 
         const setTheme = th => { 
-            document.body.className = ''; document.documentElement.style = ''; // Reset
+            document.body.className = ''; document.documentElement.style = '';
             let uTh = THEMES.get(th);
             if(uTh) {
                 for(let k in uTh.colors) document.documentElement.style.setProperty(k, uTh.colors[k]);
                 syncPickers(uTh.colors);
             } else if (th !== 'default') {
                 document.body.classList.add(`theme-${th}`);
-                syncPickers(); // Reset pickers visual
+                syncPickers();
             }
             localStorage.setItem('incy_t', th); 
             renderThemeGrid();
         };
 
-        // Запуск темы при старте
         setTheme(localStorage.getItem('incy_t') || 'default');
-
         g('btnThemeToggle').onclick = () => { vibe(); setTheme(document.body.className.includes('light')?'default':'light'); };
         g('btnThemeBuilder').onclick = () => { vibe(); toggleModal('modalThemeBuilder', true); renderThemeGrid(); };
 
@@ -548,7 +565,6 @@
                     <span class="th-btn-del" onclick="window.delThemeObj('${t.id}')" title="Удалить">✖</span>
                 </div>`
             ).join('');
-            
             g('themesGrid').innerHTML = html;
         }
 
@@ -579,8 +595,6 @@
             let c = getColorsFromPickers(); THEMES.add(n, c); g('newThemeName').value = '';
             setTheme(THEMES.user[THEMES.user.length-1].id); showT('Тема сохранена в коллекции!');
         };
-
-        // Экспорт / Импорт Тем
         window.exportCurrentThemeAsFile = () => {
             vibe(); let curr = localStorage.getItem('incy_t') || 'default';
             let th = THEMES.get(curr);
@@ -589,7 +603,6 @@
             let a = document.createElement("a"); a.href = URL.createObjectURL(blob); 
             a.download = `${th.name.replace(/\s+/g, '_')}.incytheme`; a.click(); showT('Тема скачана!');
         };
-
         g('themeFileInput').onchange = e => {
             let f = e.target.files[0]; if(!f) return; let rd = new FileReader();
             rd.onload = ev => {
@@ -597,7 +610,6 @@
                 catch(err){ showT('Файл поврежден', 1); }
             }; rd.readAsText(f); e.target.value='';
         };
-
         window.loadThemeFromURL = async () => {
             let u = g('themeUrlInput').value.trim(); if(!u) return; vibe();
             try {
@@ -606,15 +618,10 @@
             } catch(e) { showT('Ошибка валидации URL JSON темы', 1); }
         };
 
-        // --- ПЛАГИНЫ (РАСШИРЕНИЯ С ИНТЕРНЕТА) ---
+        // --- ПЛАГИНЫ ---
         g('btnPluginsModal').onclick = () => { vibe(); toggleModal('modalPlugins', true); renderPlugins(); };
-        
-        const loadPluginsCore = () => {
-            let plugs = JSON.parse(localStorage.getItem('incy_plugins') || '[]');
-            plugs.forEach(p => { try { window.eval(p.code); } catch(e) { console.error("Ошибка в плагине", p.url); } });
-        };
+        const loadPluginsCore = () => { let plugs = JSON.parse(localStorage.getItem('incy_plugins') || '[]'); plugs.forEach(p => { try { window.eval(p.code); } catch(e) { console.error("Ошибка в плагине", p.url); } }); };
         loadPluginsCore();
-
         const renderPlugins = () => {
             let plugs = JSON.parse(localStorage.getItem('incy_plugins') || '[]');
             if(plugs.length === 0) { g('pluginsList').innerHTML = '<div style="font-size:12px; color:var(--text-muted);">Плагинов нет.</div>'; return; }
@@ -625,32 +632,24 @@
                 </div>
             `).join('');
         };
-
         g('btnInstallPlugin').onclick = async () => {
             let url = g('pluginUrl').value.trim(); if(!url) return;
             try {
-                vibe(); g('btnInstallPlugin').textContent = '...';
-                let res = await fetch(url); let code = await res.text();
-                let plugs = JSON.parse(localStorage.getItem('incy_plugins') || '[]');
-                plugs.push({id: Date.now(), url: url, code: code});
-                localStorage.setItem('incy_plugins', JSON.stringify(plugs));
+                vibe(); g('btnInstallPlugin').textContent = '...'; let res = await fetch(url); let code = await res.text();
+                let plugs = JSON.parse(localStorage.getItem('incy_plugins') || '[]'); plugs.push({id: Date.now(), url: url, code: code}); localStorage.setItem('incy_plugins', JSON.stringify(plugs));
                 try { window.eval(code); showT('Плагин запущен!'); } catch(e) { showT('Ошибка кода плагина', 1); }
-                g('pluginUrl').value = ''; renderPlugins(); g('btnInstallPlugin').textContent = '💾';
-                linter();
+                g('pluginUrl').value = ''; renderPlugins(); g('btnInstallPlugin').textContent = '💾'; linter();
             } catch(e) { showT('Ошибка сервера (CORS)', 1); g('btnInstallPlugin').textContent = '💾'; }
         };
-
         window.delPlugin = (id) => {
-            let plugs = JSON.parse(localStorage.getItem('incy_plugins') || '[]');
-            plugs = plugs.filter(p => p.id !== id);
-            localStorage.setItem('incy_plugins', JSON.stringify(plugs));
+            let plugs = JSON.parse(localStorage.getItem('incy_plugins') || '[]'); plugs = plugs.filter(p => p.id !== id); localStorage.setItem('incy_plugins', JSON.stringify(plugs));
             renderPlugins(); showT('Плагин удален. Обновите страницу!');
         };
 
         const encodeB64 = str => btoa(unescape(encodeURIComponent(str))).replace(/=+$/, '');
         const decodeB64 = str => { let p = str.length % 4; if(p) str += '='.repeat(4 - p); return decodeURIComponent(escape(atob(str))); };
 
-        // --- ВЕЛИКИЙ LINTER / ВИЗУАЛЬНЫЙ ГРАФ ---
+        // --- ВИЗУАЛЬНЫЙ ГРАФ И LINTER ---
         const parseNode = (o) => { 
             let h = ''; 
             for(let k in o) { 
@@ -658,54 +657,37 @@
                 if(typeof v==='object' && v!==null) { 
                     let p = Array.isArray(v)?`[${v.length} эл-тов]`:`{...}`; 
                     h += `<div class="vg-node"><div class="vg-key" onclick="this.nextElementSibling.classList.toggle('hidden')">⊖ ${k} <span class="vg-obj">${p}</span></div><div>${parseNode(v)}</div></div>`; 
-                } else {
-                    h += `<div class="vg-node" style="font-size:13px"><span style="color:var(--text-main);font-weight:bold;">${k}:</span> <span class="vg-val">${v}</span></div>`; 
-                } 
+                } else { h += `<div class="vg-node" style="font-size:13px"><span style="color:var(--text-main);font-weight:bold;">${k}:</span> <span class="vg-val">${v}</span></div>`; } 
             } return h; 
         };
-
-        const buildG = () => {
-            try { 
-                els.vGraph.innerHTML = `<div style="font-weight:bold; color:var(--text-main); margin-bottom:8px;">{ Root }</div>` + parseNode(JSON.parse(els.jsonEditor.value)); 
-            } catch(e) { 
-                els.vGraph.innerHTML = `<div style="color:var(--red-text); padding:20px;">Ошибка JSON-парсера: ${e.message}</div>`; 
-            }
-        };
-
-        g('btnViewToggle').onclick = function() { 
-            vibe(); let a = els.vGraph.classList.toggle('active'); this.textContent = a ? '✏️ Редактор' : '👁 Визуал'; if(a) buildG(); 
-        };
+        const buildG = () => { try { els.vGraph.innerHTML = `<div style="font-weight:bold; color:var(--text-main); margin-bottom:8px;">{ Root }</div>` + parseNode(JSON.parse(els.jsonEditor.value)); } catch(e) { els.vGraph.innerHTML = `<div style="color:var(--red-text); padding:20px;">Ошибка JSON-парсера: ${e.message}</div>`; } };
+        g('btnViewToggle').onclick = function() { vibe(); let a = els.vGraph.classList.toggle('active'); this.textContent = a ? '✏️ Редактор' : '👁 Визуал'; if(a) buildG(); };
 
         function parseAndScrollToError(e) {
             let msg = e.message; let matchPos = msg.match(/position (\d+)/); let matchLine = msg.match(/line (\d+) column (\d+)/); 
             let lineNum = 1; let charIdx = 0;
             if (matchPos && matchPos[1]) {
-                charIdx = parseInt(matchPos[1]);
-                lineNum = els.jsonEditor.value.substring(0, charIdx).split('\n').length;
+                charIdx = parseInt(matchPos[1]); lineNum = els.jsonEditor.value.substring(0, charIdx).split('\n').length;
                 els.jsonEditor.focus(); els.jsonEditor.setSelectionRange(charIdx, charIdx + 1);
             } else if (matchLine && matchLine[1]) { lineNum = parseInt(matchLine[1]); }
             
             [...els.tLineH.children].forEach(d => d.classList.remove('error'));
             if(els.tLineH.children[lineNum-1]) els.tLineH.children[lineNum-1].classList.add('error');
             
-            els.jsonEditor.scrollTop = Math.max(0, (lineNum - 3) * 22); els.tLineH.scrollTop = els.jsonEditor.scrollTop; 
-            showT("➡️ Ошибка на строке " + lineNum, 1);
+            els.jsonEditor.scrollTop = Math.max(0, (lineNum - 3) * 22); els.tLineH.scrollTop = els.jsonEditor.scrollTop; showT("➡️ Ошибка на строке " + lineNum, 1);
         }
 
         const linter = () => {
             let val = els.jsonEditor.value;
             els.jsonEditor.style.borderColor = ''; [...els.tLineH.children].forEach(d => d.classList.remove('error')); els.errorBox.classList.add('hidden');
             if(!g('uiLinter').checked) return true;
-
             if(window.INCY_CUSTOM_LINTER) {
                 let res = window.INCY_CUSTOM_LINTER(val);
                 if(res && res.error) {
                     els.jsonEditor.style.borderColor = 'var(--red-text)';
                     if(res.line && els.tLineH.children[res.line-1]) els.tLineH.children[res.line-1].classList.add('error');
-                    els.errorBox.textContent = "Ошибка плагина: " + res.error; els.errorBox.classList.remove('hidden');
-                    return false;
-                }
-                return true;
+                    els.errorBox.textContent = "Ошибка плагина: " + res.error; els.errorBox.classList.remove('hidden'); return false;
+                } return true;
             }
             try { if(val.trim() !== '') JSON.parse(val); return true; } catch(e) {
                 els.jsonEditor.style.borderColor = 'var(--red-text)'; els.errorBox.textContent = "Синтаксис сломан: " + e.message; els.errorBox.classList.remove('hidden');
@@ -717,21 +699,16 @@
             }
         };
 
-        // --- ИНСТРУМЕНТЫ РЕДАКТОРА (UNDO И ОТКАТ) ---
+        // --- ИНСТРУМЕНТЫ РЕДАКТОРА ---
         function saveEdState(val) { if(edHist[edHist.length - 1] === val) return; edHist.push(val); if(edHist.length > 30) edHist.shift(); }
         
         g('btnUndo').onclick = () => { 
-            vibe(); 
-            if(edHist.length > 1) { 
-                edHist.pop(); els.jsonEditor.value = edHist[edHist.length - 1]; updateLines(); showT("↶ Отменено"); hasUnsavedChanges = true; 
+            vibe(); if(edHist.length > 1) { edHist.pop(); els.jsonEditor.value = edHist[edHist.length - 1]; updateLines(); showT("↶ Отменено"); hasUnsavedChanges = true; 
                 if (els.vGraph.classList.contains('active')) buildG(); linter(); refreshLinks();
             } else { showT("Дальше отменять некуда", 1); } 
         };
 
-        els.btnCancelEdit.onclick = () => {
-            vibe(); els.jsonEditor.value = lastSavedJson; updateLines(); saveEdState(els.jsonEditor.value);
-            if (els.vGraph.classList.contains('active')) buildG(); linter(); refreshLinks(); hasUnsavedChanges = false; showT("🔙 Откатили к сохранённому");
-        };
+        els.btnCancelEdit.onclick = () => { vibe(); els.jsonEditor.value = lastSavedJson; updateLines(); saveEdState(els.jsonEditor.value); if (els.vGraph.classList.contains('active')) buildG(); linter(); refreshLinks(); hasUnsavedChanges = false; showT("🔙 Откатили к сохранённому"); };
 
         els.btnToggleFs.onclick = () => {
             vibe(); isFullscreen = !isFullscreen;
@@ -760,25 +737,17 @@
         });
 
         els.jsonEditor.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault(); let start = this.selectionStart, end = this.selectionEnd, val = this.value;
-                let lineStart = val.substring(0, start).lastIndexOf('\n') + 1; let indent = val.substring(lineStart, start).match(/^\s*/)[0];
-                this.setRangeText('\n' + indent, start, end, 'end'); updateLines(); saveEdState(els.jsonEditor.value); linter();
-            }
+            if (e.key === 'Enter') { e.preventDefault(); let start = this.selectionStart, end = this.selectionEnd, val = this.value; let lineStart = val.substring(0, start).lastIndexOf('\n') + 1; let indent = val.substring(lineStart, start).match(/^\s*/)[0]; this.setRangeText('\n' + indent, start, end, 'end'); updateLines(); saveEdState(els.jsonEditor.value); linter(); }
         });
 
         let lastSearchTerm = "";
         g('btnSearch').onclick = () => { vibe(); g('searchBar').classList.toggle('hidden'); if(!g('searchBar').classList.contains('hidden')) g('searchInput').focus(); else els.jsonEditor.focus(); };
         g('btnSearchClose').onclick = () => { vibe(); g('searchBar').classList.add('hidden'); els.jsonEditor.focus(); };
         const doSearch = () => {
-            vibe(); let term = g('searchInput').value; if(!term) return;
-            let val = els.jsonEditor.value, startPos = els.jsonEditor.selectionEnd;
+            vibe(); let term = g('searchInput').value; if(!term) return; let val = els.jsonEditor.value, startPos = els.jsonEditor.selectionEnd;
             if (lastSearchTerm !== term) { startPos = 0; lastSearchTerm = term; }
             let idx = val.indexOf(term, startPos); if (idx === -1 && startPos > 0) idx = val.indexOf(term, 0); 
-            if(idx !== -1) { els.jsonEditor.focus(); els.jsonEditor.setSelectionRange(idx, idx + term.length);
-                let linesBefore = val.substring(0, idx).split('\n').length; let scrollPos = Math.max(0, (linesBefore - 3) * 22);
-                els.jsonEditor.scrollTop = scrollPos; els.tLineH.scrollTop = scrollPos; lastSearchTerm = term; showT("Найдено!");
-            } else { showT(`"${term}" не найдено`, 1); }
+            if(idx !== -1) { els.jsonEditor.focus(); els.jsonEditor.setSelectionRange(idx, idx + term.length); let linesBefore = val.substring(0, idx).split('\n').length; let scrollPos = Math.max(0, (linesBefore - 3) * 22); els.jsonEditor.scrollTop = scrollPos; els.tLineH.scrollTop = scrollPos; lastSearchTerm = term; showT("Найдено!"); } else { showT(`"${term}" не найдено`, 1); }
         };
         g('btnSearchNext').onclick = doSearch; g('searchInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') doSearch(); });
 
@@ -786,62 +755,124 @@
             dns: `\n"dns": {\n  "servers": [\n    "https+local://1.1.1.1/dns-query",\n    "8.8.8.8"\n  ]\n}`,
             routing: `\n"routing": {\n  "domainStrategy": "IPIfNonMatch",\n  "rules": [\n    {\n      "type": "field",\n      "domain": ["geosite:ru"],\n      "outboundTag": "direct"\n    }\n  ]\n}`
         };
-
         g('btnSnippetsModal').onclick = () => { vibe(); toggleModal('modalSnippets', true); };
-        window.insSnip = (key) => { 
-            vibe(); let txt = snippetsDictionary[key]; if(!txt) return; let start = els.jsonEditor.selectionStart, end = els.jsonEditor.selectionEnd; 
-            els.jsonEditor.setRangeText(txt, start, end, 'end'); toggleModal('modalSnippets', false); els.jsonEditor.focus(); updateLines(); saveEdState(els.jsonEditor.value); linter(); refreshLinks();
+        window.insSnip = (key) => { vibe(); let txt = snippetsDictionary[key]; if(!txt) return; let start = els.jsonEditor.selectionStart, end = els.jsonEditor.selectionEnd; els.jsonEditor.setRangeText(txt, start, end, 'end'); toggleModal('modalSnippets', false); els.jsonEditor.focus(); updateLines(); saveEdState(els.jsonEditor.value); linter(); refreshLinks(); };
+
+        // --- ВЫБОР ПРОТОКОЛА И НАСТРОЙКА ---
+        
+        // Восстановление памяти для кастомного протокола
+        if(localStorage.getItem('incy_c_man') !== null) {
+            g('customProtoInput').value = localStorage.getItem('incy_c_proto') || '';
+            g('customCmdManual').value = localStorage.getItem('incy_c_man') || '';
+            g('customCmdAuto').value = localStorage.getItem('incy_c_aut') || '';
+            g('customUseToggle').checked = localStorage.getItem('incy_c_usetog') !== '0';
+        } else {
+            g('customCmdManual').value = 'add';
+            g('customCmdAuto').value = 'onadd';
+        }
+
+        const saveCustomPrefs = () => {
+            localStorage.setItem('incy_c_proto', g('customProtoInput').value);
+            localStorage.setItem('incy_c_man', g('customCmdManual').value);
+            localStorage.setItem('incy_c_aut', g('customCmdAuto').value);
+            localStorage.setItem('incy_c_usetog', g('customUseToggle').checked ? '1' : '0');
         };
 
-        // --- ВЫБОР ПРОТОКОЛА И АВТО-АКТИВАЦИЯ ---
+        const updateToggleLabel = () => {
+            let isAuto = g('autoActivateToggle').checked;
+            if (currentProtocol === 'incy' || currentProtocol === 'happ') {
+                g('toggleLabel').textContent = isAuto ? "Авто-активация (onadd)" : "Авто-активация (add)";
+                g('autoActivateContainer').classList.remove('hidden');
+            } else {
+                if (g('customUseToggle').checked) {
+                    let m = g('customCmdManual').value.trim() || '—';
+                    let a = g('customCmdAuto').value.trim() || '—';
+                    g('toggleLabel').textContent = `Команда: ${isAuto ? a : m}`;
+                    g('autoActivateContainer').classList.remove('hidden');
+                    g('customCommandsBox').style.opacity = '1';
+                    g('customCommandsBox').style.pointerEvents = 'auto';
+                } else {
+                    g('autoActivateContainer').classList.add('hidden');
+                    g('customCommandsBox').style.opacity = '0.3';
+                    g('customCommandsBox').style.pointerEvents = 'none';
+                }
+            }
+        };
+
         const setProtocol = (p) => {
             let isC = p !== 'incy' && p !== 'happ' && p !== 'incy-mini';
             g('btnProtoIncy').classList.toggle('active', p === 'incy' || p === 'incy-mini');
             g('btnProtoHapp').classList.toggle('active', p === 'happ');
             g('btnProtoCustom').classList.toggle('active', isC);
-            if (isC) { currentProtocol = p || 'custom'; g('customProtoContainer').classList.add('active'); if(p !== 'custom') g('customProtoInput').value = p; } 
-            else { currentProtocol = p === 'incy-mini' ? 'incy' : p; g('customProtoContainer').classList.remove('active'); }
+            
+            if (isC) { 
+                currentProtocol = 'custom'; 
+                g('customProtoContainer').classList.add('active'); 
+                if(p !== 'custom' && !g('customProtoInput').value) {
+                    g('customProtoInput').value = p; saveCustomPrefs();
+                }
+            } 
+            else { 
+                currentProtocol = p === 'incy-mini' ? 'incy' : p; 
+                g('customProtoContainer').classList.remove('active'); 
+            }
+            updateToggleLabel();
         };
+
         g('btnProtoIncy').onclick = () => { vibe(); setProtocol('incy'); refreshLinks(); };
         g('btnProtoHapp').onclick = () => { vibe(); setProtocol('happ'); refreshLinks(); };
         g('btnProtoCustom').onclick = () => { vibe(); setProtocol(g('customProtoInput').value || 'custom'); g('customProtoInput').focus(); refreshLinks(); };
-        g('customProtoInput').addEventListener('input', (e) => { currentProtocol = e.target.value.replace(/[^a-zA-Z0-9-]/g, '').toLowerCase() || 'custom'; refreshLinks(); });
         
-        g('autoActivateToggle').addEventListener('change', () => { vibe(); refreshLinks(); });
+        ['customProtoInput', 'customCmdManual', 'customCmdAuto'].forEach(id => {
+            g(id).addEventListener('input', () => { saveCustomPrefs(); updateToggleLabel(); refreshLinks(); });
+        });
+        g('customUseToggle').addEventListener('change', () => { vibe(); saveCustomPrefs(); updateToggleLabel(); refreshLinks(); });
+        g('autoActivateToggle').addEventListener('change', () => { vibe(); updateToggleLabel(); refreshLinks(); });
 
         // --- РЕДАКТИРОВАНИЕ ИМЕНИ ---
         els.pName.addEventListener('change', (e) => {
-            vibe();
-            let newName = e.target.value.trim();
-            if (!newName) return;
+            vibe(); let newName = e.target.value.trim(); if (!newName) return;
             try {
-                let j = JSON.parse(els.jsonEditor.value);
-                j.Name = newName;
+                let j = JSON.parse(els.jsonEditor.value); j.Name = newName;
                 let formatted = JSON.stringify(j, null, els.jsonEditor.classList.contains('wrap-text') ? 0 : 4);
-                els.jsonEditor.value = formatted;
-                updateLines();
-                saveEdState(formatted);
-                linter();
-                refreshLinks();
-                hasUnsavedChanges = true;
-                showT("Имя обновлено!");
-            } catch (err) {
-                showT("Исправьте ошибки JSON перед переименованием", 1);
-            }
+                els.jsonEditor.value = formatted; updateLines(); saveEdState(formatted); linter(); refreshLinks(); hasUnsavedChanges = true; showT("Имя обновлено!");
+            } catch (err) { showT("Исправьте ошибки JSON перед переименованием", 1); }
         });
 
+        // --- УМНАЯ ГЕНЕРАЦИЯ ССЫЛКИ ---
         function refreshLinks() {
             try {
                 let parsed = JSON.parse(els.jsonEditor.value);
                 let rawMinified = JSON.stringify(parsed);
-                let safeProtocol = currentProtocol === 'custom' ? 'custom' : currentProtocol;
-                let mode = g('autoActivateToggle').checked ? 'onadd' : 'add';
-                let newUrl = `${safeProtocol}://routing/${mode}/${encodeB64(rawMinified)}`;
+                let b64 = encodeB64(rawMinified);
+                let newUrl = "";
+
+                if (currentProtocol === 'incy' || currentProtocol === 'happ') {
+                    let mode = g('autoActivateToggle').checked ? 'onadd' : 'add';
+                    newUrl = `${currentProtocol}://routing/${mode}/${b64}`;
+                } else {
+                    let prefix = g('customProtoInput').value.trim() || 'custom';
+                    if (!prefix.includes('://')) prefix += '://';
+                    
+                    if (g('customUseToggle').checked) {
+                        let cmd = g('autoActivateToggle').checked ? g('customCmdAuto').value.trim() : g('customCmdManual').value.trim();
+                        if (cmd && !cmd.endsWith('/')) cmd += '/';
+                        
+                        // Защита от дублей, если юзер случайно вписал команду в сам префикс
+                        if (prefix.endsWith(cmd)) prefix = prefix.substring(0, prefix.length - cmd.length);
+
+                        newUrl = prefix + cmd + b64;
+                    } else {
+                        // Если режим выключен, аккуратно склеиваем
+                        if (!prefix.match(/[\/=\?&]$/) && !prefix.endsWith('://')) prefix += '/';
+                        newUrl = prefix + b64;
+                    }
+                }
                 updateOutputLinks(newUrl, parsed.Name);
             } catch(e) {}
         }
+
         function updateOutputLinks(urlStr, name) {
-            let safeProtocol = currentProtocol === 'custom' ? 'custom' : currentProtocol; urlStr = urlStr.replace(/^([a-zA-Z0-9-]+):\/\//i, `${safeProtocol}://`);
             els.resOut.style.backgroundColor = 'var(--bg-card)'; setTimeout(() => els.resOut.style.backgroundColor = '', 200);
             els.resOut.value = urlStr; els.btnDeepLink.href = urlStr; els.pName.value = name || "Без имени";
         }
@@ -852,15 +883,10 @@
         els.jsonEditor.addEventListener('input', () => { 
             hasUnsavedChanges = true; updateLines(); if (els.vGraph.classList.contains('active')) buildG();
             if(els.jsonEditor.value.length > 5) localStorage.setItem('incy_draft', els.jsonEditor.value);
-
-            clearTimeout(typedDebounce);
-            typedDebounce = setTimeout(() => { saveEdState(els.jsonEditor.value); }, 600);
-
-            clearTimeout(liveUpdateTimer);
-            liveUpdateTimer = setTimeout(() => { linter(); refreshLinks(); }, 300);
+            clearTimeout(typedDebounce); typedDebounce = setTimeout(() => { saveEdState(els.jsonEditor.value); }, 600);
+            clearTimeout(liveUpdateTimer); liveUpdateTimer = setTimeout(() => { linter(); refreshLinks(); }, 300);
         });
         els.jsonEditor.addEventListener('scroll', () => { els.tLineH.scrollTop = els.jsonEditor.scrollTop; }, { passive: true });
-        
         g('btnWrapToggle').onclick = function() { vibe(); els.jsonEditor.classList.toggle('wrap-text'); els.tLineH.style.opacity = els.jsonEditor.classList.contains('wrap-text')?'0.3':'1'; };
         
         els.btnFormat.onclick = () => {
@@ -878,15 +904,15 @@
             vibe(); if (g('uiLinter').checked && !linter()) { showT("Исправьте ошибки перед сохранением!", 1); return; }
             try {
                 let cname = "Config"; try { let p = JSON.parse(els.jsonEditor.value); if(p.Name) cname = p.Name; } catch(e){}
-                lastSavedJson = els.jsonEditor.value; refreshLinks(); pushHist(cname, els.jsonEditor.value); els.errorBox.classList.add('hidden'); hasUnsavedChanges = false;
-                showT("✅ Сохранено в Историю");
+                lastSavedJson = els.jsonEditor.value; refreshLinks(); 
+                pushHist(cname, els.jsonEditor.value, els.resOut.value); // Сохраняем АКТИВНУЮ ссылку, чтобы формат не слетал
+                els.errorBox.classList.add('hidden'); hasUnsavedChanges = false; showT("✅ Сохранено в Историю");
             } catch(e) {}
         };
 
-        // --- ВВОД ФАЙЛА И ПАРСИНГ ---
+        // --- ВВОД ФАЙЛА И УМНЫЙ ПАРСИНГ ---
         document.body.addEventListener('dragover', e => e.preventDefault()); document.body.addEventListener('drop', e => { e.preventDefault(); if(e.dataTransfer.files.length) { let rd = new FileReader(); rd.onload = ev => { els.srcInput.value = ev.target.result.trim(); handleSrc(); }; rd.readAsText(e.dataTransfer.files[0]); } });
         g('fileInput').onchange = e => { let file = e.target.files[0]; if(!file) return; let rd = new FileReader(); rd.onload = ev => { els.srcInput.value = ev.target.result.trim(); handleSrc(); }; rd.readAsText(file); g('fileInput').value = ''; };
-
         els.btnPaste.onclick = async () => { try{ els.srcInput.value = await navigator.clipboard.readText(); handleSrc(); } catch(e){} };
         els.btnClear.onclick = () => { vibe(); els.srcInput.value=''; loadCfg(defaultJsonTemplate, false); showT('Очищено'); edHist=[]; };
 
@@ -899,14 +925,31 @@
 
             let protoMatch = val.match(/^([a-zA-Z0-9-]+):\/\//i);
             let detectedProto = protoMatch ? protoMatch[1].toLowerCase() : 'incy';
-            if (detectedProto === 'happ') setProtocol('happ'); else if (detectedProto === 'incy' || detectedProto === 'incy-mini') setProtocol('incy'); else setProtocol(detectedProto);
+            if (detectedProto === 'happ') setProtocol('happ'); 
+            else if (detectedProto === 'incy' || detectedProto === 'incy-mini') setProtocol('incy'); 
+            else setProtocol(detectedProto); // Автоматом переключает на "Свой"
 
             if (window.INCY_CUSTOM_PARSER) { let pRes = window.INCY_CUSTOM_PARSER(val); if (pRes) { loadCfg(pRes, true); return; } }
 
             let jsonStr = null;
             if (val.startsWith('{')) { try { JSON.parse(val); jsonStr = val; } catch(e) {} }
             if (!jsonStr) {
-                let b64 = val.includes('://') ? (val.split('://')[1].split(/\/onadd\/|\/add\//)[1] || val.split('://')[1]) : val;
+                // Универсальный экстрактор Base64 для самых разных ссылок
+                let b64 = val;
+                if (val.includes('://')) {
+                    let pathStr = val.substring(val.indexOf('://') + 3);
+                    if (pathStr.startsWith('routing/onadd/')) b64 = pathStr.substring(14);
+                    else if (pathStr.startsWith('routing/add/')) b64 = pathStr.substring(12);
+                    else if (pathStr.startsWith('route/')) b64 = pathStr.substring(6);
+                    else {
+                        let firstSlash = pathStr.indexOf('/');
+                        // Отсекаем всё до первого слеша, если это похоже на команду
+                        if (firstSlash > 0 && firstSlash < 30 && !pathStr.substring(0, firstSlash).includes('?')) {
+                            b64 = pathStr.substring(firstSlash + 1);
+                        } else { b64 = pathStr; }
+                    }
+                }
+
                 try {
                     let bytes = new Uint8Array(atob(b64.padEnd(b64.length + (4 - b64.length % 4) % 4, '=')).split('').map(c=>c.charCodeAt(0)));
                     let decomp = await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).text().catch(()=>null);
@@ -916,27 +959,15 @@
             if(jsonStr) { loadCfg(jsonStr, true); } else { if (val.length > 30 && !val.includes(" ")) { vibe(100); showT("ФОРМАТ НЕ РАСПОЗНАН", 1); } }
         }
 
-        // ====== ФИКС ФОРМАТИРОВАНИЯ ИМПОРТИРОВАННОГО КОДА ======
         function loadCfg(codeStr, saveToHistoryFlag = true) {
             try {
                 g('searchBar').classList.add('hidden');
-                let cn = "New Config"; 
-                let formattedStr = codeStr;
-                
-                // Пробуем распарсить и сразу красиво отформатировать JSON
-                try { 
-                    let j = JSON.parse(codeStr); 
-                    if(j.Name) cn = j.Name; 
-                    formattedStr = JSON.stringify(j, null, 4); // <- Вот эта магия разворачивает сжатый код
-                } catch(e){}
-                
-                els.jsonEditor.value = formattedStr; 
-                lastSavedJson = formattedStr; 
-                edHist = [formattedStr];
-                
+                let cn = "New Config"; let formattedStr = codeStr;
+                try { let j = JSON.parse(codeStr); if(j.Name) cn = j.Name; formattedStr = JSON.stringify(j, null, 4); } catch(e){}
+                els.jsonEditor.value = formattedStr; lastSavedJson = formattedStr; edHist = [formattedStr];
                 if (els.editorBlockWrapper.classList.contains('hidden') && saveToHistoryFlag) { g('uiS2').checked = true; g('uiS2').dispatchEvent(new Event('change')); }
                 updateLines(); linter(); refreshLinks();
-                if (saveToHistoryFlag) { pushHist(cn, formattedStr); showT("Успешно Распознано!"); els.editorBlockWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' }); els.srcInput.value = ''; }
+                if (saveToHistoryFlag) { pushHist(cn, formattedStr, els.resOut.value); showT("Успешно Распознано!"); els.editorBlockWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' }); els.srcInput.value = ''; }
             } catch(e) { vibe(100); showT("Ошибка загрузки в редактор", 1); }
         }
 
@@ -945,7 +976,7 @@
             if(draft && draft.length > 20 && !window.location.hash) { 
                 try { let p = JSON.parse(draft); els.jsonEditor.value = draft; els.pName.value = p.Name||'Черновик'; updateLines(); refreshLinks(); } catch(e) { els.jsonEditor.value = draft; els.pName.value = 'Черновик (Raw)'; updateLines(); } 
             } else if (!window.location.hash) { els.jsonEditor.value = defaultJsonTemplate; els.pName.value = 'New Config'; updateLines(); refreshLinks(); }
-            saveEdState(els.jsonEditor.value); renderHist();
+            saveEdState(els.jsonEditor.value); renderHist(); updateToggleLabel();
         };
 
         // --- СОХРАНЕНИЕ: СЖАТИЕ / КОПИРОВАНИЕ / ФАЙЛЫ ---
@@ -953,10 +984,8 @@
         async function getMini() { try { return `incy-mini://${btoa(String.fromCharCode.apply(null, new Uint8Array(await new Response(new Blob([JSON.stringify(JSON.parse(els.jsonEditor.value))]).stream().pipeThrough(new CompressionStream('deflate-raw'))).arrayBuffer()))).replace(/=+$/,'')}`; } catch(e) { return `incy-mini://${encodeB64(els.jsonEditor.value)}`; } }
         g('btnCopyMini').onclick = async () => { vibe(); try { let m = await getMini(); copyToC(m); } catch(e){ showT("Проверьте код",1); } };
         g('btnCopyResult').onclick = () => { vibe(); copyToC(els.resOut.value); };
-
         g('fileExtSelect').addEventListener('change', (e) => { vibe(); if(e.target.value === 'custom') { g('fileExtSelect').classList.add('hidden'); g('fileExtInput').classList.remove('hidden'); g('fileExtInput').value = '.'; g('fileExtInput').focus(); } });
         g('fileExtInput').addEventListener('blur', (e) => { let val = e.target.value.trim(); if(!val || val === '.') { g('fileExtInput').classList.add('hidden'); g('fileExtSelect').classList.remove('hidden'); g('fileExtSelect').value = '.json'; } });
-
         g('btnDownload').onclick = () => { 
             vibe(); let text = els.jsonEditor.value; if(!text) return;
             let ext = g('fileExtSelect').classList.contains('hidden') ? g('fileExtInput').value.trim() : g('fileExtSelect').value;
@@ -967,17 +996,17 @@
         };
 
         // --- УМНАЯ ИСТОРИЯ ---
-        const getH = () => { 
-            let h = JSON.parse(localStorage.getItem('incy_history') || '[]'); let needsFix = false;
-            h.forEach(i => { if (!i.id) { i.id = i.timestamp || Math.floor(Math.random() * 1000000000); needsFix = true; } });
-            if(needsFix) localStorage.setItem('incy_history', JSON.stringify(h)); return h;
-        };
+        const getH = () => { let h = JSON.parse(localStorage.getItem('incy_history') || '[]'); let needsFix = false; h.forEach(i => { if (!i.id) { i.id = i.timestamp || Math.floor(Math.random() * 1000000000); needsFix = true; } }); if(needsFix) localStorage.setItem('incy_history', JSON.stringify(h)); return h; };
         const setH = d => { localStorage.setItem('incy_history', JSON.stringify(d)); renderHist(); };
         
-        const pushHist = (name, content) => {
+        // Теперь History хранит ИМЕННО ту ссылку, которая была в момент сохранения
+        const pushHist = (name, content, activeUrl) => {
             if(!content) return; name = name || "Без имени"; let hist = getH().filter(i => i.name !== name);
-            let mode = g('autoActivateToggle').checked ? 'onadd' : 'add';
-            let nUrl = ""; try { nUrl = `incy://routing/${mode}/${encodeB64(JSON.stringify(JSON.parse(content)))}`; } catch(e){ nUrl = `incy://routing/${mode}/${encodeB64(content)}`;}
+            let nUrl = activeUrl; 
+            if (!nUrl) {
+                let mode = g('autoActivateToggle').checked ? 'onadd' : 'add';
+                try { nUrl = `incy://routing/${mode}/${encodeB64(JSON.stringify(JSON.parse(content)))}`; } catch(e){ nUrl = `incy://routing/${mode}/${encodeB64(content)}`;}
+            }
             hist.unshift({ id: Date.now(), name: name, url: nUrl, content: content }); if(hist.length > 30) hist.pop(); setH(hist);
         };
 
@@ -989,16 +1018,14 @@
             let hist = getH(); if(!hist.length) { g('historyCard').classList.add('hidden'); return; }
             g('historyCard').classList.remove('hidden'); let data = filt ? hist.filter(i=>i.name.toLowerCase().includes(filt)) : hist;
             els.historyList.innerHTML = data.map(i => {
-                let mode = g('autoActivateToggle').checked ? 'onadd' : 'add';
-                let upUrl = i.url; try { upUrl = `incy://routing/${mode}/${encodeB64(JSON.stringify(JSON.parse(i.content)))}`; } catch(e){upUrl = `incy://routing/${mode}/${encodeB64(i.content)}`;}
+                let upUrl = i.url; // Используем сохраненную сылку с нужным форматом!
                 return `<div class="history-item" data-id="${i.id}"><div class="history-top"> <div class="history-title" data-act="ren">${i.name} ✏️</div><div class="history-controls"> <button class="history-btn-small" data-act="up">⬆</button> <button class="history-btn-small" data-act="dn">⬇</button> <button class="history-btn-small" data-act="dup">⧉</button> <button class="history-btn-small" style="color:var(--red-text)" data-act="del">✖</button> </div></div><div style="display:flex;gap:8px;"> <button class="btn-action" style="flex:1.5;background:var(--accent-blue);color:white;border:none;" onclick="location.href='${upUrl}'">🚀 Запуск</button> <button class="btn-action" style="flex:1;" data-act="load">✒️ Редактор</button> <button class="btn-action" style="flex:1;" onclick="copyToC('${upUrl}')">🔗 Copy</button></div></div>`;
             }).join('');
         };
 
         els.historyList.addEventListener('click', async e => {
             let t = e.target.closest('[data-act]'); if(!t) return; vibe(); 
-            let aid = Number(t.closest('.history-item').dataset.id); let h = getH();
-            let idx = h.findIndex(i=>i.id===aid); 
+            let aid = Number(t.closest('.history-item').dataset.id); let h = getH(); let idx = h.findIndex(i=>i.id===aid); 
             if(idx === -1) { let fallbackName = t.closest('.history-item').querySelector('.history-title').textContent.replace(' ✏️','').trim(); idx = h.findIndex(i=>i.name === fallbackName); }
             if(idx === -1) return; let act = t.dataset.act;
             if (act === 'del') { h.splice(idx,1); showT('Удалено'); } 
