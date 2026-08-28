@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -127,7 +128,6 @@
         .modal-overlay.active .modal-card { transform: translateY(0); }
         .modal-header { font-size: 18px; font-weight: bold; margin-bottom: 16px; display: flex; justify-content: space-between;}
         .setting-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 8px; background: var(--bg-input); border-radius: 8px; border: 1px solid var(--border-gray);}
-        #qrCanvas { background: white; padding: 12px; border-radius: 12px; margin: 0 auto 16px; display: block; border: 2px solid var(--border-gray); max-width: 100%;}
         
         .toast { position: fixed; top: max(20px, env(safe-area-inset-top, 20px)); left: 50%; transform: translate(-50%, -20px); opacity: 0; background: var(--bg-input); border: 1px solid var(--border-gray); color: var(--text-main); padding: 12px 24px; border-radius: 12px; font-size: 14px; font-weight: bold; pointer-events: none; transition: 0.3s; z-index: 10000; box-shadow: 0 10px 25px rgba(0,0,0,0.5); text-align: center; max-width: 90%;}
         .toast.show { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
@@ -473,12 +473,11 @@
     <div class="modal-overlay" id="modalCloud">
         <div class="modal-card">
             <div class="modal-header"> 🚀 Cloud Share <button class="btn-action" onclick="toggleModal('modalCloud')">✕</button> </div>
-            <p style="font-size:12px; color:var(--text-muted); margin-bottom: 16px;">Ваш конфиг надёжно зашифруется стандартом AES-GCM-256 прямо на телефоне. Сервера увидят лишь бинарный мусор.</p>
+            <p style="font-size:12px; color:var(--text-muted); margin-bottom: 16px;">Ваш конфиг надёжно зашифруется стандартом AES-GCM-256 прямо на телефоне. Никто не сможет открыть ссылку без ключа (пароля).</p>
             <input type="text" id="sharePassword" class="resizable-box" style="margin-bottom:12px; min-height:40px; padding:10px;" placeholder="Пароль защиты (можно пустой)">
             <button class="btn-primary" id="btnGenerateCloud">🔐 Зашифровать</button>
             <div id="shareResultBlock" class="hidden" style="margin-top:16px;">
-                <canvas id="qrCanvas"></canvas>
-                <input type="text" id="shareUrlOut" readonly class="resizable-box" style="padding:10px; min-height:40px; text-align:center;">
+                <input type="text" id="shareUrlOut" readonly class="resizable-box" style="padding:10px; min-height:80px; text-align:center;">
                 <button class="btn-action" style="width:100%; margin-top:8px;" onclick="copyToC(document.getElementById('shareUrlOut').value)">📋 Скопировать</button>
             </div>
         </div>
@@ -760,7 +759,6 @@
 
         // --- ВЫБОР ПРОТОКОЛА И НАСТРОЙКА ---
         
-        // Восстановление памяти для кастомного протокола
         if(localStorage.getItem('incy_c_man') !== null) {
             g('customProtoInput').value = localStorage.getItem('incy_c_proto') || '';
             g('customCmdManual').value = localStorage.getItem('incy_c_man') || '';
@@ -857,13 +855,9 @@
                     if (g('customUseToggle').checked) {
                         let cmd = g('autoActivateToggle').checked ? g('customCmdAuto').value.trim() : g('customCmdManual').value.trim();
                         if (cmd && !cmd.endsWith('/')) cmd += '/';
-                        
-                        // Защита от дублей, если юзер случайно вписал команду в сам префикс
                         if (prefix.endsWith(cmd)) prefix = prefix.substring(0, prefix.length - cmd.length);
-
                         newUrl = prefix + cmd + b64;
                     } else {
-                        // Если режим выключен, аккуратно склеиваем
                         if (!prefix.match(/[\/=\?&]$/) && !prefix.endsWith('://')) prefix += '/';
                         newUrl = prefix + b64;
                     }
@@ -905,7 +899,7 @@
             try {
                 let cname = "Config"; try { let p = JSON.parse(els.jsonEditor.value); if(p.Name) cname = p.Name; } catch(e){}
                 lastSavedJson = els.jsonEditor.value; refreshLinks(); 
-                pushHist(cname, els.jsonEditor.value, els.resOut.value); // Сохраняем АКТИВНУЮ ссылку, чтобы формат не слетал
+                pushHist(cname, els.jsonEditor.value, els.resOut.value);
                 els.errorBox.classList.add('hidden'); hasUnsavedChanges = false; showT("✅ Сохранено в Историю");
             } catch(e) {}
         };
@@ -927,14 +921,13 @@
             let detectedProto = protoMatch ? protoMatch[1].toLowerCase() : 'incy';
             if (detectedProto === 'happ') setProtocol('happ'); 
             else if (detectedProto === 'incy' || detectedProto === 'incy-mini') setProtocol('incy'); 
-            else setProtocol(detectedProto); // Автоматом переключает на "Свой"
+            else setProtocol(detectedProto);
 
             if (window.INCY_CUSTOM_PARSER) { let pRes = window.INCY_CUSTOM_PARSER(val); if (pRes) { loadCfg(pRes, true); return; } }
 
             let jsonStr = null;
             if (val.startsWith('{')) { try { JSON.parse(val); jsonStr = val; } catch(e) {} }
             if (!jsonStr) {
-                // Универсальный экстрактор Base64 для самых разных ссылок
                 let b64 = val;
                 if (val.includes('://')) {
                     let pathStr = val.substring(val.indexOf('://') + 3);
@@ -943,7 +936,6 @@
                     else if (pathStr.startsWith('route/')) b64 = pathStr.substring(6);
                     else {
                         let firstSlash = pathStr.indexOf('/');
-                        // Отсекаем всё до первого слеша, если это похоже на команду
                         if (firstSlash > 0 && firstSlash < 30 && !pathStr.substring(0, firstSlash).includes('?')) {
                             b64 = pathStr.substring(firstSlash + 1);
                         } else { b64 = pathStr; }
@@ -999,7 +991,6 @@
         const getH = () => { let h = JSON.parse(localStorage.getItem('incy_history') || '[]'); let needsFix = false; h.forEach(i => { if (!i.id) { i.id = i.timestamp || Math.floor(Math.random() * 1000000000); needsFix = true; } }); if(needsFix) localStorage.setItem('incy_history', JSON.stringify(h)); return h; };
         const setH = d => { localStorage.setItem('incy_history', JSON.stringify(d)); renderHist(); };
         
-        // Теперь History хранит ИМЕННО ту ссылку, которая была в момент сохранения
         const pushHist = (name, content, activeUrl) => {
             if(!content) return; name = name || "Без имени"; let hist = getH().filter(i => i.name !== name);
             let nUrl = activeUrl; 
@@ -1018,7 +1009,7 @@
             let hist = getH(); if(!hist.length) { g('historyCard').classList.add('hidden'); return; }
             g('historyCard').classList.remove('hidden'); let data = filt ? hist.filter(i=>i.name.toLowerCase().includes(filt)) : hist;
             els.historyList.innerHTML = data.map(i => {
-                let upUrl = i.url; // Используем сохраненную сылку с нужным форматом!
+                let upUrl = i.url;
                 return `<div class="history-item" data-id="${i.id}"><div class="history-top"> <div class="history-title" data-act="ren">${i.name} ✏️</div><div class="history-controls"> <button class="history-btn-small" data-act="up">⬆</button> <button class="history-btn-small" data-act="dn">⬇</button> <button class="history-btn-small" data-act="dup">⧉</button> <button class="history-btn-small" style="color:var(--red-text)" data-act="del">✖</button> </div></div><div style="display:flex;gap:8px;"> <button class="btn-action" style="flex:1.5;background:var(--accent-blue);color:white;border:none;" onclick="location.href='${upUrl}'">🚀 Запуск</button> <button class="btn-action" style="flex:1;" data-act="load">✒️ Редактор</button> <button class="btn-action" style="flex:1;" onclick="copyToC('${upUrl}')">🔗 Copy</button></div></div>`;
             }).join('');
         };
@@ -1045,7 +1036,10 @@
 
         const deriveK = async(p,s)=>crypto.subtle.deriveKey({name:"PBKDF2",salt:s,iterations:100000,hash:"SHA-256"}, await crypto.subtle.importKey("raw",new TextEncoder().encode(p),{name:"PBKDF2"},0,["deriveKey"]),{name:"AES-GCM",length:256},0,["encrypt","decrypt"]);
         g('btnOpenCloudModal').onclick = () => { vibe(); toggleModal('modalCloud', true); g('shareResultBlock').classList.add('hidden'); };
-        g('btnGenerateCloud').onclick = async () => { vibe(); if(g('uiLinter').checked && !linter()) {showT('Исправьте код',1); return;} try { let p = g('sharePassword').value || Math.random().toString(36).slice(-8); let salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12)); let enc = await crypto.subtle.encrypt({name: "AES-GCM", iv}, await deriveK(p,salt), new TextEncoder().encode(els.jsonEditor.value)); let su = `${window.location.origin}${window.location.pathname}?sid=${encodeURIComponent(btoa(String.fromCharCode(...new Uint8Array(enc))))}&s=${encodeURIComponent(btoa(String.fromCharCode(...salt)))}&i=${encodeURIComponent(btoa(String.fromCharCode(...iv)))}#${p}`; g('shareUrlOut').value = su; g('shareResultBlock').classList.remove('hidden'); let img = new Image(); img.crossOrigin = "Anonymous"; img.onload = () => { let ctx = g('qrCanvas').getContext('2d'); ctx.canvas.width=200; ctx.canvas.height=200; ctx.clearRect(0,0,200,200); ctx.drawImage(img,0,0,200,200); }; img.src = `https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=${encodeURIComponent(su)}&choe=UTF-8`; showT('Зашифровано AES256!'); } catch(e) { showT('Ошибка шифрования', 1); } };
+        
+        // --- ФИКС: Убрана генерация QR-кода, чтобы не было пустого белого квадрата ---
+        g('btnGenerateCloud').onclick = async () => { vibe(); if(g('uiLinter').checked && !linter()) {showT('Исправьте код',1); return;} try { let p = g('sharePassword').value || Math.random().toString(36).slice(-8); let salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12)); let enc = await crypto.subtle.encrypt({name: "AES-GCM", iv}, await deriveK(p,salt), new TextEncoder().encode(els.jsonEditor.value)); let su = `${window.location.origin}${window.location.pathname}?sid=${encodeURIComponent(btoa(String.fromCharCode(...new Uint8Array(enc))))}&s=${encodeURIComponent(btoa(String.fromCharCode(...salt)))}&i=${encodeURIComponent(btoa(String.fromCharCode(...iv)))}#${p}`; g('shareUrlOut').value = su; g('shareResultBlock').classList.remove('hidden'); showT('Зашифровано AES256!'); } catch(e) { showT('Ошибка шифрования', 1); } };
+        
         async function decryptCloud(u) { try { let url=new URL(u), p=url.hash.substring(1), sid=url.searchParams.get('sid'), s=url.searchParams.get('s'), i=url.searchParams.get('i'); if(!p||!sid||!s||!i)return; let dec = await crypto.subtle.decrypt({name:"AES-GCM", iv:Uint8Array.from(atob(i),c=>c.charCodeAt(0))}, await deriveK(p, Uint8Array.from(atob(s),c=>c.charCodeAt(0))), Uint8Array.from(atob(sid),c=>c.charCodeAt(0))); els.srcInput.value = new TextDecoder().decode(dec); handleSrc(); showT('🔓 Облако расшифровано'); } catch(e) { showT('Ссылка или ключ поврежден', 1); els.srcInput.value=''; } }
         if(window.location.hash && window.location.search.includes('sid=')) decryptCloud(window.location.href);
 
