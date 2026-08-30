@@ -22,9 +22,9 @@
             --header-text: #ffffff;
         }
 
-        body.theme-light { --bg-body:#f3f4f6; --bg-card:#ffffff; --bg-input:#ffffff; --border-gray:#d1d5db; --accent-blue:#2563eb; --accent-green:#059669; --text-main:#111827; --text-muted:#6b7280; --code-color:#0366d6; --line-num-bg:#f9fafb; --header-text:#111827;}
-        body.theme-dracula { --bg-body:#282a36; --bg-card:#44475a; --bg-input:#282a36; --border-gray:#6272a4; --accent-blue:#bd93f9; --accent-green:#50fa7b; --text-main:#f8f8f2; --code-color:#ff79c6; }
-        body.theme-cyberpunk { --bg-body:#fcee09; --bg-card:#111111; --bg-input:#222222; --border-gray:#0bcada; --accent-blue:#0bcada; --accent-green:#ff003c; --text-main:#fcee09; --text-muted:#888888; --line-num-bg:#000000; --code-color: #0bcada; --header-text:#111111;}
+        body.theme-light { --bg-body:#f3f4f6; --bg-card:#ffffff; --bg-input:#ffffff; --border-gray:#d1d5db; --accent-blue:#2563eb; --accent-green:#059669; --text-main:#111827; --text-muted:#6b7280; --code-color:#0366d6; --line-num-bg:#f9fafb; --line-num-color:#6b7280; --header-text:#111827;}
+        body.theme-dracula { --bg-body:#282a36; --bg-card:#44475a; --bg-input:#282a36; --border-gray:#6272a4; --accent-blue:#bd93f9; --accent-green:#50fa7b; --text-main:#f8f8f2; --text-muted:#6272a4; --code-color:#ff79c6; --line-num-bg:#282a36; --line-num-color:#6272a4;}
+        body.theme-cyberpunk { --bg-body:#fcee09; --bg-card:#111111; --bg-input:#222222; --border-gray:#0bcada; --accent-blue:#0bcada; --accent-green:#ff003c; --text-main:#fcee09; --text-muted:#888888; --code-color: #0bcada; --line-num-bg:#000000; --line-num-color:#0bcada; --header-text:#111111;}
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent;}
         body { background-color: var(--bg-body); color: var(--text-main); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; justify-content: center; padding: 16px; padding-bottom: 80px; min-height: 100vh; transition: background-color 0.3s; overflow-x: hidden; }
@@ -170,15 +170,17 @@
         ::selection { background: var(--accent-blue); color: white; }
         
         /* THEME BUILDER CSS */
-        .color-picker-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 13px; color: var(--text-main);}
-        .color-picker-row span { font-weight: bold; }
-        .color-picker { border: none; width: 32px; height: 32px; border-radius: 4px; cursor: pointer; padding: 0; background: transparent; }
+        .color-picker-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+        .color-picker-row { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--text-main); background: var(--bg-card); padding: 6px 10px; border-radius: 8px; border: 1px solid var(--border-gray); }
+        .color-picker-row span { font-weight: bold; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .color-picker { border: none; width: 24px; height: 24px; border-radius: 4px; cursor: pointer; padding: 0; background: transparent; flex-shrink: 0;}
         .color-picker::-webkit-color-swatch-wrapper { padding: 0; }
         .color-picker::-webkit-color-swatch { border: 1px solid var(--border-gray); border-radius: 4px; }
         
         /* Сетка тем */
         .theme-grid { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; padding-top: 4px; scrollbar-width: none; }
         .theme-grid::-webkit-scrollbar { display: none; }
+        
         .th-btn { flex-shrink: 0; background: var(--bg-input); color: var(--text-main); border: 2px solid var(--border-gray); border-radius: 8px; padding: 8px 14px; font-weight: bold; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px;}
         .th-btn.active { border-color: var(--accent-blue); box-shadow: 0 0 10px rgba(59,130,246,0.3);}
         .th-btn-del { font-size: 12px; color: var(--red-text); margin-left: auto; cursor: pointer; background: rgba(239,68,68,0.1); border-radius: 4px; padding: 2px 4px;}
@@ -420,15 +422,24 @@
 
             <div style="font-size:11px; color:var(--text-muted); margin:12px 0 6px; font-weight:bold;">КОНСТРУКТОР ТЕКУЩЕЙ ТЕМЫ:</div>
             <div style="background:var(--bg-input); padding: 12px; border-radius: 12px; border: 1px solid var(--border-gray); margin-bottom: 12px;">
-                <div class="color-picker-row"> <span>Главный Фон</span> <input type="color" class="color-picker" id="cpCbg" value="#0a0d14" oninput="applyColorsLive()"> </div>
-                <div class="color-picker-row"> <span>Фон Карточек</span> <input type="color" class="color-picker" id="cpCcrd" value="#111827" oninput="applyColorsLive()"> </div>
-                <div class="color-picker-row"> <span>Текст основной</span> <input type="color" class="color-picker" id="cpCtx" value="#e5e7eb" oninput="applyColorsLive()"> </div>
-                <div class="color-picker-row"> <span>Акцент (Кнопки)</span> <input type="color" class="color-picker" id="cpCacc" value="#3b82f6" oninput="applyColorsLive()"> </div>
-                <div class="color-picker-row"> <span>Цвет JSON</span> <input type="color" class="color-picker" id="cpCcode" value="#60a5fa" oninput="applyColorsLive()"> </div>
                 
-                <div style="display:flex; gap:8px; margin-top: 12px;">
+                <div class="color-picker-grid">
+                    <div class="color-picker-row" title="Главный фон приложения"> <span>Фон (Body)</span> <input type="color" class="color-picker" id="cpCbg" oninput="applyColorsLive()"> </div>
+                    <div class="color-picker-row" title="Фон блоков и карточек"> <span>Карточки</span> <input type="color" class="color-picker" id="cpCcrd" oninput="applyColorsLive()"> </div>
+                    <div class="color-picker-row" title="Фон полей ввода"> <span>Поля ввода</span> <input type="color" class="color-picker" id="cpCin" oninput="applyColorsLive()"> </div>
+                    <div class="color-picker-row" title="Цвет рамок и разделителей"> <span>Границы</span> <input type="color" class="color-picker" id="cpCbdr" oninput="applyColorsLive()"> </div>
+                    <div class="color-picker-row" title="Основной цвет текста"> <span>Текст (Осн)</span> <input type="color" class="color-picker" id="cpCtx" oninput="applyColorsLive()"> </div>
+                    <div class="color-picker-row" title="Второстепенный текст"> <span>Текст (Втор)</span> <input type="color" class="color-picker" id="cpCmut" oninput="applyColorsLive()"> </div>
+                    <div class="color-picker-row" title="Основной цвет кнопок"> <span>Акцент (Синий)</span> <input type="color" class="color-picker" id="cpCacc" oninput="applyColorsLive()"> </div>
+                    <div class="color-picker-row" title="Цвет успешных действий"> <span>Акцент (Зеленый)</span> <input type="color" class="color-picker" id="cpCok" oninput="applyColorsLive()"> </div>
+                    <div class="color-picker-row" title="Цвет JSON-значений"> <span>Код (JSON)</span> <input type="color" class="color-picker" id="cpCcode" oninput="applyColorsLive()"> </div>
+                    <div class="color-picker-row" title="Фон панели нумерации"> <span>Фон цифр</span> <input type="color" class="color-picker" id="cpCnumBg" oninput="applyColorsLive()"> </div>
+                    <div class="color-picker-row" title="Цвет самих цифр нумерации"> <span>Цвет цифр</span> <input type="color" class="color-picker" id="cpCnumTx" oninput="applyColorsLive()"> </div>
+                </div>
+                
+                <div style="display:flex; gap:8px;">
                     <input type="text" id="newThemeName" class="custom-proto-input" style="flex:1;" placeholder="Имя для темы">
-                    <button class="btn-action btn-action-green" onclick="saveCustomThemeToCollection()" style="font-weight:bold;">💾 Сохранить</button>
+                    <button class="btn-action btn-action-green" onclick="saveCustomThemeToCollection()" style="font-weight:bold;" title="Сохранить или обновить тему">💾 Сохранить</button>
                     <button class="btn-action btn-action-red" onclick="resetThemeColors()" title="Сбросить изменения к сохранённым">🔄</button>
                 </div>
             </div>
@@ -521,10 +532,10 @@
         // --- THEME ENGINE ---
         const THEMES = {
             base: [
-                {id: 'default', name: 'Dark', c: '#0a0d14', colors: {'--bg-body': '#0a0d14', '--bg-card': '#111827', '--text-main': '#e5e7eb', '--accent-blue': '#3b82f6', '--code-color': '#60a5fa'}},
-                {id: 'light', name: 'Light', c: '#f3f4f6', colors: {'--bg-body': '#f3f4f6', '--bg-card': '#ffffff', '--text-main': '#111827', '--accent-blue': '#2563eb', '--code-color': '#0366d6'}},
-                {id: 'dracula', name: 'Drac', c: '#282a36', colors: {'--bg-body': '#282a36', '--bg-card': '#44475a', '--text-main': '#f8f8f2', '--accent-blue': '#bd93f9', '--code-color': '#ff79c6'}},
-                {id: 'cyberpunk', name: 'Cyber', c: '#fcee09', colors: {'--bg-body': '#fcee09', '--bg-card': '#111111', '--text-main': '#fcee09', '--accent-blue': '#0bcada', '--code-color': '#0bcada'}}
+                {id: 'default', name: 'Dark', c: '#0a0d14', colors: {'--bg-body': '#0a0d14', '--bg-card': '#111827', '--bg-input': '#1f2937', '--border-gray': '#374151', '--text-main': '#e5e7eb', '--text-muted': '#9ca3af', '--accent-blue': '#3b82f6', '--accent-green': '#10b981', '--code-color': '#60a5fa', '--line-num-bg': '#0d1117', '--line-num-color': '#6b7280'}},
+                {id: 'light', name: 'Light', c: '#f3f4f6', colors: {'--bg-body': '#f3f4f6', '--bg-card': '#ffffff', '--bg-input': '#ffffff', '--border-gray': '#d1d5db', '--text-main': '#111827', '--text-muted': '#6b7280', '--accent-blue': '#2563eb', '--accent-green': '#059669', '--code-color': '#0366d6', '--line-num-bg': '#f9fafb', '--line-num-color': '#6b7280'}},
+                {id: 'dracula', name: 'Drac', c: '#282a36', colors: {'--bg-body': '#282a36', '--bg-card': '#44475a', '--bg-input': '#282a36', '--border-gray': '#6272a4', '--text-main': '#f8f8f2', '--text-muted': '#6272a4', '--accent-blue': '#bd93f9', '--accent-green': '#50fa7b', '--code-color': '#ff79c6', '--line-num-bg': '#282a36', '--line-num-color': '#6272a4'}},
+                {id: 'cyberpunk', name: 'Cyber', c: '#fcee09', colors: {'--bg-body': '#fcee09', '--bg-card': '#111111', '--bg-input': '#222222', '--border-gray': '#0bcada', '--text-main': '#fcee09', '--text-muted': '#888888', '--accent-blue': '#0bcada', '--accent-green': '#ff003c', '--code-color': '#0bcada', '--line-num-bg': '#000000', '--line-num-color': '#0bcada'}}
             ],
             user: JSON.parse(localStorage.getItem('incy_user_themes') || '[]'),
             save() { localStorage.setItem('incy_user_themes', JSON.stringify(this.user)); renderThemeGrid(); },
@@ -552,7 +563,20 @@
         };
 
         setTheme(localStorage.getItem('incy_t') || 'default');
-        g('btnThemeToggle').onclick = () => { vibe(); setTheme(document.body.className.includes('light')?'default':'light'); };
+        
+        // Умный тумблер Луна/Солнце с памятью
+        g('btnThemeToggle').onclick = () => { 
+            vibe(); 
+            let curr = localStorage.getItem('incy_t') || 'default';
+            if (curr !== 'light') {
+                localStorage.setItem('incy_last_dark', curr);
+                setTheme('light');
+            } else {
+                let lastDark = localStorage.getItem('incy_last_dark') || 'default';
+                setTheme(lastDark);
+            }
+        };
+        
         g('btnThemeBuilder').onclick = () => { vibe(); toggleModal('modalThemeBuilder', true); renderThemeGrid(); };
 
         function renderThemeGrid() {
@@ -579,18 +603,30 @@
             if(!colorsObj) return;
             if(colorsObj['--bg-body']) g('cpCbg').value = colorsObj['--bg-body'];
             if(colorsObj['--bg-card']) g('cpCcrd').value = colorsObj['--bg-card'];
+            if(colorsObj['--bg-input']) g('cpCin').value = colorsObj['--bg-input'];
+            if(colorsObj['--border-gray']) g('cpCbdr').value = colorsObj['--border-gray'];
             if(colorsObj['--text-main']) g('cpCtx').value = colorsObj['--text-main'];
+            if(colorsObj['--text-muted']) g('cpCmut').value = colorsObj['--text-muted'];
             if(colorsObj['--accent-blue']) g('cpCacc').value = colorsObj['--accent-blue'];
+            if(colorsObj['--accent-green']) g('cpCok').value = colorsObj['--accent-green'];
             if(colorsObj['--code-color']) g('cpCcode').value = colorsObj['--code-color'];
+            if(colorsObj['--line-num-bg']) g('cpCnumBg').value = colorsObj['--line-num-bg'];
+            if(colorsObj['--line-num-color']) g('cpCnumTx').value = colorsObj['--line-num-color'];
         }
 
         function getColorsFromPickers() {
             return {
-                '--bg-body': g('cpCbg').value, '--bg-input': g('cpCbg').value,
-                '--bg-card': g('cpCcrd').value, '--line-num-bg': g('cpCcrd').value,
+                '--bg-body': g('cpCbg').value,
+                '--bg-card': g('cpCcrd').value,
+                '--bg-input': g('cpCin').value,
+                '--border-gray': g('cpCbdr').value,
                 '--text-main': g('cpCtx').value,
-                '--accent-blue': g('cpCacc').value, '--accent-green': g('cpCacc').value,
-                '--code-color': g('cpCcode').value, '--border-gray': '#374151'
+                '--text-muted': g('cpCmut').value,
+                '--accent-blue': g('cpCacc').value,
+                '--accent-green': g('cpCok').value,
+                '--code-color': g('cpCcode').value,
+                '--line-num-bg': g('cpCnumBg').value,
+                '--line-num-color': g('cpCnumTx').value
             };
         }
 
@@ -600,9 +636,7 @@
         };
         
         window.resetThemeColors = () => {
-            vibe();
-            setTheme(localStorage.getItem('incy_t') || 'default');
-            showT('Сброшено к сохраненному');
+            vibe(); setTheme(localStorage.getItem('incy_t') || 'default'); showT('Сброшено к сохраненному');
         };
 
         window.saveCustomThemeToCollection = () => {
