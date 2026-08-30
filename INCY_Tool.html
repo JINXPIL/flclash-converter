@@ -179,8 +179,6 @@
         /* Сетка тем */
         .theme-grid { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; padding-top: 4px; scrollbar-width: none; }
         .theme-grid::-webkit-scrollbar { display: none; }
-        
-        /* Исправление цвета текста на кнопках тем */
         .th-btn { flex-shrink: 0; background: var(--bg-input); color: var(--text-main); border: 2px solid var(--border-gray); border-radius: 8px; padding: 8px 14px; font-weight: bold; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px;}
         .th-btn.active { border-color: var(--accent-blue); box-shadow: 0 0 10px rgba(59,130,246,0.3);}
         .th-btn-del { font-size: 12px; color: var(--red-text); margin-left: auto; cursor: pointer; background: rgba(239,68,68,0.1); border-radius: 4px; padding: 2px 4px;}
@@ -422,16 +420,16 @@
 
             <div style="font-size:11px; color:var(--text-muted); margin:12px 0 6px; font-weight:bold;">КОНСТРУКТОР ТЕКУЩЕЙ ТЕМЫ:</div>
             <div style="background:var(--bg-input); padding: 12px; border-radius: 12px; border: 1px solid var(--border-gray); margin-bottom: 12px;">
-                <div class="color-picker-row"> <span>Главный Фон</span> <input type="color" class="color-picker" id="cpCbg" value="#0a0d14"> </div>
-                <div class="color-picker-row"> <span>Фон Карточек</span> <input type="color" class="color-picker" id="cpCcrd" value="#111827"> </div>
-                <div class="color-picker-row"> <span>Текст основной</span> <input type="color" class="color-picker" id="cpCtx" value="#e5e7eb"> </div>
-                <div class="color-picker-row"> <span>Акцент (Кнопки)</span> <input type="color" class="color-picker" id="cpCacc" value="#3b82f6"> </div>
-                <div class="color-picker-row"> <span>Цвет JSON</span> <input type="color" class="color-picker" id="cpCcode" value="#60a5fa"> </div>
+                <div class="color-picker-row"> <span>Главный Фон</span> <input type="color" class="color-picker" id="cpCbg" value="#0a0d14" oninput="applyColorsLive()"> </div>
+                <div class="color-picker-row"> <span>Фон Карточек</span> <input type="color" class="color-picker" id="cpCcrd" value="#111827" oninput="applyColorsLive()"> </div>
+                <div class="color-picker-row"> <span>Текст основной</span> <input type="color" class="color-picker" id="cpCtx" value="#e5e7eb" oninput="applyColorsLive()"> </div>
+                <div class="color-picker-row"> <span>Акцент (Кнопки)</span> <input type="color" class="color-picker" id="cpCacc" value="#3b82f6" oninput="applyColorsLive()"> </div>
+                <div class="color-picker-row"> <span>Цвет JSON</span> <input type="color" class="color-picker" id="cpCcode" value="#60a5fa" oninput="applyColorsLive()"> </div>
                 
                 <div style="display:flex; gap:8px; margin-top: 12px;">
                     <input type="text" id="newThemeName" class="custom-proto-input" style="flex:1;" placeholder="Имя для темы">
-                    <button class="btn-action btn-action-green" onclick="saveCustomThemeToCollection()">➕ Сохранить</button>
-                    <button class="btn-action" onclick="applyColorsLive()" title="Примерить не сохраняя">👀</button>
+                    <button class="btn-action btn-action-green" onclick="saveCustomThemeToCollection()" style="font-weight:bold;">💾 Сохранить</button>
+                    <button class="btn-action btn-action-red" onclick="resetThemeColors()" title="Сбросить изменения к сохранённым">🔄</button>
                 </div>
             </div>
 
@@ -523,8 +521,10 @@
         // --- THEME ENGINE ---
         const THEMES = {
             base: [
-                {id: 'default', name: 'Dark', c: '#0a0d14'}, {id: 'light', name: 'Light', c: '#f3f4f6'},
-                {id: 'dracula', name: 'Drac', c: '#282a36'}, {id: 'cyberpunk', name: 'Cyber', c: '#fcee09'}
+                {id: 'default', name: 'Dark', c: '#0a0d14', colors: {'--bg-body': '#0a0d14', '--bg-card': '#111827', '--text-main': '#e5e7eb', '--accent-blue': '#3b82f6', '--code-color': '#60a5fa'}},
+                {id: 'light', name: 'Light', c: '#f3f4f6', colors: {'--bg-body': '#f3f4f6', '--bg-card': '#ffffff', '--text-main': '#111827', '--accent-blue': '#2563eb', '--code-color': '#0366d6'}},
+                {id: 'dracula', name: 'Drac', c: '#282a36', colors: {'--bg-body': '#282a36', '--bg-card': '#44475a', '--text-main': '#f8f8f2', '--accent-blue': '#bd93f9', '--code-color': '#ff79c6'}},
+                {id: 'cyberpunk', name: 'Cyber', c: '#fcee09', colors: {'--bg-body': '#fcee09', '--bg-card': '#111111', '--text-main': '#fcee09', '--accent-blue': '#0bcada', '--code-color': '#0bcada'}}
             ],
             user: JSON.parse(localStorage.getItem('incy_user_themes') || '[]'),
             save() { localStorage.setItem('incy_user_themes', JSON.stringify(this.user)); renderThemeGrid(); },
@@ -536,12 +536,16 @@
         const setTheme = th => { 
             document.body.className = ''; document.documentElement.style = '';
             let uTh = THEMES.get(th);
+            let bTh = THEMES.base.find(t=>t.id===th);
+            
             if(uTh) {
                 for(let k in uTh.colors) document.documentElement.style.setProperty(k, uTh.colors[k]);
                 syncPickers(uTh.colors);
-            } else if (th !== 'default') {
-                document.body.classList.add(`theme-${th}`);
-                syncPickers();
+                if(g('newThemeName')) g('newThemeName').value = uTh.name;
+            } else if (bTh) {
+                if (th !== 'default') document.body.classList.add(`theme-${th}`);
+                syncPickers(bTh.colors);
+                if(g('newThemeName')) g('newThemeName').value = bTh.name + ' (Copy)';
             }
             localStorage.setItem('incy_t', th); 
             renderThemeGrid();
@@ -590,12 +594,35 @@
             };
         }
 
-        window.applyColorsLive = () => { vibe(); let c = getColorsFromPickers(); document.body.className=''; for(let k in c) document.documentElement.style.setProperty(k, c[k]); };
-        window.saveCustomThemeToCollection = () => {
-            vibe(); let n = g('newThemeName').value.trim() || 'My Theme ' + (THEMES.user.length+1);
-            let c = getColorsFromPickers(); THEMES.add(n, c); g('newThemeName').value = '';
-            setTheme(THEMES.user[THEMES.user.length-1].id); showT('Тема сохранена в коллекции!');
+        window.applyColorsLive = () => { 
+            let c = getColorsFromPickers(); 
+            for(let k in c) document.documentElement.style.setProperty(k, c[k]); 
         };
+        
+        window.resetThemeColors = () => {
+            vibe();
+            setTheme(localStorage.getItem('incy_t') || 'default');
+            showT('Сброшено к сохраненному');
+        };
+
+        window.saveCustomThemeToCollection = () => {
+            vibe(); 
+            let n = g('newThemeName').value.trim() || 'My Theme ' + (THEMES.user.length+1);
+            let c = getColorsFromPickers(); 
+            
+            let existing = THEMES.user.find(t => t.name === n);
+            if(existing) {
+                existing.colors = c;
+                THEMES.save();
+                setTheme(existing.id);
+                showT('Тема обновлена!');
+            } else {
+                THEMES.add(n, c); 
+                setTheme(THEMES.user[THEMES.user.length-1].id); 
+                showT('Новая тема сохранена!');
+            }
+        };
+
         window.exportCurrentThemeAsFile = () => {
             vibe(); let curr = localStorage.getItem('incy_t') || 'default';
             let th = THEMES.get(curr);
