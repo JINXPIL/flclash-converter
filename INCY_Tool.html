@@ -98,7 +98,8 @@
         .json-textarea { flex: 1; color: var(--code-color); background: transparent; border: none; padding: 16px; padding-bottom: 80px; resize: none; outline: none; min-width: 0; white-space: pre !important; word-wrap: normal !important; overflow: auto; }
         .json-textarea.wrap-text { white-space: pre-wrap !important; word-wrap: break-word !important; }
 
-        .resizer { height: 28px; background: var(--bg-input); border-top: 1px solid var(--border-gray); display: flex; justify-content: center; align-items: center; cursor: ns-resize; flex-shrink: 0; }
+        /* ИСПРАВЛЕНИЕ: touch-action: none и высокий z-index, чтобы скролл не перехватывал касание */
+        .resizer { height: 28px; background: var(--bg-input); border-top: 1px solid var(--border-gray); display: flex; justify-content: center; align-items: center; cursor: ns-resize; flex-shrink: 0; position: relative; z-index: 50; touch-action: none; user-select: none;}
         .resizer-handle { width: 60px; height: 4px; background: var(--border-gray); border-radius: 2px; }
         
         #visualGraph { background: var(--bg-body); overflow: auto; padding: 20px; font-family: sans-serif; position: absolute; inset: 0; z-index: 10; display: none; flex-direction: column; gap: 8px;}
@@ -874,7 +875,7 @@
 
         let isDrag=false, startY=0, startH=0;
         const initDrag = e => { isDrag=true; startY=e.type.includes('touch')?e.touches[0].clientY:e.clientY; startH=els.editorContainerTarget.offsetHeight; document.body.style.userSelect='none'; };
-        const doDrag = e => { if(!isDrag)return; if(e.cancelable)e.preventDefault(); let currY=e.type.includes('touch')?e.touches[0].clientY:e.clientY; els.editorContainerTarget.style.height=Math.max(150, Math.min(startH+(currY-startY), window.innerHeight*0.8))+'px'; };
+        const doDrag = e => { if(!isDrag)return; if(e.cancelable)e.preventDefault(); let currY=e.type.includes('touch')?e.touches[0].clientY:e.clientY; els.editorContainerTarget.style.height=Math.max(220, Math.min(startH+(currY-startY), window.innerHeight*0.8))+'px'; };
         const stopDrag = () => { isDrag=false; document.body.style.userSelect=''; };
         els.resizer.addEventListener('mousedown', initDrag); els.resizer.addEventListener('touchstart', initDrag, {passive:false});
         window.addEventListener('mousemove', doDrag); window.addEventListener('touchmove', doDrag, {passive:false});
