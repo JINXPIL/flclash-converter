@@ -459,14 +459,22 @@
     <!-- МОДАЛКА ПЛАГИНОВ -->
     <div class="modal-overlay" id="modalPlugins">
         <div class="modal-card">
-            <div class="modal-header"> 🧩 Плагины (Extensions) <button class="btn-action" onclick="toggleModal('modalPlugins')">✕</button> </div>
-            <p style="font-size:12px; color:var(--text-muted); margin-bottom: 16px;"> Установите JS-скрипт с интернета, чтобы редактор начал понимать YAML, XML и другие форматы. </p>
-            <div style="display:flex; gap:8px; margin-bottom:16px; align-items: stretch;">
-                <input type="text" id="pluginUrl" class="custom-proto-input" style="flex:1;" placeholder="Прямая ссылка на .js скрипт">
-                <button class="btn-action btn-action-green" id="btnInstallPlugin">💾</button>
+            <div class="modal-header"> 🧩 Управление плагинами <button class="btn-action" onclick="toggleModal('modalPlugins')">✕</button> </div>
+            
+            <div style="font-size:11px; color:var(--text-muted); margin-bottom:6px; font-weight:bold;">КАТАЛОГ (БЫСТРАЯ УСТАНОВКА):</div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:16px;">
+                <button class="btn-action" onclick="installPresetPlugin('yaml')" style="text-align:left; font-size:12px; justify-content: flex-start;">📄 YAML Конвертер</button>
+                <button class="btn-action" onclick="installPresetPlugin('minify')" style="text-align:left; font-size:12px; justify-content: flex-start;">🗜️ Сжать JSON (В 1 строку)</button>
             </div>
-            <div style="font-size:11px; color:var(--text-muted); margin-bottom:6px; font-weight:bold;">УСТАНОВЛЕННО:</div>
-            <div id="pluginsList"></div>
+
+            <div style="font-size:11px; color:var(--text-muted); margin-bottom:6px; font-weight:bold;">РУЧНАЯ УСТАНОВКА ИЗ СЕТИ ИЛИ КОДА:</div>
+            <div style="display:flex; gap:8px; margin-bottom:16px; align-items: stretch;">
+                <input type="text" id="pluginUrl" class="custom-proto-input" style="flex:1; font-size: 12px;" placeholder="URL скрипта (.js) или код (data:...)">
+                <button class="btn-action btn-action-green" id="btnInstallPlugin" title="Установить">📥</button>
+            </div>
+            
+            <div style="font-size:11px; color:var(--text-muted); margin-bottom:6px; font-weight:bold;">УСТАНОВЛЕННЫЕ ПЛАГИНЫ:</div>
+            <div id="pluginsList" style="display:flex; flex-direction:column; gap:8px; max-height: 200px; overflow-y:auto;"></div>
         </div>
     </div>
 
@@ -680,28 +688,113 @@
             } catch(e) { showT('Ошибка валидации URL JSON темы', 1); }
         };
 
-        // --- ПЛАГИНЫ ---
+        // --- ПЛАГИНЫ (ОБНОВЛЕННЫЕ С АНТИ-АЛЕРТОМ И ПРЕСЕТАМИ) ---
+        
+        // API для плагинов
+        window.INCY_API = {
+            getText: () => els.jsonEditor.value,
+            setText: (t) => { els.jsonEditor.value = t; updateLines(); saveEdState(t); linter(); refreshLinks(); },
+            toast: (msg, err=false) => showT(msg, err)
+        };
+
         g('btnPluginsModal').onclick = () => { vibe(); toggleModal('modalPlugins', true); renderPlugins(); };
-        const loadPluginsCore = () => { let plugs = JSON.parse(localStorage.getItem('incy_plugins') || '[]'); plugs.forEach(p => { try { window.eval(p.code); } catch(e) { console.error("Ошибка в плагине", p.url); } }); };
+        
+        const loadPluginsCore = () => { 
+            // Сбрасываем хуки перед загрузкой
+            window.INCY_CUSTOM_LINTER = null;
+            window.INCY_CUSTOM_FORMATTER = null;
+            window.INCY_CUSTOM_PARSER = null;
+
+            let plugs = JSON.parse(localStorage.getItem('incy_plugins') || '[]'); 
+            plugs.forEach(p => { 
+                if (p.active !== false) {
+                    try { 
+                        // БЛОКИРАТОР АЛЕРТОВ (Чтобы кривые плагины не спамили при перезагрузке)
+                        let oldAlert = window.alert;
+                        window.alert = (msg) => console.log("Заблокирован alert от плагина: ", msg);
+                        window.eval(p.code); 
+                        window.alert = oldAlert; // Возвращаем нормальный alert для интерфейса
+                    } catch(e) { console.error("Ошибка в плагине", p.name); } 
+                }
+            }); 
+        };
         loadPluginsCore();
+        
         const renderPlugins = () => {
             let plugs = JSON.parse(localStorage.getItem('incy_plugins') || '[]');
-            if(plugs.length === 0) { g('pluginsList').innerHTML = '<div style="font-size:12px; color:var(--text-muted);">Плагинов нет.</div>'; return; }
+            if(plugs.length === 0) { g('pluginsList').innerHTML = '<div style="font-size:12px; color:var(--text-muted); padding: 8px; text-align:center;">Плагинов пока нет. Выберите из каталога выше!</div>'; return; }
             g('pluginsList').innerHTML = plugs.map(p => `
-                <div class="setting-row">
-                    <div style="font-size:11px; max-width:80%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--code-color);" title="${p.url}">${p.url}</div>
-                    <button class="btn-action btn-action-red" onclick="window.delPlugin(${p.id})">✖</button>
+                <div style="background:var(--bg-input); border:1px solid var(--border-gray); padding:8px 12px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+                    <div style="display:flex; flex-direction:column; overflow:hidden;">
+                        <span style="font-size:13px; font-weight:bold; color:var(--text-main); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.name || 'Скрипт'}</span>
+                    </div>
+                    <div style="display:flex; gap:6px; align-items:center;">
+                        <label class="switch" style="transform:scale(0.8);">
+                            <input type="checkbox" ${p.active !== false ? 'checked' : ''} onchange="window.togglePlugin(${p.id}, this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                        <button class="btn-action btn-action-red" style="padding:4px 8px;" onclick="window.delPlugin(${p.id})" title="Удалить">✖</button>
+                    </div>
                 </div>
             `).join('');
         };
+
+        window.togglePlugin = (id, isActive) => {
+            let plugs = JSON.parse(localStorage.getItem('incy_plugins') || '[]');
+            let idx = plugs.findIndex(p => p.id === id);
+            if(idx > -1) {
+                plugs[idx].active = isActive;
+                localStorage.setItem('incy_plugins', JSON.stringify(plugs));
+                loadPluginsCore();
+                if(isActive) showT('Плагин включен'); else showT('Плагин выключен');
+            }
+        };
+
+        window.installPresetPlugin = (type) => {
+            vibe();
+            let plugs = JSON.parse(localStorage.getItem('incy_plugins') || '[]');
+            let newPlug = null;
+            if (type === 'minify') {
+                newPlug = { id: Date.now(), name: '🗜️ Сжиматель (Minifier)', active: true, code: `window.INCY_CUSTOM_FORMATTER = function(val) { return JSON.stringify(JSON.parse(val)); }; window.INCY_API.toast('JSON сжат в 1 строку!');` };
+            } else if (type === 'yaml') {
+                newPlug = { 
+                    id: Date.now(), name: '📄 YAML Конвертер', active: true, 
+                    code: `
+                    if(!window.jsyaml) {
+                        let s = document.createElement('script');
+                        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js';
+                        document.head.appendChild(s);
+                        s.onload = () => window.INCY_API.toast('Движок YAML загружен!');
+                    }
+                    window.INCY_CUSTOM_PARSER = function(val) {
+                        if(!val.startsWith('{') && window.jsyaml) {
+                            try { return JSON.stringify(jsyaml.load(val), null, 4); } catch(e){}
+                        } return null;
+                    };
+                    ` 
+                };
+            }
+            if (newPlug) { plugs.push(newPlug); localStorage.setItem('incy_plugins', JSON.stringify(plugs)); loadPluginsCore(); renderPlugins(); showT('Плагин установлен!'); }
+        }
+
         g('btnInstallPlugin').onclick = async () => {
             let url = g('pluginUrl').value.trim(); if(!url) return;
             try {
-                vibe(); g('btnInstallPlugin').textContent = '...'; let res = await fetch(url); let code = await res.text();
-                let plugs = JSON.parse(localStorage.getItem('incy_plugins') || '[]'); plugs.push({id: Date.now(), url: url, code: code}); localStorage.setItem('incy_plugins', JSON.stringify(plugs));
+                vibe(); g('btnInstallPlugin').textContent = '...'; 
+                let code = "";
+                if (url.startsWith('data:')) {
+                    code = decodeURIComponent(escape(atob(url.split(',')[1])));
+                } else {
+                    let res = await fetch(url); code = await res.text();
+                }
+                
+                let plugs = JSON.parse(localStorage.getItem('incy_plugins') || '[]'); 
+                plugs.push({id: Date.now(), name: 'Пользовательский скрипт', active: true, url: url, code: code}); 
+                localStorage.setItem('incy_plugins', JSON.stringify(plugs));
+                
                 try { window.eval(code); showT('Плагин запущен!'); } catch(e) { showT('Ошибка кода плагина', 1); }
-                g('pluginUrl').value = ''; renderPlugins(); g('btnInstallPlugin').textContent = '💾'; linter();
-            } catch(e) { showT('Ошибка сервера (CORS)', 1); g('btnInstallPlugin').textContent = '💾'; }
+                g('pluginUrl').value = ''; renderPlugins(); g('btnInstallPlugin').textContent = '📥'; linter();
+            } catch(e) { showT('Ошибка (Проверьте ссылку)', 1); g('btnInstallPlugin').textContent = '📥'; }
         };
         window.delPlugin = (id) => {
             let plugs = JSON.parse(localStorage.getItem('incy_plugins') || '[]'); plugs = plugs.filter(p => p.id !== id); localStorage.setItem('incy_plugins', JSON.stringify(plugs));
