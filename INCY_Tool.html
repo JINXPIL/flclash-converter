@@ -56,6 +56,7 @@
         .btn-action-blue { background: var(--bg-input); color: var(--accent-blue); border-color: rgba(59,130,246,0.3); }
         .btn-action-blue:active { background: var(--accent-blue); color: white;}
         .btn-action-green { background: var(--bg-input); color: var(--accent-green); border-color: rgba(16,185,129,0.3); }
+        .btn-action-green:active { background: var(--accent-green); color: white;}
         .btn-action-red { color: var(--red-text); }
         .btn-action-red:active { background: var(--red-text); color: white; }
         .btn-util { background: var(--bg-card); }
@@ -73,7 +74,6 @@
         .fs-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; border-bottom: 1px solid var(--border-gray); padding-bottom: 12px; margin-bottom: 16px;}
         .fs-header-info { display: flex; flex-direction: column; min-width: 0; flex: 1; align-items: flex-start; }
         
-        /* Ввод имени конфигурации */
         #profileNameInput { background: transparent; border: 1px dashed transparent; color: var(--text-main); font-size: 14px; font-weight: bold; font-family: inherit; outline: none; width: 100%; padding: 2px 4px; border-radius: 6px; transition: 0.2s; margin-left: -4px; max-width: 100%; text-overflow: ellipsis; }
         #profileNameInput:focus { border-color: var(--accent-blue); background: var(--bg-input); }
         #profileNameInput:hover:not(:focus) { border-color: var(--border-gray); background: var(--bg-input); }
@@ -160,7 +160,9 @@
         .custom-proto-container { width: 100%; margin-top: 10px; display: none; margin-bottom: 2px; }
         .custom-proto-container.active { display: block; animation: slide-down 0.2s ease-out; }
         @keyframes slide-down { 0% { opacity: 0; transform: translateY(-5px); } 100% { opacity: 1; transform: translateY(0); } }
-        .custom-proto-input { width: 100%; background: var(--bg-body); border: 1px solid var(--border-gray); border-radius: 8px; padding: 10px 12px; font-family: monospace; font-size: 13px; color: var(--text-main); outline: none; transition: 0.2s;}
+        
+        /* ПРАВИЛЬНЫЙ ИНПУТ ДЛЯ ОДНОСТРОЧНЫХ ПОЛЕЙ (Без багов с RTL и высотой) */
+        .custom-proto-input { width: 100%; background: var(--bg-input); border: 1px solid var(--border-gray); border-radius: 8px; padding: 10px 12px; font-family: inherit; font-size: 13px; color: var(--text-main); outline: none; transition: 0.2s; }
         .custom-proto-input:focus { border-color: var(--accent-blue); }
 
         .ext-input { background: var(--bg-input); border: 1px solid var(--border-gray); border-radius: 12px; padding: 12px 8px; font-family: monospace; font-size: 14px; color: var(--text-main); outline: none; transition: 0.2s; text-align: center; font-weight: bold; width: 100px; flex-shrink: 0; }
@@ -179,7 +181,7 @@
         /* Сетка тем */
         .theme-grid { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; padding-top: 4px; scrollbar-width: none; }
         .theme-grid::-webkit-scrollbar { display: none; }
-        .th-btn { flex-shrink: 0; background: var(--bg-input); border: 2px solid var(--bg-input); border-radius: 8px; padding: 8px 14px; font-weight: bold; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px;}
+        .th-btn { flex-shrink: 0; background: var(--bg-input); border: 2px solid var(--border-gray); border-radius: 8px; padding: 8px 14px; font-weight: bold; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px;}
         .th-btn.active { border-color: var(--accent-blue); box-shadow: 0 0 10px rgba(59,130,246,0.3);}
         .th-btn-del { font-size: 12px; color: var(--red-text); margin-left: auto; cursor: pointer; background: rgba(239,68,68,0.1); border-radius: 4px; padding: 2px 4px;}
         .th-color-dot { width: 12px; height: 12px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); }
@@ -301,7 +303,7 @@
                 
                 <!-- ПРОДВИНУТЫЙ КОНСТРУКТОР КАСТОМНОГО ПРЕДФИКСА -->
                 <div id="customProtoContainer" class="custom-proto-container">
-                    <input type="text" id="customProtoInput" class="custom-proto-input" placeholder="Базовый префикс (напр: throne, clash)" spellcheck="false" autocomplete="off" style="margin-bottom: 8px;">
+                    <input type="text" id="customProtoInput" class="custom-proto-input" placeholder="Базовый префикс (напр: throne, clash)" spellcheck="false" autocomplete="off" style="margin-bottom: 8px; font-family: monospace;">
                     
                     <div style="background: var(--bg-body); border: 1px solid var(--border-gray); border-radius: 8px; padding: 10px;">
                         <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: bold; color: var(--text-main); cursor: pointer; margin-bottom: 8px;">
@@ -311,11 +313,11 @@
                         <div id="customCommandsBox" style="display: flex; gap: 8px; transition: 0.2s;">
                             <div style="flex: 1;">
                                 <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 4px; padding-left: 2px;">Команда (Выкл)</div>
-                                <input type="text" id="customCmdManual" class="custom-proto-input" style="font-size: 12px; padding: 6px 10px;" placeholder="напр: route">
+                                <input type="text" id="customCmdManual" class="custom-proto-input" style="font-size: 12px; padding: 6px 10px; font-family: monospace;" placeholder="напр: route">
                             </div>
                             <div style="flex: 1;">
                                 <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 4px; padding-left: 2px;">Команда (Вкл)</div>
-                                <input type="text" id="customCmdAuto" class="custom-proto-input" style="font-size: 12px; padding: 6px 10px;" placeholder="напр: onadd">
+                                <input type="text" id="customCmdAuto" class="custom-proto-input" style="font-size: 12px; padding: 6px 10px; font-family: monospace;" placeholder="напр: onadd">
                             </div>
                         </div>
                     </div>
@@ -367,7 +369,7 @@
                 <span class="badge">История</span>
                 <button class="btn-action btn-action-red" style="font-size: 11px; padding: 6px 10px;" id="btnClearHistory">Очистить всё</button>
             </div>
-            <input type="text" id="histSearch" placeholder="🔍 Найти конфиг..." class="resizable-box" style="margin-bottom: 12px; padding: 10px; min-height: 40px; font-family:inherit;">
+            <input type="text" id="histSearch" placeholder="🔍 Найти конфиг..." class="custom-proto-input" style="margin-bottom: 12px;">
             <div id="historyList"></div>
         </div>
     </div>
@@ -427,17 +429,17 @@
                 <div class="color-picker-row"> <span>Цвет JSON</span> <input type="color" class="color-picker" id="cpCcode" value="#60a5fa"> </div>
                 
                 <div style="display:flex; gap:8px; margin-top: 12px;">
-                    <input type="text" id="newThemeName" class="resizable-box" style="padding:10px; min-height:0; flex:1;" placeholder="Имя для сохранения">
-                    <button class="btn-green" style="padding:10px !important;" onclick="saveCustomThemeToCollection()">➕ Сохранить</button>
-                    <button class="btn-action" style="padding:10px !important;" onclick="applyColorsLive()" title="Примерить не сохраняя">👀</button>
+                    <input type="text" id="newThemeName" class="custom-proto-input" style="flex:1;" placeholder="Имя для темы">
+                    <button class="btn-action btn-action-green" onclick="saveCustomThemeToCollection()">➕ Сохранить</button>
+                    <button class="btn-action" onclick="applyColorsLive()" title="Примерить не сохраняя">👀</button>
                 </div>
             </div>
 
             <div style="font-size:11px; color:var(--text-muted); margin-bottom:6px; font-weight:bold;">ЗАГРУЗИТЬ ТЕМУ (.INCYTHEME):</div>
             <div style="display:flex; gap:8px; margin-bottom: 12px;">
-                <input type="text" id="themeUrlInput" class="resizable-box" style="padding:10px; min-height:0; flex:1;" placeholder="URL (GitHub/Pastebin)">
-                <button class="btn-primary" style="width:auto; padding:10px;" onclick="loadThemeFromURL()">📥 URL</button>
-                <button class="btn-action" style="padding:10px;" onclick="g('themeFileInput').click()">📂 Файл</button>
+                <input type="text" id="themeUrlInput" class="custom-proto-input" style="flex:1;" placeholder="URL (GitHub/Pastebin)">
+                <button class="btn-action btn-action-blue" onclick="loadThemeFromURL()">📥 URL</button>
+                <button class="btn-action" onclick="g('themeFileInput').click()">📂 Файл</button>
                 <input type="file" id="themeFileInput" class="hidden" accept=".json,.incytheme">
             </div>
             
@@ -450,9 +452,9 @@
         <div class="modal-card">
             <div class="modal-header"> 🧩 Плагины (Extensions) <button class="btn-action" onclick="toggleModal('modalPlugins')">✕</button> </div>
             <p style="font-size:12px; color:var(--text-muted); margin-bottom: 16px;"> Установите JS-скрипт с интернета, чтобы редактор начал понимать YAML, XML и другие форматы. </p>
-            <div style="display:flex; gap:8px; margin-bottom:16px;">
-                <input type="text" id="pluginUrl" class="resizable-box" style="padding:10px; min-height:40px; font-size:12px;" placeholder="Прямая ссылка на .js скрипт">
-                <button class="btn-green" id="btnInstallPlugin" style="padding:10px !important; width:auto;">💾</button>
+            <div style="display:flex; gap:8px; margin-bottom:16px; align-items: stretch;">
+                <input type="text" id="pluginUrl" class="custom-proto-input" style="flex:1;" placeholder="Прямая ссылка на .js скрипт">
+                <button class="btn-action btn-action-green" id="btnInstallPlugin">💾</button>
             </div>
             <div style="font-size:11px; color:var(--text-muted); margin-bottom:6px; font-weight:bold;">УСТАНОВЛЕННО:</div>
             <div id="pluginsList"></div>
@@ -474,10 +476,10 @@
         <div class="modal-card">
             <div class="modal-header"> 🚀 Cloud Share <button class="btn-action" onclick="toggleModal('modalCloud')">✕</button> </div>
             <p style="font-size:12px; color:var(--text-muted); margin-bottom: 16px;">Ваш конфиг надёжно зашифруется стандартом AES-GCM-256 прямо на телефоне. Никто не сможет открыть ссылку без ключа (пароля).</p>
-            <input type="text" id="sharePassword" class="resizable-box" style="margin-bottom:12px; min-height:40px; padding:10px;" placeholder="Пароль защиты (можно пустой)">
+            <input type="text" id="sharePassword" class="custom-proto-input" style="margin-bottom:12px;" placeholder="Пароль защиты (можно пустой)">
             <button class="btn-primary" id="btnGenerateCloud">🔐 Зашифровать</button>
             <div id="shareResultBlock" class="hidden" style="margin-top:16px;">
-                <input type="text" id="shareUrlOut" readonly class="resizable-box" style="padding:10px; min-height:80px; text-align:center;">
+                <textarea id="shareUrlOut" readonly class="custom-proto-input" style="min-height:80px; text-align:center; resize:vertical; word-break:break-all;"></textarea>
                 <button class="btn-action" style="width:100%; margin-top:8px;" onclick="copyToC(document.getElementById('shareUrlOut').value)">📋 Скопировать</button>
             </div>
         </div>
@@ -1037,7 +1039,6 @@
         const deriveK = async(p,s)=>crypto.subtle.deriveKey({name:"PBKDF2",salt:s,iterations:100000,hash:"SHA-256"}, await crypto.subtle.importKey("raw",new TextEncoder().encode(p),{name:"PBKDF2"},0,["deriveKey"]),{name:"AES-GCM",length:256},0,["encrypt","decrypt"]);
         g('btnOpenCloudModal').onclick = () => { vibe(); toggleModal('modalCloud', true); g('shareResultBlock').classList.add('hidden'); };
         
-        // --- ФИКС: Убрана генерация QR-кода, чтобы не было пустого белого квадрата ---
         g('btnGenerateCloud').onclick = async () => { vibe(); if(g('uiLinter').checked && !linter()) {showT('Исправьте код',1); return;} try { let p = g('sharePassword').value || Math.random().toString(36).slice(-8); let salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12)); let enc = await crypto.subtle.encrypt({name: "AES-GCM", iv}, await deriveK(p,salt), new TextEncoder().encode(els.jsonEditor.value)); let su = `${window.location.origin}${window.location.pathname}?sid=${encodeURIComponent(btoa(String.fromCharCode(...new Uint8Array(enc))))}&s=${encodeURIComponent(btoa(String.fromCharCode(...salt)))}&i=${encodeURIComponent(btoa(String.fromCharCode(...iv)))}#${p}`; g('shareUrlOut').value = su; g('shareResultBlock').classList.remove('hidden'); showT('Зашифровано AES256!'); } catch(e) { showT('Ошибка шифрования', 1); } };
         
         async function decryptCloud(u) { try { let url=new URL(u), p=url.hash.substring(1), sid=url.searchParams.get('sid'), s=url.searchParams.get('s'), i=url.searchParams.get('i'); if(!p||!sid||!s||!i)return; let dec = await crypto.subtle.decrypt({name:"AES-GCM", iv:Uint8Array.from(atob(i),c=>c.charCodeAt(0))}, await deriveK(p, Uint8Array.from(atob(s),c=>c.charCodeAt(0))), Uint8Array.from(atob(sid),c=>c.charCodeAt(0))); els.srcInput.value = new TextDecoder().decode(dec); handleSrc(); showT('🔓 Облако расшифровано'); } catch(e) { showT('Ссылка или ключ поврежден', 1); els.srcInput.value=''; } }
