@@ -12,7 +12,7 @@
   "ClientSubnet": "0.0.0.0/0",
   "Geoipurl": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.dat",
   "Geositeurl": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geosite.dat",
-  "LastUpdated": "1787661859",
+  "LastUpdated": "1789084082",
   "DnsHosts": {
     "dns.quad9.net": "9.9.9.9",
     "cloudflare-dns.com": "1.1.1.1",
