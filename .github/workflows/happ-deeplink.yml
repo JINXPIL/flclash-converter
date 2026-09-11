@@ -8,6 +8,11 @@ on:
     paths:
       - 'HAPP/DEFAULT.json'
 
+# --- ДОБАВЬТЕ ЭТОТ БЛОК ---
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+# -------------------------
+
 permissions:
   contents: write
 
