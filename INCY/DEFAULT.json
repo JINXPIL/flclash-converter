@@ -1,25 +1,17 @@
 {
-  "Name": "RUS-VIP-ULTIMATE v83.00 (Master-Release-2026)",
+  "Name": "RUS-VIP-ULTIMATE v83.20 (Incy-Happ-Universal)",
   "GlobalProxy": "true",
-  "RouteOrder": "block-proxy-direct",
+  "RouteOrder": "block-direct-proxy",
   "DomainStrategy": "IPIfNonMatch",
-  "FakeDNS": "true",
-  "UseChunkFiles": "true",
-  "IPv6": "true",
-  "DnsIPv6": "true",
-  "TCPMssClamping": "true",
-  "MTU": 1400,
   "RemoteDNSType": "DoH",
   "RemoteDNSDomain": "https://cloudflare-dns.com/dns-query",
   "RemoteDNSIP": "1.1.1.1",
   "DomesticDNSType": "DoH",
   "DomesticDNSDomain": "https://dns.yandex.ru/dns-query",
   "DomesticDNSIP": "77.88.8.8",
-  "DisableEDNS": "true",
-  "ClientSubnet": "0.0.0.0/0",
   "Geoipurl": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.dat",
   "Geositeurl": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geosite.dat",
-  "LastUpdated": "1789085910",
+  "LastUpdated": "1789086304",
   "DnsHosts": {
     "dns.quad9.net": "9.9.9.9",
     "cloudflare-dns.com": "1.1.1.1",
@@ -43,9 +35,6 @@
     "domain:keenetic.link",
     "domain:3gppnetwork.org",
     "domain:sevsu.ru",
-    "domain:ru",
-    "domain:su",
-    "domain:xn--p1ai",
     "geosite:yandex",
     "geosite:vk",
     "geosite:kaspersky",
@@ -159,7 +148,7 @@
     "domain:rk.gov.ru",
     "domain:sev.gov.ru",
     "domain:crpt.ru",
-    "domain:честныйзнак.рф",
+    "domain:xn--80ajghhoc2ajlc8b.xn--p1ai",
     "domain:habr.com",
     "domain:lisaalert.org",
     "domain:dobro.ru",
@@ -346,9 +335,6 @@
     "169.254.0.0/16",
     "224.0.0.0/4",
     "255.255.255.255",
-    "::1/128",
-    "fc00::/7",
-    "fe80::/10",
     "114.114.114.114/32",
     "42.81.82.209/32",
     "120.53.53.53/32",
@@ -1031,7 +1017,6 @@
     "domain:log.tiktokv.com"
   ],
   "BlockIp": [],
-  "BlockPort": [
-    "443/udp"
-  ]
+  "FakeDNS": "true",
+  "UseChunkFiles": "true"
 }
