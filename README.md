@@ -116,7 +116,6 @@
 </table>
 
 ---
-
 ### 🎯 Готовые пресеты
 
 Чтобы не засорять страницу портянками кода, все готовые базовые пресеты вынесены в отдельные папки.
@@ -149,7 +148,15 @@
   </td>
 </tr>
 <tr>
-  <td>⚙️ <b>Mihomo / Clash Meta</b></td>
+  <td>⚙️ <b>Mihomo / Clash Meta</b><br><i>(VPS Routing)</i></td>
+  <td>Чистый блок правил маршрутизации (Direct / Proxy / Block) для развертывания на VPS-серверах</td>
+  <td>
+    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/refs/heads/main/MIHOMO/routing.yaml">⚡ Скопировать RAW (routing.yaml)</a><br>
+    <a href="https://github.com/JINXPIL/flclash-converter/blob/main/MIHOMO/routing.yaml">📄 Просмотр файла</a>
+  </td>
+</tr>
+<tr>
+  <td>⚙️ <b>Mihomo / Clash Meta</b><br><i>(Full Config)</i></td>
   <td>v79.0 Ultimate (Защита от DPI-анализаторов, строгий TLS)</td>
   <td><a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/MIHOMO/ULTIMATE.yml">🔗 Импорт YML Конфига</a></td>
 </tr>
