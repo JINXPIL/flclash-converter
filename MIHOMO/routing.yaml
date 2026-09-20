@@ -1,0 +1,180 @@
+rules:
+# ================================================================
+# 0.0 СИСТЕМНЫЕ ПРОЦЕССЫ ИБ / АНАЛИЗАТОРЫ ТРАФИКА (Сброс из TUN)
+# ================================================================
+- PROCESS-NAME,wireshark.exe,DIRECT
+- PROCESS-NAME,nmap.exe,DIRECT
+- PROCESS-NAME,dumpcap.exe,DIRECT
+- PROCESS-NAME,fiddler.exe,DIRECT
+- PROCESS-NAME,charles.exe,DIRECT
+- PROCESS-NAME,proxifier.exe,DIRECT
+
+# ================================================================
+# 0.1 СИСТЕМНЫЕ ПРОЦЕССЫ ОС И ПРОВЕРКИ СВЯЗИ (Captive Portals)
+# ================================================================
+- DOMAIN,captive.apple.com,DIRECT
+- DOMAIN-SUFFIX,push.apple.com,DIRECT
+- DOMAIN,aps.apple.com,DIRECT
+- DOMAIN-SUFFIX,ls.apple.com,DIRECT
+- PROCESS-NAME,nsurlsessiond,DIRECT
+- PROCESS-NAME,apsd,DIRECT
+- PROCESS-NAME,trustd,DIRECT
+- PROCESS-NAME,svchost.exe,DIRECT
+- PROCESS-NAME,System,DIRECT
+- DOMAIN-SUFFIX,do.dsp.mp.microsoft.com,DIRECT
+- DOMAIN-SUFFIX,windowsupdate.com,DIRECT
+- DOMAIN-SUFFIX,msftncsi.com,DIRECT
+- DOMAIN-SUFFIX,msftconnecttest.com,DIRECT
+- DOMAIN,ipv6.msftconnecttest.com,REJECT
+- DOMAIN,connectivitycheck.gstatic.com,DIRECT
+- DOMAIN,connectivitycheck.android.com,DIRECT
+- DOMAIN,connect.rom.miui.com,DIRECT
+- DOMAIN,wifi.vivo.com.cn,DIRECT
+- DOMAIN,netcheck.vivo.com.cn,DIRECT
+- DOMAIN,vpushonrt-stsdk.vivo.com.cn,DIRECT
+- DOMAIN,accountinfo.vivo.com.cn,DIRECT
+- DOMAIN-SUFFIX,vivo.com.cn,DIRECT
+- DOMAIN,os-content-recommend.vivo.com,DIRECT
+- DOMAIN,newfind.vivo.com,DIRECT
+- DOMAIN,content-aware.vivo.com,DIRECT
+- DOMAIN-SUFFIX,com.vivo.pushservice,DIRECT
+- DOMAIN-SUFFIX,push.vivo.com.cn,DIRECT
+
+# ================================================================
+# 0.2 БЛОКИРОВКА РЕКЛАМЫ, УГРОЗ, ХИТРЫХ DNS И ТЕЛЕМЕТРИИ
+# ================================================================
+- RULE-SET,hijacking-plus,REJECT
+- GEOSITE,category-ads-all,REJECT
+- RULE-SET,hagezi-tif,REJECT
+- RULE-SET,sukka-phishing,REJECT
+- RULE-SET,adblock-rules,REJECT
+- RULE-SET,blockhttpdns,REJECT
+- DOMAIN,os-content-recommend.vivo.com,REJECT
+- DOMAIN,newfind.vivo.com,REJECT
+- DOMAIN,content-aware.vivo.com,REJECT
+- DOMAIN-SUFFIX,mediation.goog,REJECT
+- DOMAIN-SUFFIX,vungle.com,REJECT
+- DOMAIN,adservice.google.com.pe,REJECT
+- DOMAIN-SUFFIX,adservice.google.co.kr,REJECT
+- DOMAIN,fundingchoicesmessages.google.com,REJECT
+
+# ================================================================
+# 0.3 ЗАЩИТА TUN ОТ МУСОРНОГО ЛОКАЛЬНОГО ТРАФИКА WINDOWS
+# ================================================================
+- DST-PORT,137,REJECT
+- DST-PORT,138,REJECT
+- DST-PORT,139,REJECT
+- DST-PORT,445,REJECT
+- DST-PORT,1900,REJECT
+- DST-PORT,5353,REJECT
+- DST-PORT,7680,REJECT
+- GEOSITE,private,DIRECT
+- GEOIP,private,DIRECT,no-resolve
+- GEOIP,lan,DIRECT,no-resolve
+
+# ================================================================
+# 0.4 ПРЯМОЙ ДОСТУП PUSH ANDROID, NTP И STUN (Звонки / WebRTC)
+# ================================================================
+- DST-PORT,5228,DIRECT
+- DST-PORT,5229,DIRECT
+- DST-PORT,5230,DIRECT
+- DOMAIN-KEYWORD,mtalk.google,DIRECT
+- DOMAIN-SUFFIX,mtalk.google.com,DIRECT
+- DST-PORT,123,DIRECT
+- DST-PORT,3478,DIRECT
+- DST-PORT,3479,DIRECT
+- DST-PORT,19302,DIRECT
+
+# ================================================================
+# 0.5 ЗАЩИТА ОТ ТОРРЕНТОВ (Только прямые P2P соединения)
+# ================================================================
+- PROCESS-NAME,qBittorrent.exe,DIRECT
+- PROCESS-NAME,qBittorrent,DIRECT
+- PROCESS-NAME,uTorrent.exe,DIRECT
+- PROCESS-NAME,BitTorrent.exe,DIRECT
+- PROCESS-NAME,WebTorrent.exe,DIRECT
+- PROCESS-NAME,tixati.exe,DIRECT
+- PROCESS-NAME,transmission-daemon,DIRECT
+- PROCESS-NAME,Transmission,DIRECT
+- PROCESS-NAME,aria2c,DIRECT
+- PROCESS-NAME,fdm.exe,DIRECT
+- PROCESS-NAME,FreeDownloadManager.exe,DIRECT
+- GEOSITE,category-pt,DIRECT
+- GEOSITE,tracker,DIRECT
+- DOMAIN-KEYWORD,torrent,DIRECT
+- DOMAIN-KEYWORD,announce,DIRECT
+
+# ================================================================
+# 0.6 ЗАЩИТА DoH И Health Checks
+# ================================================================
+- DOMAIN,cp.cloudflare.com,DIRECT
+- DOMAIN-SUFFIX,cloudflare-dns.com,🚀 Выбор сервера
+
+# ================================================================
+# 0.7 ПРИНУДИТЕЛЬНОЕ ПРОКСИРОВАНИЕ ДЛЯ ПК (МЕССЕНДЖЕРЫ)
+# ================================================================
+- PROCESS-NAME,Telegram.exe,🚀 Выбор сервера
+- PROCESS-NAME,AyuGram.exe,🚀 Выбор сервера
+- PROCESS-NAME,Nekogram.exe,🚀 Выбор сервера
+- PROCESS-NAME,64Gram.exe,🚀 Выбор сервера
+- PROCESS-NAME,org.telegram.messenger,🚀 Выбор сервера
+- PROCESS-NAME,org.telegram.messenger.web,🚀 Выбор сервера
+- PROCESS-NAME,org.telegram.plus,🚀 Выбор сервера
+- PROCESS-NAME,org.thunderdog.challegram,🚀 Выбор сервера
+- PROCESS-NAME,Discord.exe,🚀 Выбор сервера
+- PROCESS-NAME,DiscordPTB.exe,🚀 Выбор сервера
+- PROCESS-NAME,DiscordCanary.exe,🚀 Выбор сервера
+- PROCESS-NAME,com.discord,🚀 Выбор сервера
+
+# ================================================================
+# 1. ПРЯМЫЕ ПОДКЛЮЧЕНИЯ И БЕЛЫЕ СПИСКИ РФ И КРЫМА
+# ================================================================
+- DOMAIN-SUFFIX,ru,DIRECT
+- DOMAIN-SUFFIX,рф,DIRECT
+- DOMAIN-SUFFIX,su,DIRECT
+- PROCESS-NAME,com.allgoritm.youla,DIRECT
+- PROCESS-NAME,ru.ok.android,DIRECT
+- PROCESS-NAME,com.vivo.car.networking,DIRECT
+- PROCESS-NAME,ru.sberbankmobile,DIRECT
+- PROCESS-NAME,ru.tinkoff.mb,DIRECT
+- PROCESS-NAME,com.tbank.mb,DIRECT
+- PROCESS-NAME,ru.rncb.android,DIRECT
+- PROCESS-NAME,ru.nspk.mirpay,DIRECT
+- PROCESS-NAME,ru.nspk.sbpay,DIRECT
+- PROCESS-NAME,ru.cian.main,DIRECT
+- PROCESS-NAME,com.vk.vkvideo,DIRECT
+- PROCESS-NAME,ru.sutochno_redesign,DIRECT
+- PROCESS-NAME,ru.zdravcity.app,DIRECT
+- PROCESS-NAME,io.walletpasses.android,DIRECT
+- PROCESS-NAME,com.avito.android,DIRECT
+- PROCESS-NAME,ru.rx_loyalty.yabloko,DIRECT
+- PROCESS-NAME,ru.rostel,DIRECT
+- PROCESS-NAME,ru.rostel.wink,DIRECT
+- PROCESS-NAME,ru.gosuslugi.pos,DIRECT
+- PROCESS-NAME,ru.biblioonline.reader,DIRECT
+- PROCESS-NAME,com.yandex.browser,DIRECT
+- PROCESS-NAME,ru.vtb24.mobilebanking.android,DIRECT
+- PROCESS-NAME,ru.yandex.searchplugin,DIRECT
+- PROCESS-NAME,ru.yandex.mobile.search,DIRECT
+- PROCESS-NAME,com.google.android.apps.messaging,DIRECT
+- PROCESS-NAME,ru.svobodacard.svoboda,DIRECT
+- PROCESS-NAME,ru.polypay.egks,DIRECT
+- PROCESS-NAME,ru.vk.store,DIRECT
+- PROCESS-NAME,ru.oneme.app,DIRECT
+- PROCESS-NAME,com.vivo.findphone,DIRECT
+- PROCESS-NAME,com.bbk.account,DIRECT
+- PROCESS-NAME,com.mobile.cos.iroaming,DIRECT
+- PROCESS-NAME,com.uma.musicvk,DIRECT
+- PROCESS-NAME,com.bbk.appstore,DIRECT
+- PROCESS-NAME,com.android.filemanager,DIRECT
+- PROCESS-NAME,com.vivo.widget.gallery,DIRECT
+- PROCESS-NAME,com.yandex.aliceapp,DIRECT
+- PROCESS-NAME,ru.yandex.music,DIRECT
+- PROCESS-NAME,ru.yandex.taxi,DIRECT
+- PROCESS-NAME,com.vivo.hover,DIRECT
+- PROCESS-NAME,com.vivo.nightpearl,DIRECT
+- PROCESS-NAME,com.vivo.pushservice,DIRECT
+- PROCESS-NAME,com.iqoo.secure,DIRECT
+- PROCESS-NAME,com.vivo.hiboard,DIRECT
+- PROCESS-NAME,com.vivo.safecenter,DIRECT
+- PROCESS-NAME,com.vivo.conn
