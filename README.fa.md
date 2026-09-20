@@ -116,42 +116,49 @@
 </table>
 
 ---
+### 🎯 الگوهای آماده
 
-### 🎯 پریست‌های آماده
-
-برای حفظ سادگی و پرهیز از طولانی شدن صفحه، تمام پریست‌های پایه در پوشه‌های اختصاصی قرار گرفته‌اند:
+برای جلوگیری از شلوغ شدن صفحه با کدهای طولانی، تمامی الگوهای پایه آماده در پوشه‌های جداگانه قرار گرفته‌اند.
 
 <table width="100%">
-<thead><tr><th align="left">پلتفرم</th><th align="left">پیکربندی</th><th align="left">لینک دریافت</th></tr></thead>
+<thead><tr><th align="right">پلتفرم</th><th align="right">پیکربندی</th><th align="right">لینک وارد کردن</th></tr></thead>
 <tbody>
 <tr>
   <td>👑 <b>Throne</b><br><i>(کلاینت دسکتاپ)</i></td>
-  <td>تفکیک ایده‌آل ترافیک (سایت‌های دولتی و بانک‌ها به صورت مستقیم، بخش‌های فیلترشده از طریق VPN). همراه با مسدودکننده تبلیغات.</td>
+  <td>تفکیک بی‌نقص ترافیک (دولت، بانک‌های روسیه به‌صورت مستقیم و سایت‌های مسدود از طریق VPN). دارای مسدودکننده تبلیغات داخلی.</td>
   <td>
     <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/Throne/Throne_INSTALL.DEEPLINK">⚡ کپی Deeplink</a><br>
     <a href="https://github.com/JINXPIL/flclash-converter/blob/main/Throne/Throne.md">📄 مشاهده توضیحات</a>
   </td>
 </tr>
 <tr>
-  <td>📱 <b>Happ (Routing)</b></td>
-  <td>بهینه‌سازی‌شده برای شرایط خاص شبکه و محیط‌های دانشگاهی، همراه با AdBlock</td>
+  <td>📱 <b>Happ (مسیریابی)</b></td>
+  <td>بهینه‌سازی شده برای کریمه، SevSU به همراه AdBlock داخلی</td>
   <td>
     <a href="https://jinxpil.github.io/flclash-converter/happ.html">⚡ نصب سریع (یک کلیک)</a><br>
-    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/HAPP/DEFAULT.json">📄 مشاهده سورس JSON</a>
+    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/HAPP/DEFAULT.json">📄 مشاهده کد (JSON)</a>
   </td>
 </tr>
 <tr>
-  <td>📱 <b>INCY (Routing)</b></td>
-  <td>بهینه‌سازی‌شده برای شرایط خاص شبکه و محیط‌های دانشگاهی، همراه با AdBlock</td>
+  <td>📱 <b>INCY (مسیریابی)</b></td>
+  <td>بهینه‌سازی شده برای کریمه، SevSU به همراه AdBlock داخلی</td>
   <td>
     <a href="https://jinxpil.github.io/flclash-converter/incy.html">⚡ نصب سریع (یک کلیک)</a><br>
-    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/INCY/DEFAULT.json">📄 مشاهده سورس JSON</a>
+    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/INCY/DEFAULT.json">📄 مشاهده کد (JSON)</a>
   </td>
 </tr>
 <tr>
-  <td>⚙️ <b>Mihomo / Clash Meta</b></td>
-  <td>نسخه v79.0 Ultimate (محافظت در برابر آنالیزورهای DPI و اعمال TLS سختگیرانه)</td>
-  <td><a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/MIHOMO/ULTIMATE.yml">🔗 دریافت فایل کانفیگ YML</a></td>
+  <td>⚙️ <b>Mihomo / Clash Meta</b><br><i>(مسیریابی VPS)</i></td>
+  <td>قوانین مسیریابی خالص (Direct / Proxy / Block) مناسب برای پیاده‌سازی روی سرورهای VPS</td>
+  <td>
+    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/refs/heads/main/MIHOMO/routing.yaml">⚡ کپی RAW (routing.yaml)</a><br>
+    <a href="https://github.com/JINXPIL/flclash-converter/blob/main/MIHOMO/routing.yaml">📄 مشاهده فایل</a>
+  </td>
+</tr>
+<tr>
+  <td>⚙️ <b>Mihomo / Clash Meta</b><br><i>(پیکربندی کامل)</i></td>
+  <td>v79.0 Ultimate (محافظت در برابر تحلیل‌گرهای DPI، امنیت سخت‌گیرانه TLS)</td>
+  <td><a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/MIHOMO/ULTIMATE.yml">🔗 وارد کردن کانفیگ YML</a></td>
 </tr>
 </tbody>
 </table>
