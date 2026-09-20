@@ -64,6 +64,7 @@
         textarea#input:focus, textarea#input.dragover { border-color: var(--primary-color); background: var(--container-bg); box-shadow: 0 0 15px rgba(88,166,255,0.15); }
         textarea#customTemplateInput { border: 1px solid var(--border-color); color: var(--accent-color); background: var(--container-bg); margin-bottom: 20px; }
        /* Обёртка редактора с нумерацией строк */
+/* Обёртка редактора: включаем горизонтальную прокрутку */
 .code-editor-wrapper {
     display: flex;
     position: relative;
@@ -71,8 +72,10 @@
     border: 1px solid var(--border-color);
     border-radius: 8px;
     margin-bottom: 20px;
-    overflow: hidden;
+    overflow-x: auto;            /* Разрешаем горизонтальный скролл на мобилках */
+    overflow-y: hidden;
     transition: border-color 0.2s, box-shadow 0.2s;
+    -webkit-overflow-scrolling: touch;
 }
 
 .code-editor-wrapper:focus-within {
@@ -81,40 +84,46 @@
     background: var(--container-bg);
 }
 
-/* Колонка с номерами строк */
-/* Колонка с номерами строк */
+/* Колонка с номерами: фиксируем слева, чтобы при скролле вправо номера оставались на месте */
 .line-numbers {
+    position: sticky;            /* Номера всегда видны у левого края экрана */
+    left: 0;
+    z-index: 2;
     padding: 15px 10px !important;
     margin: 0 !important;
     text-align: right;
-    background: rgba(0, 0, 0, 0.18);
+    background: var(--container-bg) !important; /* Непрозрачный фон, чтобы код не просвечивал под номерами */
     color: var(--text-muted);
     font-size: 13px !important;
-    line-height: 20px !important;   /* Жесткая фиксированная высота строки */
+    line-height: 20px !important;
     font-family: 'JetBrains Mono', monospace !important;
     user-select: none;
     border-right: 1px solid var(--border-color);
-    min-width: 45px;
+    min-width: 55px;             /* С запасом под 4 знака (1300+ строк) */
     box-sizing: border-box;
+    flex-shrink: 0;              /* Запрещаем сжимать колонку номеров */
 }
 
-/* Редактор кода */
+/* Сам редактор */
 pre#outputEditor {
     flex-grow: 1;
-    width: 100%;
+    min-width: max-content;      /* Растягиваемся по самой длинной строке кода */
     min-height: 120px;
-    padding: 15px !important;       /* Ровно такой же padding сверху/снизу (15px) */
-    margin: 0 !important;          /* Убираем браузерный отступ у <pre> */
+    padding: 15px !important;
+    margin: 0 !important;
     background: transparent !important;
     border: none !important;
     border-radius: 0 !important;
     outline: none;
     color: var(--primary-color);
     font-size: 13px !important;
-    line-height: 20px !important;   /* В точности как у .line-numbers */
+    line-height: 20px !important;
     font-family: 'JetBrains Mono', monospace !important;
-    white-space: pre-wrap;
-    word-break: break-all;
+    
+    /* КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ: строго без переноса строк */
+    white-space: pre !important; 
+    word-break: normal !important;
+    word-wrap: normal !important;
     box-sizing: border-box;
 }
 
