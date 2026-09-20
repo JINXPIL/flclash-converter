@@ -25,8 +25,8 @@
 <h1 align="center">⚡ Network Builder v17.05 ULTRA</h1>
 
 <p align="center">
-  <b>极其强大且100%本地化的网络工具，用于管理海量代理服务器数据库。</b><br>
-  <i>为 FlClash、Exclave、Sing-box、Clash Meta、Throne 提供解析、转换和深度优化配置，以及适用于 INCY / HAPP 的移动 PWA 环境。</i>
+  <b>超强性能、100% 本地运行的 Web 工具，专为管理海量代理节点数据库而生。</b><br>
+  <i>支持 FlClash、Exclave、Sing-box、Clash Meta、Throne 配置解析、转换与深度优化，并配备面向 INCY / HAPP 的移动端 PWA 开发环境。</i>
 </p>
 
 <p align="center">
@@ -42,34 +42,34 @@
     <img src="https://img.shields.io/badge/🚀_打开_ULTRA_版本-0052FF?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Open Web Version">
   </a>
   <a href="https://jinxpil.github.io/flclash-converter/INCY_Tool.html">
-    <img src="https://img.shields.io/badge/🔮_INCY_配置工具-8A2BE2?style=for-the-badge&logo=pwa&logoColor=white" alt="Open INCY Tool">
+    <img src="https://img.shields.io/badge/🔮_INCY_CONFIG_TOOL-8A2BE2?style=for-the-badge&logo=pwa&logoColor=white" alt="Open INCY Tool">
   </a>
 </p>
 
 <p align="center">
-  🤖 <b>同时也请关注我的第二个项目：</b><br>
+  🤖 <b>欢迎了解我的另一个项目：</b><br>
   👉 <a href="https://github.com/JINXPIL/json-yaml-ai"><b>JSON-YAML-AI</b></a> 👈
 </p>
 
 > [!IMPORTANT]
-> **零信任与隐私优先。** 所有计算均在您的浏览器中严格本地执行。任何数据都不会离开您的设备。该工具专门用于深入研究网络协议的教育目的。在更新订阅时导致超时的提供商限制可以通过本地复制配置文件轻松绕过。
+> **Zero-Trust & 隐私优先。** 所有数据计算与转换均严格在您的本地浏览器内完成。任何数据均不会上传或离开您的设备。本工具仅供学习网络协议与学术研究使用。运营商网络限制导致的订阅更新超时问题，可通过本地导入配置文件轻松解决。
 
 ---
 
-### 🔮 全新：INCY Config Tool (Ultimate PWA)
+### 🔮 全新推出: INCY Config Tool (Ultimate PWA)
 
-除了全局转换器外，该项目还提供了一个**专门用于移动设备的独立集成开发环境（IDE）**，旨在“随时随地”对 `incy://` 和 `happ://` 路由配置文件进行精确编辑。
+除全局转换器外，本项目还提供**专为移动设备打造的独立路由配置集成开发环境（IDE）**，可在手机端随时对 `incy://` 和 `happ://` 路由规则进行精准编辑。
 
-* 📱 **零依赖 & PWA：** 仅包含 1 个文件。不使用外部库。即使在没有互联网的情况下也能 100% 本地运行（可以作为本机应用程序安装在手机主屏幕上）。
-* 🪄 **INCY-MINI 包装器：** 独特的系统级链接压缩算法（缩小5倍以上），以绕过 Telegram/WhatsApp 消息长度限制（随后自动解压）。
-* 🚀 **直接 Deep-Link：** 只需点击一下，即可从浏览器中直接启动修改后的配置文件到客户端中。
-* 🧠 **移动智能编辑器：** 自动缩进（类似于 VS Code）、带自动滚动的 JSON 语法错误定位器、撤销拦截器、格式管理器以及完整的配置文件更改历史记录。
+* 📱 **零依赖 & PWA:** 单文件架构。无需加载外部依赖库。100% 离线可用（可直接添加至手机主屏幕作为原生 App 使用）。
+* 🪄 **INCY-MINI 压缩封装:** 独创系统级链接压缩算法（压缩率超 5 倍），轻松绕过 Telegram / WhatsApp 消息字符长度限制（客户端自动解包）。
+* 🚀 **直接 Deep-Link 联动:** 在浏览器中一键将修改后的路由方案直达并加载进客户端。
+* 🧠 **移动端智能编辑器:** 具备类 VS Code 自动缩进、带自动定位滚动的 JSON 语法错误提示器、Undo 撤销捕获器、格式管理器与完整的修改历史记录。
 
-👉 **[启动 INCY Config Tool](https://jinxpil.github.io/flclash-converter/INCY_Tool.html)**
+👉 **[立即启动 INCY Config Tool](https://jinxpil.github.io/flclash-converter/INCY_Tool.html)**
 
 ---
 
-### 📸 界面 (ULTRA 设计)
+### 📸 界面预览 (ULTRA Design)
 
 <p align="center">
   <a href="https://raw.githubusercontent.com/jinxpil/flclash-converter/main/media/Gemini_Generated_Image_w0ysv7w0ysv7w0ys.png" target="_blank">
@@ -89,185 +89,196 @@
 
 ---
 
-### 🔥 v17.05 ULTRA 版本有什么新功能？ (The HighLoad Perfection)
+### 🔥 17.05 ULTRA 版本更新亮点 (The HighLoad Perfection)
 
-* 👑 **Throne 集成：** 添加了对为现代桌面客户端 Throne 创建和托管加密路由配置文件 (`throne://`) 的支持。
-* 🌐 **全球协议扩展：** 增加了对 **VMess、Hysteria2 (hy2)、Shadowsocks (SS) 和 ShadowsocksR (SSR)** 的全面解析支持。
-* 🚀 **极致性能 (HighLoad)：** 实现了异步分块和 `Set` 字典。DOM 虚拟化允许在几毫秒内加载并清理超过 **250,000 个节点** 的重复项，而不会导致浏览器卡顿。
-* 🛡️ **穿甲弹级 YAML 清理器：** 工业级准入控制。脚本会自动清除公共列表中的垃圾数据（不可见的 ASCII 字符、伪造的 `2022-blake3` 密码、空密码），并保证 100% 稳定导入 Mihomo。
-* ⚙️ **战胜超时：** YAML 生成器被重写以符合严格的 Mihomo 标准（添加了 `alpn`、`skip-cert-verify: true`、`servername` 并改进了 Fake-IP DNS）。
-* 🎨 **全新 UI/UX：** 独立的浅色/深色主题，带有独立的颜色保存功能，以及一个 **“订阅模式”开关**，用于将 RAW 链接（Pastebin/GitHub）直接嵌入到 `proxy-providers` 块中。
+* 👑 **全面支持 Throne 客户端:** 新增对新一代桌面端代理客户端 Throne 加密路由配置文件（`throne://`）的创建与托管支持。
+* 🌐 **全协议解析支持:** 现已全面支持 **VMess、Hysteria2 (hy2)、Shadowsocks (SS) 以及 ShadowsocksR (SSR)** 节点的精准解析。
+* 🚀 **极致高并发性能 (HighLoad):** 引入异步分块与高效 `Set` 哈希去重算法。配合虚拟 DOM，在毫秒级内完成 **250,000+ 节点** 的导入与去重，全程丝滑不卡顿。
+* 🛡️ **工业级 YAML 清洗净化器:** 严格过滤公共订阅源中的无效脏数据（不可见 ASCII 字符、伪造的 `2022-blake3` 加密套件、空密码节点），确保导入 Mihomo 时 100% 稳定运行。
+* ⚙️ **彻底解决网络超时:** 按照最新 Mihomo 规范重构 YAML 生成模块（集成 `alpn`、`skip-cert-verify: true`、`servername` 与优化的 Fake-IP 本地域名解析）。
+* 🎨 **全新 UI/UX 体验:** 独立亮色/暗色主题记忆切换，并新增 **“订阅模式”开关**，可直接将 RAW 外链（Pastebin/GitHub）无缝注入 `proxy-providers`。
 
 ---
 
-### 🔌 支持的协议
+### 🔌 支持的协议矩阵
 
 <table align="center" width="100%">
   <tr>
     <td align="center">🛡️ <b>VLESS / VMess</b><br>Reality & Vision</td>
-    <td align="center">⚡ <b>Hysteria 2</b><br>狂暴速度</td>
-    <td align="center">🐎 <b>Trojan</b><br>隐秘协议</td>
+    <td align="center">⚡ <b>Hysteria 2</b><br>极速 QUIC 体验</td>
+    <td align="center">🐎 <b>Trojan</b><br>经典隐蔽协议</td>
   </tr>
   <tr>
-    <td align="center">🔒 <b>WireGuard</b><br>原生 VPN</td>
-    <td align="center">🌐 <b>SS / SSR</b><br>Shadowsocks</td>
-    <td align="center">🔌 <b>TUIC / Socks5 / HTTP</b><br>全面支持</td>
+    <td align="center">🔒 <b>WireGuard</b><br>原生加密隧道</td>
+    <td align="center">🌐 <b>SS / SSR</b><br>Shadowsocks 家族</td>
+    <td align="center">🔌 <b>TUIC / Socks5 / HTTP</b><br>全量支持</td>
   </tr>
 </table>
 
 ---
 
-### 🎯 现成的预设
+### 🎯 官方精选预设
 
-为了避免代码块使页面显得混乱，所有现成的基础预设都被移到了单独的文件夹中。
+为了保持页面清爽，所有精调的基础分流预设均已归类存放在各独立目录中：
 
 <table width="100%">
-<thead><tr><th align="left">平台</th><th align="left">配置</th><th align="left">导入链接</th></tr></thead>
+<thead><tr><th align="left">客户端平台</th><th align="left">预设特性</th><th align="left">一键导入链接</th></tr></thead>
 <tbody>
 <tr>
-  <td>👑 <b>Throne</b><br><i>(桌面客户端)</i></td>
-  <td>完美的流量分流（本地服务/银行直连，屏蔽内容通过 VPN）。内置广告拦截器。</td>
+  <td>👑 <b>Throne</b><br><i>(桌面端客户端)</i></td>
+  <td>完美精细分流（政务、银行直连，受限网络资源经由代理）。内置广告拦截规则。</td>
   <td>
     <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/Throne/Throne_INSTALL.DEEPLINK">⚡ 复制 Deeplink</a><br>
-    <a href="https://github.com/JINXPIL/flclash-converter/blob/main/Throne/Throne.md">📄 查看说明</a>
+    <a href="https://github.com/JINXPIL/flclash-converter/blob/main/Throne/Throne.md">📄 查看配置说明</a>
   </td>
 </tr>
 <tr>
   <td>📱 <b>Happ (Routing)</b></td>
-  <td>针对特定地区优化，内置 AdBlock</td>
+  <td>针对特定受限区域与大学网络专项优化，内置去广告分流</td>
   <td>
-    <a href="https://jinxpil.github.io/flclash-converter/happ.html">⚡ 快速安装（一键）</a><br>
-    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/HAPP/DEFAULT.json">📄 查看代码 (JSON)</a>
+    <a href="https://jinxpil.github.io/flclash-converter/happ.html">⚡ 一键快速安装</a><br>
+    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/HAPP/DEFAULT.json">📄 查看 JSON 源码</a>
   </td>
 </tr>
 <tr>
   <td>📱 <b>INCY (Routing)</b></td>
-  <td>针对特定地区优化，内置 AdBlock</td>
+  <td>针对特定受限区域与大学网络专项优化，内置去广告分流</td>
   <td>
-    <a href="https://jinxpil.github.io/flclash-converter/incy.html">⚡ 快速安装（一键）</a><br>
-    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/INCY/DEFAULT.json">📄 查看代码 (JSON)</a>
+    <a href="https://jinxpil.github.io/flclash-converter/incy.html">⚡ 一键快速安装</a><br>
+    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/INCY/DEFAULT.json">📄 查看 JSON 源码</a>
   </td>
 </tr>
 <tr>
   <td>⚙️ <b>Mihomo / Clash Meta</b></td>
-  <td>v79.0 Ultimate（DPI 分析器保护，严格 TLS）</td>
-  <td><a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/MIHOMO/ULTIMATE.yml">🔗 导入 YML 配置</a></td>
+  <td>v79.0 旗舰版（抗 DPI 深度包检测，严格 TLS 验证）</td>
+  <td><a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/MIHOMO/ULTIMATE.yml">🔗 导入 YML 配置文件</a></td>
 </tr>
 </tbody>
 </table>
 
 ---
 
-### 🤝 替代路由数据库
+### 🤝 社区分流规则库推荐
 
-如果您正在寻找来自社区的其他分割隧道（split-tunneling）数据库：
-* [Roscomvpn-routing](https://github.com/hydraponique/roscomvpn-routing) — *hydraponique* 的优秀项目，定期更新适用于 **INCY、HAPP** 和 **Clash Meta** 的现成配置和路由规则。
+如果您需要更多样化的社区精细分流规则方案：
+* [Roscomvpn-routing](https://github.com/hydraponique/roscomvpn-routing) — 来自 *hydraponique* 的优质开源分流项目，持续维护并提供针对 **INCY、HAPP** 与 **Clash Meta** 的现成规则库。
 
 ---
 
-### 🚦 路由内部是什么（规则）
+### 🚦 分流规则内核
 
-可靠的“外科手术式”分割隧道，使所需资源无延迟起飞，而被屏蔽的资源通过代理打开。
+精准的分流策略，让本地服务低延迟直连，受阻服务自动平滑走代理节点。
 
 <table width="100%">
 <tbody>
 <tr>
-  <td>🔴 <b>BLOCK (拦截)</b></td>
-  <td>广告、追踪器、遥测数据（节省服务器流量和设备资源）</td>
+  <td>🔴 <b>BLOCK (拦截拦截)</b></td>
+  <td>广告、用户跟踪器、遥测数据（节约服务器流量与移动端电量）</td>
 </tr>
 <tr>
-  <td>🟢 <b>DIRECT (直连)</b></td>
-  <td>本地提供商、大学、银行、政府服务（极低的延迟，不会因可疑 IP 导致银行封号）</td>
+  <td>🟢 <b>DIRECT (直接连接)</b></td>
+  <td>本土宽带、学校内网、本地银行、政务便民服务（极低延迟，避免触发外地异地 IP 风控）</td>
 </tr>
 <tr>
-  <td>🔵 <b>PROXY (通过 VPN)</b></td>
-  <td>YouTube、Instagram、ChatGPT、外国 CDN 以及所有其他被屏蔽的流量</td>
+  <td>🔵 <b>PROXY (经由代理)</b></td>
+  <td>YouTube、Instagram、ChatGPT、境外 CDN 以及所有受限国际互联网流量</td>
 </tr>
 </tbody>
 </table>
 
 ---
 
-### 🛡️ DNS 设置
+### 🛡️ DNS 解析策略
 
 <table width="100%">
-<thead><tr><th align="center">用途</th><th align="left">服务器</th><th align="left">原因</th></tr></thead>
+<thead><tr><th align="center">流向类型</th><th align="left">DNS 服务器</th><th align="left">作用与优势</th></tr></thead>
 <tbody>
 <tr>
-  <td align="center">🏠 <b>DIRECT (本地)</b></td>
+  <td align="center">🏠 <b>DIRECT (本土/本地)</b></td>
   <td><a href="https://dns.yandex.ru/">Yandex DNS</a> <code>77.88.8.8</code></td>
-  <td>内部资源快速解析，本地延迟低，无需开启 VPN 即可工作。</td>
+  <td>快速解析本土网站与内网服务，超低延迟，关闭代理时仍可原生使用。</td>
 </tr>
 <tr>
-  <td align="center">🌍 <b>PROXY (国外)</b></td>
+  <td align="center">🌍 <b>PROXY (国际节点)</b></td>
   <td><a href="https://developers.cloudflare.com/1.1.1.1/">Cloudflare</a> / <a href="https://developers.google.com/speed/public-dns/">Google</a></td>
-  <td>代理流量的可靠解析，防止本地提供商的 DNS 欺骗。</td>
+  <td>稳定解析跨境访问域名，杜绝本地运营商的 DNS 劫持与投毒篡改。</td>
 </tr>
 </tbody>
 </table>
 
 ---
 > [!NOTE]
-> 曾经流行的客户端如 **NekoBox** 和 **NekoRay** 目前被认为已经过时。建议过渡到基于现代 **sing-box** 和 **Xray** 内核的最新优化类似物（例如，跨平台客户端 **Throne**）。
+> 曾经广泛使用的 **NekoBox** 与 **NekoRay** 目前已停止活跃维护，建议全面升级至基于最新 **sing-box** 和 **Xray** 核心的现代跨平台客户端（推荐 **Throne**）。
 
 <details>
-<summary><b>💻 Desktop (Win/Mac/Linux)</b></summary>
+<summary><b>💻 桌面端客户端 (Windows / macOS / Linux)</b></summary>
 
-* [Throne](https://github.com/throneproj/Throne) — 👑 NekoRay 的强大现代继承者，具有扩展功能和跨平台支持。 **(推荐)**
-* [Happ](https://www.happ.su/main) — 跨平台桌面版本。
-* [v2RayTun](https://v2raytun.com/) — 基于 Xray Core 的高速安全客户端。
-* [v2rayN](https://github.com/2dust/v2rayN) — 适用于 Windows 的强大可定制客户端。
-* [FlClash](https://github.com/chen08209/FlClash) — 极简且快速的 GUI。
-* [Karing](https://github.com/KaringX/karing)
-* [Clash Verge Rev](https://github.com/clash-verge-rev/clash-verge-rev)
-* ~~[NekoRay](https://github.com/MatsuriDayo/nekoray)~~ *(已过时，请使用 Throne)*
+* [Throne](https://github.com/throneproj/Throne) — 👑 NekoRay 的现代强大继承者，跨平台且功能完备。**(强烈推荐)**
+* [Happ](https://www.happ.su/main) — 跨平台桌面客户端。
+* [v2RayTun](https://v2raytun.com/) — 基于 Xray 核心开发的高速、安全客户端。
+* [v2rayN](https://github.com/2dust/v2rayN) — Windows 端功能极其丰富的经典客户端。
+* [FlClash](https://github.com/chen08209/FlClash) — 界面极简且轻量的高性能图形客户端。
+* [Karing](https://github.com/KaringX/karing) — 现代全平台代理工具。
+* [Clash Verge Rev](https://github.com/clash-verge-rev/clash-verge-rev) — Clash Verge 活跃延续分支。
+* ~~[NekoRay](https://github.com/MatsuriDayo/nekoray)~~ *(已过时，推荐切换至 Throne)*
 </details>
 
 <details>
-<summary><b>🤖 Android</b></summary>
+<summary><b>🤖 Android 安卓端</b></summary>
 
-* [v2RayTun](https://v2raytun.com/) — 基于 Xray Core 的高速安全客户端。
-* [FlClash](https://github.com/chen08209/FlClash) — 主要的跨平台客户端。
-* [Incy](https://incy.cc/) — 现代快速客户端，支持一键导入。
-* [Happ](https://www.happ.su/main) — 代理实用程序，方便管理服务器列表。
-* [Exclave](https://github.com/ExclaveNetwork/Exclave) — NekoBox 的现代更新类似物，具有熟悉的界面。
-* [Sing-box](https://github.com/SagerNet/sing-box) — 官方纯净内核，用于高级配置。
-* [Hiddify App](https://github.com/hiddify/hiddify-app) — 适用于任何配置类型的通用客户端。
-* [v2rayNG](https://github.com/2dust/v2rayNG) — 适用于 Xray 内核的稳定经典解决方案。
-* [Karing](https://github.com/KaringX/karing) — 功能丰富的图形界面。
+* [v2RayTun](https://v2raytun.com/) — 基于 Xray 核心的高性能客户端。
+* [FlClash](https://github.com/chen08209/FlClash) — 优秀现代跨平台客户端。
+* [Incy](https://incy.cc/) — 极速轻盈、支持一键导入配置的移动端新秀。
+* [Happ](https://www.happ.su/main) — 操作便捷的订阅与节点管理工具。
+* [Exclave](https://github.com/ExclaveNetwork/Exclave) — 界面亲切、持续迭代维护的 NekoBox 现代化替代品。
+* [Sing-box](https://github.com/SagerNet/sing-box) — 官方通用轻量级底层内核。
+* [Hiddify App](https://github.com/hiddify/hiddify-app) — 全能通用代理客户端。
+* [v2rayNG](https://github.com/2dust/v2rayNG) — Android 端历经考验的经典 Xray 客户端。
+* [Karing](https://github.com/KaringX/karing) — 跨平台统一体验客户端。
 * [Clash Meta for Android](https://github.com/MetaCubeX/ClashMetaForAndroid)
 * ~~[NekoBox For Android](https://github.com/MatsuriDayo/NekoBoxForAndroid)~~ *(已过时)*
 </details>
 
 <details>
-<summary><b>🍏 iOS</b></summary>
+<summary><b>🍏 iOS 苹果端</b></summary>
 
-* [v2RayTun](https://v2raytun.com/) — 基于 Xray Core 的高速安全客户端。
-* [Incy](https://incy.cc/) — App Store 中优秀的现代客户端。
-* [Happ](https://www.happ.su/main) — 舒适的代理实用程序。
+* [v2RayTun](https://v2raytun.com/) — 依托 Xray 核心的高速客户端。
+* [Incy](https://incy.cc/) — App Store 备受好评的现代网络工具。
+* [Happ](https://www.happ.su/main) — 便捷轻巧的代理管理工具。
 * [Karing](https://apps.apple.com/us/app/karing/id6472431552)
 * [Clash.MI](https://apps.apple.com/us/app/clash-mi/id6744321968)
-* [Stash](https://apps.apple.com/us/app/stash-rule-based-proxy/id1596063349)
+* [Stash](https://apps.apple.com/us/app/stash-rule-based-proxy/id1596063349) — 专业的基于规则网络调试工具。
 * [Clash Lite](https://apps.apple.com/us/app/clash-lite/id6761357475)
 * [V2Lite VPN](https://apps.apple.com/us/app/v2lite-vpn-super-vpn-proxy/id6444585377)
 </details>
 
 ---
 
-### 🛡️ 替代工具 (DPI Bypass & Proxy)
+### 🛡️ DPI 深度包检测绕过与前置代理工具
 
-*如果标准 VPN 协议被运营商或 TSPU 完全屏蔽，请使用本地深度数据包检测绕过或专用代理隧道：*
+*当标准 VPN 协议在网络层面遭遇强力阻断或深度检测（TSPU/DPI）时，可配合本地 DPI 混淆工具或专用中继方案使用：*
 
-* [Zapret](https://github.com/bol-van/zapret) — 用于在系统层面进行深度 DPI 绕过的最强大和灵活的工具。
-* [Zapret2](https://github.com/bol-van/zapret2) — 来自 `bol-van` 的强大绕过脚本的更新和实验分支。
-* [Zapret-discord-youtube](https://github.com/Flowseal/zapret-discord-youtube) — 针对特定流行服务进行了优化和配置的现成绕过脚本。
-* [ByeByeDPI](https://github.com/romanvht/ByeByeDPI) — 在 Windows 上本地运行的经过验证的经典解决方案。
-* [tg-ws-proxy](https://github.com/Flowseal/tg-ws-proxy) — 通过 WebSockets 代理 Telegram 的工具（保证即时通讯软件在严重屏蔽下稳定运行）。
+* [Zapret](https://github.com/bol-van/zapret) — 系统底层最强劲、最灵活的抗 DPI 阻断利器。
+* [Zapret2](https://github.com/bol-van/zapret2) — 由 `bol-van` 维护的最新实验性分支。
+* [Zapret-discord-youtube](https://github.com/Flowseal/zapret-discord-youtube) — 专为热门流媒体与通讯服务预调的优化脚本。
+* [ByeByeDPI](https://github.com/romanvht/ByeByeDPI) — Windows 端成熟的轻量级本地抗审查方案。
+* [tg-ws-proxy](https://github.com/Flowseal/tg-ws-proxy) — 通过 WebSocket 隧道中继 Telegram 流量的专业代理工具（确保极端断网封锁环境下的即时通讯稳定）。
 
 ---
 
-### ⭐ 支持该项目
+### 🌐 绕过“白名单”限制 (TURN & WebRTC 隧道技术)
 
-**如果 Network Builder ULTRA、移动版 INCY Tool 或我们的配置文件对您有帮助，请不要忘记点亮一颗星！这极大地激励了项目的进一步发展。** :star2:
+*适用于在严格的网络审查以及仅允许“白名单”访问的网络环境下部署在 VPS 上的解决方案。此类工具将任意网络流量（WireGuard、Hysteria、TCP）封装并伪装成语音/视频通话以及在线会议的合规媒体流（如 VK Calls、Yandex Telemost、WebRTC/SFU）：*
+
+* [csqtt](https://github.com/amurcanov/csqtt) — 高性能服务端与 Android 客户端应用，通过基于 TURN/RTP 的加密隧道将流量伪装成常规语音/视频通话的媒体数据。
+* [olcrtc](https://github.com/openlibrecommunity/olcrtc) — 基于 WebRTC 的加密 TCP 隧道（TCP-over-WebRTC），将与 VPS 的连接伪装为在受信任平台上参与常规 WebRTC/SFU 视频会议。
+* [vk-turn-proxy](https://github.com/cacggghp/vk-turn-proxy) — Good TURN：服务端与客户端代理工具，通过 VK Calls 与 Yandex Telemost 的 TURN 服务器转发 WireGuard / Hysteria 流量（基于 STUN 之上的 DTLS 1.2）。
+* [proxy-turn-vk-android](https://github.com/amurcanov/proxy-turn-vk-android) — Android 客户端应用程序（WDTT），用于通过 VK TURN 中继媒体节点将 WireGuard 流量隧道化传输至个人 VPS。
+
+---
+
+### ⭐ 赞赏与支持
+
+**如果 Network Builder ULTRA、移动端 INCY Tool 或我们提供的配置方案为您带来了便利，请为本仓库点亮一颗 Star！这是支持我们持续更新与迭代的最大动力。** :star2:
 
 [![Star History Chart](https://api.star-history.com/svg?repos=JINXPIL/flclash-converter&type=Date)](https://star-history.com/#JINXPIL/flclash-converter&Date)
