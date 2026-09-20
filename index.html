@@ -637,8 +637,6 @@ sniffer:
   parse-pure-ip: true
   override-destination: true 
   sniff-client-payload: true
-  force-domain:
-    - "+"
   sniff:
     tls:
       ports: [443, 8443, 2053, 2083, 2087, 2096]
@@ -718,6 +716,62 @@ sniffer:
     - '91.108.56.0/22'
     - '91.105.192.0/23'
     - '185.76.151.0/24'
+
+tun:
+  enable: true
+  stack: system
+  device: Mihomo
+  gso: true
+  udp-timeout: 300
+  dns-hijack:
+    - 'any:53'
+    - 'tcp://any:53'
+  auto-route: true
+  auto-detect-interface: true
+  strict-route: true
+  endpoint-independent-nat: true
+  mtu: 1420
+
+proxies: []
+
+proxy-groups:
+  - name: "🚀 Выбор сервера"
+    type: select
+    proxies:
+      - "♻️ Автовыбор"
+      - "🤖 Premium AI (Auto)"
+    use:
+      - igareck_mobile_black
+      - zieng2_universal
+      - igareck_white_1
+      - goida_26
+
+  - name: "♻️ Автовыбор"
+    type: url-test
+    url: "http://cp.cloudflare.com/generate_204"
+    interval: 180
+    tolerance: 30
+    timeout: 5000
+    lazy: true
+    exclude-filter: "(?i)Россия|Russia|Украина|Ukraine|Молдова|Moldova|РФ|России"
+    use:
+      - igareck_mobile_black
+      - zieng2_universal
+      - igareck_white_1
+      - goida_26
+
+  - name: "🤖 Premium AI (Auto)"
+    type: url-test
+    url: "http://cp.cloudflare.com/generate_204"
+    interval: 180
+    tolerance: 30
+    timeout: 5000
+    lazy: true
+    use:
+      - igareck_mobile_black
+      - zieng2_universal
+      - igareck_white_1
+      - goida_26
     </script>
 
 <script type="text/plain" id="tpl-crimea-rules">
