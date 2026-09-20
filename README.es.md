@@ -117,41 +117,49 @@ Además del convertidor global, el proyecto incluye un **entorno de desarrollo i
 
 ---
 
-### 🎯 Ajustes preestablecidos listos para usar
+### 🎯 Ajustes preestablecidos
 
-Para evitar sobrecargar la página, todas las configuraciones base predeterminadas se han organizado en carpetas independientes:
+Para no sobrecargar la página con bloques interminables de código, todos los preajustes básicos listos para usar se han organizado en carpetas independientes.
 
 <table width="100%">
 <thead><tr><th align="left">Plataforma</th><th align="left">Configuración</th><th align="left">Enlace de importación</th></tr></thead>
 <tbody>
 <tr>
   <td>👑 <b>Throne</b><br><i>(Cliente Desktop)</i></td>
-  <td>División óptima de tráfico (servicios públicos y bancos locales directo, recursos bloqueados vía VPN). Bloqueador de anuncios integrado.</td>
+  <td>División perfecta del tráfico (servicios gubernamentales y bancos rusos directos, sitios bloqueados vía VPN). Incluye bloqueador de anuncios.</td>
   <td>
     <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/Throne/Throne_INSTALL.DEEPLINK">⚡ Copiar Deeplink</a><br>
     <a href="https://github.com/JINXPIL/flclash-converter/blob/main/Throne/Throne.md">📄 Ver descripción</a>
   </td>
 </tr>
 <tr>
-  <td>📱 <b>Happ (Routing)</b></td>
-  <td>Optimizado para redes restringidas y entornos universitarios, incluye AdBlock</td>
+  <td>📱 <b>Happ (Enrutamiento)</b></td>
+  <td>Optimizado para Crimea, SevSU, incluye AdBlock</td>
   <td>
-    <a href="https://jinxpil.github.io/flclash-converter/happ.html">⚡ Instalación rápida en 1 clic</a><br>
+    <a href="https://jinxpil.github.io/flclash-converter/happ.html">⚡ Instalación rápida (1 clic)</a><br>
     <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/HAPP/DEFAULT.json">📄 Ver código (JSON)</a>
   </td>
 </tr>
 <tr>
-  <td>📱 <b>INCY (Routing)</b></td>
-  <td>Optimizado para redes restringidas y entornos universitarios, incluye AdBlock</td>
+  <td>📱 <b>INCY (Enrutamiento)</b></td>
+  <td>Optimizado para Crimea, SevSU, incluye AdBlock</td>
   <td>
-    <a href="https://jinxpil.github.io/flclash-converter/incy.html">⚡ Instalación rápida en 1 clic</a><br>
+    <a href="https://jinxpil.github.io/flclash-converter/incy.html">⚡ Instalación rápida (1 clic)</a><br>
     <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/INCY/DEFAULT.json">📄 Ver código (JSON)</a>
   </td>
 </tr>
 <tr>
-  <td>⚙️ <b>Mihomo / Clash Meta</b></td>
+  <td>⚙️ <b>Mihomo / Clash Meta</b><br><i>(Enrutamiento VPS)</i></td>
+  <td>Bloque limpio de reglas de enrutamiento (Direct / Proxy / Block) para despliegue en servidores VPS</td>
+  <td>
+    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/refs/heads/main/MIHOMO/routing.yaml">⚡ Copiar RAW (routing.yaml)</a><br>
+    <a href="https://github.com/JINXPIL/flclash-converter/blob/main/MIHOMO/routing.yaml">📄 Ver archivo</a>
+  </td>
+</tr>
+<tr>
+  <td>⚙️ <b>Mihomo / Clash Meta</b><br><i>(Configuración completa)</i></td>
   <td>v79.0 Ultimate (Protección contra analizadores DPI, TLS estricto)</td>
-  <td><a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/MIHOMO/ULTIMATE.yml">🔗 Importar config YML</a></td>
+  <td><a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/MIHOMO/ULTIMATE.yml">🔗 Importar archivo YML</a></td>
 </tr>
 </tbody>
 </table>
