@@ -82,34 +82,42 @@
 }
 
 /* Колонка с номерами строк */
+/* Колонка с номерами строк */
 .line-numbers {
-    padding: 15px 10px;
+    padding: 15px 10px !important;
+    margin: 0 !important;
     text-align: right;
-    background: rgba(0, 0, 0, 0.15);
+    background: rgba(0, 0, 0, 0.18);
     color: var(--text-muted);
-    font-size: 13px;
-    line-height: 1.5;
+    font-size: 13px !important;
+    line-height: 20px !important;   /* Жесткая фиксированная высота строки */
+    font-family: 'JetBrains Mono', monospace !important;
     user-select: none;
-    font-family: inherit;
     border-right: 1px solid var(--border-color);
-    min-width: 40px;
+    min-width: 45px;
     box-sizing: border-box;
 }
 
-/* Сам редактор: переносим рамку на обёртку */
+/* Редактор кода */
 pre#outputEditor {
     flex-grow: 1;
     width: 100%;
     min-height: 120px;
+    padding: 15px !important;       /* Ровно такой же padding сверху/снизу (15px) */
+    margin: 0 !important;          /* Убираем браузерный отступ у <pre> */
     background: transparent !important;
     border: none !important;
-    margin-bottom: 0 !important;
     border-radius: 0 !important;
     outline: none;
     color: var(--primary-color);
+    font-size: 13px !important;
+    line-height: 20px !important;   /* В точности как у .line-numbers */
+    font-family: 'JetBrains Mono', monospace !important;
     white-space: pre-wrap;
-    word-wrap: break-word;
+    word-break: break-all;
+    box-sizing: border-box;
 }
+
         .controls-group { display: flex; flex-direction: column; gap: 10px; justify-content: stretch; min-width: 100px; }
         .paste-btn { background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; flex: 1; padding: 10px; display: flex; flex-direction: column; justify-content: center; align-items: center; color: var(--text-color); cursor: pointer; transition: 0.2s; font-weight: bold; font-size: 12px; text-align: center; margin-bottom: 0;}
         .paste-btn:hover { background: var(--border-color); border-color: var(--primary-color); }
@@ -2122,18 +2130,22 @@ function toggleAppTheme() {
     const badge = document.getElementById('linesCounterBadge');
     if (!editor || !gutter) return;
 
-    // Считаем строки по символам перевода строки
-    const text = editor.innerText || '';
+    // trim() убирает случайные пустые переносы в начале и в самом конце
+    const text = (editor.innerText || '').trim();
+    if (!text) {
+        gutter.innerHTML = '1';
+        if (badge) badge.textContent = '0 строк';
+        return;
+    }
+
     const lineCount = text.split(/\r\n|\r|\n/).length;
 
-    // Генерируем номера
     let linesHtml = '';
     for (let i = 1; i <= lineCount; i++) {
         linesHtml += i + '<br>';
     }
     gutter.innerHTML = linesHtml;
 
-    // Обновляем бейдж в заголовке
     if (badge) {
         badge.textContent = `${lineCount} строк`;
     }
@@ -3309,7 +3321,7 @@ async function pingAll() {
             finalOutput = finalOutput.replace(/\t/g, '  ');    
             perfectConfigData = finalOutput;
             
-            outputElement.innerText = finalOutput;
+            outputElement.innerText = finalOutput.trim();
             autoResize(outputElement);
             AppState.saveEditorState();
             updateLineNumbers();
