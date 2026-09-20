@@ -117,53 +117,52 @@
 
 ---
 
-### 🎯 开箱即用预设
+### 🎯 預設設定
 
-为了保持页面整洁，所有基准预设均已分类存放于相应目录中。
+為了避免頁面過於冗長，所有預設配置皆已移至獨立資料夾中。
 
 <table width="100%">
-<thead><tr><th align="left">平台 / 客户端</th><th align="left">配置说明</th><th align="left">导入链接</th></tr></thead>
+<thead><tr><th align="left">平台</th><th align="left">配置說明</th><th align="left">匯入連結</th></tr></thead>
 <tbody>
 <tr>
-  <td>👑 <b>Throne</b><br><i>(桌面端)</i></td>
-  <td>完美分流策略（本土常用服务直连，受限资源走代理），内置去广告。</td>
+  <td>👑 <b>Throne</b><br><i>(桌面客戶端)</i></td>
+  <td>完美的分流配置（俄羅斯政府服務、銀行直連，受阻站點經由 VPN）。內建廣告攔截。</td>
   <td>
-    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/Throne/Throne_INSTALL.DEEPLINK">⚡ 复制 Deeplink</a><br>
-    <a href="https://github.com/JINXPIL/flclash-converter/blob/main/Throne/Throne.md">📄 查看说明文档</a>
+    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/Throne/Throne_INSTALL.DEEPLINK">⚡ 複製 Deeplink</a><br>
+    <a href="https://github.com/JINXPIL/flclash-converter/blob/main/Throne/Throne.md">📄 檢視說明</a>
   </td>
 </tr>
 <tr>
-  <td>📱 <b>Happ (Routing)</b></td>
-  <td>深度优化分流规则，内置广告拦截。</td>
+  <td>📱 <b>Happ (分流路由)</b></td>
+  <td>針對克里米亞、SevSU 進行最佳化，內建 AdBlock</td>
   <td>
-    <a href="https://jinxpil.github.io/flclash-converter/happ.html">⚡ 一键安装</a><br>
-    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/HAPP/DEFAULT.json">📄 查看代码 (JSON)</a>
+    <a href="https://jinxpil.github.io/flclash-converter/happ.html">⚡ 一鍵快速安裝</a><br>
+    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/HAPP/DEFAULT.json">📄 檢視程式碼 (JSON)</a>
   </td>
 </tr>
 <tr>
-  <td>📱 <b>INCY (Routing)</b></td>
-  <td>深度优化分流规则，内置广告拦截。</td>
+  <td>📱 <b>INCY (分流路由)</b></td>
+  <td>針對克里米亞、SevSU 進行最佳化，內建 AdBlock</td>
   <td>
-    <a href="https://jinxpil.github.io/flclash-converter/incy.html">⚡ 一键安装</a><br>
-    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/INCY/DEFAULT.json">📄 查看代码 (JSON)</a>
+    <a href="https://jinxpil.github.io/flclash-converter/incy.html">⚡ 一鍵快速安裝</a><br>
+    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/INCY/DEFAULT.json">📄 檢視程式碼 (JSON)</a>
   </td>
 </tr>
 <tr>
-  <td>⚙️ <b>Mihomo / Clash Meta</b><br><i>(VPS 路由规则)</i></td>
-  <td>专为 VPS 服务端部署定制的纯路由分流规则 (Direct / Proxy / Block)。</td>
+  <td>⚙️ <b>Mihomo / Clash Meta</b><br><i>(VPS 路由)</i></td>
+  <td>純路由分流規則 (Direct / Proxy / Block)，適用於 VPS 伺服器部署</td>
   <td>
-    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/refs/heads/main/MIHOMO/routing.yaml">⚡ 复制 RAW (routing.yaml)</a><br>
-    <a href="https://github.com/JINXPIL/flclash-converter/blob/main/MIHOMO/routing.yaml">📄 浏览文件</a>
+    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/refs/heads/main/MIHOMO/routing.yaml">⚡ 複製 RAW (routing.yaml)</a><br>
+    <a href="https://github.com/JINXPIL/flclash-converter/blob/main/MIHOMO/routing.yaml">📄 檢視檔案</a>
   </td>
 </tr>
 <tr>
   <td>⚙️ <b>Mihomo / Clash Meta</b><br><i>(完整配置)</i></td>
-  <td>v79.0 Ultimate（DPI 深度规避、严格 TLS、强化 DNS 解析）。</td>
-  <td><a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/MIHOMO/ULTIMATE.yml">🔗 导入 YML 完整配置</a></td>
+  <td>v79.0 Ultimate（防護 DPI 分析器，嚴格 TLS）</td>
+  <td><a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/MIHOMO/ULTIMATE.yml">🔗 匯入 YML 配置</a></td>
 </tr>
 </tbody>
 </table>
-
 ---
 
 ### 🤝 社区分流规则库推荐
