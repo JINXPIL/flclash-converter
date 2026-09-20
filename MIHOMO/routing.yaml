@@ -1,180 +1,435 @@
 rules:
-# ================================================================
-# 0.0 СИСТЕМНЫЕ ПРОЦЕССЫ ИБ / АНАЛИЗАТОРЫ ТРАФИКА (Сброс из TUN)
-# ================================================================
-- PROCESS-NAME,wireshark.exe,DIRECT
-- PROCESS-NAME,nmap.exe,DIRECT
-- PROCESS-NAME,dumpcap.exe,DIRECT
-- PROCESS-NAME,fiddler.exe,DIRECT
-- PROCESS-NAME,charles.exe,DIRECT
-- PROCESS-NAME,proxifier.exe,DIRECT
-
-# ================================================================
-# 0.1 СИСТЕМНЫЕ ПРОЦЕССЫ ОС И ПРОВЕРКИ СВЯЗИ (Captive Portals)
-# ================================================================
-- DOMAIN,captive.apple.com,DIRECT
-- DOMAIN-SUFFIX,push.apple.com,DIRECT
-- DOMAIN,aps.apple.com,DIRECT
-- DOMAIN-SUFFIX,ls.apple.com,DIRECT
-- PROCESS-NAME,nsurlsessiond,DIRECT
-- PROCESS-NAME,apsd,DIRECT
-- PROCESS-NAME,trustd,DIRECT
-- PROCESS-NAME,svchost.exe,DIRECT
-- PROCESS-NAME,System,DIRECT
-- DOMAIN-SUFFIX,do.dsp.mp.microsoft.com,DIRECT
-- DOMAIN-SUFFIX,windowsupdate.com,DIRECT
-- DOMAIN-SUFFIX,msftncsi.com,DIRECT
-- DOMAIN-SUFFIX,msftconnecttest.com,DIRECT
-- DOMAIN,ipv6.msftconnecttest.com,REJECT
-- DOMAIN,connectivitycheck.gstatic.com,DIRECT
-- DOMAIN,connectivitycheck.android.com,DIRECT
-- DOMAIN,connect.rom.miui.com,DIRECT
-- DOMAIN,wifi.vivo.com.cn,DIRECT
-- DOMAIN,netcheck.vivo.com.cn,DIRECT
-- DOMAIN,vpushonrt-stsdk.vivo.com.cn,DIRECT
-- DOMAIN,accountinfo.vivo.com.cn,DIRECT
-- DOMAIN-SUFFIX,vivo.com.cn,DIRECT
-- DOMAIN,os-content-recommend.vivo.com,DIRECT
-- DOMAIN,newfind.vivo.com,DIRECT
-- DOMAIN,content-aware.vivo.com,DIRECT
-- DOMAIN-SUFFIX,com.vivo.pushservice,DIRECT
-- DOMAIN-SUFFIX,push.vivo.com.cn,DIRECT
-
-# ================================================================
-# 0.2 БЛОКИРОВКА РЕКЛАМЫ, УГРОЗ, ХИТРЫХ DNS И ТЕЛЕМЕТРИИ
-# ================================================================
-- RULE-SET,hijacking-plus,REJECT
-- GEOSITE,category-ads-all,REJECT
-- RULE-SET,hagezi-tif,REJECT
-- RULE-SET,sukka-phishing,REJECT
-- RULE-SET,adblock-rules,REJECT
-- RULE-SET,blockhttpdns,REJECT
-- DOMAIN,os-content-recommend.vivo.com,REJECT
-- DOMAIN,newfind.vivo.com,REJECT
-- DOMAIN,content-aware.vivo.com,REJECT
-- DOMAIN-SUFFIX,mediation.goog,REJECT
-- DOMAIN-SUFFIX,vungle.com,REJECT
-- DOMAIN,adservice.google.com.pe,REJECT
-- DOMAIN-SUFFIX,adservice.google.co.kr,REJECT
-- DOMAIN,fundingchoicesmessages.google.com,REJECT
-
-# ================================================================
-# 0.3 ЗАЩИТА TUN ОТ МУСОРНОГО ЛОКАЛЬНОГО ТРАФИКА WINDOWS
-# ================================================================
-- DST-PORT,137,REJECT
-- DST-PORT,138,REJECT
-- DST-PORT,139,REJECT
-- DST-PORT,445,REJECT
-- DST-PORT,1900,REJECT
-- DST-PORT,5353,REJECT
-- DST-PORT,7680,REJECT
-- GEOSITE,private,DIRECT
-- GEOIP,private,DIRECT,no-resolve
-- GEOIP,lan,DIRECT,no-resolve
-
-# ================================================================
-# 0.4 ПРЯМОЙ ДОСТУП PUSH ANDROID, NTP И STUN (Звонки / WebRTC)
-# ================================================================
-- DST-PORT,5228,DIRECT
-- DST-PORT,5229,DIRECT
-- DST-PORT,5230,DIRECT
-- DOMAIN-KEYWORD,mtalk.google,DIRECT
-- DOMAIN-SUFFIX,mtalk.google.com,DIRECT
-- DST-PORT,123,DIRECT
-- DST-PORT,3478,DIRECT
-- DST-PORT,3479,DIRECT
-- DST-PORT,19302,DIRECT
-
-# ================================================================
-# 0.5 ЗАЩИТА ОТ ТОРРЕНТОВ (Только прямые P2P соединения)
-# ================================================================
-- PROCESS-NAME,qBittorrent.exe,DIRECT
-- PROCESS-NAME,qBittorrent,DIRECT
-- PROCESS-NAME,uTorrent.exe,DIRECT
-- PROCESS-NAME,BitTorrent.exe,DIRECT
-- PROCESS-NAME,WebTorrent.exe,DIRECT
-- PROCESS-NAME,tixati.exe,DIRECT
-- PROCESS-NAME,transmission-daemon,DIRECT
-- PROCESS-NAME,Transmission,DIRECT
-- PROCESS-NAME,aria2c,DIRECT
-- PROCESS-NAME,fdm.exe,DIRECT
-- PROCESS-NAME,FreeDownloadManager.exe,DIRECT
-- GEOSITE,category-pt,DIRECT
-- GEOSITE,tracker,DIRECT
-- DOMAIN-KEYWORD,torrent,DIRECT
-- DOMAIN-KEYWORD,announce,DIRECT
-
-# ================================================================
-# 0.6 ЗАЩИТА DoH И Health Checks
-# ================================================================
-- DOMAIN,cp.cloudflare.com,DIRECT
-- DOMAIN-SUFFIX,cloudflare-dns.com,🚀 Выбор сервера
-
-# ================================================================
-# 0.7 ПРИНУДИТЕЛЬНОЕ ПРОКСИРОВАНИЕ ДЛЯ ПК (МЕССЕНДЖЕРЫ)
-# ================================================================
-- PROCESS-NAME,Telegram.exe,🚀 Выбор сервера
-- PROCESS-NAME,AyuGram.exe,🚀 Выбор сервера
-- PROCESS-NAME,Nekogram.exe,🚀 Выбор сервера
-- PROCESS-NAME,64Gram.exe,🚀 Выбор сервера
-- PROCESS-NAME,org.telegram.messenger,🚀 Выбор сервера
-- PROCESS-NAME,org.telegram.messenger.web,🚀 Выбор сервера
-- PROCESS-NAME,org.telegram.plus,🚀 Выбор сервера
-- PROCESS-NAME,org.thunderdog.challegram,🚀 Выбор сервера
-- PROCESS-NAME,Discord.exe,🚀 Выбор сервера
-- PROCESS-NAME,DiscordPTB.exe,🚀 Выбор сервера
-- PROCESS-NAME,DiscordCanary.exe,🚀 Выбор сервера
-- PROCESS-NAME,com.discord,🚀 Выбор сервера
-
-# ================================================================
-# 1. ПРЯМЫЕ ПОДКЛЮЧЕНИЯ И БЕЛЫЕ СПИСКИ РФ И КРЫМА
-# ================================================================
-- DOMAIN-SUFFIX,ru,DIRECT
-- DOMAIN-SUFFIX,рф,DIRECT
-- DOMAIN-SUFFIX,su,DIRECT
-- PROCESS-NAME,com.allgoritm.youla,DIRECT
-- PROCESS-NAME,ru.ok.android,DIRECT
-- PROCESS-NAME,com.vivo.car.networking,DIRECT
-- PROCESS-NAME,ru.sberbankmobile,DIRECT
-- PROCESS-NAME,ru.tinkoff.mb,DIRECT
-- PROCESS-NAME,com.tbank.mb,DIRECT
-- PROCESS-NAME,ru.rncb.android,DIRECT
-- PROCESS-NAME,ru.nspk.mirpay,DIRECT
-- PROCESS-NAME,ru.nspk.sbpay,DIRECT
-- PROCESS-NAME,ru.cian.main,DIRECT
-- PROCESS-NAME,com.vk.vkvideo,DIRECT
-- PROCESS-NAME,ru.sutochno_redesign,DIRECT
-- PROCESS-NAME,ru.zdravcity.app,DIRECT
-- PROCESS-NAME,io.walletpasses.android,DIRECT
-- PROCESS-NAME,com.avito.android,DIRECT
-- PROCESS-NAME,ru.rx_loyalty.yabloko,DIRECT
-- PROCESS-NAME,ru.rostel,DIRECT
-- PROCESS-NAME,ru.rostel.wink,DIRECT
-- PROCESS-NAME,ru.gosuslugi.pos,DIRECT
-- PROCESS-NAME,ru.biblioonline.reader,DIRECT
-- PROCESS-NAME,com.yandex.browser,DIRECT
-- PROCESS-NAME,ru.vtb24.mobilebanking.android,DIRECT
-- PROCESS-NAME,ru.yandex.searchplugin,DIRECT
-- PROCESS-NAME,ru.yandex.mobile.search,DIRECT
-- PROCESS-NAME,com.google.android.apps.messaging,DIRECT
-- PROCESS-NAME,ru.svobodacard.svoboda,DIRECT
-- PROCESS-NAME,ru.polypay.egks,DIRECT
-- PROCESS-NAME,ru.vk.store,DIRECT
-- PROCESS-NAME,ru.oneme.app,DIRECT
-- PROCESS-NAME,com.vivo.findphone,DIRECT
-- PROCESS-NAME,com.bbk.account,DIRECT
-- PROCESS-NAME,com.mobile.cos.iroaming,DIRECT
-- PROCESS-NAME,com.uma.musicvk,DIRECT
-- PROCESS-NAME,com.bbk.appstore,DIRECT
-- PROCESS-NAME,com.android.filemanager,DIRECT
-- PROCESS-NAME,com.vivo.widget.gallery,DIRECT
-- PROCESS-NAME,com.yandex.aliceapp,DIRECT
-- PROCESS-NAME,ru.yandex.music,DIRECT
-- PROCESS-NAME,ru.yandex.taxi,DIRECT
-- PROCESS-NAME,com.vivo.hover,DIRECT
-- PROCESS-NAME,com.vivo.nightpearl,DIRECT
-- PROCESS-NAME,com.vivo.pushservice,DIRECT
-- PROCESS-NAME,com.iqoo.secure,DIRECT
-- PROCESS-NAME,com.vivo.hiboard,DIRECT
-- PROCESS-NAME,com.vivo.safecenter,DIRECT
-- PROCESS-NAME,com.vivo.conn
+  # ================================================================
+  # 0.0 СИСТЕМНЫЕ ПРОЦЕССЫ ИБ / АНАЛИЗАТОРЫ ТРАФИКА (Сброс из TUN)
+  # ================================================================
+  - PROCESS-NAME,wireshark.exe,DIRECT
+  - PROCESS-NAME,nmap.exe,DIRECT
+  - PROCESS-NAME,dumpcap.exe,DIRECT
+  - PROCESS-NAME,fiddler.exe,DIRECT
+  - PROCESS-NAME,charles.exe,DIRECT
+  - PROCESS-NAME,proxifier.exe,DIRECT
+  # ================================================================
+  # 0.1 СИСТЕМНЫЕ ПРОЦЕССЫ ОС И ПРОВЕРКИ СВЯЗИ (Captive Portals)
+  # ================================================================
+  - DOMAIN,captive.apple.com,DIRECT
+  - DOMAIN-SUFFIX,push.apple.com,DIRECT
+  - DOMAIN,aps.apple.com,DIRECT
+  - DOMAIN-SUFFIX,ls.apple.com,DIRECT
+  - PROCESS-NAME,nsurlsessiond,DIRECT
+  - PROCESS-NAME,apsd,DIRECT
+  - PROCESS-NAME,trustd,DIRECT
+  - PROCESS-NAME,svchost.exe,DIRECT
+  - PROCESS-NAME,System,DIRECT
+  - DOMAIN-SUFFIX,do.dsp.mp.microsoft.com,DIRECT
+  - DOMAIN-SUFFIX,windowsupdate.com,DIRECT
+  - DOMAIN-SUFFIX,msftncsi.com,DIRECT
+  - DOMAIN-SUFFIX,msftconnecttest.com,DIRECT
+  - DOMAIN,ipv6.msftconnecttest.com,REJECT 
+  - DOMAIN,connectivitycheck.gstatic.com,DIRECT
+  - DOMAIN,connectivitycheck.android.com,DIRECT
+  - DOMAIN,connect.rom.miui.com,DIRECT
+  - DOMAIN,wifi.vivo.com.cn,DIRECT
+  - DOMAIN,netcheck.vivo.com.cn,DIRECT
+  - DOMAIN,vpushonrt-stsdk.vivo.com.cn,DIRECT    
+  - DOMAIN,accountinfo.vivo.com.cn,DIRECT        
+  - DOMAIN-SUFFIX,vivo.com.cn,DIRECT
+  - DOMAIN,os-content-recommend.vivo.com,DIRECT  
+  - DOMAIN,newfind.vivo.com,DIRECT
+  - DOMAIN,content-aware.vivo.com,DIRECT
+  - DOMAIN-SUFFIX,com.vivo.pushservice,DIRECT
+  - DOMAIN-SUFFIX,push.vivo.com.cn,DIRECT
+  # ================================================================
+  # 0.2 БЛОКИРОВКА РЕКЛАМЫ, УГРОЗ, ХИТРЫХ DNS И ТЕЛЕМЕТРИИ
+  # ================================================================
+  - GEOSITE,category-ads-all,REJECT 
+  - DOMAIN,os-content-recommend.vivo.com,REJECT  
+  - DOMAIN,newfind.vivo.com,REJECT
+  - DOMAIN,content-aware.vivo.com,REJECT
+  - DOMAIN-SUFFIX,mediation.goog,REJECT
+  - DOMAIN-SUFFIX,vungle.com,REJECT
+  - DOMAIN,adservice.google.com.pe,REJECT
+  - DOMAIN-SUFFIX,adservice.google.co.kr,REJECT
+  - DOMAIN,fundingchoicesmessages.google.com,REJECT
+  # ================================================================
+  # 0.3 ЗАЩИТА TUN ОТ МУСОРНОГО ЛОКАЛЬНОГО ТРАФИКА WINDOWS
+  # ================================================================
+  - DST-PORT,137,REJECT    
+  - DST-PORT,138,REJECT    
+  - DST-PORT,139,REJECT    
+  - DST-PORT,445,REJECT    
+  - DST-PORT,1900,REJECT   
+  - DST-PORT,5353,REJECT   
+  - DST-PORT,7680,REJECT   
+  - GEOSITE,private,DIRECT
+  - GEOIP,private,DIRECT,no-resolve
+  - GEOIP,lan,DIRECT,no-resolve
+  # ================================================================
+  # 0.4 ПРЯМОЙ ДОСТУП PUSH ANDROID, NTP И STUN (Звонки / WebRTC)
+  # ================================================================
+  - DST-PORT,5228,DIRECT  
+  - DST-PORT,5229,DIRECT
+  - DST-PORT,5230,DIRECT
+  - DOMAIN-KEYWORD,mtalk.google,DIRECT 
+  - DOMAIN-SUFFIX,mtalk.google.com,DIRECT
+  - DST-PORT,123,DIRECT    
+  - DST-PORT,3478,DIRECT   
+  - DST-PORT,3479,DIRECT   
+  - DST-PORT,19302,DIRECT  
+  # ================================================================
+  # 0.5 ЗАЩИТА ОТ ТОРРЕНТОВ (Только прямые P2P соединения)
+  # ================================================================
+  - PROCESS-NAME,qBittorrent.exe,DIRECT
+  - PROCESS-NAME,qBittorrent,DIRECT
+  - PROCESS-NAME,uTorrent.exe,DIRECT
+  - PROCESS-NAME,BitTorrent.exe,DIRECT
+  - PROCESS-NAME,WebTorrent.exe,DIRECT
+  - PROCESS-NAME,tixati.exe,DIRECT
+  - PROCESS-NAME,transmission-daemon,DIRECT
+  - PROCESS-NAME,Transmission,DIRECT
+  - PROCESS-NAME,aria2c,DIRECT
+  - PROCESS-NAME,fdm.exe,DIRECT
+  - PROCESS-NAME,FreeDownloadManager.exe,DIRECT
+  - GEOSITE,category-pt,DIRECT
+  - GEOSITE,tracker,DIRECT
+  - DOMAIN-KEYWORD,torrent,DIRECT
+  - DOMAIN-KEYWORD,announce,DIRECT 
+  # ================================================================
+  # 0.6 ЗАЩИТА DoH И Health Checks
+  # ================================================================
+  - DOMAIN,cp.cloudflare.com,DIRECT 
+  # ================================================================
+  # 1. ПРЯМЫЕ ПОДКЛЮЧЕНИЯ И БЕЛЫЕ СПИСКИ РФ И КРЫМА
+  # ================================================================
+  - DOMAIN-SUFFIX,ru,DIRECT
+  - DOMAIN-SUFFIX,рф,DIRECT
+  - DOMAIN-SUFFIX,su,DIRECT
+  - PROCESS-NAME,com.allgoritm.youla,DIRECT
+  - PROCESS-NAME,ru.ok.android,DIRECT
+  - PROCESS-NAME,com.vivo.car.networking,DIRECT
+  - PROCESS-NAME,ru.sberbankmobile,DIRECT
+  - PROCESS-NAME,ru.tinkoff.mb,DIRECT
+  - PROCESS-NAME,com.tbank.mb,DIRECT
+  - PROCESS-NAME,ru.rncb.android,DIRECT
+  - PROCESS-NAME,ru.nspk.mirpay,DIRECT
+  - PROCESS-NAME,ru.nspk.sbpay,DIRECT
+  - PROCESS-NAME,ru.cian.main,DIRECT
+  - PROCESS-NAME,com.vk.vkvideo,DIRECT
+  - PROCESS-NAME,ru.sutochno_redesign,DIRECT
+  - PROCESS-NAME,ru.zdravcity.app,DIRECT
+  - PROCESS-NAME,io.walletpasses.android,DIRECT
+  - PROCESS-NAME,com.avito.android,DIRECT
+  - PROCESS-NAME,ru.rx_loyalty.yabloko,DIRECT
+  - PROCESS-NAME,ru.rostel,DIRECT
+  - PROCESS-NAME,ru.rostel.wink,DIRECT
+  - PROCESS-NAME,ru.gosuslugi.pos,DIRECT
+  - PROCESS-NAME,ru.biblioonline.reader,DIRECT
+  - PROCESS-NAME,com.yandex.browser,DIRECT       
+  - PROCESS-NAME,ru.vtb24.mobilebanking.android,DIRECT 
+  - PROCESS-NAME,ru.yandex.searchplugin,DIRECT   
+  - PROCESS-NAME,ru.yandex.mobile.search,DIRECT  
+  - PROCESS-NAME,com.google.android.apps.messaging,DIRECT 
+  - PROCESS-NAME,ru.svobodacard.svoboda,DIRECT   
+  - PROCESS-NAME,ru.polypay.egks,DIRECT          
+  - PROCESS-NAME,ru.vk.store,DIRECT              
+  - PROCESS-NAME,ru.oneme.app,DIRECT        
+  - PROCESS-NAME,com.vivo.findphone,DIRECT       
+  - PROCESS-NAME,com.bbk.account,DIRECT          
+  - PROCESS-NAME,com.mobile.cos.iroaming,DIRECT
+  - PROCESS-NAME,com.uma.musicvk,DIRECT
+  - PROCESS-NAME,com.bbk.appstore,DIRECT
+  - PROCESS-NAME,com.android.filemanager,DIRECT
+  - PROCESS-NAME,com.vivo.widget.gallery,DIRECT
+  - PROCESS-NAME,com.yandex.aliceapp,DIRECT
+  - PROCESS-NAME,ru.yandex.music,DIRECT
+  - PROCESS-NAME,ru.yandex.taxi,DIRECT
+  - PROCESS-NAME,com.vivo.hover,DIRECT
+  - PROCESS-NAME,com.vivo.nightpearl,DIRECT
+  - PROCESS-NAME,com.vivo.pushservice,DIRECT
+  - PROCESS-NAME,com.iqoo.secure,DIRECT
+  - PROCESS-NAME,com.vivo.hiboard,DIRECT
+  - PROCESS-NAME,com.vivo.safecenter,DIRECT
+  - PROCESS-NAME,com.vivo.connbase,DIRECT
+  - PROCESS-NAME,com.vivo.basemanager,DIRECT
+  - PROCESS-NAME,com.vkontakte.android,DIRECT
+  - PROCESS-NAME,ru.ozon.app.android,DIRECT
+  - PROCESS-NAME,ru.ozon.fintech.finance,DIRECT
+  - PROCESS-NAME,ru.wildberries.wbpayclient,DIRECT
+  - PROCESS-NAME,com.logistic.sdek,DIRECT
+  - PROCESS-NAME,ru.gazprombank.android,DIRECT
+  - DOMAIN-SUFFIX,pool.ntp.org,DIRECT
+  - DOMAIN,firebaselogging-pa.googleapis.com,DIRECT
+  - DOMAIN-SUFFIX,protek.ru,DIRECT
+  - DOMAIN-SUFFIX,kaspersky.com,DIRECT
+  - DOMAIN-SUFFIX,cian.ru,DIRECT
+  - DOMAIN-SUFFIX,cdn-cian.ru,DIRECT
+  - DOMAIN-SUFFIX,sutochno.ru,DIRECT
+  - DOMAIN-SUFFIX,crashlytics.com,DIRECT
+  - DOMAIN-SUFFIX,appsflyer.com,DIRECT
+  - DOMAIN,connectivitycheck.gstatic.com,DIRECT
+  - DOMAIN,api.ipify.org,DIRECT
+  - DOMAIN-SUFFIX,uxfeedback.ru,DIRECT
+  - DOMAIN-SUFFIX,dbankcloud.ru,DIRECT
+  - DOMAIN-SUFFIX,urait.ru,DIRECT
+  - DOMAIN-SUFFIX,jivo.ru,DIRECT
+  - DOMAIN-SUFFIX,jivosite.com,DIRECT
+  - DOMAIN-SUFFIX,amplitude.com,DIRECT
+  - DOMAIN-SUFFIX,settings.crashlytics.com,DIRECT
+  - DOMAIN-SUFFIX,yandex.com,DIRECT              
+  - DOMAIN-SUFFIX,facct.ru,DIRECT                
+  - DOMAIN,mobileconfiguration-pa.googleapis.com,DIRECT 
+  - IP-CIDR,114.114.114.114/32,DIRECT,no-resolve            
+  - DOMAIN-SUFFIX,egks.ru,DIRECT     
+  - DOMAIN-SUFFIX,polypay.ru,DIRECT              
+  - DOMAIN-SUFFIX,svobodacard.ru,DIRECT          
+  - DOMAIN,in.appcenter.ms,DIRECT                
+  - IP-CIDR,42.81.82.209/32,DIRECT,no-resolve               
+  - DOMAIN-SUFFIX,oneme.ru,DIRECT                
+  - DOMAIN-SUFFIX,rustore.ru,DIRECT              
+  - DOMAIN-SUFFIX,kaspersky-labs.com,DIRECT      
+  - DOMAIN-SUFFIX,inappstory.ru,DIRECT           
+  - DOMAIN-SUFFIX,tns-counter.ru,DIRECT          
+  - DOMAIN,doh.pub,DIRECT                        
+  - DOMAIN-SUFFIX,doh.pub,DIRECT 
+  - IP-CIDR,120.53.53.53/32,DIRECT,no-resolve               
+  - DOMAIN,vpushonrt-stsdk.vivo.com.cn,DIRECT    
+  - DOMAIN,accountinfo.vivo.com.cn,DIRECT        
+  - DOMAIN-SUFFIX,vivo.com.cn,DIRECT
+  - DOMAIN-SUFFIX,yandex.net,DIRECT
+  - DOMAIN-SUFFIX,yandex.ru,DIRECT
+  - DOMAIN-SUFFIX,yastatic.net,DIRECT
+  - DOMAIN-SUFFIX,yandex.st,DIRECT
+  - DOMAIN-SUFFIX,vk.com,DIRECT
+  - DOMAIN-SUFFIX,ms.vk.com,DIRECT
+  - DOMAIN-SUFFIX,mail.ru,DIRECT
+  - DOMAIN-SUFFIX,imgsmail.ru,DIRECT
+  - DOMAIN-SUFFIX,appmetrica.yandex.net,DIRECT
+  - DOMAIN,push.clients6.google.com,DIRECT
+  - DOMAIN,firebaselogging.googleapis.com,DIRECT
+  - DOMAIN,firebaseinstallations.googleapis.com,DIRECT
+  - DOMAIN-SUFFIX,appsflyersdk.com,DIRECT
+  - DOMAIN-SUFFIX,sev.gov.ru,DIRECT
+  - DOMAIN-SUFFIX,amap.com,DIRECT
+  - DOMAIN-SUFFIX,baidu.com,DIRECT
+  - DOMAIN-SUFFIX,ctobsnssdk.com,DIRECT
+  - DOMAIN-SUFFIX,qq.com,DIRECT
+  - DOMAIN-SUFFIX,amazonaws.com.cn,DIRECT
+  - DOMAIN-SUFFIX,ozone.ru,DIRECT
+  - DOMAIN-SUFFIX,ozonusercontent.com,DIRECT
+  - DOMAIN-SUFFIX,alidns.com,DIRECT
+  - DOMAIN-SUFFIX,copilot-voice.vivo.com.cn,DIRECT
+  - DOMAIN-SUFFIX,yango.tech,DIRECT
+  - DOMAIN-SUFFIX,apple.com,DIRECT
+  - DOMAIN-SUFFIX,icloud.com,DIRECT
+  - DOMAIN-SUFFIX,mzstatic.com,DIRECT
+  - DOMAIN-SUFFIX,mi.com,DIRECT
+  - DOMAIN-SUFFIX,xiaomi.com,DIRECT
+  - DOMAIN-SUFFIX,xiaomi.net,DIRECT
+  - DOMAIN-SUFFIX,com.vivo.magazine,DIRECT
+  - DOMAIN-SUFFIX,com.vivo.connbase,DIRECT
+  - DOMAIN-SUFFIX,com.vivo.base.gallery,DIRECT
+  - DOMAIN-SUFFIX,vhs.wwstat.com,DIRECT
+  - DOMAIN-SUFFIX,api.map.baidu.com,DIRECT
+  - DOMAIN-SUFFIX,on-device-ai.vivo.com.cn,DIRECT
+  - DOMAIN-SUFFIX,api.vivo.com.cn,DIRECT
+  - DOMAIN-SUFFIX,ota.vivo.com.cn,DIRECT
+  - DOMAIN-SUFFIX,cloud.vivo.com.cn,DIRECT
+  - DOMAIN-SUFFIX,miui.com,DIRECT
+  - DOMAIN-SUFFIX,api.mi.com,DIRECT
+  - DOMAIN-SUFFIX,push.mi.com,DIRECT
+  - DOMAIN-SUFFIX,ota.mi.com,DIRECT
+  - DOMAIN-SUFFIX,cloud.mi.com,DIRECT
+  - DOMAIN-SUFFIX,fota.mi.com,DIRECT
+  - DOMAIN-SUFFIX,update.mi.com,DIRECT
+  - DOMAIN-SUFFIX,account.mi.com,DIRECT
+  - DOMAIN-SUFFIX,auth.mi.com,DIRECT
+  - DOMAIN-SUFFIX,oppo.com,DIRECT
+  - DOMAIN-SUFFIX,oppo.com.cn,DIRECT
+  - DOMAIN-SUFFIX,api.oppo.com,DIRECT
+  - DOMAIN-SUFFIX,push.oppo.com,DIRECT
+  - DOMAIN-SUFFIX,ota.oppo.com,DIRECT
+  - DOMAIN-SUFFIX,cloud.oppo.com,DIRECT
+  - DOMAIN-SUFFIX,realme.com,DIRECT
+  - DOMAIN-SUFFIX,realme.com.cn,DIRECT
+  - DOMAIN-SUFFIX,api.realme.com,DIRECT
+  - DOMAIN-SUFFIX,push.realme.com,DIRECT
+  - DOMAIN-SUFFIX,ota.realme.com,DIRECT
+  - DOMAIN-SUFFIX,oneplus.com,DIRECT
+  - DOMAIN-SUFFIX,oneplus.net,DIRECT
+  - DOMAIN-SUFFIX,api.oneplus.com,DIRECT
+  - DOMAIN-SUFFIX,ota.oneplus.com,DIRECT
+  - DOMAIN-SUFFIX,cloud.oneplus.com,DIRECT
+  - DOMAIN-SUFFIX,huawei.com,DIRECT
+  - DOMAIN-SUFFIX,huawei.com.cn,DIRECT
+  - DOMAIN-SUFFIX,api.huawei.com,DIRECT
+  - DOMAIN-SUFFIX,push.huawei.com,DIRECT
+  - DOMAIN-SUFFIX,ota.huawei.com,DIRECT
+  - DOMAIN-SUFFIX,cloud.huawei.com,DIRECT
+  - DOMAIN-SUFFIX,harmonyos.huawei.com,DIRECT
+  - DOMAIN-SUFFIX,hihonor.com,DIRECT
+  - DOMAIN-SUFFIX,honor.com,DIRECT
+  - DOMAIN-SUFFIX,honor.cn,DIRECT
+  - DOMAIN-SUFFIX,samsung.com,DIRECT
+  - DOMAIN-SUFFIX,api.samsung.com,DIRECT
+  - DOMAIN-SUFFIX,push.samsung.com,DIRECT
+  - DOMAIN-SUFFIX,ota.samsung.com,DIRECT
+  - DOMAIN-SUFFIX,fota.samsung.com,DIRECT
+  - DOMAIN-SUFFIX,cloud.samsung.com,DIRECT
+  - DOMAIN-SUFFIX,account.samsung.com,DIRECT
+  - DOMAIN-SUFFIX,auth.samsung.com,DIRECT
+  - DOMAIN-SUFFIX,samsungapps.com,DIRECT
+  - DOMAIN-SUFFIX,samsungknox.com,DIRECT
+  - DOMAIN-SUFFIX,sony.com,DIRECT
+  - DOMAIN-SUFFIX,sonymobile.com,DIRECT
+  - DOMAIN-SUFFIX,api.sony.com,DIRECT
+  - DOMAIN-SUFFIX,push.sony.com,DIRECT
+  - DOMAIN-SUFFIX,ota.sony.com,DIRECT
+  - DOMAIN-SUFFIX,cloud.sony.com,DIRECT
+  - DOMAIN-SUFFIX,mobile-win.ru,DIRECT
+  - DOMAIN-SUFFIX,volnamobile.ru,DIRECT
+  - DOMAIN-SUFFIX,miranda-media.ru,DIRECT
+  - DOMAIN-SUFFIX,sevstar.net,DIRECT
+  - DOMAIN-SUFFIX,farline.net,DIRECT
+  - DOMAIN-SUFFIX,krymtelecom.ru,DIRECT
+  - DOMAIN-SUFFIX,crpt.ru,DIRECT
+  - DOMAIN-SUFFIX,честныйзнак.рф,DIRECT
+  - DOMAIN-SUFFIX,xn--80ajghhoc2aj1c8b.xn--p1ai,DIRECT
+  - DOMAIN-SUFFIX,habr.com,DIRECT
+  - DOMAIN-SUFFIX,sevsu.ru,DIRECT
+  - DOMAIN-SUFFIX,sevastopol.ru,DIRECT          
+  - DOMAIN-SUFFIX,kerch.ru,DIRECT              
+  - DOMAIN-SUFFIX,feodosia.ru,DIRECT           
+  - DOMAIN-SUFFIX,yalta.ru,DIRECT              
+  - DOMAIN-SUFFIX,alushta.ru,DIRECT            
+  - DOMAIN-SUFFIX,crimea.gov.ru,DIRECT         
+  - DOMAIN-SUFFIX,sevastopol.gov.ru,DIRECT     
+  - DOMAIN-SUFFIX,rk.gov.ru,DIRECT             
+  - DOMAIN-SUFFIX,gosuslugi.ru,DIRECT
+  - DOMAIN-SUFFIX,mos.ru,DIRECT
+  - DOMAIN-SUFFIX,gu-st.ru,DIRECT
+  - DOMAIN-SUFFIX,nalog.gov.ru,DIRECT
+  - DOMAIN-SUFFIX,cbr.ru,DIRECT
+  - DOMAIN-SUFFIX,nspk.ru,DIRECT
+  - DOMAIN-SUFFIX,mironline.ru,DIRECT
+  - DOMAIN-SUFFIX,sbp.nspk.ru,DIRECT
+  - DOMAIN-SUFFIX,vtb.ru,DIRECT
+  - DOMAIN-SUFFIX,psbank.ru,DIRECT
+  - DOMAIN-SUFFIX,rncb.ru,DIRECT
+  - DOMAIN-SUFFIX,genbank.ru,DIRECT
+  - DOMAIN-SUFFIX,abr.ru,DIRECT
+  - DOMAIN-SUFFIX,pochta.ru,DIRECT
+  - DOMAIN-SUFFIX,vk.com,DIRECT          
+  - DOMAIN-SUFFIX,vk.ru,DIRECT           
+  - DOMAIN-SUFFIX,userapi.com,DIRECT
+  - DOMAIN-SUFFIX,vkvideo.ru,DIRECT
+  - DOMAIN-SUFFIX,m.vk.com,DIRECT
+  - DOMAIN-SUFFIX,api.vk.com,DIRECT
+  - DOMAIN-SUFFIX,oauth.vk.com,DIRECT
+  - DOMAIN-SUFFIX,ok.ru,DIRECT
+  - DOMAIN-SUFFIX,com.vkontakte.android,DIRECT
+  - DOMAIN-SUFFIX,crashlyticsreports-pa.googleapis.com,DIRECT
+  - DOMAIN-SUFFIX,sun10-2.vkuserphoto.ru,DIRECT
+  - DOMAIN-SUFFIX,vkvd468.okcdn.ru,DIRECT
+  - DOMAIN-SUFFIX,d0.mradx.net,DIRECT
+  - DOMAIN-SUFFIX,api.mycdn.me,DIRECT
+  - DOMAIN-SUFFIX,sun163-2.vkuserphoto.ru,DIRECT
+  - DOMAIN-SUFFIX,vk28-1.vkuser.net,DIRECT
+  - DOMAIN-SUFFIX,sun10-1.vkuserphoto.ru,DIRECT
+  - DOMAIN-SUFFIX,sun9-86.vkuserphoto.ru,DIRECT
+  - DOMAIN-SUFFIX,vkvd411.okcdn.ru,DIRECT
+  - DOMAIN-SUFFIX,iv.okcdn.ru,DIRECT
+  - DOMAIN-SUFFIX,vkvd516.okcdn.ru,DIRECT
+  - DOMAIN-SUFFIX,okcdn.ru,DIRECT
+  - DOMAIN-SUFFIX,vkuserphoto.ru,DIRECT
+  - DOMAIN-SUFFIX,vkuser.net,DIRECT
+  - DOMAIN-SUFFIX,mycdn.me,DIRECT
+  - DOMAIN-SUFFIX,mradx.net,DIRECT
+  - DOMAIN-SUFFIX,vkcdn.net,DIRECT
+  - DOMAIN-SUFFIX,vk-portal.net,DIRECT
+  - DOMAIN-SUFFIX,vk.me,DIRECT
+  - DOMAIN-SUFFIX,dzen.ru,DIRECT
+  - DOMAIN-SUFFIX,max.ru,DIRECT              
+  - DOMAIN-SUFFIX,vkontakte.ru,DIRECT
+  - DOMAIN-SUFFIX,api.vk.com,DIRECT
+  - DOMAIN-SUFFIX,oauth.vk.com,DIRECT
+  - DOMAIN-SUFFIX,login.vk.com,DIRECT
+  - DOMAIN-SUFFIX,static.vk.com,DIRECT
+  - DOMAIN-SUFFIX,im.vk.com,DIRECT
+  - DOMAIN-SUFFIX,chat.vk.com,DIRECT
+  - DOMAIN-SUFFIX,yandex.ru,DIRECT
+  - DOMAIN-SUFFIX,yandex.net,DIRECT
+  - DOMAIN-SUFFIX,ya.ru,DIRECT
+  - DOMAIN-SUFFIX,kinopoisk.ru,DIRECT
+  - DOMAIN-SUFFIX,rutube.ru,DIRECT
+  - DOMAIN-SUFFIX,wink.ru,DIRECT
+  - DOMAIN-SUFFIX,kion.ru,DIRECT
+  - DOMAIN-SUFFIX,start.ru,DIRECT
+  - DOMAIN-SUFFIX,vkplay.ru,DIRECT
+  - DOMAIN-SUFFIX,tricolor.tv,DIRECT
+  - DOMAIN-SUFFIX,okko.tv,DIRECT
+  - DOMAIN-SUFFIX,ivi.ru,DIRECT
+  - DOMAIN-SUFFIX,dns-shop.ru,DIRECT
+  - DOMAIN-SUFFIX,ozon.ru,DIRECT
+  - DOMAIN-SUFFIX,ozon.bank,DIRECT          
+  - DOMAIN-SUFFIX,wildberries.ru,DIRECT
+  - DOMAIN-SUFFIX,wb.ru,DIRECT
+  - DOMAIN-SUFFIX,bank.wildberries.ru,DIRECT  
+  - DOMAIN-SUFFIX,avito.ru,DIRECT
+  - DOMAIN-SUFFIX,megamarket.ru,DIRECT
+  - DOMAIN-SUFFIX,magnit.ru,DIRECT
+  - DOMAIN-SUFFIX,5ka.ru,DIRECT
+  - DOMAIN-SUFFIX,vkusvill.ru,DIRECT
+  - DOMAIN-SUFFIX,yandex.com,DIRECT
+  - DOMAIN-SUFFIX,passport.yandex.ru,DIRECT
+  - DOMAIN-SUFFIX,esia.gosuslugi.ru,DIRECT
+  - DOMAIN-SUFFIX,sber.ru,DIRECT
+  - DOMAIN-SUFFIX,sberbank.ru,DIRECT
+  - DOMAIN-SUFFIX,tbank.ru,DIRECT
+  - DOMAIN-SUFFIX,tinkoff.ru,DIRECT
+  - DOMAIN-SUFFIX,alfabank.ru,DIRECT
+  - DOMAIN-SUFFIX,raiffeisen.ru,DIRECT
+  - DOMAIN-SUFFIX,1c.ru,DIRECT
+  - DOMAIN-SUFFIX,1c-bitrix.ru,DIRECT
+  - DOMAIN-SUFFIX,rzd.ru,DIRECT
+  - DOMAIN-SUFFIX,grandtrain.ru,DIRECT
+  - DOMAIN-SUFFIX,tutu.ru,DIRECT
+  - DOMAIN-SUFFIX,2gis.ru,DIRECT
+  - DOMAIN-SUFFIX,2gis.com,DIRECT
+  - DOMAIN-SUFFIX,cdek.ru,DIRECT
+  - DOMAIN-SUFFIX,kuper.ru,DIRECT
+  - DOMAIN-SUFFIX,samokat.ru,DIRECT
+  - DOMAIN-SUFFIX,aeroflot.ru,DIRECT
+  - DOMAIN-SUFFIX,pobeda.aero,DIRECT
+  - DOMAIN-SUFFIX,mts.ru,DIRECT
+  - DOMAIN-SUFFIX,beeline.ru,DIRECT
+  - DOMAIN-SUFFIX,megafon.ru,DIRECT
+  - DOMAIN-SUFFIX,t2.ru,DIRECT
+  - DOMAIN-SUFFIX,crimea.ru,DIRECT
+  - DOMAIN-SUFFIX,lisaalert.org,DIRECT
+  - DOMAIN-SUFFIX,dobro.ru,DIRECT
+  - DOMAIN-SUFFIX,onf.ru,DIRECT
+  - DOMAIN-SUFFIX,znanie.ru,DIRECT
+  - DOMAIN-SUFFIX,lenta.com,DIRECT
+  - DOMAIN-SUFFIX,dostavista.ru,DIRECT
+  - DOMAIN-SUFFIX,dodopizza.ru,DIRECT
+  - DOMAIN-SUFFIX,gazprombank.ru,DIRECT
+  - DOMAIN-SUFFIX,khl.ru,DIRECT
+  - DOMAIN-SUFFIX,delimobil.ru,DIRECT
+  - DOMAIN-SUFFIX,belkacar.ru,DIRECT
+  - DOMAIN-SUFFIX,medsi.ru,DIRECT
+  - DOMAIN-SUFFIX,ruviki.ru,DIRECT
+  - DOMAIN-SUFFIX,premier.one,DIRECT
+  - DOMAIN-SUFFIX,roskachestvo.ru,DIRECT
+  - DOMAIN-SUFFIX,rosatom.ru,DIRECT
+  - DOMAIN-SUFFIX,rostec.ru,DIRECT
+  - DOMAIN-SUFFIX,rosneft.ru,DIRECT
+  - DOMAIN-SUFFIX,nornickel.ru,DIRECT
+  # ================================================================
+  # 2. ИСКЛЮЧЕНИЯ БАЗ И ПРИОРИТЕТНЫЙ ПРОКСИ-СТРИМИНГ (TIKTOK)
+  # ================================================================
+  - DOMAIN,ipv6.msftconnecttest.com,REJECT
+  - DOMAIN,www.msftconnecttest.com,DIRECT
+  # ================================================================
+  # 3. УМНАЯ БЛОКИРОВКА QUIC (UDP 443) ТОЛЬКО ДЛЯ ЗАБУГОРА (БЕЗ TELEGRAM)
+  # ================================================================
+  - AND,((DST-PORT,443),(NETWORK,UDP),(NOT,((GEOIP,RU))),(NOT,((GEOIP,telegram)))),REJECT
+  - GEOIP,RU,DIRECT,no-resolve
