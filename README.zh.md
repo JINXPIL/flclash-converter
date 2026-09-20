@@ -117,41 +117,49 @@
 
 ---
 
-### 🎯 官方精选预设
+### 🎯 开箱即用预设
 
-为了保持页面清爽，所有精调的基础分流预设均已归类存放在各独立目录中：
+为了保持页面整洁，所有基准预设均已分类存放于相应目录中。
 
 <table width="100%">
-<thead><tr><th align="left">客户端平台</th><th align="left">预设特性</th><th align="left">一键导入链接</th></tr></thead>
+<thead><tr><th align="left">平台 / 客户端</th><th align="left">配置说明</th><th align="left">导入链接</th></tr></thead>
 <tbody>
 <tr>
-  <td>👑 <b>Throne</b><br><i>(桌面端客户端)</i></td>
-  <td>完美精细分流（政务、银行直连，受限网络资源经由代理）。内置广告拦截规则。</td>
+  <td>👑 <b>Throne</b><br><i>(桌面端)</i></td>
+  <td>完美分流策略（本土常用服务直连，受限资源走代理），内置去广告。</td>
   <td>
     <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/Throne/Throne_INSTALL.DEEPLINK">⚡ 复制 Deeplink</a><br>
-    <a href="https://github.com/JINXPIL/flclash-converter/blob/main/Throne/Throne.md">📄 查看配置说明</a>
+    <a href="https://github.com/JINXPIL/flclash-converter/blob/main/Throne/Throne.md">📄 查看说明文档</a>
   </td>
 </tr>
 <tr>
   <td>📱 <b>Happ (Routing)</b></td>
-  <td>针对特定受限区域与大学网络专项优化，内置去广告分流</td>
+  <td>深度优化分流规则，内置广告拦截。</td>
   <td>
-    <a href="https://jinxpil.github.io/flclash-converter/happ.html">⚡ 一键快速安装</a><br>
-    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/HAPP/DEFAULT.json">📄 查看 JSON 源码</a>
+    <a href="https://jinxpil.github.io/flclash-converter/happ.html">⚡ 一键安装</a><br>
+    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/HAPP/DEFAULT.json">📄 查看代码 (JSON)</a>
   </td>
 </tr>
 <tr>
   <td>📱 <b>INCY (Routing)</b></td>
-  <td>针对特定受限区域与大学网络专项优化，内置去广告分流</td>
+  <td>深度优化分流规则，内置广告拦截。</td>
   <td>
-    <a href="https://jinxpil.github.io/flclash-converter/incy.html">⚡ 一键快速安装</a><br>
-    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/INCY/DEFAULT.json">📄 查看 JSON 源码</a>
+    <a href="https://jinxpil.github.io/flclash-converter/incy.html">⚡ 一键安装</a><br>
+    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/INCY/DEFAULT.json">📄 查看代码 (JSON)</a>
   </td>
 </tr>
 <tr>
-  <td>⚙️ <b>Mihomo / Clash Meta</b></td>
-  <td>v79.0 旗舰版（抗 DPI 深度包检测，严格 TLS 验证）</td>
-  <td><a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/MIHOMO/ULTIMATE.yml">🔗 导入 YML 配置文件</a></td>
+  <td>⚙️ <b>Mihomo / Clash Meta</b><br><i>(VPS 路由规则)</i></td>
+  <td>专为 VPS 服务端部署定制的纯路由分流规则 (Direct / Proxy / Block)。</td>
+  <td>
+    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/refs/heads/main/MIHOMO/routing.yaml">⚡ 复制 RAW (routing.yaml)</a><br>
+    <a href="https://github.com/JINXPIL/flclash-converter/blob/main/MIHOMO/routing.yaml">📄 浏览文件</a>
+  </td>
+</tr>
+<tr>
+  <td>⚙️ <b>Mihomo / Clash Meta</b><br><i>(完整配置)</i></td>
+  <td>v79.0 Ultimate（DPI 深度规避、严格 TLS、强化 DNS 解析）。</td>
+  <td><a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/MIHOMO/ULTIMATE.yml">🔗 导入 YML 完整配置</a></td>
 </tr>
 </tbody>
 </table>
