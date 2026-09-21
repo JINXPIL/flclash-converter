@@ -901,6 +901,17 @@
     "domain:fastly.net",
     "domain:appspot.com",
     "domain:bing.com",
+    "geosite:razer",
+    "domain:razer.com",
+    "domain:razerzone.com",
+    "domain:razerapi.com",
+    "domain:razersupport.com",
+    "domain:razerid.com",
+    "domain:rzr.to",
+    "domain:rzr.com",
+    "domain:thx.com",
+    "domain:thxspatial.com",
+    "domain:razergold.com",
     "domain:live.com"
   ],
   "BlockSites": [
