@@ -8,6 +8,7 @@ rules:
   - PROCESS-NAME,fiddler.exe,DIRECT
   - PROCESS-NAME,charles.exe,DIRECT
   - PROCESS-NAME,proxifier.exe,DIRECT
+
   # ================================================================
   # 0.1 СИСТЕМНЫЕ ПРОЦЕССЫ ОС И ПРОВЕРКИ СВЯЗИ (Captive Portals)
   # ================================================================
@@ -22,59 +23,192 @@ rules:
   - PROCESS-NAME,System,DIRECT
   - DOMAIN-SUFFIX,do.dsp.mp.microsoft.com,DIRECT
   - DOMAIN-SUFFIX,windowsupdate.com,DIRECT
+  - DOMAIN-SUFFIX,update.microsoft.com,DIRECT
   - DOMAIN-SUFFIX,msftncsi.com,DIRECT
   - DOMAIN-SUFFIX,msftconnecttest.com,DIRECT
-  - DOMAIN,ipv6.msftconnecttest.com,REJECT 
+  - DOMAIN,www.msftconnecttest.com,DIRECT
+  - DOMAIN,ipv6.msftconnecttest.com,REJECT
   - DOMAIN,connectivitycheck.gstatic.com,DIRECT
   - DOMAIN,connectivitycheck.android.com,DIRECT
   - DOMAIN,connect.rom.miui.com,DIRECT
   - DOMAIN,wifi.vivo.com.cn,DIRECT
   - DOMAIN,netcheck.vivo.com.cn,DIRECT
-  - DOMAIN,vpushonrt-stsdk.vivo.com.cn,DIRECT    
-  - DOMAIN,accountinfo.vivo.com.cn,DIRECT        
+  - DOMAIN,vpushonrt-stsdk.vivo.com.cn,DIRECT
+  - DOMAIN,accountinfo.vivo.com.cn,DIRECT
   - DOMAIN-SUFFIX,vivo.com.cn,DIRECT
-  - DOMAIN,os-content-recommend.vivo.com,DIRECT  
-  - DOMAIN,newfind.vivo.com,DIRECT
-  - DOMAIN,content-aware.vivo.com,DIRECT
   - DOMAIN-SUFFIX,com.vivo.pushservice,DIRECT
   - DOMAIN-SUFFIX,push.vivo.com.cn,DIRECT
+  - DOMAIN-SUFFIX,notify.windows.com,DIRECT
+  - DOMAIN-SUFFIX,wns.windows.com,DIRECT
+  - DOMAIN,edge-mqtt.facebook.com,DIRECT
+  - DOMAIN,mqtt-mini.facebook.com,DIRECT
+  - DOMAIN,ping.ubuntu.com,DIRECT
+  - DOMAIN-SUFFIX,networkmanager.org,DIRECT
+
   # ================================================================
-  # 0.2 БЛОКИРОВКА РЕКЛАМЫ, УГРОЗ, ХИТРЫХ DNS И ТЕЛЕМЕТРИИ
+  # 0.2 БЛОКИРОВКА РЕКЛАМЫ, УГРОЗ, ХИТРЫХ DNS И ТЕЛЕМЕТРИИ (BlockSites)
   # ================================================================
-  - GEOSITE,category-ads-all,REJECT 
-  - DOMAIN,os-content-recommend.vivo.com,REJECT  
+
+  # --- Майнеры и сомнительные сервисы ---
+  - DOMAIN,quic.c3pool.com,REJECT
+  - DOMAIN-SUFFIX,coinhive.com,REJECT
+  - DOMAIN-SUFFIX,minergate.com,REJECT
+
+  # --- Телеметрия и реклама вендоров мобильных ОС и ТВ ---
+  - DOMAIN,os-content-recommend.vivo.com,REJECT
   - DOMAIN,newfind.vivo.com,REJECT
   - DOMAIN,content-aware.vivo.com,REJECT
+  - DOMAIN,adlog.vivo.com.cn,REJECT
+  - DOMAIN,adreq.vivo.com.cn,REJECT
+  - DOMAIN,adservice.vivo.com.cn,REJECT
+  - DOMAIN,vtrack.vivo.com.cn,REJECT
+  - DOMAIN,stats.vivo.com.cn,REJECT
+  - DOMAIN,stsdk.vivo.com.cn,REJECT
+  - DOMAIN,tracking.miui.com,REJECT
+  - DOMAIN,tracking.intl.miui.com,REJECT
+  - DOMAIN,data.mistat.xiaomi.com,REJECT
+  - DOMAIN,data.mistat.intl.xiaomi.com,REJECT
+  - DOMAIN,ad.xiaomi.com,REJECT
+  - DOMAIN,ad.intl.xiaomi.com,REJECT
+  - DOMAIN,sdkconfig.ad.intl.xiaomi.com,REJECT
+  - DOMAIN,metrics.data.hicloud.com,REJECT
+  - DOMAIN,metrics2.data.hicloud.com,REJECT
+  - DOMAIN,grs.hicloud.com,REJECT
+  - DOMAIN-SUFFIX,samsungqbe.com,REJECT
+  - DOMAIN-SUFFIX,samsungrm.net,REJECT
+  - DOMAIN,telemetry.samsung.com,REJECT
+  - DOMAIN,adsfs.oppomobile.com,REJECT
+  - DOMAIN,adx.oppomobile.com,REJECT
+  - DOMAIN,metrics.icloud.com,REJECT
+  - DOMAIN,metrics.apple.com,REJECT
+  - DOMAIN,iad.apple.com,REJECT
+  - DOMAIN,supportmetrics.apple.com,REJECT
+  - DOMAIN,api-adservices.apple.com,REJECT
+  - DOMAIN,iadsdk.apple.com,REJECT
+  - DOMAIN,metrics.ubuntu.com,REJECT
+  - DOMAIN,popcon.ubuntu.com,REJECT
+  - DOMAIN-SUFFIX,samsungcloudtv.com,REJECT
+  - DOMAIN-SUFFIX,smartshare.lgetv.com,REJECT
+
+  # --- Телеметрия Microsoft Windows ---
+  - DOMAIN,vortex.data.microsoft.com,REJECT
+  - DOMAIN-SUFFIX,telemetry.microsoft.com,REJECT
+  - DOMAIN,watson.telemetry.microsoft.com,REJECT
+  - DOMAIN,browser.events.data.msn.com,REJECT
+  - DOMAIN,v10.events.data.microsoft.com,REJECT
+  - DOMAIN,v20.events.data.microsoft.com,REJECT
+  - DOMAIN,settings-win.data.microsoft.com,REJECT
+  - DOMAIN,oca.telemetry.microsoft.com,REJECT
+  - DOMAIN,sqm.telemetry.microsoft.com,REJECT
+
+  # --- Рекламные сети, счетчики и трекеры ---
+  - DOMAIN,an.yandex.ru,REJECT
+  - DOMAIN,dsp.yandex.ru,REJECT
+  - DOMAIN-SUFFIX,awaps.yandex.net,REJECT
+  - DOMAIN-SUFFIX,yandexadexchange.net,REJECT
+  - DOMAIN,mc.yandex.ru,REJECT
+  - DOMAIN,metrika.yandex.ru,REJECT
+  - DOMAIN,app.tanker.yandex.net,REJECT
+  - DOMAIN,startup.mobile.yandex.net,REJECT
+  - DOMAIN,ads.vk.com,REJECT
+  - DOMAIN,target.my.com,REJECT
+  - DOMAIN,ad.mail.ru,REJECT
+  - DOMAIN,top-fwz1.mail.ru,REJECT
+  - DOMAIN-SUFFIX,vk-analytics.ru,REJECT
+  - DOMAIN-SUFFIX,apptracer.ru,REJECT
+  - DOMAIN-SUFFIX,adriver.ru,REJECT
+  - DOMAIN,sentry.ozon.ru,REJECT
+  - DOMAIN,marketplace-sentry.wb.ru,REJECT
+  - DOMAIN,stats.avito.ru,REJECT
+  - DOMAIN,stats.rustore.ru,REJECT
+  - DOMAIN,ads.rustore.ru,REJECT
+  - DOMAIN,tracker-api.my.com,REJECT
+  - DOMAIN-SUFFIX,trafficjunky.com,REJECT
+  - DOMAIN-SUFFIX,pornhubpremium.com,REJECT
+  - DOMAIN-SUFFIX,awempire.com,REJECT
+  - DOMAIN-SUFFIX,branch.io,REJECT
+  - DOMAIN-SUFFIX,kochava.com,REJECT
+  - DOMAIN-SUFFIX,flurry.com,REJECT
+  - DOMAIN-SUFFIX,scorecardresearch.com,REJECT
+  - DOMAIN-SUFFIX,facebook.net,REJECT
+  - DOMAIN-SUFFIX,criteo.com,REJECT
+  - DOMAIN-SUFFIX,taboola.com,REJECT
+  - DOMAIN-SUFFIX,outbrain.com,REJECT
+  - DOMAIN-SUFFIX,googlesyndication.com,REJECT
+  - DOMAIN-SUFFIX,googleadservices.com,REJECT
+  - DOMAIN,pagead2.googlesyndication.com,REJECT
+  - DOMAIN-SUFFIX,doubleclick.net,REJECT
+  - DOMAIN-SUFFIX,google-analytics.com,REJECT
   - DOMAIN-SUFFIX,mediation.goog,REJECT
   - DOMAIN-SUFFIX,vungle.com,REJECT
   - DOMAIN,adservice.google.com.pe,REJECT
   - DOMAIN-SUFFIX,adservice.google.co.kr,REJECT
   - DOMAIN,fundingchoicesmessages.google.com,REJECT
+  - DOMAIN-SUFFIX,buzzoola.com,REJECT
+  - DOMAIN-SUFFIX,adjust.com,REJECT
+  - DOMAIN-SUFFIX,applovin.com,REJECT
+  - DOMAIN-SUFFIX,applvn.com,REJECT
+  - DOMAIN-SUFFIX,inmobi.com,REJECT
+  - DOMAIN-SUFFIX,ironsrc.com,REJECT
+  - DOMAIN-SUFFIX,unityads.unity3d.com,REJECT
+  - DOMAIN-SUFFIX,chartboost.com,REJECT
+  - DOMAIN,firebase-settings.crashlytics.com,REJECT
+  - DOMAIN-SUFFIX,app-measurement.com,REJECT
+  - DOMAIN-SUFFIX,byteoversea.com,REJECT
+  - DOMAIN-SUFFIX,byteoversea.net,REJECT
+  - DOMAIN-SUFFIX,pstatp.com,REJECT
+  - DOMAIN,log.tiktokv.com,REJECT
+  - DOMAIN,analytics.tiktok.com,REJECT
+  - DOMAIN-SUFFIX,rayjump.com,REJECT
+
   # ================================================================
-  # 0.3 ЗАЩИТА TUN ОТ МУСОРНОГО ЛОКАЛЬНОГО ТРАФИКА WINDOWS
+  # 0.3 ЗАЩИТА TUN ОТ МУСОРНОГО ЛОКАЛЬНОГО ТРАФИКА И IP-ИСКЛЮЧЕНИЯ
   # ================================================================
-  - DST-PORT,137,REJECT    
-  - DST-PORT,138,REJECT    
-  - DST-PORT,139,REJECT    
-  - DST-PORT,445,REJECT    
-  - DST-PORT,1900,REJECT   
-  - DST-PORT,5353,REJECT   
-  - DST-PORT,7680,REJECT   
-  - GEOSITE,private,DIRECT
+  - DST-PORT,137,REJECT
+  - DST-PORT,138,REJECT
+  - DST-PORT,139,REJECT
+  - DST-PORT,445,REJECT
+  - DST-PORT,1900,REJECT
+  - DST-PORT,5353,REJECT
+  - DST-PORT,7680,REJECT
+
+  # --- Локальные домены и роутеры (DirectSites) ---
+  - DOMAIN-SUFFIX,localhost,DIRECT
+  - DOMAIN-SUFFIX,local,DIRECT
+  - DOMAIN-SUFFIX,lan,DIRECT
+  - DOMAIN-SUFFIX,home.arpa,DIRECT
+  - DOMAIN,router.asus.com,DIRECT
+  - DOMAIN,tplinkwifi.net,DIRECT
+  - DOMAIN,tplinklogin.net,DIRECT
+  - DOMAIN-SUFFIX,keenetic.link,DIRECT
+  - DOMAIN-SUFFIX,3gppnetwork.org,DIRECT
+
+  # --- Локальные и специальные IP-диапазоны (DirectIp) ---
+  - IP-CIDR,127.0.0.0/8,DIRECT,no-resolve
+  - IP-CIDR,10.0.0.0/8,DIRECT,no-resolve
+  - IP-CIDR,172.16.0.0/12,DIRECT,no-resolve
+  - IP-CIDR,192.168.0.0/16,DIRECT,no-resolve
+  - IP-CIDR,100.64.0.0/10,DIRECT,no-resolve
+  - IP-CIDR,169.254.0.0/16,DIRECT,no-resolve
+  - IP-CIDR,224.0.0.0/4,DIRECT,no-resolve
+  - IP-CIDR,255.255.255.255/32,DIRECT,no-resolve
   - GEOIP,private,DIRECT,no-resolve
   - GEOIP,lan,DIRECT,no-resolve
+
   # ================================================================
   # 0.4 ПРЯМОЙ ДОСТУП PUSH ANDROID, NTP И STUN (Звонки / WebRTC)
   # ================================================================
-  - DST-PORT,5228,DIRECT  
+  - DST-PORT,5228,DIRECT
   - DST-PORT,5229,DIRECT
   - DST-PORT,5230,DIRECT
-  - DOMAIN-KEYWORD,mtalk.google,DIRECT 
+  - DOMAIN-KEYWORD,mtalk.google,DIRECT
   - DOMAIN-SUFFIX,mtalk.google.com,DIRECT
-  - DST-PORT,123,DIRECT    
-  - DST-PORT,3478,DIRECT   
-  - DST-PORT,3479,DIRECT   
-  - DST-PORT,19302,DIRECT  
+  - DST-PORT,123,DIRECT
+  - DST-PORT,3478,DIRECT
+  - DST-PORT,3479,DIRECT
+  - DST-PORT,19302,DIRECT
+  - DOMAIN-SUFFIX,pool.ntp.org,DIRECT
+
   # ================================================================
   # 0.5 ЗАЩИТА ОТ ТОРРЕНТОВ (Только прямые P2P соединения)
   # ================================================================
@@ -89,20 +223,107 @@ rules:
   - PROCESS-NAME,aria2c,DIRECT
   - PROCESS-NAME,fdm.exe,DIRECT
   - PROCESS-NAME,FreeDownloadManager.exe,DIRECT
-  - GEOSITE,category-pt,DIRECT
-  - GEOSITE,tracker,DIRECT
   - DOMAIN-KEYWORD,torrent,DIRECT
-  - DOMAIN-KEYWORD,announce,DIRECT 
+  - DOMAIN-KEYWORD,announce,DIRECT
+
   # ================================================================
   # 0.6 ЗАЩИТА DoH И Health Checks
   # ================================================================
-  - DOMAIN,cp.cloudflare.com,DIRECT 
+  - DOMAIN,cp.cloudflare.com,DIRECT
+  - DOMAIN,doh.pub,DIRECT
+  - DOMAIN-SUFFIX,doh.pub,DIRECT
+  - IP-CIDR,120.53.53.53/32,DIRECT,no-resolve
+  - IP-CIDR,114.114.114.114/32,DIRECT,no-resolve
+  - IP-CIDR,42.81.82.209/32,DIRECT,no-resolve
+
   # ================================================================
-  # 1. ПРЯМЫЕ ПОДКЛЮЧЕНИЯ И БЕЛЫЕ СПИСКИ РФ И КРЫМА
+  # 1. ПРЯМЫЕ ПОДКЛЮЧЕНИЯ И БЕЛЫЕ СПИСКИ РФ, КРЫМА И СНГ
   # ================================================================
+
+  # --- Национальные доменные зоны ---
   - DOMAIN-SUFFIX,ru,DIRECT
   - DOMAIN-SUFFIX,рф,DIRECT
   - DOMAIN-SUFFIX,su,DIRECT
+
+  # --- Ресурсы РФ в зарубежных доменных зонах (.com/.net/.cloud/.io/.st) ---
+  - DOMAIN-SUFFIX,ozon-st.com,DIRECT
+  - DOMAIN-SUFFIX,wbstatic.net,DIRECT
+  - DOMAIN-SUFFIX,avito.st,DIRECT
+  - DOMAIN-SUFFIX,vgtrk.com,DIRECT
+  - DOMAIN-SUFFIX,vmet.ro,DIRECT
+  - DOMAIN-SUFFIX,ddos-guard.net,DIRECT
+  - DOMAIN-SUFFIX,qrator.net,DIRECT
+  - DOMAIN-SUFFIX,webankor.com,DIRECT
+  - DOMAIN-SUFFIX,smartcaptcha.yandexcloud.net,DIRECT
+  - DOMAIN-SUFFIX,yandex.cloud,DIRECT
+  - DOMAIN-SUFFIX,vk.cloud,DIRECT
+  - DOMAIN-SUFFIX,beget.com,DIRECT
+  - DOMAIN-SUFFIX,timeweb.cloud,DIRECT
+  - DOMAIN-SUFFIX,timeweb.com,DIRECT
+  - DOMAIN-SUFFIX,ruvds.com,DIRECT
+  - DOMAIN-SUFFIX,vscale.io,DIRECT
+  - DOMAIN-SUFFIX,aeza.net,DIRECT
+  - DOMAIN-SUFFIX,ngenix.net,DIRECT
+  - DOMAIN-SUFFIX,kinescope.io,DIRECT
+  - DOMAIN-SUFFIX,vk.video,DIRECT
+  - DOMAIN-SUFFIX,vk-video.net,DIRECT
+  - DOMAIN-SUFFIX,2gis.com,DIRECT
+  - DOMAIN-SUFFIX,habr.com,DIRECT
+  - DOMAIN-SUFFIX,jivo.ru,DIRECT
+  - DOMAIN-SUFFIX,jivosite.com,DIRECT
+  - DOMAIN-SUFFIX,yango.tech,DIRECT
+
+  # --- Игровые CDN (прямое скачивание на макс. скорости) ---
+  - DOMAIN-SUFFIX,steamcontent.com,DIRECT
+  - DOMAIN-SUFFIX,steampipe.steamcontent.com,DIRECT
+  - DOMAIN,download.epicgames.com,DIRECT
+  - DOMAIN-SUFFIX,akamai.cdn.ea.com,DIRECT
+  - DOMAIN-SUFFIX,gog-statics.com,DIRECT
+  - DOMAIN-SUFFIX,dl.playstation.net,DIRECT
+  - DOMAIN-SUFFIX,gs2.ww.prod.dl.playstation.net,DIRECT
+  - DOMAIN-SUFFIX,update.playstation.net,DIRECT
+  - DOMAIN-SUFFIX,dlassets.xboxlive.com,DIRECT
+  - DOMAIN-SUFFIX,tlu.dl.delivery.mp.microsoft.com,DIRECT
+  - DOMAIN-SUFFIX,updates.cdn-apple.com,DIRECT
+  - DOMAIN-SUFFIX,swcdn.apple.com,DIRECT
+  - DOMAIN-SUFFIX,appldnld.apple.com,DIRECT
+  - DOMAIN-SUFFIX,akamai.cdn.nintendo.net,DIRECT
+
+  # --- Вендоры мобильных устройств и экосистемы ---
+  - DOMAIN-SUFFIX,vivo.com,DIRECT
+  - DOMAIN-SUFFIX,vivoglobal.com,DIRECT
+  - DOMAIN-SUFFIX,vivosmartphone.cn,DIRECT
+  - DOMAIN-SUFFIX,iqoo.com,DIRECT
+  - DOMAIN-SUFFIX,bbk.com,DIRECT
+  - DOMAIN-SUFFIX,heytap.com,DIRECT
+  - DOMAIN-SUFFIX,heytapmobile.com,DIRECT
+  - DOMAIN-SUFFIX,coloros.com,DIRECT
+  - DOMAIN-SUFFIX,mi.com,DIRECT
+  - DOMAIN-SUFFIX,xiaomi.com,DIRECT
+  - DOMAIN-SUFFIX,xiaomi.net,DIRECT
+  - DOMAIN-SUFFIX,miui.com,DIRECT
+  - DOMAIN-SUFFIX,oppo.com,DIRECT
+  - DOMAIN-SUFFIX,oppo.com.cn,DIRECT
+  - DOMAIN-SUFFIX,realme.com,DIRECT
+  - DOMAIN-SUFFIX,realme.com.cn,DIRECT
+  - DOMAIN-SUFFIX,oneplus.com,DIRECT
+  - DOMAIN-SUFFIX,oneplus.net,DIRECT
+  - DOMAIN-SUFFIX,huawei.com,DIRECT
+  - DOMAIN-SUFFIX,huawei.com.cn,DIRECT
+  - DOMAIN-SUFFIX,harmonyos.huawei.com,DIRECT
+  - DOMAIN-SUFFIX,hihonor.com,DIRECT
+  - DOMAIN-SUFFIX,honor.com,DIRECT
+  - DOMAIN-SUFFIX,honor.cn,DIRECT
+  - DOMAIN-SUFFIX,samsung.com,DIRECT
+  - DOMAIN-SUFFIX,samsungapps.com,DIRECT
+  - DOMAIN-SUFFIX,samsungknox.com,DIRECT
+  - DOMAIN-SUFFIX,ospserver.net,DIRECT
+  - DOMAIN-SUFFIX,sony.com,DIRECT
+  - DOMAIN-SUFFIX,sonymobile.com,DIRECT
+  - DOMAIN-SUFFIX,apple.com,DIRECT
+  - DOMAIN-SUFFIX,mzstatic.com,DIRECT
+
+  # --- Системные мобильные процессы (Android/OriginOS/MIUI) ---
   - PROCESS-NAME,com.allgoritm.youla,DIRECT
   - PROCESS-NAME,ru.ok.android,DIRECT
   - PROCESS-NAME,com.vivo.car.networking,DIRECT
@@ -123,17 +344,17 @@ rules:
   - PROCESS-NAME,ru.rostel.wink,DIRECT
   - PROCESS-NAME,ru.gosuslugi.pos,DIRECT
   - PROCESS-NAME,ru.biblioonline.reader,DIRECT
-  - PROCESS-NAME,com.yandex.browser,DIRECT       
-  - PROCESS-NAME,ru.vtb24.mobilebanking.android,DIRECT 
-  - PROCESS-NAME,ru.yandex.searchplugin,DIRECT   
-  - PROCESS-NAME,ru.yandex.mobile.search,DIRECT  
-  - PROCESS-NAME,com.google.android.apps.messaging,DIRECT 
-  - PROCESS-NAME,ru.svobodacard.svoboda,DIRECT   
-  - PROCESS-NAME,ru.polypay.egks,DIRECT          
-  - PROCESS-NAME,ru.vk.store,DIRECT              
-  - PROCESS-NAME,ru.oneme.app,DIRECT        
-  - PROCESS-NAME,com.vivo.findphone,DIRECT       
-  - PROCESS-NAME,com.bbk.account,DIRECT          
+  - PROCESS-NAME,com.yandex.browser,DIRECT
+  - PROCESS-NAME,ru.vtb24.mobilebanking.android,DIRECT
+  - PROCESS-NAME,ru.yandex.searchplugin,DIRECT
+  - PROCESS-NAME,ru.yandex.mobile.search,DIRECT
+  - PROCESS-NAME,com.google.android.apps.messaging,DIRECT
+  - PROCESS-NAME,ru.svobodacard.svoboda,DIRECT
+  - PROCESS-NAME,ru.polypay.egks,DIRECT
+  - PROCESS-NAME,ru.vk.store,DIRECT
+  - PROCESS-NAME,ru.oneme.app,DIRECT
+  - PROCESS-NAME,com.vivo.findphone,DIRECT
+  - PROCESS-NAME,com.bbk.account,DIRECT
   - PROCESS-NAME,com.mobile.cos.iroaming,DIRECT
   - PROCESS-NAME,com.uma.musicvk,DIRECT
   - PROCESS-NAME,com.bbk.appstore,DIRECT
@@ -144,7 +365,6 @@ rules:
   - PROCESS-NAME,ru.yandex.taxi,DIRECT
   - PROCESS-NAME,com.vivo.hover,DIRECT
   - PROCESS-NAME,com.vivo.nightpearl,DIRECT
-  - PROCESS-NAME,com.vivo.pushservice,DIRECT
   - PROCESS-NAME,com.iqoo.secure,DIRECT
   - PROCESS-NAME,com.vivo.hiboard,DIRECT
   - PROCESS-NAME,com.vivo.safecenter,DIRECT
@@ -156,280 +376,217 @@ rules:
   - PROCESS-NAME,ru.wildberries.wbpayclient,DIRECT
   - PROCESS-NAME,com.logistic.sdek,DIRECT
   - PROCESS-NAME,ru.gazprombank.android,DIRECT
-  - DOMAIN-SUFFIX,pool.ntp.org,DIRECT
-  - DOMAIN,firebaselogging-pa.googleapis.com,DIRECT
-  - DOMAIN-SUFFIX,protek.ru,DIRECT
-  - DOMAIN-SUFFIX,kaspersky.com,DIRECT
-  - DOMAIN-SUFFIX,cian.ru,DIRECT
-  - DOMAIN-SUFFIX,cdn-cian.ru,DIRECT
-  - DOMAIN-SUFFIX,sutochno.ru,DIRECT
-  - DOMAIN-SUFFIX,crashlytics.com,DIRECT
-  - DOMAIN-SUFFIX,appsflyer.com,DIRECT
-  - DOMAIN,connectivitycheck.gstatic.com,DIRECT
-  - DOMAIN,api.ipify.org,DIRECT
-  - DOMAIN-SUFFIX,uxfeedback.ru,DIRECT
-  - DOMAIN-SUFFIX,dbankcloud.ru,DIRECT
-  - DOMAIN-SUFFIX,urait.ru,DIRECT
-  - DOMAIN-SUFFIX,jivo.ru,DIRECT
-  - DOMAIN-SUFFIX,jivosite.com,DIRECT
-  - DOMAIN-SUFFIX,amplitude.com,DIRECT
-  - DOMAIN-SUFFIX,settings.crashlytics.com,DIRECT
-  - DOMAIN-SUFFIX,yandex.com,DIRECT              
-  - DOMAIN-SUFFIX,facct.ru,DIRECT                
-  - DOMAIN,mobileconfiguration-pa.googleapis.com,DIRECT 
-  - IP-CIDR,114.114.114.114/32,DIRECT,no-resolve            
-  - DOMAIN-SUFFIX,egks.ru,DIRECT     
-  - DOMAIN-SUFFIX,polypay.ru,DIRECT              
-  - DOMAIN-SUFFIX,svobodacard.ru,DIRECT          
-  - DOMAIN,in.appcenter.ms,DIRECT                
-  - IP-CIDR,42.81.82.209/32,DIRECT,no-resolve               
-  - DOMAIN-SUFFIX,oneme.ru,DIRECT                
-  - DOMAIN-SUFFIX,rustore.ru,DIRECT              
-  - DOMAIN-SUFFIX,kaspersky-labs.com,DIRECT      
-  - DOMAIN-SUFFIX,inappstory.ru,DIRECT           
-  - DOMAIN-SUFFIX,tns-counter.ru,DIRECT          
-  - DOMAIN,doh.pub,DIRECT                        
-  - DOMAIN-SUFFIX,doh.pub,DIRECT 
-  - IP-CIDR,120.53.53.53/32,DIRECT,no-resolve               
-  - DOMAIN,vpushonrt-stsdk.vivo.com.cn,DIRECT    
-  - DOMAIN,accountinfo.vivo.com.cn,DIRECT        
-  - DOMAIN-SUFFIX,vivo.com.cn,DIRECT
-  - DOMAIN-SUFFIX,yandex.net,DIRECT
-  - DOMAIN-SUFFIX,yandex.ru,DIRECT
-  - DOMAIN-SUFFIX,yastatic.net,DIRECT
-  - DOMAIN-SUFFIX,yandex.st,DIRECT
-  - DOMAIN-SUFFIX,vk.com,DIRECT
-  - DOMAIN-SUFFIX,ms.vk.com,DIRECT
-  - DOMAIN-SUFFIX,mail.ru,DIRECT
-  - DOMAIN-SUFFIX,imgsmail.ru,DIRECT
-  - DOMAIN-SUFFIX,appmetrica.yandex.net,DIRECT
-  - DOMAIN,push.clients6.google.com,DIRECT
-  - DOMAIN,firebaselogging.googleapis.com,DIRECT
-  - DOMAIN,firebaseinstallations.googleapis.com,DIRECT
-  - DOMAIN-SUFFIX,appsflyersdk.com,DIRECT
-  - DOMAIN-SUFFIX,sev.gov.ru,DIRECT
-  - DOMAIN-SUFFIX,amap.com,DIRECT
-  - DOMAIN-SUFFIX,baidu.com,DIRECT
-  - DOMAIN-SUFFIX,ctobsnssdk.com,DIRECT
-  - DOMAIN-SUFFIX,qq.com,DIRECT
-  - DOMAIN-SUFFIX,amazonaws.com.cn,DIRECT
-  - DOMAIN-SUFFIX,ozone.ru,DIRECT
-  - DOMAIN-SUFFIX,ozonusercontent.com,DIRECT
-  - DOMAIN-SUFFIX,alidns.com,DIRECT
-  - DOMAIN-SUFFIX,copilot-voice.vivo.com.cn,DIRECT
-  - DOMAIN-SUFFIX,yango.tech,DIRECT
-  - DOMAIN-SUFFIX,apple.com,DIRECT
-  - DOMAIN-SUFFIX,icloud.com,DIRECT
-  - DOMAIN-SUFFIX,mzstatic.com,DIRECT
-  - DOMAIN-SUFFIX,mi.com,DIRECT
-  - DOMAIN-SUFFIX,xiaomi.com,DIRECT
-  - DOMAIN-SUFFIX,xiaomi.net,DIRECT
-  - DOMAIN-SUFFIX,com.vivo.magazine,DIRECT
-  - DOMAIN-SUFFIX,com.vivo.connbase,DIRECT
-  - DOMAIN-SUFFIX,com.vivo.base.gallery,DIRECT
-  - DOMAIN-SUFFIX,vhs.wwstat.com,DIRECT
-  - DOMAIN-SUFFIX,api.map.baidu.com,DIRECT
-  - DOMAIN-SUFFIX,on-device-ai.vivo.com.cn,DIRECT
-  - DOMAIN-SUFFIX,api.vivo.com.cn,DIRECT
-  - DOMAIN-SUFFIX,ota.vivo.com.cn,DIRECT
-  - DOMAIN-SUFFIX,cloud.vivo.com.cn,DIRECT
-  - DOMAIN-SUFFIX,miui.com,DIRECT
-  - DOMAIN-SUFFIX,api.mi.com,DIRECT
-  - DOMAIN-SUFFIX,push.mi.com,DIRECT
-  - DOMAIN-SUFFIX,ota.mi.com,DIRECT
-  - DOMAIN-SUFFIX,cloud.mi.com,DIRECT
-  - DOMAIN-SUFFIX,fota.mi.com,DIRECT
-  - DOMAIN-SUFFIX,update.mi.com,DIRECT
-  - DOMAIN-SUFFIX,account.mi.com,DIRECT
-  - DOMAIN-SUFFIX,auth.mi.com,DIRECT
-  - DOMAIN-SUFFIX,oppo.com,DIRECT
-  - DOMAIN-SUFFIX,oppo.com.cn,DIRECT
-  - DOMAIN-SUFFIX,api.oppo.com,DIRECT
-  - DOMAIN-SUFFIX,push.oppo.com,DIRECT
-  - DOMAIN-SUFFIX,ota.oppo.com,DIRECT
-  - DOMAIN-SUFFIX,cloud.oppo.com,DIRECT
-  - DOMAIN-SUFFIX,realme.com,DIRECT
-  - DOMAIN-SUFFIX,realme.com.cn,DIRECT
-  - DOMAIN-SUFFIX,api.realme.com,DIRECT
-  - DOMAIN-SUFFIX,push.realme.com,DIRECT
-  - DOMAIN-SUFFIX,ota.realme.com,DIRECT
-  - DOMAIN-SUFFIX,oneplus.com,DIRECT
-  - DOMAIN-SUFFIX,oneplus.net,DIRECT
-  - DOMAIN-SUFFIX,api.oneplus.com,DIRECT
-  - DOMAIN-SUFFIX,ota.oneplus.com,DIRECT
-  - DOMAIN-SUFFIX,cloud.oneplus.com,DIRECT
-  - DOMAIN-SUFFIX,huawei.com,DIRECT
-  - DOMAIN-SUFFIX,huawei.com.cn,DIRECT
-  - DOMAIN-SUFFIX,api.huawei.com,DIRECT
-  - DOMAIN-SUFFIX,push.huawei.com,DIRECT
-  - DOMAIN-SUFFIX,ota.huawei.com,DIRECT
-  - DOMAIN-SUFFIX,cloud.huawei.com,DIRECT
-  - DOMAIN-SUFFIX,harmonyos.huawei.com,DIRECT
-  - DOMAIN-SUFFIX,hihonor.com,DIRECT
-  - DOMAIN-SUFFIX,honor.com,DIRECT
-  - DOMAIN-SUFFIX,honor.cn,DIRECT
-  - DOMAIN-SUFFIX,samsung.com,DIRECT
-  - DOMAIN-SUFFIX,api.samsung.com,DIRECT
-  - DOMAIN-SUFFIX,push.samsung.com,DIRECT
-  - DOMAIN-SUFFIX,ota.samsung.com,DIRECT
-  - DOMAIN-SUFFIX,fota.samsung.com,DIRECT
-  - DOMAIN-SUFFIX,cloud.samsung.com,DIRECT
-  - DOMAIN-SUFFIX,account.samsung.com,DIRECT
-  - DOMAIN-SUFFIX,auth.samsung.com,DIRECT
-  - DOMAIN-SUFFIX,samsungapps.com,DIRECT
-  - DOMAIN-SUFFIX,samsungknox.com,DIRECT
-  - DOMAIN-SUFFIX,sony.com,DIRECT
-  - DOMAIN-SUFFIX,sonymobile.com,DIRECT
-  - DOMAIN-SUFFIX,api.sony.com,DIRECT
-  - DOMAIN-SUFFIX,push.sony.com,DIRECT
-  - DOMAIN-SUFFIX,ota.sony.com,DIRECT
-  - DOMAIN-SUFFIX,cloud.sony.com,DIRECT
-  - DOMAIN-SUFFIX,mobile-win.ru,DIRECT
-  - DOMAIN-SUFFIX,volnamobile.ru,DIRECT
-  - DOMAIN-SUFFIX,miranda-media.ru,DIRECT
-  - DOMAIN-SUFFIX,sevstar.net,DIRECT
-  - DOMAIN-SUFFIX,farline.net,DIRECT
-  - DOMAIN-SUFFIX,krymtelecom.ru,DIRECT
-  - DOMAIN-SUFFIX,crpt.ru,DIRECT
-  - DOMAIN-SUFFIX,честныйзнак.рф,DIRECT
-  - DOMAIN-SUFFIX,xn--80ajghhoc2aj1c8b.xn--p1ai,DIRECT
-  - DOMAIN-SUFFIX,habr.com,DIRECT
-  - DOMAIN-SUFFIX,sevsu.ru,DIRECT
-  - DOMAIN-SUFFIX,sevastopol.ru,DIRECT          
-  - DOMAIN-SUFFIX,kerch.ru,DIRECT              
-  - DOMAIN-SUFFIX,feodosia.ru,DIRECT           
-  - DOMAIN-SUFFIX,yalta.ru,DIRECT              
-  - DOMAIN-SUFFIX,alushta.ru,DIRECT            
-  - DOMAIN-SUFFIX,crimea.gov.ru,DIRECT         
-  - DOMAIN-SUFFIX,sevastopol.gov.ru,DIRECT     
-  - DOMAIN-SUFFIX,rk.gov.ru,DIRECT             
-  - DOMAIN-SUFFIX,gosuslugi.ru,DIRECT
-  - DOMAIN-SUFFIX,mos.ru,DIRECT
-  - DOMAIN-SUFFIX,gu-st.ru,DIRECT
-  - DOMAIN-SUFFIX,nalog.gov.ru,DIRECT
-  - DOMAIN-SUFFIX,cbr.ru,DIRECT
-  - DOMAIN-SUFFIX,nspk.ru,DIRECT
-  - DOMAIN-SUFFIX,mironline.ru,DIRECT
-  - DOMAIN-SUFFIX,sbp.nspk.ru,DIRECT
-  - DOMAIN-SUFFIX,vtb.ru,DIRECT
-  - DOMAIN-SUFFIX,psbank.ru,DIRECT
-  - DOMAIN-SUFFIX,rncb.ru,DIRECT
-  - DOMAIN-SUFFIX,genbank.ru,DIRECT
-  - DOMAIN-SUFFIX,abr.ru,DIRECT
-  - DOMAIN-SUFFIX,pochta.ru,DIRECT
-  - DOMAIN-SUFFIX,vk.com,DIRECT          
-  - DOMAIN-SUFFIX,vk.ru,DIRECT           
-  - DOMAIN-SUFFIX,userapi.com,DIRECT
-  - DOMAIN-SUFFIX,vkvideo.ru,DIRECT
-  - DOMAIN-SUFFIX,m.vk.com,DIRECT
-  - DOMAIN-SUFFIX,api.vk.com,DIRECT
-  - DOMAIN-SUFFIX,oauth.vk.com,DIRECT
-  - DOMAIN-SUFFIX,ok.ru,DIRECT
-  - DOMAIN-SUFFIX,com.vkontakte.android,DIRECT
-  - DOMAIN-SUFFIX,crashlyticsreports-pa.googleapis.com,DIRECT
-  - DOMAIN-SUFFIX,sun10-2.vkuserphoto.ru,DIRECT
-  - DOMAIN-SUFFIX,vkvd468.okcdn.ru,DIRECT
-  - DOMAIN-SUFFIX,d0.mradx.net,DIRECT
-  - DOMAIN-SUFFIX,api.mycdn.me,DIRECT
-  - DOMAIN-SUFFIX,sun163-2.vkuserphoto.ru,DIRECT
-  - DOMAIN-SUFFIX,vk28-1.vkuser.net,DIRECT
-  - DOMAIN-SUFFIX,sun10-1.vkuserphoto.ru,DIRECT
-  - DOMAIN-SUFFIX,sun9-86.vkuserphoto.ru,DIRECT
-  - DOMAIN-SUFFIX,vkvd411.okcdn.ru,DIRECT
-  - DOMAIN-SUFFIX,iv.okcdn.ru,DIRECT
-  - DOMAIN-SUFFIX,vkvd516.okcdn.ru,DIRECT
-  - DOMAIN-SUFFIX,okcdn.ru,DIRECT
-  - DOMAIN-SUFFIX,vkuserphoto.ru,DIRECT
-  - DOMAIN-SUFFIX,vkuser.net,DIRECT
-  - DOMAIN-SUFFIX,mycdn.me,DIRECT
-  - DOMAIN-SUFFIX,mradx.net,DIRECT
-  - DOMAIN-SUFFIX,vkcdn.net,DIRECT
-  - DOMAIN-SUFFIX,vk-portal.net,DIRECT
-  - DOMAIN-SUFFIX,vk.me,DIRECT
-  - DOMAIN-SUFFIX,dzen.ru,DIRECT
-  - DOMAIN-SUFFIX,max.ru,DIRECT              
-  - DOMAIN-SUFFIX,vkontakte.ru,DIRECT
-  - DOMAIN-SUFFIX,api.vk.com,DIRECT
-  - DOMAIN-SUFFIX,oauth.vk.com,DIRECT
-  - DOMAIN-SUFFIX,login.vk.com,DIRECT
-  - DOMAIN-SUFFIX,static.vk.com,DIRECT
-  - DOMAIN-SUFFIX,im.vk.com,DIRECT
-  - DOMAIN-SUFFIX,chat.vk.com,DIRECT
-  - DOMAIN-SUFFIX,yandex.ru,DIRECT
-  - DOMAIN-SUFFIX,yandex.net,DIRECT
-  - DOMAIN-SUFFIX,ya.ru,DIRECT
-  - DOMAIN-SUFFIX,kinopoisk.ru,DIRECT
-  - DOMAIN-SUFFIX,rutube.ru,DIRECT
-  - DOMAIN-SUFFIX,wink.ru,DIRECT
-  - DOMAIN-SUFFIX,kion.ru,DIRECT
-  - DOMAIN-SUFFIX,start.ru,DIRECT
-  - DOMAIN-SUFFIX,vkplay.ru,DIRECT
-  - DOMAIN-SUFFIX,tricolor.tv,DIRECT
-  - DOMAIN-SUFFIX,okko.tv,DIRECT
-  - DOMAIN-SUFFIX,ivi.ru,DIRECT
-  - DOMAIN-SUFFIX,dns-shop.ru,DIRECT
-  - DOMAIN-SUFFIX,ozon.ru,DIRECT
-  - DOMAIN-SUFFIX,ozon.bank,DIRECT          
-  - DOMAIN-SUFFIX,wildberries.ru,DIRECT
-  - DOMAIN-SUFFIX,wb.ru,DIRECT
-  - DOMAIN-SUFFIX,bank.wildberries.ru,DIRECT  
-  - DOMAIN-SUFFIX,avito.ru,DIRECT
-  - DOMAIN-SUFFIX,megamarket.ru,DIRECT
-  - DOMAIN-SUFFIX,magnit.ru,DIRECT
-  - DOMAIN-SUFFIX,5ka.ru,DIRECT
-  - DOMAIN-SUFFIX,vkusvill.ru,DIRECT
-  - DOMAIN-SUFFIX,yandex.com,DIRECT
-  - DOMAIN-SUFFIX,passport.yandex.ru,DIRECT
-  - DOMAIN-SUFFIX,esia.gosuslugi.ru,DIRECT
-  - DOMAIN-SUFFIX,sber.ru,DIRECT
-  - DOMAIN-SUFFIX,sberbank.ru,DIRECT
-  - DOMAIN-SUFFIX,tbank.ru,DIRECT
-  - DOMAIN-SUFFIX,tinkoff.ru,DIRECT
-  - DOMAIN-SUFFIX,alfabank.ru,DIRECT
-  - DOMAIN-SUFFIX,raiffeisen.ru,DIRECT
-  - DOMAIN-SUFFIX,1c.ru,DIRECT
-  - DOMAIN-SUFFIX,1c-bitrix.ru,DIRECT
-  - DOMAIN-SUFFIX,rzd.ru,DIRECT
-  - DOMAIN-SUFFIX,grandtrain.ru,DIRECT
-  - DOMAIN-SUFFIX,tutu.ru,DIRECT
-  - DOMAIN-SUFFIX,2gis.ru,DIRECT
-  - DOMAIN-SUFFIX,2gis.com,DIRECT
-  - DOMAIN-SUFFIX,cdek.ru,DIRECT
-  - DOMAIN-SUFFIX,kuper.ru,DIRECT
-  - DOMAIN-SUFFIX,samokat.ru,DIRECT
-  - DOMAIN-SUFFIX,aeroflot.ru,DIRECT
-  - DOMAIN-SUFFIX,pobeda.aero,DIRECT
-  - DOMAIN-SUFFIX,mts.ru,DIRECT
-  - DOMAIN-SUFFIX,beeline.ru,DIRECT
-  - DOMAIN-SUFFIX,megafon.ru,DIRECT
-  - DOMAIN-SUFFIX,t2.ru,DIRECT
-  - DOMAIN-SUFFIX,crimea.ru,DIRECT
-  - DOMAIN-SUFFIX,lisaalert.org,DIRECT
-  - DOMAIN-SUFFIX,dobro.ru,DIRECT
-  - DOMAIN-SUFFIX,onf.ru,DIRECT
-  - DOMAIN-SUFFIX,znanie.ru,DIRECT
-  - DOMAIN-SUFFIX,lenta.com,DIRECT
-  - DOMAIN-SUFFIX,dostavista.ru,DIRECT
-  - DOMAIN-SUFFIX,dodopizza.ru,DIRECT
-  - DOMAIN-SUFFIX,gazprombank.ru,DIRECT
-  - DOMAIN-SUFFIX,khl.ru,DIRECT
-  - DOMAIN-SUFFIX,delimobil.ru,DIRECT
-  - DOMAIN-SUFFIX,belkacar.ru,DIRECT
-  - DOMAIN-SUFFIX,medsi.ru,DIRECT
-  - DOMAIN-SUFFIX,ruviki.ru,DIRECT
-  - DOMAIN-SUFFIX,premier.one,DIRECT
-  - DOMAIN-SUFFIX,roskachestvo.ru,DIRECT
-  - DOMAIN-SUFFIX,rosatom.ru,DIRECT
-  - DOMAIN-SUFFIX,rostec.ru,DIRECT
-  - DOMAIN-SUFFIX,rosneft.ru,DIRECT
-  - DOMAIN-SUFFIX,nornickel.ru,DIRECT
+
+  # --- Прямые IP СНГ ---
+  - GEOIP,RU,DIRECT,no-resolve
+  - GEOIP,BY,DIRECT,no-resolve
+  - GEOIP,KZ,DIRECT,no-resolve
+  - GEOIP,UZ,DIRECT,no-resolve
+
   # ================================================================
-  # 2. ИСКЛЮЧЕНИЯ БАЗ И ПРИОРИТЕТНЫЙ ПРОКСИ-СТРИМИНГ (TIKTOK)
+  # 2. ПРОКСИРУЕМЫЕ СЕРВИСЫ (ProxySites из JSON)
   # ================================================================
-  - DOMAIN,ipv6.msftconnecttest.com,REJECT
-  - DOMAIN,www.msftconnecttest.com,DIRECT
+
+  # --- OCSP и сертификаты ---
+  - DOMAIN,ocsp.digicert.com,PROXY
+  - DOMAIN,ocsp.sectigo.com,PROXY
+  - DOMAIN,ocsp.letsencrypt.org,PROXY
+  - DOMAIN,r3.o.lencr.org,PROXY
+  - DOMAIN,crl.identrust.com,PROXY
+  - DOMAIN,ocsp.pki.goog,PROXY
+  - DOMAIN,status.geotrust.com,PROXY
+  - DOMAIN-SUFFIX,letsencrypt.org,PROXY
+  - DOMAIN-SUFFIX,lencr.org,PROXY
+  - DOMAIN-SUFFIX,pki.goog,PROXY
+
+  # --- Торговые площадки (AliExpress, Joom) ---
+  - DOMAIN-SUFFIX,aliexpress.com,PROXY
+  - DOMAIN-SUFFIX,aliexpress.ru,PROXY
+  - DOMAIN-SUFFIX,alicdn.com,PROXY
+  - DOMAIN-SUFFIX,aliexpress.media,PROXY
+  - DOMAIN-SUFFIX,aliseek.com,PROXY
+  - DOMAIN-SUFFIX,alipay.com,PROXY
+  - DOMAIN-SUFFIX,alipayobjects.com,PROXY
+  - DOMAIN-SUFFIX,joom.com,PROXY
+  - DOMAIN-SUFFIX,joom.it,PROXY
+  - DOMAIN-SUFFIX,joomcdn.net,PROXY
+  - DOMAIN-SUFFIX,joom-cdn.net,PROXY
+
+  # --- Google, YouTube и сервисы ---
+  - DOMAIN-SUFFIX,google.com,PROXY
+  - DOMAIN-SUFFIX,youtube.com,PROXY
+  - DOMAIN-SUFFIX,googlevideo.com,PROXY
+  - DOMAIN-SUFFIX,ytimg.com,PROXY
+  - DOMAIN-SUFFIX,ggpht.com,PROXY
+  - DOMAIN-SUFFIX,youtu.be,PROXY
+  - DOMAIN-SUFFIX,youtubei.googleapis.com,PROXY
+  - DOMAIN-SUFFIX,youtube-nocookie.com,PROXY
+  - DOMAIN-SUFFIX,1e100.net,PROXY
+  - DOMAIN-SUFFIX,gvt1.com,PROXY
+  - DOMAIN-SUFFIX,gvt2.com,PROXY
+  - DOMAIN-SUFFIX,gvt3.com,PROXY
+  - DOMAIN-SUFFIX,play.google.com,PROXY
+  - DOMAIN-SUFFIX,googleapis.com,PROXY
+  - DOMAIN-SUFFIX,gstatic.com,PROXY
+  - DOMAIN-SUFFIX,googleusercontent.com,PROXY
+  - DOMAIN-SUFFIX,gemini.google.com,PROXY
+  - DOMAIN-SUFFIX,antigravity.google,PROXY
+  - DOMAIN-SUFFIX,antigravity.com,PROXY
+  - DOMAIN-SUFFIX,widevine.com,PROXY
+
+  # --- Искусственный интеллект и нейросети ---
+  - DOMAIN-SUFFIX,openai.com,PROXY
+  - DOMAIN-SUFFIX,chatgpt.com,PROXY
+  - DOMAIN-SUFFIX,oaistatic.com,PROXY
+  - DOMAIN-SUFFIX,oaiusercontent.com,PROXY
+  - DOMAIN-SUFFIX,claude.ai,PROXY
+  - DOMAIN-SUFFIX,anthropic.com,PROXY
+  - DOMAIN-SUFFIX,claudeusercontent.com,PROXY
+  - DOMAIN-SUFFIX,perplexity.ai,PROXY
+  - DOMAIN-SUFFIX,poe.com,PROXY
+  - DOMAIN-SUFFIX,midjourney.com,PROXY
+  - DOMAIN-SUFFIX,x.ai,PROXY
+  - DOMAIN-SUFFIX,grok.com,PROXY
+  - DOMAIN-SUFFIX,copilot.microsoft.com,PROXY
+  - DOMAIN-SUFFIX,suno.com,PROXY
+  - DOMAIN-SUFFIX,suno.ai,PROXY
+  - DOMAIN-SUFFIX,udio.com,PROXY
+  - DOMAIN-SUFFIX,elevenlabs.io,PROXY
+  - DOMAIN-SUFFIX,runwayml.com,PROXY
+  - DOMAIN-SUFFIX,civitai.com,PROXY
+  - DOMAIN-SUFFIX,stability.ai,PROXY
+  - DOMAIN-SUFFIX,krea.ai,PROXY
+  - DOMAIN-SUFFIX,leonardo.ai,PROXY
+  - DOMAIN-SUFFIX,phind.com,PROXY
+  - DOMAIN-SUFFIX,you.com,PROXY
+  - DOMAIN-SUFFIX,cohere.com,PROXY
+  - DOMAIN-SUFFIX,mistral.ai,PROXY
+  - DOMAIN-SUFFIX,c.ai,PROXY
+  - DOMAIN-SUFFIX,deepseek.com,PROXY
+  - DOMAIN-SUFFIX,huggingface.co,PROXY
+  - DOMAIN-SUFFIX,hf.co,PROXY
+
+  # --- Социальные сети и мессенджеры ---
+  - DOMAIN-SUFFIX,instagram.com,PROXY
+  - DOMAIN-SUFFIX,facebook.com,PROXY
+  - DOMAIN-SUFFIX,cdninstagram.com,PROXY
+  - DOMAIN-SUFFIX,fbcdn.net,PROXY
+  - DOMAIN-SUFFIX,whatsapp.com,PROXY
+  - DOMAIN-SUFFIX,whatsapp.net,PROXY
+  - DOMAIN-SUFFIX,twitter.com,PROXY
+  - DOMAIN-SUFFIX,x.com,PROXY
+  - DOMAIN-SUFFIX,twimg.com,PROXY
+  - DOMAIN-SUFFIX,t.co,PROXY
+  - DOMAIN-SUFFIX,tiktok.com,PROXY
+  - DOMAIN-SUFFIX,tiktokcdn.com,PROXY
+  - DOMAIN-SUFFIX,capcut.com,PROXY
+  - DOMAIN-SUFFIX,discord.com,PROXY
+  - DOMAIN-SUFFIX,discord.gg,PROXY
+  - DOMAIN-SUFFIX,telegram.org,PROXY
+  - DOMAIN-SUFFIX,t.me,PROXY
+  - DOMAIN-SUFFIX,telegram.me,PROXY
+  - DOMAIN-SUFFIX,cdn-telegram.org,PROXY
+  - DOMAIN-SUFFIX,telesco.pe,PROXY
+  - DOMAIN-SUFFIX,signal.org,PROXY
+  - DOMAIN-SUFFIX,viber.com,PROXY
+  - DOMAIN-SUFFIX,skype.com,PROXY
+  - DOMAIN-SUFFIX,teams.microsoft.com,PROXY
+  - DOMAIN-SUFFIX,meet.google.com,PROXY
+
+  # --- Разработка, облака и IT-инфраструктура ---
+  - DOMAIN-SUFFIX,amazonaws.com,PROXY
+  - DOMAIN-SUFFIX,cloudfront.net,PROXY
+  - DOMAIN-SUFFIX,azure.com,PROXY
+  - DOMAIN-SUFFIX,azureedge.net,PROXY
+  - DOMAIN-SUFFIX,microsoftonline.com,PROXY
+  - DOMAIN-SUFFIX,office.com,PROXY
+  - DOMAIN-SUFFIX,oracle.com,PROXY
+  - DOMAIN-SUFFIX,ibm.com,PROXY
+  - DOMAIN-SUFFIX,redhat.com,PROXY
+  - DOMAIN-SUFFIX,vmware.com,PROXY
+  - DOMAIN-SUFFIX,broadcom.com,PROXY
+  - DOMAIN-SUFFIX,cisco.com,PROXY
+  - DOMAIN-SUFFIX,atlassian.com,PROXY
+  - DOMAIN-SUFFIX,jira.com,PROXY
+  - DOMAIN-SUFFIX,trello.com,PROXY
+  - DOMAIN-SUFFIX,bitbucket.org,PROXY
+  - DOMAIN-SUFFIX,notion.so,PROXY
+  - DOMAIN-SUFFIX,notion.site,PROXY
+  - DOMAIN-SUFFIX,miro.com,PROXY
+  - DOMAIN-SUFFIX,slack.com,PROXY
+  - DOMAIN-SUFFIX,asana.com,PROXY
+  - DOMAIN-SUFFIX,docker.com,PROXY
+  - DOMAIN-SUFFIX,docker.io,PROXY
+  - DOMAIN-SUFFIX,github.com,PROXY
+  - DOMAIN-SUFFIX,githubusercontent.com,PROXY
+  - DOMAIN-SUFFIX,githubassets.com,PROXY
+  - DOMAIN-SUFFIX,githubcopilot.com,PROXY
+  - DOMAIN-SUFFIX,gitlab.com,PROXY
+  - DOMAIN-SUFFIX,jetbrains.com,PROXY
+  - DOMAIN-SUFFIX,cursor.sh,PROXY
+  - DOMAIN-SUFFIX,cursor.com,PROXY
+  - DOMAIN-SUFFIX,npmjs.com,PROXY
+  - DOMAIN-SUFFIX,pypi.org,PROXY
+  - DOMAIN-SUFFIX,crates.io,PROXY
+  - DOMAIN-SUFFIX,jsdelivr.net,PROXY
+  - DOMAIN-SUFFIX,cloudflare.com,PROXY
+  - DOMAIN-SUFFIX,cloudflare.net,PROXY
+  - DOMAIN-SUFFIX,workers.dev,PROXY
+  - DOMAIN-SUFFIX,pages.dev,PROXY
+  - DOMAIN-SUFFIX,vercel.app,PROXY
+  - DOMAIN-SUFFIX,vercel.com,PROXY
+  - DOMAIN-SUFFIX,netlify.app,PROXY
+  - DOMAIN-SUFFIX,digitalocean.com,PROXY
+  - DOMAIN-SUFFIX,hetzner.com,PROXY
+  - DOMAIN-SUFFIX,vultr.com,PROXY
+  - DOMAIN-SUFFIX,tailscale.com,PROXY
+  - DOMAIN-SUFFIX,zerotier.com,PROXY
+
+  # --- Медиа, стриминг и дизайн ---
+  - DOMAIN-SUFFIX,adobe.com,PROXY
+  - DOMAIN-SUFFIX,behance.net,PROXY
+  - DOMAIN-SUFFIX,figma.com,PROXY
+  - DOMAIN-SUFFIX,canva.com,PROXY
+  - DOMAIN-SUFFIX,netflix.com,PROXY
+  - DOMAIN-SUFFIX,spotify.com,PROXY
+  - DOMAIN-SUFFIX,twitch.tv,PROXY
+  - DOMAIN-SUFFIX,patreon.com,PROXY
+  - DOMAIN-SUFFIX,soundcloud.com,PROXY
+  - DOMAIN-SUFFIX,crunchyroll.com,PROXY
+
+  # --- Криптовалюта и платежи ---
+  - DOMAIN-SUFFIX,binance.com,PROXY
+  - DOMAIN-SUFFIX,bybit.com,PROXY
+  - DOMAIN-SUFFIX,okx.com,PROXY
+  - DOMAIN-SUFFIX,coinbase.com,PROXY
+  - DOMAIN-SUFFIX,tradingview.com,PROXY
+  - DOMAIN-SUFFIX,stripe.com,PROXY
+  - DOMAIN-SUFFIX,paypal.com,PROXY
+  - DOMAIN-SUFFIX,wise.com,PROXY
+
+  # --- Заблокированные сайты, торрент-трекеры и сми ---
+  - DOMAIN-SUFFIX,rutracker.org,PROXY
+  - DOMAIN-SUFFIX,nnmclub.to,PROXY
+  - DOMAIN-SUFFIX,rutor.info,PROXY
+  - DOMAIN-SUFFIX,flibusta.is,PROXY
+  - DOMAIN-SUFFIX,ntc.party,PROXY
+  - DOMAIN-SUFFIX,4pda.to,PROXY
+  - DOMAIN-SUFFIX,themoscowtimes.com,PROXY
+  - DOMAIN-SUFFIX,meduza.io,PROXY
+  - DOMAIN-SUFFIX,zona.media,PROXY
+  - DOMAIN-SUFFIX,torproject.org,PROXY
+  - DOMAIN-SUFFIX,reddit.com,PROXY
+  - DOMAIN-SUFFIX,quora.com,PROXY
+
+  # --- Зарубежные DNS / DoH ---
+  - DOMAIN,dns.quad9.net,PROXY
+  - DOMAIN,cloudflare-dns.com,PROXY
+  - DOMAIN,doh.opendns.com,PROXY
+  - DOMAIN,nextdns.io,PROXY
+  - DOMAIN,controld.com,PROXY
+
   # ================================================================
-  # 3. УМНАЯ БЛОКИРОВКА QUIC (UDP 443) ТОЛЬКО ДЛЯ ЗАБУГОРА (БЕЗ TELEGRAM)
+  # 3. УМНАЯ БЛОКИРОВКА QUIC (UDP 443) И ФИНАЛЬНЫЙ ТРАФИК
   # ================================================================
   - AND,((DST-PORT,443),(NETWORK,UDP),(NOT,((GEOIP,RU))),(NOT,((GEOIP,telegram)))),REJECT
-  - GEOIP,RU,DIRECT,no-resolve
+  - MATCH,PROXY
