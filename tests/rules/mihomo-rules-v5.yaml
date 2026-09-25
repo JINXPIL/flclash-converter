@@ -1,0 +1,1277 @@
+# Mihomo (Clash Meta) — правила v5: inline rule-providers + короткая политика
+# Вставляется ДВУМЯ секциями: rule-providers: и rules: (ядро mihomo ≥ 1.19).
+# Маршрутизация идентична плоской v4 (mihomo-rules-fixed.yaml) — проверено на
+# ядре 1.19.31: 58 регрессионных кейсов + 1644 хоста, сверка цели И класса
+# сработавшего правила (rules_test.py). Плоская v4 остаётся запасным вариантом
+# для клиентов/оверрайдов, куда можно вставить только секцию rules:.
+# Зачем: доменные наборы матчатся по индексу (trie) вместо ~1000 проверок
+# подряд, а политика маршрутизации читается целиком на одном экране.
+# Формат payload: +.example.com = домен и все поддомены; example.com = точно.
+
+rule-providers:
+  # Блокировки: майнеры, телеметрия, реклама, трекеры (0.1) — 116 записей
+  block-domains:
+    type: inline
+    behavior: domain
+    payload:
+      # --- Майнеры / криптоджекинг ---
+      - '+.c3pool.com'
+      - '+.supportxmr.com'
+      - '+.moneroocean.stream'
+      - '+.coinhive.com'
+      - '+.minergate.com'
+      # --- Телеметрия и реклама вендоров ОС и ТВ ---
+      - 'os-content-recommend.vivo.com'
+      - 'newfind.vivo.com'
+      - 'content-aware.vivo.com'
+      - 'adlog.vivo.com.cn'
+      - 'adreq.vivo.com.cn'
+      - 'adservice.vivo.com.cn'
+      - 'vtrack.vivo.com.cn'
+      - 'stats.vivo.com.cn'
+      - 'stsdk.vivo.com.cn'
+      - 'onrt-stsdk.vivo.com.cn'
+      - 'appstoreort-stsdk.vivo.com.cn'
+      - 'abeacdataort-stsdk.vivo.com.cn'             # vpush*-stsdk оставлены: связаны с push
+      - 'tracking.miui.com'
+      - 'tracking.intl.miui.com'
+      - 'data.mistat.xiaomi.com'
+      - 'data.mistat.intl.xiaomi.com'
+      - 'ad.xiaomi.com'
+      - 'ad.intl.xiaomi.com'
+      - 'sdkconfig.ad.intl.xiaomi.com'
+      - 'metrics.data.hicloud.com'
+      - 'metrics2.data.hicloud.com'
+      - 'grs.hicloud.com'                            # нужен HMS: на Huawei/Honor убери
+      - '+.samsungqbe.com'
+      - '+.samsungrm.net'
+      - 'telemetry.samsung.com'
+      - 'adsfs.oppomobile.com'
+      - 'adx.oppomobile.com'
+      - 'metrics.icloud.com'
+      - 'metrics.apple.com'
+      - 'iad.apple.com'
+      - 'supportmetrics.apple.com'
+      - 'api-adservices.apple.com'
+      - 'iadsdk.apple.com'
+      - 'metrics.ubuntu.com'
+      - 'popcon.ubuntu.com'
+      - '+.samsungcloudtv.com'
+      - '+.smartshare.lgetv.com'
+      # --- Телеметрия Windows (suffix telemetry.* покрывает watson/oca/sqm) ---
+      - '+.telemetry.microsoft.com'
+      - 'vortex.data.microsoft.com'
+      - 'v10.events.data.microsoft.com'
+      - 'v20.events.data.microsoft.com'
+      - 'settings-win.data.microsoft.com'
+      - 'browser.events.data.msn.com'
+      # --- Рекламные сети, счётчики, трекеры ---
+      - 'an.yandex.ru'
+      - 'dsp.yandex.ru'
+      - '+.awaps.yandex.net'
+      - '+.yandexadexchange.net'
+      - '+.adfox.ru'
+      - 'mc.yandex.ru'
+      - 'mc.yandex.com'
+      - 'metrika.yandex.ru'                          # это веб-кабинет Метрики; сам счётчик — mc.yandex.*
+      - 'app.tanker.yandex.net'
+      - 'startup.mobile.yandex.net'
+      - 'ads.vk.com'
+      - 'target.my.com'
+      - '+.tracker-api.my.com'                       # был DOMAIN: ip4.tracker-api.my.com проходил мимо
+      - 'ad.mail.ru'
+      - 'top-fwz1.mail.ru'
+      - '+.vk-analytics.ru'
+      - '+.apptracer.ru'
+      - '+.adriver.ru'
+      - 'sentry.ozon.ru'
+      - 'marketplace-sentry.wb.ru'
+      - '+.ads-media.wildberries.ru'
+      - 'stats.avito.ru'
+      - 'stats.rustore.ru'
+      - 'ads.rustore.ru'
+      - '+.trafficjunky.com'
+      - '+.pornhubpremium.com'
+      - '+.awempire.com'
+      - '+.branch.io'                                # может ломать deep-ссылки app.link в письмах
+      - '+.adjust.com'                               # то же для ссылок app.adjust.com
+      - '+.kochava.com'
+      - '+.flurry.com'
+      - '+.scorecardresearch.com'
+      - '+.facebook.net'
+      - '+.criteo.com'
+      - '+.taboola.com'
+      - '+.outbrain.com'
+      - '+.googlesyndication.com'
+      - '+.googleadservices.com'
+      - '+.doubleclick.net'
+      - '+.google-analytics.com'
+      - '+.mediation.goog'
+      - 'fundingchoicesmessages.google.com'
+      - '+.buzzoola.com'
+      - '+.vungle.com'
+      - '+.applovin.com'
+      - '+.applvn.com'
+      - '+.inmobi.com'
+      - '+.ironsrc.com'
+      - '+.unityads.unity3d.com'
+      - '+.chartboost.com'
+      - '+.rayjump.com'
+      - '+.app-measurement.com'
+      - 'log.tiktokv.com'
+      - 'analytics.tiktok.com'
+      - '+.byteoversea.com'                          # если TikTok/CapCut начнут глючить —
+      - '+.byteoversea.net'                          # начни с этих трёх строк
+      - '+.pstatp.com'                               # (в ULTIMATE.yml byteoversea.* идут в PROXY)
+      # --- SDK-аналитика и счётчики (из DEFAULT.json) ---
+      # В ULTIMATE.yml эти же домены стояли в DIRECT. Если банковское/RU-приложение
+      # после этого начнёт сбоить — первыми кандидаты appsflyer и appmetrica.
+      - '+.crashlytics.com'
+      - '+.firebaselogging.googleapis.com'
+      - '+.firebaselogging-pa.googleapis.com'
+      - '+.crashlyticsreports-pa.googleapis.com'
+      - '+.appsflyer.com'
+      - '+.appsflyersdk.com'
+      - '+.amplitude.com'
+      - '+.appmetrica.yandex.net'
+      - '+.mradx.net'                                # рекламный CDN Mail.ru; если сломается mail.ru/ok.ru — убери
+      - '+.tns-counter.ru'
+      - '+.uxfeedback.ru'
+
+  # Системные проверки связи, captive-порталы, push, обновления (0.3) — 26 записей
+  system-domains:
+    type: inline
+    behavior: domain
+    payload:
+      - '+.msftconnecttest.com'
+      - '+.msftncsi.com'
+      - 'connectivitycheck.gstatic.com'
+      - 'connectivitycheck.android.com'
+      - 'connectivitycheck.platform.hicloud.com'
+      - 'connect.rom.miui.com'
+      - 'captive.apple.com'
+      - 'detectportal.firefox.com'
+      - 'nmcheck.gnome.org'
+      - 'connectivity-check.ubuntu.com'
+      - 'ping.ubuntu.com'
+      - '+.networkmanager.org'
+      # --- Push ---
+      - '+.push.apple.com'
+      - 'aps.apple.com'
+      - '+.ls.apple.com'
+      - '+.vivo.com.cn'                              # push / аккаунт / проверка сети vivo (трекеры vivo отбиты выше)
+      - '+.notify.windows.com'
+      - '+.wns.windows.com'
+      - '+.mtalk.google.com'
+      - 'firebaseinstallations.googleapis.com'       # нужен для выдачи FCM-токена: REJECT из DEFAULT.json ломал бы push
+      - 'mobileconfiguration-pa.googleapis.com'
+      - 'push.clients6.google.com'
+      - '+.pool.ntp.org'
+      # --- Обновления Windows ---
+      - '+.windowsupdate.com'
+      - '+.update.microsoft.com'
+      - '+.do.dsp.mp.microsoft.com'
+
+  # Исключения из зоны .ru и DIRECT-вендоров → PROXY (1.1) — 16 записей
+  ru-exceptions:
+    type: inline
+    behavior: domain
+    payload:
+      - '+.aliexpress.ru'
+      - '+.aerdns.ru'
+      - '+.aeplatform.ru'
+      - '+.ae-rus.net'
+      - '+.aliexpress-media.com'                     # CDN картинок/видео/скриптов — его не было: серые иконки
+      # --- Google / YouTube / вендоры, ушедшие из РФ ---
+      - '+.google.ru'                                # чтобы Google не видел два разных IP
+      - '+.google.com.ru'
+      - '+.youtube.ru'
+      - '+.intel.ru'
+      - '+.nvidia.ru'
+      # --- Apple: исключения из DIRECT-вендора apple.com (блок 1.2) ---
+      # App Store / TestFlight / Developer недоступны с крымского IP; Siri и
+      # Apple Intelligence требуют разрешённый регион. Push, обновления и
+      # mzstatic остаются напрямую.
+      - '+.apps.apple.com'
+      - '+.itunes.apple.com'
+      - '+.testflight.apple.com'
+      - '+.developer.apple.com'
+      - '+.siri.apple.com'
+      - '+.guzzoni.apple.com'
+
+  # РФ, Крым, СНГ, вендоры, игровые CDN → DIRECT (1.2) — 112 записей
+  direct-domains:
+    type: inline
+    behavior: domain
+    payload:
+      # --- Национальные зоны ---
+      # Кириллический DOMAIN-SUFFIX,рф НЕ срабатывает (проверено на ядре 1.19.31):
+      # в DNS/SNI домен приходит в punycode, поэтому только xn--.
+      - '+.ru'
+      - '+.su'
+      - '+.xn--p1ai'                                 # .рф
+      - '+.xn--p1acf'                                # .рус
+      - '+.xn--80adxhks'                             # .москва
+      # --- VK / Mail.ru вне .ru (раньше уходили в прокси) ---
+      - '+.vk.com'
+      - '+.vk.me'
+      - '+.userapi.com'
+      - '+.vkuser.net'
+      - '+.vkuseraudio.net'
+      - '+.mycdn.me'
+      - '+.vk.company'
+      - '+.vk.video'
+      - '+.vk-video.net'
+      - '+.vk.cloud'
+      - '+.vkcdn.net'
+      - '+.vk-portal.net'
+      # --- Яндекс вне .ru ---
+      - '+.yandex.net'
+      - '+.yandex.com'
+      - '+.yastatic.net'
+      - '+.yandexcloud.net'                          # вместо одного smartcaptcha.*
+      - '+.yandex.cloud'
+      - '+.naydex.net'
+      - '+.yandex.by'
+      - '+.yandex.kz'
+      - '+.yandex.uz'
+      - '+.yandex.st'
+      - '+.yango.tech'
+      # --- Прочие сервисы РФ вне .ru ---
+      - '+.ozon-st.com'
+      - '+.wbstatic.net'
+      - '+.avito.st'
+      - '+.sberbank.com'
+      - '+.vgtrk.com'
+      - '+.vmet.ro'
+      - '+.2gis.com'
+      - '+.habr.com'
+      - '+.jivosite.com'
+      - '+.kinescope.io'
+      - '+.boosty.to'
+      - '+.okko.tv'
+      - '+.premier.one'
+      - '+.more.tv'
+      - '+.tricolor.tv'
+      - '+.ozon.bank'
+      - '+.ozonusercontent.com'
+      - '+.lenta.com'
+      - '+.pobeda.aero'
+      - '+.lisaalert.org'
+      - '+.sdo.support'
+      - '+.kaspersky.com'
+      - '+.kaspersky-labs.com'
+      # --- Провайдеры Крыма / Севастополя ---
+      - '+.sevstar.net'
+      - '+.farline.net'
+      # --- Хостинг, CDN и anti-DDoS РФ ---
+      - '+.ddos-guard.net'
+      - '+.qrator.net'
+      - '+.stormwall.pro'
+      - '+.ngenix.net'
+      - '+.selcdn.net'
+      - '+.webankor.com'
+      - '+.beget.com'
+      - '+.timeweb.cloud'
+      - '+.timeweb.com'
+      - '+.ruvds.com'
+      - '+.vscale.io'
+      - '+.aeza.net'
+      # --- Вендоры устройств и экосистемы ---
+      - '+.vivo.com'
+      - '+.vivoglobal.com'
+      - '+.vivosmartphone.cn'
+      - '+.iqoo.com'
+      - '+.bbk.com'
+      - '+.heytap.com'
+      - '+.heytapmobile.com'
+      - '+.coloros.com'
+      - '+.mi.com'
+      - '+.xiaomi.com'
+      - '+.xiaomi.net'
+      - '+.miui.com'
+      - '+.oppo.com'
+      - '+.oppo.com.cn'
+      - '+.realme.com'
+      - '+.realme.com.cn'
+      - '+.oneplus.com'
+      - '+.oneplus.net'
+      - '+.huawei.com'
+      - '+.huawei.com.cn'
+      - '+.hihonor.com'
+      - '+.honor.com'
+      - '+.honor.cn'
+      - '+.samsung.com'
+      - '+.samsungapps.com'
+      - '+.samsungknox.com'
+      - '+.ospserver.net'
+      - '+.sony.com'
+      - '+.sonymobile.com'
+      - '+.apple.com'
+      - '+.mzstatic.com'
+      # --- Китайские SDK системных приложений vivo/OriginOS (карты, погода, геолокация) ---
+      - '+.amap.com'
+      - '+.baidu.com'
+      - '+.qq.com'
+      - '+.ctobsnssdk.com'
+      - '+.amazonaws.com.cn'
+      - '+.vhs.wwstat.com'
+      # --- Игровые CDN и загрузки обновлений (напрямую = быстрее) ---
+      - '+.steamcontent.com'
+      - 'download.epicgames.com'
+      - '+.akamai.cdn.ea.com'
+      - '+.gog-statics.com'
+      - '+.dl.playstation.net'
+      - '+.update.playstation.net'
+      - '+.dlassets.xboxlive.com'
+      - '+.tlu.dl.delivery.mp.microsoft.com'
+      - '+.updates.cdn-apple.com'
+      - '+.akamai.cdn.nintendo.net'
+
+  # Проксируемые сервисы (3.0) — 537 записей
+  proxy-domains:
+    type: inline
+    behavior: domain
+    payload:
+      # --- OCSP / CRL (Let's Encrypt с 2025 г. отдаёт статус через CRL на *.c.lencr.org) ---
+      - 'ocsp.digicert.com'
+      - 'ocsp.sectigo.com'
+      - 'crl.identrust.com'
+      - 'status.geotrust.com'
+      - '+.letsencrypt.org'
+      - '+.lencr.org'
+      - '+.pki.goog'
+      # --- Торговые площадки ---
+      - '+.aliexpress.com'
+      - '+.alicdn.com'
+      - '+.aliexpress.media'
+      - '+.aliseek.com'
+      - '+.alipay.com'
+      - '+.alipayobjects.com'
+      - '+.joom.com'
+      - '+.joom.it'
+      - '+.joomcdn.net'
+      - '+.joom-cdn.net'
+      # Экосистема Alibaba: капча, антифрод, CDN, логистика, трекинг заказов.
+      # mmstat.com критичен для слайдер-капчи AliExpress — не блокировать.
+      # (aliexpress.com / aliexpress.media выше фактически уже ловит ключевое слово из 1.1)
+      - '+.alibaba.com'
+      - '+.alibabacloud.com'
+      - '+.mmstat.com'
+      - '+.tbcdn.cn'
+      - '+.taobao.com'
+      - '+.cainiao.com'
+      - '+.ykimg.com'
+      - '+.aliimg.com'
+      - '+.alibabausercontent.com'
+      - '+.aliyuncs.com'                             # OSS: фото из отзывов, файлы продавцов
+      # Прочие зарубежные магазины
+      - '+.amazon.com'
+      - '+.ebay.com'
+      - '+.ebaystatic.com'
+      - '+.ebayrtm.com'
+      - '+.iherb.com'
+      - '+.etsy.com'
+      - '+.asos.com'
+      # --- Google и YouTube ---
+      - '+.google'                                   # вся зона .google: gemini, antigravity, notebooklm, dns.google
+      - '+.google.com'
+      - '+.googleapis.com'
+      - '+.gstatic.com'
+      - '+.googleusercontent.com'
+      - '+.1e100.net'
+      - '+.gvt1.com'
+      - '+.gvt2.com'
+      - '+.gvt3.com'
+      - '+.youtube.com'
+      - '+.googlevideo.com'
+      - '+.ytimg.com'
+      - '+.ggpht.com'
+      - '+.youtu.be'
+      - '+.yt.be'
+      - '+.youtube-nocookie.com'
+      - '+.youtubekids.com'
+      - '+.widevine.com'
+      - '+.antigravity.com'
+      - '+.market.android.com'
+      - '+.developer.android.com'
+      - '+.ampproject.org'
+      - '+.ampproject.net'
+      - '+.appspot.com'
+      - '+.run.app'
+      - '+.recaptcha.net'
+      # --- ИИ и нейросети ---
+      - '+.openai.com'
+      - '+.chatgpt.com'
+      - '+.oaistatic.com'
+      - '+.oaiusercontent.com'
+      - '+.sora.com'
+      - '+.claude.ai'
+      - '+.claude.com'
+      - '+.anthropic.com'
+      - '+.claudeusercontent.com'
+      - '+.perplexity.ai'
+      - '+.poe.com'
+      - '+.midjourney.com'
+      - '+.x.ai'
+      - '+.grok.com'
+      - '+.copilot.microsoft.com'
+      - '+.suno.com'
+      - '+.suno.ai'
+      - '+.udio.com'
+      - '+.elevenlabs.io'
+      - '+.runwayml.com'
+      - '+.civitai.com'
+      - '+.stability.ai'
+      - '+.krea.ai'
+      - '+.leonardo.ai'
+      - '+.phind.com'
+      - '+.you.com'
+      - '+.cohere.com'
+      - '+.mistral.ai'
+      - '+.character.ai'
+      - '+.c.ai'
+      - '+.deepseek.com'
+      - '+.huggingface.co'
+      - '+.hf.co'
+      - '+.openrouter.ai'
+      - '+.lmarena.ai'
+      - '+.windsurf.com'
+      - '+.codeium.com'
+      - '+.lovable.dev'
+      - '+.bolt.new'
+      - '+.v0.dev'
+      - '+.replit.com'
+      # служебные домены ИИ-сервисов: авторизация, фичефлаги, антибот, голос
+      - '+.openaimerge.com'
+      - '+.statsig.com'
+      - '+.statsigapi.net'
+      - '+.featuregates.org'
+      - '+.featureassets.org'
+      - '+.workos.com'
+      - '+.workoscdn.com'
+      - '+.intercom.io'
+      - '+.intercomcdn.com'
+      - '+.livekit.cloud'
+      - '+.arkoselabs.com'
+      - '+.poecdn.net'
+      - '+.gamma.app'
+      - '+.gamma.site'
+      # --- Соцсети и мессенджеры ---
+      # edge-mqtt / mqtt-mini.facebook.com убраны из DIRECT: Facebook
+      # заблокирован, и realtime Instagram/Messenger так не работал.
+      - '+.facebook.com'
+      - '+.fb.com'
+      - '+.fb.me'
+      - '+.fbcdn.net'
+      - '+.fbsbx.com'
+      - '+.messenger.com'
+      - '+.instagram.com'
+      - '+.cdninstagram.com'
+      - '+.ig.me'
+      - '+.threads.net'
+      - '+.threads.com'
+      - '+.whatsapp.com'
+      - '+.whatsapp.net'
+      - '+.wa.me'
+      - '+.twitter.com'
+      - '+.x.com'
+      - '+.twimg.com'
+      - '+.t.co'
+      - '+.linkedin.com'
+      - '+.licdn.com'
+      - '+.tiktok.com'
+      - '+.tiktokv.com'
+      - '+.tiktokcdn.com'
+      - '+.tiktokcdn-us.com'
+      - '+.ibytedtos.com'
+      - '+.capcut.com'
+      - '+.discord.com'
+      - '+.discord.gg'
+      - '+.discordapp.com'
+      - '+.discordapp.net'
+      - '+.discord.media'
+      - '+.telegram.org'
+      - '+.t.me'
+      - '+.telegram.me'
+      - '+.cdn-telegram.org'
+      - '+.telesco.pe'
+      - '+.telegra.ph'
+      - '+.tdesktop.com'
+      - '+.signal.org'
+      - '+.viber.com'
+      - '+.skype.com'
+      - '+.teams.microsoft.com'
+      - '+.pinimg.com'
+      - '+.instagr.am'
+      - '+.meta.com'
+      - '+.tiktokinfo.com'
+      - '+.muscdn.com'
+      - '+.musical.ly'
+      - '+.musically.com'
+      - '+.capcut.net'
+      - '+.capcutv.com'
+      - '+.faceu.mobi'
+      - '+.viamaker.com'
+      - '+.snssdk.com'
+      - '+.bytedance.com'
+      - '+.bytedance.net'
+      - '+.byteimg.com'
+      - '+.ibyteimg.com'
+      - '+.tiktokd.org'
+      - '+.ttwstatic.com'
+      - '+.tx.me'
+      - '+.legra.ph'
+      - '+.fragment.com'
+      - '+.signal.me'
+      - '+.signal.captcha.website'
+      - '+.skypeassets.com'
+      - '+.threema.ch'
+      - '+.session.org'
+      - '+.tutanota.com'
+      - '+.tuta.com'
+      - '+.tinder.com'
+      - '+.badoo.com'
+      - '+.zoom.us'
+      - '+.zoom.com'
+      - '+.zoomgov.com'
+      - '+.webex.com'
+      # --- Apple вне зоны apple.com (iCloud, App Store) ---
+      - '+.icloud.com'
+      - '+.icloud-content.com'
+      - '+.appstore.com'
+      # --- Разработка, облака и IT-инфраструктура ---
+      - '+.github.com'
+      - '+.githubusercontent.com'
+      - '+.githubassets.com'
+      - '+.githubcopilot.com'
+      - '+.github.io'
+      - '+.ghcr.io'
+      - '+.gitlab.com'
+      - '+.bitbucket.org'
+      - '+.docker.com'
+      - '+.docker.io'
+      - '+.jetbrains.com'
+      - '+.cursor.sh'
+      - '+.cursor.com'
+      - '+.npmjs.com'
+      - '+.pypi.org'
+      - '+.crates.io'
+      - '+.jsdelivr.net'
+      - '+.amazonaws.com'
+      - '+.cloudfront.net'
+      - '+.azure.com'
+      - '+.azureedge.net'
+      - '+.microsoftonline.com'
+      - '+.office.com'
+      - '+.oracle.com'
+      - '+.ibm.com'
+      - '+.redhat.com'
+      - '+.vmware.com'
+      - '+.broadcom.com'
+      - '+.cisco.com'
+      - '+.atlassian.com'
+      - '+.jira.com'
+      - '+.trello.com'
+      - '+.notion.so'
+      - '+.notion.site'
+      - '+.miro.com'
+      - '+.slack.com'
+      - '+.asana.com'
+      - '+.cloudflare.com'
+      - '+.cloudflare.net'
+      - '+.workers.dev'
+      - '+.pages.dev'
+      - '+.vercel.app'
+      - '+.vercel.com'
+      - '+.netlify.app'
+      - '+.digitalocean.com'
+      - '+.hetzner.com'
+      - '+.vultr.com'
+      - '+.tailscale.com'
+      - '+.zerotier.com'
+      - '+.githubapp.com'
+      - '+.github.blog'
+      - '+.githubstatus.com'
+      - '+.github.dev'
+      - '+.gcr.io'
+      - '+.docker.elastic.co'
+      - '+.docker.com.cn'
+      - '+.hashicorp.com'
+      - '+.terraform.io'
+      - '+.vaultproject.io'
+      - '+.postman.com'
+      - '+.identity.getpostman.com'
+      - '+.postman-echo.com'
+      - '+.pkg.go.dev'
+      - '+.maven.org'
+      - '+.rubygems.org'
+      - '+.unpkg.com'
+      - '+.vscode-cdn.net'
+      - '+.vsassets.io'
+      - '+.visualstudio.com'
+      - '+.vscode.dev'
+      - '+.netlify.com'
+      - '+.heroku.com'
+      - '+.herokuapp.com'
+      - '+.linode.com'
+      - '+.hostinger.com'
+      - '+.ngrok.com'
+      - '+.ngrok.io'
+      - '+.kaggle.com'
+      - '+.sourceforge.net'
+      - '+.sonarqube.org'
+      - '+.stackoverflow.com'
+      - '+.ghp.ci'
+      - '+.ghproxy.com'
+      - '+.atlassian.net'
+      - '+.notion-static.com'
+      - '+.slack-edge.com'
+      - '+.monday.com'
+      - '+.clickup.com'
+      - '+.coda.io'
+      - '+.sap.com'
+      - '+.salesforce.com'
+      - '+.force.com'
+      - '+.hubspot.com'
+      - '+.microsoft.com'
+      - '+.windows.com'
+      - '+.office365.com'
+      - '+.live.com'
+      - '+.bing.com'
+      - '+.godaddy.com'
+      - '+.namecheap.com'
+      - '+.namesilo.com'
+      - '+.cloudflare-ech.com'
+      - '+.digicert.com'
+      - '+.sectigo.com'
+      - '+.globalsign.com'
+      - '+.identrust.com'
+      - '+.sentry.io'
+      - '+.datadoghq.com'
+      - '+.imgix.net'
+      - '+.akamaihd.net'
+      - '+.akamaized.net'
+      - '+.fastly.net'
+      - '+.auth0.com'
+      - '+.hcaptcha.com'
+      - '+.teamviewer.com'
+      - '+.anydesk.com'
+      - '+.mega.nz'
+      - '+.mega.co.nz'
+      - '+.dropbox.com'
+      - '+.wetransfer.com'
+      # --- Железо и драйверы (вендоры ушли из РФ / режут Крым) ---
+      - '+.intel.com'
+      - '+.amd.com'
+      - '+.nvidia.com'
+      - '+.nvidiagrid.net'
+      - '+.realtek.com'
+      - '+.realtek.com.tw'
+      - '+.qualcomm.com'
+      - '+.ti.com'
+      - '+.microchip.com'
+      - '+.dell.com'
+      - '+.hp.com'
+      - '+.lenovo.com'
+      - '+.topazlabs.com'
+      - '+.razer.com'
+      - '+.razerzone.com'
+      - '+.razerapi.com'
+      - '+.razersupport.com'
+      - '+.razerid.com'
+      - '+.rzr.to'
+      - '+.rzr.com'
+      - '+.thx.com'
+      - '+.thxspatial.com'
+      - '+.razergold.com'
+      # --- Медиа, стриминг и дизайн ---
+      - '+.adobe.com'
+      - '+.behance.net'
+      - '+.figma.com'
+      - '+.canva.com'
+      - '+.netflix.com'
+      - '+.spotify.com'
+      - '+.twitch.tv'
+      - '+.patreon.com'
+      - '+.soundcloud.com'
+      - '+.crunchyroll.com'
+      - '+.adobe.io'
+      - '+.creativecloud.com'
+      - '+.adobelogin.com'
+      - '+.typekit.net'
+      - '+.figmausercontent.com'
+      - '+.pictographic.io'
+      - '+.unsplash.com'
+      - '+.pexels.com'
+      - '+.giphy.com'
+      - '+.iframely.net'
+      - '+.sketch.com'
+      - '+.invisionapp.com'
+      - '+.corel.com'
+      - '+.autodesk.com'
+      - '+.tinkercad.com'
+      - '+.dribbble.com'
+      - '+.envato.com'
+      - '+.framer.com'
+      - '+.unity.com'
+      - '+.unity3d.com'
+      - '+.unrealengine.com'
+      - '+.max.com'
+      - '+.hbomax.com'
+      - '+.hbomaxcdn.com'
+      - '+.hbo.com'
+      - '+.maxgo.com'
+      - '+.discomax.com'
+      - '+.nflxext.com'
+      - '+.nflximg.net'
+      - '+.nflxvideo.net'
+      - '+.spotifycdn.com'
+      - '+.spotifycdn.net'
+      - '+.scdn.co'
+      - '+.spoti.fi'
+      - '+.hulu.com'
+      - '+.disneyplus.com'
+      - '+.dssott.com'
+      - '+.primevideo.com'
+      - '+.ttvnw.net'
+      - '+.jtvnw.net'
+      - '+.patreonusercontent.com'
+      - '+.redditmedia.com'
+      - '+.redditstatic.com'
+      - '+.quoracdn.net'
+      - '+.medium.com'
+      - '+.fandom.com'
+      - '+.wikipedia.org'
+      - '+.wikimedia.org'
+      - '+.wiktionary.org'
+      # --- Работа, обучение, путешествия ---
+      - '+.upwork.com'
+      - '+.freelancer.com'
+      - '+.fiverr.com'
+      - '+.toptal.com'
+      - '+.coursera.org'
+      - '+.edx.org'
+      - '+.udemy.com'
+      - '+.duolingo.com'
+      - '+.grammarly.com'
+      - '+.booking.com'
+      - '+.airbnb.com'
+      # --- Криптовалюта и платежи ---
+      - '+.binance.com'
+      - '+.bybit.com'
+      - '+.okx.com'
+      - '+.coinbase.com'
+      - '+.tradingview.com'
+      - '+.stripe.com'
+      - '+.paypal.com'
+      - '+.wise.com'
+      - '+.binance.org'
+      - '+.kraken.com'
+      - '+.bitfinex.com'
+      - '+.kucoin.com'
+      - '+.htx.com'
+      - '+.coinmarketcap.com'
+      - '+.coingecko.com'
+      - '+.metamask.io'
+      - '+.infura.io'
+      - '+.alchemy.com'
+      - '+.solana.com'
+      - '+.polygon.technology'
+      - '+.bscscan.com'
+      - '+.etherscan.io'
+      - '+.payoneer.com'
+      - '+.deel.com'
+      - '+.skrill.com'
+      - '+.neteller.com'
+      # --- Игры и игровые магазины (сторы режут Крым; контент из 1.2 — напрямую) ---
+      - '+.steampowered.com'
+      - '+.steamcommunity.com'
+      - '+.steamstatic.com'
+      - '+.epicgames.com'
+      - '+.fortnite.com'
+      - '+.playstation.com'
+      - '+.sonyentertainmentnetwork.com'
+      - '+.xbox.com'
+      - '+.xboxlive.com'
+      - '+.nintendo.com'
+      - '+.nintendo.net'
+      - '+.battle.net'
+      - '+.blizzard.com'
+      - '+.blzstatic.com'
+      - '+.riotgames.com'
+      - '+.leagueoflegends.com'
+      - '+.valorant.com'
+      - '+.playvalorant.com'
+      - '+.pvp.net'
+      - '+.ea.com'
+      - '+.origin.com'
+      - '+.ubisoft.com'
+      - '+.uplay.com'
+      - '+.rockstargames.com'
+      - '+.roblox.com'
+      - '+.rbxcdn.com'
+      - '+.supercell.com'
+      - '+.brawlstars.com'
+      - '+.brawlstarsgame.com'
+      - '+.clashofclans.com'
+      - '+.clashroyale.com'
+      - '+.squadbusters.com'
+      - '+.hayday.com'
+      - '+.boombeach.com'
+      - '+.plati.market'
+      - '+.plati.io'
+      - '+.digiseller.market'
+      # --- Заблокированные сайты, трекеры и СМИ ---
+      - '+.rutracker.org'
+      - '+.nnmclub.to'
+      - '+.rutor.info'
+      - '+.flibusta.is'
+      - '+.ntc.party'
+      - '+.4pda.to'
+      - '+.themoscowtimes.com'
+      - '+.meduza.io'
+      - '+.zona.media'
+      - '+.torproject.org'
+      - '+.proton.me'
+      - '+.protonmail.com'
+      - '+.reddit.com'
+      - '+.quora.com'
+      - '+.kinozal.tv'
+      - '+.tapochek.net'
+      - '+.bbc.com'
+      - '+.cnn.com'
+      - '+.dw.com'
+      - '+.rferl.org'
+      - '+.svoboda.org'
+      - '+.nordvpn.com'
+      - '+.surfshark.com'
+      - '+.protonvpn.com'
+      - '+.v2ex.com'
+      - '+.brave.com'
+      - '+.duckduckgo.com'
+      - '+.snowflake.torproject.net'
+      - '+.f-droid.org'
+      - '+.apkmirror.com'
+      - '+.apkpure.com'
+      - '+.trustedsource.org'
+      - '+.location.services.mozilla.com'
+      - '+.stun.services.mozilla.com'
+      - '+.v2fly.org'
+      - '+.v2ray.com'
+      - '+.sing-box.sagernet.org'
+      - '+.webrtc.org'
+      # --- Проверка IP и скорости: должны показывать выход прокси ---
+      - '+.ipinfo.io'
+      - '+.ip-api.com'
+      - '+.icanhazip.com'
+      - '+.whoer.net'
+      - '+.ipleak.net'
+      - '+.browserleaks.com'
+      - '+.speedtest.net'
+      - '+.ookla.com'
+      - '+.ooklaserver.net'
+      - '+.fast.com'
+      - '+.nperf.com'
+      # --- Контент 18+ (заблокирован в РФ) ---
+      - '+.redtube.com'
+      - '+.tube8.com'
+      - '+.xhamster.com'
+      - '+.spankbang.com'
+      - '+.cam4.com'
+      - '+.redgifs.com'
+      - '+.e621.net'
+      - '+.manyvids.com'
+      - '+.myfreecams.com'
+      - '+.livejasmin.com'
+      - '+.camsoda.com'
+      - '+.flirt4free.com'
+      # --- Зарубежные DNS / DoH ---
+      # Были DOMAIN (точное совпадение) и не ловили реальные хосты вроде
+      # dns.nextdns.io или freedns.controld.com — теперь суффиксы.
+      - 'dns.quad9.net'
+      - 'doh.opendns.com'
+      - '+.cloudflare-dns.com'
+      - '+.nextdns.io'
+      - '+.controld.com'
+      - '+.adguard-dns.com'
+
+  # Торрент-клиенты Windows/Linux/macOS/Android (0.4) — 25 записей
+  torrent-apps:
+    type: inline
+    behavior: classical
+    payload:
+      - 'PROCESS-NAME,qBittorrent.exe'
+      - 'PROCESS-NAME,qbittorrent'
+      - 'PROCESS-NAME,qbittorrent-nox'
+      - 'PROCESS-NAME,uTorrent.exe'
+      - 'PROCESS-NAME,BitTorrent.exe'
+      - 'PROCESS-NAME,WebTorrent.exe'
+      - 'PROCESS-NAME,tixati.exe'
+      - 'PROCESS-NAME,transmission-qt.exe'
+      - 'PROCESS-NAME,transmission-daemon'
+      - 'PROCESS-NAME,Transmission'
+      - 'PROCESS-NAME,deluge.exe'
+      - 'PROCESS-NAME,deluged'
+      - 'PROCESS-NAME,aria2c'
+      - 'PROCESS-NAME,aria2c.exe'                    # в т.ч. движок Motrix
+      - 'PROCESS-NAME,fdm.exe'
+      - 'PROCESS-NAME,FreeDownloadManager.exe'
+      # Android — раньше отсутствовали, и торренты с телефона шли через прокси
+      - 'PROCESS-NAME,org.proninyaroslav.libretorrent'
+      - 'PROCESS-NAME,com.delphicoder.flud'
+      - 'PROCESS-NAME,com.delphicoder.flud.paid'
+      - 'PROCESS-NAME,com.utorrent.client'
+      - 'PROCESS-NAME,com.bittorrent.client'
+      - 'PROCESS-NAME,hu.tagsoft.ttorrent.lite'
+      - 'PROCESS-NAME,hu.tagsoft.ttorrent.pro'
+      - 'PROCESS-NAME,idm.internet.download.manager'
+      - 'PROCESS-NAME,idm.internet.download.manager.plus'
+
+  # Российские приложения Android (1.0) — 53 записей
+  ru-apps:
+    type: inline
+    behavior: classical
+    payload:
+      - 'PROCESS-NAME,com.allgoritm.youla'
+      - 'PROCESS-NAME,ru.ok.android'
+      - 'PROCESS-NAME,com.vivo.car.networking'
+      - 'PROCESS-NAME,ru.sberbankmobile'
+      - 'PROCESS-NAME,ru.tinkoff.mb'
+      - 'PROCESS-NAME,com.tbank.mb'
+      - 'PROCESS-NAME,ru.rncb.android'
+      - 'PROCESS-NAME,ru.nspk.mirpay'
+      - 'PROCESS-NAME,ru.nspk.sbpay'
+      - 'PROCESS-NAME,ru.cian.main'
+      - 'PROCESS-NAME,com.vk.vkvideo'
+      - 'PROCESS-NAME,ru.sutochno_redesign'
+      - 'PROCESS-NAME,ru.zdravcity.app'
+      - 'PROCESS-NAME,io.walletpasses.android'
+      - 'PROCESS-NAME,com.avito.android'
+      - 'PROCESS-NAME,ru.rx_loyalty.yabloko'
+      - 'PROCESS-NAME,ru.rostel'
+      - 'PROCESS-NAME,ru.rostel.wink'
+      - 'PROCESS-NAME,ru.gosuslugi.pos'
+      - 'PROCESS-NAME,ru.biblioonline.reader'
+      # ОТКЛЮЧЕНО: правило отправляло ВЕСЬ трафик браузера в DIRECT раньше доменных
+      # правил (YouTube, ИИ, соцсети уходили с крымского IP). Теперь Яндекс Браузер
+      # подчиняется общей маршрутизации по доменам.
+      # - PROCESS-NAME,com.yandex.browser,DIRECT
+      - 'PROCESS-NAME,ru.vtb24.mobilebanking.android'
+      - 'PROCESS-NAME,ru.yandex.searchplugin'
+      - 'PROCESS-NAME,ru.yandex.mobile.search'
+      - 'PROCESS-NAME,com.google.android.apps.messaging'
+      - 'PROCESS-NAME,ru.svobodacard.svoboda'
+      - 'PROCESS-NAME,ru.polypay.egks'
+      - 'PROCESS-NAME,ru.vk.store'
+      - 'PROCESS-NAME,ru.oneme.app'
+      - 'PROCESS-NAME,com.vivo.findphone'
+      - 'PROCESS-NAME,com.bbk.account'
+      - 'PROCESS-NAME,com.mobile.cos.iroaming'
+      - 'PROCESS-NAME,com.uma.musicvk'
+      - 'PROCESS-NAME,com.bbk.appstore'
+      - 'PROCESS-NAME,com.android.filemanager'
+      - 'PROCESS-NAME,com.vivo.widget.gallery'
+      - 'PROCESS-NAME,com.yandex.aliceapp'
+      - 'PROCESS-NAME,ru.yandex.music'
+      - 'PROCESS-NAME,ru.yandex.taxi'
+      - 'PROCESS-NAME,com.vivo.hover'
+      - 'PROCESS-NAME,com.vivo.nightpearl'
+      - 'PROCESS-NAME,com.iqoo.secure'
+      - 'PROCESS-NAME,com.vivo.hiboard'
+      - 'PROCESS-NAME,com.vivo.safecenter'
+      - 'PROCESS-NAME,com.vivo.connbase'
+      - 'PROCESS-NAME,com.vivo.basemanager'
+      - 'PROCESS-NAME,com.vivo.magazine'             # в ULTIMATE.yml ошибочно записан как DOMAIN-SUFFIX
+      - 'PROCESS-NAME,com.vivo.base.gallery'         # то же
+      - 'PROCESS-NAME,com.vkontakte.android'
+      - 'PROCESS-NAME,ru.ozon.app.android'
+      - 'PROCESS-NAME,ru.ozon.fintech.finance'
+      - 'PROCESS-NAME,ru.wildberries.wbpayclient'
+      - 'PROCESS-NAME,com.logistic.sdek'
+      - 'PROCESS-NAME,ru.gazprombank.android'
+
+  # Приложения заблокированных сервисов и игровые лаунчеры (3.0) — 25 записей
+  proxy-apps:
+    type: inline
+    behavior: classical
+    payload:
+      # --- Приложения заблокированных сервисов (по процессу) ---
+      # Закрывают соединения по голым IP, в т.ч. голос/видео мимо STUN-DIRECT.
+      - 'PROCESS-NAME,Telegram.exe'
+      - 'PROCESS-NAME,AyuGram.exe'
+      - 'PROCESS-NAME,Nekogram.exe'
+      - 'PROCESS-NAME,64Gram.exe'
+      - 'PROCESS-NAME,org.telegram.messenger'
+      - 'PROCESS-NAME,org.telegram.messenger.web'
+      - 'PROCESS-NAME,org.telegram.plus'
+      - 'PROCESS-NAME,org.thunderdog.challegram'
+      - 'PROCESS-NAME,Discord.exe'
+      - 'PROCESS-NAME,DiscordPTB.exe'
+      - 'PROCESS-NAME,DiscordCanary.exe'
+      - 'PROCESS-NAME,com.discord'
+      - 'PROCESS-NAME,com.zhiliaoapp.musically'
+      - 'PROCESS-NAME,com.ss.android.ugc.trill'
+      - 'PROCESS-NAME,com.instagram.android'
+      - 'PROCESS-NAME,com.facebook.katana'
+      - 'PROCESS-NAME,com.pinterest'
+      # Игровые лаунчеры (загрузки Steam/Epic/Xbox/PS/Nintendo по доменам из 1.2
+      # всё равно идут напрямую). Игровой трафик через прокси = выше пинг.
+      - 'PROCESS-NAME,steam.exe'
+      - 'PROCESS-NAME,steamwebhelper.exe'
+      - 'PROCESS-NAME,EpicGamesLauncher.exe'
+      - 'PROCESS-NAME,Battle.net.exe'
+      - 'PROCESS-NAME,EADesktop.exe'
+      - 'PROCESS-NAME,riotclient.exe'
+      - 'PROCESS-NAME,LeagueClient.exe'
+      - 'PROCESS-NAME,valorant.exe'
+
+  # Ключевые слова — страховка в конце блока 3.0 — 27 записей
+  proxy-keywords:
+    type: inline
+    behavior: classical
+    payload:
+      # --- Ключевые слова (в конце блока: суффиксы выше дешевле и срабатывают первыми) ---
+      - 'DOMAIN-KEYWORD,youtube'
+      - 'DOMAIN-KEYWORD,instagram'
+      - 'DOMAIN-KEYWORD,discord'
+      - 'DOMAIN-KEYWORD,telegram'
+      - 'DOMAIN-KEYWORD,pinterest'
+      - 'DOMAIN-KEYWORD,tiktokcdn'
+      - 'DOMAIN-KEYWORD,grok'
+      - 'DOMAIN-KEYWORD,copilot'
+      - 'DOMAIN-KEYWORD,geforce'
+      - 'DOMAIN-KEYWORD,ggsel'
+      - 'DOMAIN-KEYWORD,z8games'
+      - 'DOMAIN-KEYWORD,crossfire'
+      - 'DOMAIN-KEYWORD,pornhub'
+      - 'DOMAIN-KEYWORD,phncdn'
+      - 'DOMAIN-KEYWORD,xvideos'
+      - 'DOMAIN-KEYWORD,xnxx'
+      - 'DOMAIN-KEYWORD,onlyfans'
+      - 'DOMAIN-KEYWORD,fansly'
+      - 'DOMAIN-KEYWORD,chaturbate'
+      - 'DOMAIN-KEYWORD,stripchat'
+      - 'DOMAIN-KEYWORD,bongacams'
+      - 'DOMAIN-KEYWORD,porn'
+      - 'DOMAIN-KEYWORD,sex'
+      - 'DOMAIN-KEYWORD,xxx'
+      - 'DOMAIN-KEYWORD,hentai'
+      - 'DOMAIN-KEYWORD,nsfw'
+      - 'DOMAIN-KEYWORD,adult'
+
+  # Подсети Telegram и Meta (4.0) — 23 записей
+  proxy-ip:
+    type: inline
+    behavior: ipcidr
+    payload:
+      # Telegram: явные подсети (не зависят от GeoIP-базы) + GEOIP как страховка
+      - '91.108.4.0/22'
+      - '91.108.8.0/22'
+      - '91.108.12.0/22'
+      - '91.108.16.0/22'
+      - '91.108.20.0/22'
+      - '91.108.56.0/22'
+      - '91.105.192.0/23'
+      - '149.154.160.0/20'
+      - '185.76.151.0/24'
+      - '2001:b28f::/32'
+      - '2001:67c:4e8::/48'
+      - '2a0a:f280::/29'
+      # Meta (WhatsApp / Instagram / Facebook)
+      - '31.13.24.0/21'
+      - '31.13.64.0/18'
+      - '66.220.144.0/20'
+      - '69.63.176.0/20'
+      - '69.171.224.0/19'
+      - '129.134.0.0/16'
+      - '157.240.0.0/16'
+      - '163.70.128.0/17'
+      - '173.252.64.0/18'
+      - '179.60.192.0/22'
+      - '185.60.216.0/22'
+
+rules:
+  # ================================================================
+  # 0.0 ИНСТРУМЕНТЫ ИБ / АНАЛИЗАТОРЫ ТРАФИКА → DIRECT
+  # Это не «сброс из TUN»: пакеты всё равно проходят TUN-стек, правило
+  # лишь выбирает DIRECT. Для сканирования (nmap, Docker/WSL2) цели нужно
+  # добавлять в tun.route-exclude-address — иначе TUN сам завершает
+  # TCP-рукопожатие и порты выглядят открытыми. Трафик из Docker/WSL2
+  # по имени процесса не опознаётся вообще.
+  # ================================================================
+  - PROCESS-NAME,wireshark.exe,DIRECT
+  - PROCESS-NAME,dumpcap.exe,DIRECT
+  - PROCESS-NAME,nmap.exe,DIRECT
+  - PROCESS-NAME,ncat.exe,DIRECT
+  - PROCESS-NAME,nping.exe,DIRECT
+  - PROCESS-NAME,fiddler.exe,DIRECT
+  - PROCESS-NAME,charles.exe,DIRECT
+  - PROCESS-NAME,proxifier.exe,DIRECT
+  - PROCESS-NAME,BurpSuiteCommunity.exe,DIRECT
+  - PROCESS-NAME,BurpSuitePro.exe,DIRECT
+  - PROCESS-NAME,mitmproxy.exe,DIRECT
+  - PROCESS-NAME,mitmdump.exe,DIRECT
+  - PROCESS-NAME,mitmweb.exe,DIRECT
+
+  # ================================================================
+  # 0.1 БЛОКИРОВКИ: майнеры, телеметрия, реклама, трекеры
+  # Стоит ВЫШЕ системных DIRECT. Раньше vivo.com.cn и svchost.exe
+  # (DiagTrack работает внутри svchost) перехватывали трафик до REJECT,
+  # и часть блокировок была мёртвой. Если после исправления что-то
+  # в системе отвалится — проверь этот блок первым.
+  # ================================================================
+  - RULE-SET,block-domains,REJECT                # Блокировки: майнеры, телеметрия, реклама, трекеры (0.1)
+  - DOMAIN-REGEX,^adservice\.google\.,REJECT   # все adservice.google.* вместо двух случайных стран
+
+  # ================================================================
+  # 0.2 ЛОКАЛЬНАЯ СЕТЬ
+  # ================================================================
+  - DOMAIN-SUFFIX,localhost,DIRECT
+  - DOMAIN-SUFFIX,local,DIRECT
+  - DOMAIN-SUFFIX,lan,DIRECT
+  - DOMAIN-SUFFIX,home.arpa,DIRECT
+  - DOMAIN-SUFFIX,internal,DIRECT
+  - DOMAIN,my.keenetic.net,DIRECT
+  - DOMAIN-SUFFIX,keenetic.link,DIRECT
+  - DOMAIN,router.asus.com,DIRECT
+  - DOMAIN,tplinkwifi.net,DIRECT
+  - DOMAIN,tplinklogin.net,DIRECT
+  - DOMAIN-SUFFIX,3gppnetwork.org,DIRECT       # VoLTE / VoWiFi (IMS)
+  - IP-CIDR,127.0.0.0/8,DIRECT,no-resolve
+  - IP-CIDR,10.0.0.0/8,DIRECT,no-resolve
+  - IP-CIDR,172.16.0.0/12,DIRECT,no-resolve
+  - IP-CIDR,192.168.0.0/16,DIRECT,no-resolve
+  - IP-CIDR,100.64.0.0/10,DIRECT,no-resolve
+  - IP-CIDR,169.254.0.0/16,DIRECT,no-resolve
+  - IP-CIDR6,::1/128,DIRECT,no-resolve
+  - IP-CIDR6,fc00::/7,DIRECT,no-resolve
+  - IP-CIDR6,fe80::/10,DIRECT,no-resolve
+  # Мусорные порты: NetBIOS, SMB, SSDP, mDNS, Delivery Optimization.
+  # Стоят ПОСЛЕ LAN-адресов: шары/принтеры в своей сети работают, а SMB
+  # наружу (утечка NTLM-хеша через \\host\share) режется. Хочешь резать SMB
+  # и внутри сети общежития (защита от Responder / NTLM-relay) — подними
+  # строку выше IP-CIDR (сработает, если LAN-трафик вообще попадает в TUN).
+  - DST-PORT,137-139/445/1900/5353/7680,REJECT
+  - IP-CIDR,224.0.0.0/4,DIRECT,no-resolve
+  - IP-CIDR,255.255.255.255/32,DIRECT,no-resolve
+  - IP-CIDR6,ff00::/8,DIRECT,no-resolve
+
+  # ================================================================
+  # 0.3 СИСТЕМА: проверки связи, captive-порталы, push, время, обновления
+  # ================================================================
+  - DOMAIN,ipv6.msftconnecttest.com,REJECT     # раньше стоял ПОСЛЕ suffix-DIRECT и не срабатывал
+  - RULE-SET,system-domains,DIRECT               # Системные проверки связи, captive-порталы, push, обновления (0.3)
+  - PROCESS-NAME,com.vivo.pushservice,DIRECT   # было DOMAIN-SUFFIX, но это имя пакета, а не домен
+  - DST-PORT,5228-5230,DIRECT                  # FCM (mtalk.google.com)
+  # --- Время ---
+  - DST-PORT,123,DIRECT
+  # --- Системные процессы ---
+  - PROCESS-NAME,svchost.exe,DIRECT
+  - PROCESS-NAME,System,DIRECT
+  - PROCESS-NAME,nsurlsessiond,DIRECT
+  - PROCESS-NAME,apsd,DIRECT
+  - PROCESS-NAME,trustd,DIRECT
+
+  # ================================================================
+  # 0.4 ТОРРЕНТЫ → только напрямую (чтобы не ловить абузы на VPS)
+  # DOMAIN-KEYWORD torrent/announce убраны: они отправляли в DIRECT
+  # заблокированные торрент-сайты в браузере, а сами клиенты и так
+  # ловятся по процессу. PROCESS-NAME не чувствителен к регистру.
+  # ================================================================
+  - RULE-SET,torrent-apps,DIRECT                 # Торрент-клиенты Windows/Linux/macOS/Android (0.4)
+
+  # ================================================================
+  # 0.5 DNS / DoH
+  # Health-check'и прокси-групп через правила НЕ идут (проверяются через
+  # каждый узел), так что cp.cloudflare.com влияет только на приложения.
+  # Китайские DoH/IP нужны, только если они прописаны в секции dns:
+  # при respect-rules: true — иначе этот блок можно удалить.
+  # ================================================================
+  - DOMAIN,cp.cloudflare.com,DIRECT
+  - DOMAIN-SUFFIX,doh.pub,DIRECT
+  - DOMAIN-SUFFIX,alidns.com,DIRECT
+  - IP-CIDR,120.53.53.53/32,DIRECT,no-resolve
+  - IP-CIDR,114.114.114.114/32,DIRECT,no-resolve
+  - IP-CIDR,42.81.82.209/32,DIRECT,no-resolve
+
+  # ================================================================
+  # 1. ПРИЛОЖЕНИЯ РФ (Android) → DIRECT
+  # Трафик всё равно проходит через TUN, и банки/Госуслуги видят
+  # активный VPN. Надёжнее исключить их из VPN в самом клиенте
+  # (per-app / exclude-package), а эти правила оставить подстраховкой.
+  # ================================================================
+  - RULE-SET,ru-apps,DIRECT                      # Российские приложения Android (1.0)
+
+  # ================================================================
+  # 1.1 ИСКЛЮЧЕНИЯ ИЗ ЗОНЫ .ru → PROXY (СТРОГО до DOMAIN-SUFFIX,ru)
+  # ================================================================
+  # --- AliExpress CIS: сессия целиком через прокси ---
+  # В Крыму AliExpress режет вход и заказы по IP, а split-routing (часть
+  # доменов напрямую, часть через прокси) рвёт сессию и антифрод.
+  # QUIC режем здесь же: блок 1.1 стоит ВЫШЕ общего QUIC-фильтра (2.0),
+  # иначе HTTP/3 AliExpress шёл бы через прокси по UDP.
+  - AND,((NETWORK,UDP),(DST-PORT,443),(PROCESS-NAME,ru.aliexpress.buyer)),REJECT
+  - AND,((NETWORK,UDP),(DST-PORT,443),(PROCESS-NAME,com.alibaba.aliexpresshd)),REJECT
+  - AND,((NETWORK,UDP),(DST-PORT,443),(DOMAIN-KEYWORD,aliexpress)),REJECT
+  # Приложение целиком: его HTTPDNS отдаёт голые IP (часто российские),
+  # которые без этого правила уходили бы в GEOIP,RU → DIRECT.
+  - PROCESS-NAME,ru.aliexpress.buyer,PROXY          # AliExpress Россия (пакет подтверждён логом FlClash)
+  - PROCESS-NAME,com.alibaba.aliexpresshd,PROXY     # глобальная версия
+  - RULE-SET,ru-exceptions,PROXY                 # Исключения из зоны .ru и DIRECT-вендоров → PROXY (1.1)
+  - DOMAIN-KEYWORD,aliexpress,PROXY            # страховка: любые *aliexpress* хосты (.su, .us, новые CDN)
+
+  # ================================================================
+  # 1.2 РФ, КРЫМ, СНГ → DIRECT (по доменам)
+  # ================================================================
+  - RULE-SET,direct-domains,DIRECT               # РФ, Крым, СНГ, вендоры, игровые CDN → DIRECT (1.2)
+
+  # ================================================================
+  # 2. QUIC (UDP/443) → REJECT для всего, что дальше уйдёт в прокси
+  # Раньше правило стояло в самом конце и не касалось YouTube, Google
+  # и остальных сервисов из списков ниже — они совпадали с PROXY раньше.
+  # Теперь RU-сервисы выше сохраняют HTTP/3, а проксируемое уходит на TCP.
+  # Если основной протокол — Hysteria2/TUIC, строку можно убрать.
+  # ================================================================
+  - AND,((NETWORK,UDP),(DST-PORT,443)),REJECT
+
+  # ================================================================
+  # 3. ПРОКСИРУЕМЫЕ СЕРВИСЫ
+  # Стоят ДО GEOIP,RU. Раз GEOIP,RU теперь резолвит домены, эти списки —
+  # единственное, что удерживает зарубежный сервис в прокси, если его
+  # домен срезолвится в российский IP (кеш-узлы CDN у провайдеров РФ).
+  # ================================================================
+  - RULE-SET,proxy-apps,PROXY                    # Приложения заблокированных сервисов и игровые лаунчеры (3.0)
+  - RULE-SET,proxy-domains,PROXY                 # Проксируемые сервисы (3.0)
+  - RULE-SET,proxy-keywords,PROXY                # Ключевые слова — страховка в конце блока 3.0
+
+  # ================================================================
+  # 4. ПРАВИЛА ПО IP (соединения без домена)
+  # Telegram и Meta стоят ДО STUN: медиа звонков мессенджеров идёт на
+  # голые IP (WhatsApp — в т.ч. UDP 3478) и раньше уходило в DIRECT,
+  # где звонки в РФ ограничены.
+  # ================================================================
+  - RULE-SET,proxy-ip,PROXY,no-resolve           # Подсети Telegram и Meta (4.0)
+  - GEOIP,telegram,PROXY,no-resolve
+  # --- STUN (WebRTC) ---
+  # Перенесено из начала: заблокированные мессенджеры сюда уже не доходят.
+  # Цена DIRECT — WebRTC узнаёт твой реальный IP. Если звонки нормально
+  # работают через прокси, строку лучше удалить.
+  - DST-PORT,3478-3479/19302,DIRECT
+  # --- СНГ по IP ---
+  # GEOIP,RU БЕЗ no-resolve: домены с зарубежными TLD на хостингах РФ,
+  # не попавшие ни в один список выше, резолвятся и уходят в DIRECT,
+  # а не в MATCH,PROXY. Цена: каждый такой домен резолвится через
+  # nameserver mihomo в момент подключения (+задержка на первом запросе),
+  # а если nameserver российский (dns.yandex.ru и т.п.) — он видит список
+  # всех посещаемых зарубежных доменов. См. отчёт: нужен зарубежный DoH.
+  # BY/KZ/UZ ниже используют уже полученный здесь IP.
+  - GEOIP,RU,DIRECT
+  - GEOIP,BY,DIRECT,no-resolve
+  - GEOIP,KZ,DIRECT,no-resolve
+  - GEOIP,UZ,DIRECT,no-resolve
+
+  # ================================================================
+  # 5. ВСЁ ОСТАЛЬНОЕ
+  # ================================================================
+  - MATCH,PROXY

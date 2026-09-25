@@ -1,0 +1,71 @@
+# Регрессионные кейсы: host, port (443), net (tcp|udp), expect, why.
+# Каждый баг, исправленный по ходу аудита, закреплён отдельным кейсом.
+
+# --- 0.1 блокировки ---
+- {host: adlog.vivo.com.cn,                 expect: REJECT, why: "баг v0: перекрывался vivo.com.cn DIRECT"}
+- {host: stats.vivo.com.cn,                 expect: REJECT}
+- {host: appstoreort-stsdk.vivo.com.cn,     expect: REJECT, why: "из лога FlClash"}
+- {host: ip4.tracker-api.my.com,            expect: REJECT, why: "баг v3: DOMAIN вместо SUFFIX"}
+- {host: ads-media.wildberries.ru,          expect: REJECT, why: "реклама WB до .ru"}
+- {host: app.appsflyer.com,                 expect: REJECT}
+- {host: firebaselogging-pa.googleapis.com, expect: REJECT, why: "REJECT до googleapis PROXY"}
+- {host: appmetrica.yandex.net,             expect: REJECT, why: "REJECT до yandex.net DIRECT"}
+- {host: adservice.google.ru,               expect: REJECT, why: "DOMAIN-REGEX"}
+- {host: pool.c3pool.com,                   expect: REJECT}
+- {host: v10.events.data.microsoft.com,     expect: REJECT}
+# --- 0.2 LAN ---
+- {host: 192.168.1.1,     port: 80,  expect: DIRECT}
+- {host: 10.0.0.5,        port: 445, expect: DIRECT, why: "SMB в своей LAN работает"}
+- {host: example.com,     port: 445, expect: REJECT, why: "SMB наружу режется (NTLM)"}
+- {host: my.keenetic.net, port: 80,  expect: DIRECT}
+# --- 0.3 система ---
+- {host: ipv6.msftconnecttest.com,      port: 80, expect: REJECT, why: "баг v0: стоял после suffix-DIRECT"}
+- {host: www.msftconnecttest.com,       port: 80, expect: DIRECT}
+- {host: connectivitycheck.gstatic.com, port: 80, expect: DIRECT, why: "captive-проверка не через прокси"}
+- {host: wifi.vivo.com.cn,                        expect: DIRECT}
+- {host: firebaseinstallations.googleapis.com,    expect: DIRECT, why: "иначе ломается FCM-токен"}
+- {host: mtalk.google.com,              port: 5228, expect: DIRECT}
+# --- 0.5 DNS ---
+- {host: cp.cloudflare.com, expect: DIRECT}
+# --- 1.1 исключения до .ru ---
+- {host: aliexpress.ru,                  expect: PROXY, why: "баг v0: перекрывался .ru DIRECT"}
+- {host: aerdns.ru,                      expect: PROXY}
+- {host: aeplatform.ru,                  expect: PROXY}
+- {host: ae-pic-a1.aliexpress-media.com, expect: PROXY, why: "баг v2: CDN картинок отсутствовал"}
+- {host: www.aliexpress.su,              expect: PROXY, why: "ключевое слово-страховка"}
+- {host: google.ru,                      expect: PROXY}
+- {host: apps.apple.com,                 expect: PROXY, why: "исключение до apple.com DIRECT"}
+- {host: aliexpress.ru, net: udp,        expect: REJECT, why: "QUIC AliExpress не идёт в прокси по UDP"}
+# --- 1.2 РФ DIRECT ---
+- {host: ya.ru,                expect: DIRECT}
+- {host: www.gosuslugi.ru,     expect: DIRECT}
+- {host: xn--80aswg.xn--p1ai,  expect: DIRECT, why: "баг v0: кириллический рф не матчится"}
+- {host: vk.com,               expect: DIRECT, why: "баг v0: уходил в прокси"}
+- {host: sun9-1.userapi.com,   expect: DIRECT}
+- {host: yastatic.net,         expect: DIRECT}
+- {host: swcdn.apple.com,      expect: DIRECT}
+- {host: sevstar.net,          expect: DIRECT}
+- {host: cache1.steamcontent.com, expect: DIRECT}
+- {host: vk.com, net: udp,     expect: DIRECT, why: "HTTP/3 для RU сохраняется"}
+# --- 2.0 QUIC ---
+- {host: www.youtube.com, net: udp, expect: REJECT, why: "баг v0: QUIC-фильтр стоял в конце"}
+# --- 3.0 прокси ---
+- {host: www.youtube.com,                 expect: PROXY}
+- {host: rr1---sn-abc.googlevideo.com,    expect: PROXY}
+- {host: claude.ai,                       expect: PROXY}
+- {host: chatgpt.com,                     expect: PROXY}
+- {host: gemini.google,                   expect: PROXY}
+- {host: dns.nextdns.io,                  expect: PROXY, why: "баг v0: DOMAIN не ловил поддомен"}
+- {host: edge-mqtt.facebook.com,          expect: PROXY, why: "баг v0: был DIRECT"}
+- {host: gj.mmstat.com,                   expect: PROXY, why: "капча AliExpress"}
+- {host: ngrok.com,                       expect: PROXY}
+- {host: torrentgalaxy.to,                expect: PROXY, why: "баг v0: keyword torrent слал в DIRECT"}
+# --- 4.0 IP ---
+- {host: 149.154.167.51, expect: PROXY,  why: "Telegram DC"}
+- {host: 157.240.1.35,   port: 3478, expect: PROXY,  why: "баг v0: звонки Meta уходили в STUN DIRECT"}
+- {host: 93.184.216.34,  port: 3478, expect: DIRECT, why: "прочий STUN"}
+- {host: 77.88.8.8,      expect: DIRECT, why: "GEOIP RU по IP"}
+- {host: championat.com, expect: DIRECT, why: "GEOIP RU с резолвом (зависит от DNS)"}
+- {host: kaspi.kz,       expect: DIRECT, why: "GEOIP KZ использует IP из резолва RU"}
+# --- 5.0 ---
+- {host: example.org, expect: PROXY}
