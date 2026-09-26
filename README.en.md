@@ -26,7 +26,7 @@
 
 <p align="center">
   <b>Extremely powerful and 100% local web tool for managing massive proxy server databases.</b><br>
-  <i>Parsing, conversion, and deep configuration optimization for FlClash, Exclave, Sing-box, Clash Meta, Throne, plus a mobile PWA environment for INCY / HAPP.</i>
+  <i>Parsing, converting, and deep optimization of configurations for FlClash, Exclave, Sing-box, Clash Meta, Throne, plus a mobile PWA environment for INCY / HAPP.</i>
 </p>
 
 <p align="center">
@@ -47,23 +47,24 @@
 </p>
 
 <p align="center">
-  🤖 <b>Also check out my second project:</b><br>
-  👉 <a href="https://github.com/JINXPIL/json-yaml-ai"><b>JSON-YAML-AI</b></a> 👈
+  🛠️ <b>Author's Project Ecosystem:</b><br>
+  🚀 <a href="https://github.com/JINXPIL/xui-bootstrap"><b>xui-bootstrap</b></a> — <i>Automated 3x-ui + VLESS Reality + BBR + Anti-Leak deployment on clean VPS in 1 minute</i><br>
+  🤖 <a href="https://github.com/JINXPIL/json-yaml-ai"><b>JSON-YAML-AI</b></a> — <i>Intelligent analyzer and validator for proxy network configurations</i>
 </p>
 
 > [!IMPORTANT]
-> **Zero-Trust & Privacy First.** All computations are performed strictly locally in your browser. No data ever leaves your device. This tool is created solely for educational purposes and the deep study of network protocols. Provider restrictions that lead to timeouts during subscription updates are easily bypassed by copying profiles locally.
+> **Zero-Trust & Privacy First.** All computations are performed strictly locally in your browser. No data ever leaves your device. This tool is created solely for educational purposes and in-depth study of network protocols. Provider restrictions causing timeouts during subscription updates are easily bypassed by local profile copying.
 
 ---
 
 ### 🔮 New: INCY Config Tool (Ultimate PWA)
 
-In addition to the global converter, the project features a **special standalone mobile IDE** designed for surgical on-the-fly editing of `incy://` and `happ://` routing profiles.
+In addition to the global converter, the project includes a **dedicated offline IDE for mobile devices**, designed for precision editing of `incy://` and `happ://` routing profiles on the go.
 
-* 📱 **Zero-Dependency & PWA:** Consists of a single file. No external libraries. Works 100% offline (can be added to your mobile home screen as a native app).
-* 🪄 **INCY-MINI Wrapper:** Unique link compression algorithm (5x+ compression) to bypass Telegram/WhatsApp message length limits (with auto-unpacking).
-* 🚀 **Direct Deep-Link:** Ability to launch modified profiles directly from the browser into the client with a single tap.
-* 🧠 **Mobile Smart Editor:** VS Code-style auto-indentation, JSON syntax error locator with auto-scroll, Undo interceptor, format manager, and full profile revision history.
+* 📱 **Zero-Dependency & PWA:** Self-contained in a single file without external dependencies. Works 100% offline (can be installed on mobile home screens as a native PWA).
+* 🪄 **INCY-MINI Wrapper:** Proprietary URL compression algorithm (5x+ ratio) to overcome Telegram/WhatsApp message length limits with auto-unpacking.
+* 🚀 **Direct Deep-Link:** Launch modified profiles directly into supported client applications with a single tap.
+* 🧠 **Mobile Smart Editor:** Smart auto-indentation, real-time JSON syntax error locator with auto-scroll, undo history manager, format selector, and revision logging.
 
 👉 **[Launch INCY Config Tool](https://jinxpil.github.io/flclash-converter/INCY_Tool.html)**
 
@@ -91,12 +92,12 @@ In addition to the global converter, the project features a **special standalone
 
 ### 🔥 What's New in Version 17.05 ULTRA? (The HighLoad Perfection)
 
-* 👑 **Throne Integration:** Added support for creating and deploying encrypted routing profiles (`throne://`) for the modern desktop client Throne.
-* 🌐 **Global Protocol Expansion:** Full parsing support added for **VMess, Hysteria2 (hy2), Shadowsocks (SS), and ShadowsocksR (SSR)**.
-* 🚀 **Extreme HighLoad Performance:** Asynchronous chunking and `Set` dictionaries implemented. Virtualized DOM enables loading and deduplicating **250,000+ nodes** in milliseconds without freezing the browser.
-* 🛡️ **Bulletproof YAML Sanitizer:** Industrial-grade filter. Automatically eliminates corrupted data from public lists (invisible ASCII characters, fake `2022-blake3` ciphers, blank passwords) ensuring 100% stable import into Mihomo.
-* ⚙️ **Conquering Timeouts:** YAML generator rewritten to strict Mihomo standards (added `alpn`, `skip-cert-verify: true`, `servername`, and enhanced Fake-IP DNS for RU).
-* 🎨 **New UI/UX:** Independent light/dark theme persistence and **"Subscription Mode" Switch** for embedding raw URLs (Pastebin/GitHub) directly into `proxy-providers`.
+* 👑 **Throne Integration:** Native support for generating and deploying encrypted routing profiles (`throne://`) for the modern Throne desktop client.
+* 🌐 **Global Protocol Expansion:** Full parsing and validation support for **VMess, Hysteria 2 (hy2), Shadowsocks (SS), and ShadowsocksR (SSR)**.
+* 🚀 **HighLoad Architecture:** Asynchronous data chunking and `Set`-based lookups with DOM virtualization allow deduplicating and rendering **250,000+ nodes** in milliseconds without UI freezes.
+* 🛡️ **Hardened YAML Sanitizer:** Automatic stripping of corrupt artifacts from public node scrapers (invisible ASCII codes, fake `2022-blake3` ciphers, empty passwords), ensuring 100% valid imports into Mihomo.
+* ⚙️ **Timeout Mitigation:** Engine rewritten to comply with strict Mihomo schema rules (`alpn`, `skip-cert-verify: true`, `servername`, and tuned Fake-IP DNS).
+* 🎨 **Refined UI/UX:** Independent light/dark mode color persistence and **Subscription Mode Toggle** for direct embedding of raw URLs into `proxy-providers`.
 
 ---
 
@@ -117,16 +118,16 @@ In addition to the global converter, the project features a **special standalone
 
 ---
 
-### 🎯 Ready-to-Use Presets
+### 🎯 Ready Presets
 
-To avoid cluttering the main page with long code blocks, all base presets are organized into dedicated folders.
+All standardized starter presets are organized in dedicated repository directories:
 
 <table width="100%">
 <thead><tr><th align="left">Platform</th><th align="left">Configuration</th><th align="left">Import Link</th></tr></thead>
 <tbody>
 <tr>
   <td>👑 <b>Throne</b><br><i>(Desktop Client)</i></td>
-  <td>Optimized traffic split (Direct domestic traffic, VPN for blocked resources). Built-in ad-blocking.</td>
+  <td>Balanced split-tunneling (domestic services direct, blocked resources via VPN) with integrated AdBlock.</td>
   <td>
     <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/Throne/Throne_INSTALL.DEEPLINK">⚡ Copy Deeplink</a><br>
     <a href="https://github.com/JINXPIL/flclash-converter/blob/main/Throne/Throne.md">📄 View Description</a>
@@ -134,23 +135,23 @@ To avoid cluttering the main page with long code blocks, all base presets are or
 </tr>
 <tr>
   <td>📱 <b>Happ (Routing)</b></td>
-  <td>Optimized routing rules with built-in AdBlock.</td>
+  <td>Optimized routing rules with built-in ad blocking.</td>
   <td>
-    <a href="https://jinxpil.github.io/flclash-converter/happ.html">⚡ One-Click Install</a><br>
-    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/HAPP/DEFAULT.json">📄 View Code (JSON)</a>
+    <a href="https://jinxpil.github.io/flclash-converter/happ.html">⚡ Quick Install (1-Click)</a><br>
+    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/HAPP/DEFAULT.json">📄 View JSON</a>
   </td>
 </tr>
 <tr>
   <td>📱 <b>INCY (Routing)</b></td>
-  <td>Optimized routing rules with built-in AdBlock.</td>
+  <td>Optimized routing rules with built-in ad blocking.</td>
   <td>
-    <a href="https://jinxpil.github.io/flclash-converter/incy.html">⚡ One-Click Install</a><br>
-    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/INCY/DEFAULT.json">📄 View Code (JSON)</a>
+    <a href="https://jinxpil.github.io/flclash-converter/incy.html">⚡ Quick Install (1-Click)</a><br>
+    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/INCY/DEFAULT.json">📄 View JSON</a>
   </td>
 </tr>
 <tr>
   <td>⚙️ <b>Mihomo / Clash Meta</b><br><i>(VPS Routing)</i></td>
-  <td>Clean routing rules block (Direct / Proxy / Block) for VPS server deployments.</td>
+  <td>Clean routing ruleset (Direct / Proxy / Block) for VPS server deployment.</td>
   <td>
     <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/refs/heads/main/MIHOMO/routing.yaml">⚡ Copy RAW (routing.yaml)</a><br>
     <a href="https://github.com/JINXPIL/flclash-converter/blob/main/MIHOMO/routing.yaml">📄 View File</a>
@@ -158,7 +159,7 @@ To avoid cluttering the main page with long code blocks, all base presets are or
 </tr>
 <tr>
   <td>⚙️ <b>Mihomo / Clash Meta</b><br><i>(Full Config)</i></td>
-  <td>v79.0 Ultimate (Anti-DPI protection, strict TLS, DNS enhancements).</td>
+  <td>v79.0 Ultimate (DPI mitigation, strict TLS enforcement).</td>
   <td><a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/MIHOMO/ULTIMATE.yml">🔗 Import YML Config</a></td>
 </tr>
 </tbody>
@@ -166,92 +167,104 @@ To avoid cluttering the main page with long code blocks, all base presets are or
 
 ---
 
-### 🤝 Alternative Routing Databases
+### 🖥️ Server Infrastructure: xui-bootstrap
 
-If you are looking for alternative community-driven split-tunneling routing bases:
-* [Roscomvpn-routing](https://github.com/hydraponique/roscomvpn-routing) — Excellent project by *hydraponique* with regular updates of ready-made configurations and routing rules for **INCY, HAPP**, and **Clash Meta**.
+Setting up your own server for our profiles and clients? Automate node deployment:
+
+* 🚀 **[xui-bootstrap](https://github.com/JINXPIL/xui-bootstrap)** — Complete automated deployment script for the **3x-ui** panel on clean VPS (Ubuntu 22.04 / 24.04, Debian 11 / 12) in 60 seconds.
+  * **Reality & Self-steal:** Automated donor validation for TLS 1.3 + H2 and ASN matching.
+  * **High-Speed Network:** `sysctl` tuning, **BBR + fq** congestion control activation, and MTU Probing.
+  * **Security:** Web panel isolation (accessible via SSH tunnel), UFW firewall, and Fail2ban protection against brute-force.
+  * **Anti-Leak:** Server-side blocking of Russian domains and subnets (`geoip:ru`) via Xray routing to prevent leaks.
 
 ---
 
-### 🚦 What's Inside Routing (Rules)
+### 🤝 Alternative Routing Databases
 
-Reliable "surgical" split-tunneling ensuring essential services run with minimal latency while restricted resources route smoothly via proxy.
+Looking for alternative community-maintained split-tunneling rule sets:
+* [Roscomvpn-routing](https://github.com/hydraponique/roscomvpn-routing) — Maintained by *hydraponique* with regular updates for **INCY, HAPP**, and **Clash Meta**.
+
+---
+
+### 🚦 Routing Logic Breakdown
+
+Engineered split-tunneling architecture to ensure low latency for trusted services while tunneling restricted destinations:
 
 <table width="100%">
 <tbody>
 <tr>
   <td>🔴 <b>BLOCK</b></td>
-  <td>Ads, trackers, telemetry (conserves server traffic and device resources)</td>
+  <td>Ad networks, analytics beacons, telemetry endpoints (conserving bandwidth and device resources).</td>
 </tr>
 <tr>
   <td>🟢 <b>DIRECT</b></td>
-  <td>Crimean ISPs, SevSU, Russian Banks, Gosuslugi (lowest ping, avoids bank security flags for foreign IPs)</td>
+  <td>Local ISPs, regional government portals, domestic banking apps (minimal latency, no fraud flags).</td>
 </tr>
 <tr>
-  <td>🔵 <b>PROXY (Via VPN)</b></td>
-  <td>YouTube, Instagram, ChatGPT, international CDNs, and all other blocked traffic</td>
+  <td>🔵 <b>PROXY</b></td>
+  <td>YouTube, Instagram, ChatGPT, international CDNs, and restricted foreign traffic.</td>
 </tr>
 </tbody>
 </table>
 
 ---
 
-### 🛡️ DNS Settings
+### 🛡️ DNS Architecture
 
 <table width="100%">
-<thead><tr><th align="center">Target</th><th align="left">Server</th><th align="left">Purpose</th></tr></thead>
+<thead><tr><th align="center">Destination</th><th align="left">Upstream DNS</th><th align="left">Purpose</th></tr></thead>
 <tbody>
 <tr>
-  <td align="center">🏠 <b>DIRECT (RU/Crimea)</b></td>
+  <td align="center">🏠 <b>DIRECT (Domestic)</b></td>
   <td><a href="https://dns.yandex.ru/">Yandex DNS</a> <code>77.88.8.8</code></td>
-  <td>Fast local resolution, minimal latency within RU, functions without active VPN.</td>
+  <td>Fast local resolution, lowest latency, operational without active VPN tunnels.</td>
 </tr>
 <tr>
   <td align="center">🌍 <b>PROXY (International)</b></td>
   <td><a href="https://developers.cloudflare.com/1.1.1.1/">Cloudflare</a> / <a href="https://developers.google.com/speed/public-dns/">Google</a></td>
-  <td>Reliable resolving for proxied traffic, protection against local DNS spoofing/poisoning.</td>
+  <td>Secure remote resolution for tunneled traffic, mitigating local ISP DNS tampering.</td>
 </tr>
 </tbody>
 </table>
 
 ---
 > [!NOTE]
-> Previously popular clients like **NekoBox** and **NekoRay** are now considered obsolete. We recommend switching to active modern alternatives (such as the cross-platform **Throne** client) based on modern **sing-box** and **Xray** cores.
+> Legacy clients such as **NekoBox** and **NekoRay** are deprecated. We recommend transitioning to active solutions (such as **Throne**) backed by modern **sing-box** and **Xray** cores.
 
 <details>
 <summary><b>💻 Desktop (Win/Mac/Linux)</b></summary>
 
-* [Throne](https://github.com/throneproj/Throne) — 👑 Modern powerful successor to NekoRay with expanded functionality and cross-platform support. **(Recommended)**
-* [Happ](https://www.happ.su/main) — Cross-platform desktop release.
-* [v2RayTun](https://v2raytun.com/) — High-speed, secure client powered by Xray Core.
-* [v2rayN](https://github.com/2dust/v2rayN) — Highly configurable Windows client.
-* [FlClash](https://github.com/chen08209/FlClash) — Minimalist and fast GUI client.
+* [Throne](https://github.com/throneproj/Throne) — 👑 Modern cross-platform successor to NekoRay with advanced core integrations. **(Recommended)**
+* [Happ](https://www.happ.su/main) — Cross-platform desktop client.
+* [v2RayTun](https://v2raytun.com/) — Fast and secure client powered by Xray Core.
+* [v2rayN](https://github.com/2dust/v2rayN) — Advanced configurable GUI client for Windows.
+* [FlClash](https://github.com/chen08209/FlClash) — Lightweight multi-platform interface.
 * [Karing](https://github.com/KaringX/karing)
 * [Clash Verge Rev](https://github.com/clash-verge-rev/clash-verge-rev)
-* ~~[NekoRay](https://github.com/MatsuriDayo/nekoray)~~ *(Obsolete, use Throne)*
+* ~~[NekoRay](https://github.com/MatsuriDayo/nekoray)~~ *(Deprecated, use Throne)*
 </details>
 
 <details>
 <summary><b>🤖 Android</b></summary>
 
-* [v2RayTun](https://v2raytun.com/) — High-speed, secure client powered by Xray Core.
-* [FlClash](https://github.com/chen08209/FlClash) — Core cross-platform client.
-* [Incy](https://incy.cc/) — Modern high-speed client with 1-tap import.
-* [Happ](https://www.happ.su/main) — Proxy utility for effortless server list management.
-* [Exclave](https://github.com/ExclaveNetwork/Exclave) — Modern and maintained NekoBox alternative with familiar UI.
-* [Sing-box](https://github.com/SagerNet/sing-box) — Official clean core for advanced configurations.
-* [Hiddify App](https://github.com/hiddify/hiddify-app) — Universal client for all configuration types.
-* [v2rayNG](https://github.com/2dust/v2rayNG) — Battle-tested classic client for Xray core.
-* [Karing](https://github.com/KaringX/karing) — Rich graphical interface.
+* [v2RayTun](https://v2raytun.com/) — High-speed client powered by Xray Core.
+* [FlClash](https://github.com/chen08209/FlClash) — Multi-platform interface.
+* [Incy](https://incy.cc/) — Lightweight mobile client with single-tap imports.
+* [Happ](https://www.happ.su/main) — Proxy utility for structured server management.
+* [Exclave](https://github.com/ExclaveNetwork/Exclave) — Modern and maintained NekoBox derivative.
+* [Sing-box](https://github.com/SagerNet/sing-box) — Clean official universal proxy core.
+* [Hiddify App](https://github.com/hiddify/hiddify-app) — Multi-protocol client.
+* [v2rayNG](https://github.com/2dust/v2rayNG) — Classic stable Xray client.
+* [Karing](https://github.com/KaringX/karing)
 * [Clash Meta for Android](https://github.com/MetaCubeX/ClashMetaForAndroid)
-* ~~[NekoBox For Android](https://github.com/MatsuriDayo/NekoBoxForAndroid)~~ *(Obsolete)*
+* ~~[NekoBox For Android](https://github.com/MatsuriDayo/NekoBoxForAndroid)~~ *(Deprecated)*
 </details>
 
 <details>
 <summary><b>🍏 iOS</b></summary>
 
-* [v2RayTun](https://v2raytun.com/) — High-speed, secure client powered by Xray Core.
-* [Incy](https://incy.cc/) — Polished modern client on App Store.
+* [v2RayTun](https://v2raytun.com/) — Fast and secure iOS client.
+* [Incy](https://incy.cc/) — Modern client on the App Store.
 * [Happ](https://www.happ.su/main) — Convenient proxy utility.
 * [Karing](https://apps.apple.com/us/app/karing/id6472431552)
 * [Clash.MI](https://apps.apple.com/us/app/clash-mi/id6744321968)
@@ -262,31 +275,31 @@ Reliable "surgical" split-tunneling ensuring essential services run with minimal
 
 ---
 
-### 🛡️ Alternative Tools (DPI Bypass & Proxy)
+### 🛡️ DPI Bypass & Deep Packet Inspection Tools
 
-*If standard VPN protocols are completely blocked by operators or deep inspection (TSPU), use local packet inspection bypass or dedicated proxy tunnels:*
+*When standard VPN protocols are intercepted or degraded by ISP DPI filters, utilize specialized packet manipulation solutions:*
 
-* [Zapret](https://github.com/bol-van/zapret) — The most versatile and powerful system-level DPI bypass tool.
-* [Zapret2](https://github.com/bol-van/zapret2) — Updated and experimental branch of bypass scripts by `bol-van`.
-* [Zapret-discord-youtube](https://github.com/Flowseal/zapret-discord-youtube) — Pre-tuned scripts specifically tailored for popular services.
-* [ByeByeDPI](https://github.com/romanvht/ByeByeDPI) — Proven classic solution for local execution on Windows.
-* [tg-ws-proxy](https://github.com/Flowseal/tg-ws-proxy) — WebSocket proxy tool for Telegram (ensures connectivity even under extreme censorship).
+* [Zapret](https://github.com/bol-van/zapret) — Low-level, high-flexibility packet manipulation engine for deep packet inspection bypass.
+* [Zapret2](https://github.com/bol-van/zapret2) — Next-generation experimental branch by `bol-van`.
+* [Zapret-discord-youtube](https://github.com/Flowseal/zapret-discord-youtube) — Preconfigured service-specific bypass profiles.
+* [ByeByeDPI](https://github.com/romanvht/ByeByeDPI) — Established local DPI mitigation software for Windows.
+* [tg-ws-proxy](https://github.com/Flowseal/tg-ws-proxy) — WebSocket-based transport proxy for Telegram traffic under severe connection throttling.
 
 ---
 
-### 🌐 Whitelist Bypass (TURN & WebRTC Tunneling)
+### 🌐 Whitelist Circumvention (TURN & WebRTC Tunneling)
 
-*Solutions for deployment on a VPS under severe network restrictions and whitelist-only internet environments. These tools encapsulate and camouflage arbitrary network traffic (WireGuard, Hysteria, TCP) as legitimate media streams of voice/video calls and conferences (VK Calls, Yandex Telemost, WebRTC/SFU):*
+*Architectures designed for zero-trust environments where ISP egress is strictly limited to domestic whitelist endpoints. These tools encapsulate arbitrary payloads (WireGuard, Hysteria, TCP) into legitimate media and conferencing streams (VK Calls, Yandex Telemost, WebRTC/SFU):*
 
-* [csqtt](https://github.com/amurcanov/csqtt) — High-performance server and Android application for establishing a secure tunnel over TURN/RTP disguised as voice and video call media traffic.
-* [olcrtc](https://github.com/openlibrecommunity/olcrtc) — Encrypted TCP-over-WebRTC tunnel that disguises VPS connections as standard participation in WebRTC/SFU video conferences on trusted platforms.
-* [vk-turn-proxy](https://github.com/cacggghp/vk-turn-proxy) — Good TURN: Server and client proxy tool for tunneling WireGuard / Hysteria traffic through VK Calls and Yandex Telemost TURN servers (DTLS 1.2 over STUN).
-* [proxy-turn-vk-android](https://github.com/amurcanov/proxy-turn-vk-android) — Client Android application (WDTT) for tunneling WireGuard to a personal VPS via intermediary VK TURN media relays.
+* [csqtt](https://github.com/amurcanov/csqtt) — High-throughput server and Android client creating secure tunnels over TURN/RTP disguised as legitimate VoIP/video media.
+* [olcrtc](https://github.com/openlibrecommunity/olcrtc) — Encrypted TCP-over-WebRTC tunnel disguising VPS connections as interactive WebRTC conferencing sessions.
+* [vk-turn-proxy](https://github.com/cacggghp/vk-turn-proxy) — Server and client proxy forwarding WireGuard / Hysteria through trusted conference media relays (DTLS 1.2 over STUN).
+* [proxy-turn-vk-android](https://github.com/amurcanov/proxy-turn-vk-android) — Native Android client (WDTT) tunneling WireGuard connections through intermediate media relays.
 
 ---
 
 ### ⭐ Support the Project
 
-**If Network Builder ULTRA, mobile INCY Tool, or our profiles helped you, don't forget to give a star! It is a huge motivation to keep developing the project.** :star2:
+**If Network Builder ULTRA, INCY Tool, or our routing presets helped you, consider starring the repository!** :star2:
 
 [![Star History Chart](https://api.star-history.com/svg?repos=JINXPIL/flclash-converter&type=Date)](https://star-history.com/#JINXPIL/flclash-converter&Date)
