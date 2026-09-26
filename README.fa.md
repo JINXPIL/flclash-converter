@@ -25,8 +25,8 @@
 <h1 align="center">⚡ Network Builder v17.05 ULTRA</h1>
 
 <p align="center">
-  <b>ابزار تحت وب فوق‌العاده قدرتمند و ۱۰۰٪ محلی برای مدیریت پایگاه‌های عظیم سرورهای پراکسی.</b><br>
-  <i>تجزیه، تبدیل و بهینه‌سازی عمیق پیکربندی‌ها برای FlClash، Exclave، Sing-box، Clash Meta، Throne، همراه با محیط توسعه PWA موبایل برای INCY / HAPP.</i>
+  <b>ابزار تحت وب فوق‌العاده قدرتمند و ۱۰۰٪ محلی برای مدیریت پایگاه‌های داده عظیم سرورهای پروکسی.</b><br>
+  <i>تجزیه، تبدیل و بهینه‌سازی پیشرفته پیکربندی‌ها برای FlClash، Exclave، Sing-box، Clash Meta، Throne و محیط موبایل PWA برای INCY / HAPP.</i>
 </p>
 
 <p align="center">
@@ -47,29 +47,30 @@
 </p>
 
 <p align="center">
-  🤖 <b>همچنین از پروژه دوم من دیدن کنید:</b><br>
-  👉 <a href="https://github.com/JINXPIL/json-yaml-ai"><b>JSON-YAML-AI</b></a> 👈
+  🛠️ <b>اکوسیستم پروژه‌های سازنده:</b><br>
+  🚀 <a href="https://github.com/JINXPIL/xui-bootstrap"><b>xui-bootstrap</b></a> — <i>استقرار خودکار 3x-ui + VLESS Reality + BBR + ضد نشت روی سرور ابری خام در ۱ دقیقه</i><br>
+  🤖 <a href="https://github.com/JINXPIL/json-yaml-ai"><b>JSON-YAML-AI</b></a> — <i>تحلیل‌گر و اعتبارسنج هوشمند پیکربندی‌های شبکه پروکسی</i>
 </p>
 
 > [!IMPORTANT]
-> **Zero-Trust و اولویت مطلق حریم خصوصی.** تمام پردازش‌ها کاملاً به صورت محلی در مرورگر شما انجام می‌شوند. هیچ داده‌ای از دستگاه شما خارج نمی‌شود. این ابزار صرفاً با اهداف آموزشی و بررسی تخصصی پروتکل‌های شبکه توسعه یافته است. محدودیت‌های ارائه‌دهندگان اینترنت که منجر به خطای Timeout در به‌روزرسانی اشتراک‌ها می‌شوند، با کپی محلی پروفایل‌ها به راحتی قابل دور زدن هستند.
+> **اعتماد صفر و حفظ حریم خصوصی (Zero-Trust & Privacy First).** تمامی محاسبات به‌صورت کاملاً محلی در مرورگر شما انجام می‌شود. هیچ داده‌ای از دستگاه شما خارج نمی‌شود. این ابزار صرفاً برای اهداف آموزشی و بررسی پروتکل‌های شبکه توسعه داده شده است.
 
 ---
 
-### 🔮 جدید: INCY Config Tool (Ultimate PWA)
+### 🔮 جدید: INCY Config Tool (محیط PWA همراه)
 
-علاوه بر مبدل سراسری، این پروژه شامل یک **محیط توسعه مستقل (IDE) برای دستگاه‌های تلفن همراه** است که جهت ویرایش دقیق و آنی پروفایل‌های مسیریابی `incy://` و `happ://` طراحی شده است.
+علاوه بر مبدل کلی، این پروژه شامل یک **محیط توسعه اختصاصی و آفلاین (IDE) برای دستگاه‌های تلفن همراه** است که جهت ویرایش دقیق پروفایل‌های مسیریابی `incy://` و `happ://` توسعه یافته است.
 
-* 📱 **بدون وابستگی خارجی و PWA:** شامل یک فایل تک. بدون استفاده از کتابخانه‌های خارجی. عملکرد ۱۰۰٪ آفلاین حتی بدون اینترنت (امکان افزودن به صفحه اصلی گوشی مانند یک اپلیکیشن بومی).
-* 🪄 **کپسوله‌ساز INCY-MINI:** الگوریتم اختصاصی فشرده‌سازی لینک‌ها (بیش از ۵ برابر) برای دور زدن محدودیت کاراکتر پیام‌ها در تلگرام و واتس‌اپ (همراه با بازگشایی خودکار).
-* 🚀 **Direct Deep-Link:** قابلیت اجرای مستقیم پروفایل تغییریافته از مرورگر به داخل کلاینت تنها با یک لمس.
-* 🧠 **ویرایشگر هوشمند موبایل:** تورفتگی خودکار به سبک VS Code، تشخیص‌دهنده خطاهای نحوی JSON با اسکرول خودکار، کنترل‌کننده Undo، مدیریت فرمت‌ها و تاریخچه کامل تغییرات پروفایل‌ها.
+* 📱 **بدون وابستگی و PWA:** در قالب ۱ فایل مستقل بدون نیاز به کتابخانه‌های خارجی. کارکرد ۱۰۰٪ آفلاین (قابل نصب روی صفحه اصلی موبایل).
+* 🪄 **فشرده‌ساز INCY-MINI:** الگوریتم اختصاصی فشرده‌سازی لینک‌ها (بیش از ۵ برابر) جهت عبور از محدودیت‌های پیام‌رسان‌ها مانند تلگرام و واتس‌اپ.
+* 🚀 **اتصال مستقیم (Deep-Link):** اعمال مستقیم پروفایل تغییریافته به کلاینت تنها با یک کلیک.
+* 🧠 **ویرایشگر هوشمند موبایل:** تورفتگی خودکار، ردیابی خطاهای نحوی JSON به‌صورت زنده، سیستم لغو تغییرات (Undo) و تاریخچه ویرایش‌ها.
 
 👉 **[اجرای INCY Config Tool](https://jinxpil.github.io/flclash-converter/INCY_Tool.html)**
 
 ---
 
-### 📸 نمای رابط کاربری (ULTRA Design)
+### 📸 نمای رابط کاربری (طراحی ULTRA)
 
 <p align="center">
   <a href="https://raw.githubusercontent.com/jinxpil/flclash-converter/main/media/Gemini_Generated_Image_w0ysv7w0ysv7w0ys.png" target="_blank">
@@ -89,169 +90,177 @@
 
 ---
 
-### 🔥 تغییرات نسخه 17.05 ULTRA (The HighLoad Perfection)
+### 🔥 تغییرات نسخه 17.05 ULTRA (بهینه‌سازی ترافیک بالا)
 
-* 👑 **یکپارچگی با Throne:** افزوده شدن پشتیبانی از ساخت و بارگذاری پروفایل‌های رمزگذاری‌شده مسیریابی (`throne://`) برای کلاینت مدرن دسکتاپ Throne.
-* 🌐 **پشتیبانی گسترده از پروتکل‌ها:** پشتیبانی کامل از تجزیه پروتکل‌های **VMess، Hysteria2 (hy2)، Shadowsocks (SS) و ShadowsocksR (SSR)**.
-* 🚀 **عملکرد فوق‌العاده در بار سنگین (HighLoad):** پیاده‌سازی قطعه‌بندی ناهمگام (Async Chunking) و ساختارهای `Set`. مجازی‌سازی DOM امکان پردازش و حذف موارد تکراری از میان بیش از **۲۵۰,۰۰۰ نود** را در کسری از ثانیه و بدون هیچ‌گونه کندی فراهم می‌سازد.
-* 🛡️ **پالایشگر قدرتمند YAML:** فیلترینگ در سطح صنعتی. حذف خودکار داده‌های نامعتبر از لیست‌های عمومی (کاراکترهای نامرئی ASCII، سایفرهای ساختگی `2022-blake3` و رمزهای خالی) جهت تضمین پایداری ۱۰۰٪ در Mihomo.
-* ⚙️ **غلبه بر خطای وقفه (Timeouts):** بازنویسی ماژول ساخت YAML منطبق بر استانداردهای سختگیرانه Mihomo (افزوده شدن `alpn`، `skip-cert-verify: true`، `servername` و بهبود Fake-IP DNS).
-* 🎨 **طراحی جدید UI/UX:** ذخیره پایدار حالت روشن/تاریک و **کلید «حالت اشتراک»** جهت جای‌گذاری مستقیم لینک‌های خام (Pastebin/GitHub) در بخش `proxy-providers`.
+* 👑 **یکپارچگی با Throne:** پشتیبانی کامل از ایجاد و انتشار پروفایل‌های مسیریابی رمزگذاری‌شده (`throne://`) برای کلاینت مدرن Throne.
+* 🌐 **پشتیبانی گسترده از پروتکل‌ها:** تجزیه و تبدیل کامل **VMess، Hysteria 2 (hy2)، Shadowsocks (SS) و ShadowsocksR (SSR)**.
+* 🚀 **معماری HighLoad:** پردازش ناهمگام و مجازی‌سازی DOM جهت پاکسازی و حذف تکراری‌ها در میان **بیش از ۲۵۰٬۰۰۰ نود** در چند میلی‌ثانیه بدون افت سرعت مرورگر.
+* 🛡️ **پالایشگر قدرتمند YAML:** حذف خودکار خطاهای ناشی از لیست‌های عمومی (کاراکترهای مخفی ASCII، الگوریتم‌های نامعتبر `2022-blake3` و کلمات عبور خالی).
+* ⚙️ **رفع مشکل قطعی و Timeout:** سازگاری کامل با استانداردهای سخت‌گیرانه هسته Mihomo (تنظیم `alpn`، `skip-cert-verify: true`، `servername` و Fake-IP DNS بهینه‌شده).
+* 🎨 **رابط کاربری ارتقایافته:** حالت تاریک/روشن مجزا و **کلید "حالت اشتراک"** برای درج مستقیم لینک‌های خام در بخش `proxy-providers`.
 
 ---
 
-### 🔌 پروتکل‌های تحت پوشش
+### 🔌 پروتکل‌های پشتیبانی‌شده
 
 <table align="center" width="100%">
   <tr>
     <td align="center">🛡️ <b>VLESS / VMess</b><br>Reality & Vision</td>
     <td align="center">⚡ <b>Hysteria 2</b><br>سرعت فوق‌العاده</td>
-    <td align="center">🐎 <b>Trojan</b><br>پروتکل پنهان‌کار</td>
+    <td align="center">🐎 <b>Trojan</b><br>پروتکل نامرئی</td>
   </tr>
   <tr>
     <td align="center">🔒 <b>WireGuard</b><br>VPN بومی</td>
     <td align="center">🌐 <b>SS / SSR</b><br>Shadowsocks</td>
-    <td align="center">🔌 <b>TUIC / Socks5 / HTTP</b><br>پشتیبانی جامع</td>
+    <td align="center">🔌 <b>TUIC / Socks5 / HTTP</b><br>پشتیبانی کامل</td>
   </tr>
 </table>
 
 ---
+
 ### 🎯 الگوهای آماده
 
-برای جلوگیری از شلوغ شدن صفحه با کدهای طولانی، تمامی الگوهای پایه آماده در پوشه‌های جداگانه قرار گرفته‌اند.
-
 <table width="100%">
-<thead><tr><th align="right">پلتفرم</th><th align="right">پیکربندی</th><th align="right">لینک وارد کردن</th></tr></thead>
+<thead><tr><th align="left">پلتفرم</th><th align="left">نوع پیکربندی</th><th align="left">لینک دریافت</th></tr></thead>
 <tbody>
 <tr>
-  <td>👑 <b>Throne</b><br><i>(کلاینت دسکتاپ)</i></td>
-  <td>تفکیک بی‌نقص ترافیک (دولت، بانک‌های روسیه به‌صورت مستقیم و سایت‌های مسدود از طریق VPN). دارای مسدودکننده تبلیغات داخلی.</td>
+  <td>👑 <b>Throne</b><br><i>(نسخه دسکتاپ)</i></td>
+  <td>تفکیک هوشمند ترافیک (سایت‌های داخلی مستقیم، ترافیک فیلترشده از پروکسی) همراه با مسدودکننده تبلیغات.</td>
   <td>
-    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/Throne/Throne_INSTALL.DEEPLINK">⚡ کپی Deeplink</a><br>
-    <a href="https://github.com/JINXPIL/flclash-converter/blob/main/Throne/Throne.md">📄 مشاهده توضیحات</a>
+    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/Throne/Throne_INSTALL.DEEPLINK">⚡ کپی دیپ‌لینک</a><br>
+    <a href="https://github.com/JINXPIL/flclash-converter/blob/main/Throne/Throne.md">📄 توضیحات</a>
   </td>
 </tr>
 <tr>
   <td>📱 <b>Happ (مسیریابی)</b></td>
-  <td>بهینه‌سازی شده برای کریمه، SevSU به همراه AdBlock داخلی</td>
+  <td>قوانین بهینه‌شده همراه با AdBlock داخلی.</td>
   <td>
-    <a href="https://jinxpil.github.io/flclash-converter/happ.html">⚡ نصب سریع (یک کلیک)</a><br>
-    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/HAPP/DEFAULT.json">📄 مشاهده کد (JSON)</a>
+    <a href="https://jinxpil.github.io/flclash-converter/happ.html">⚡ نصب سریع (۱ کلیک)</a><br>
+    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/HAPP/DEFAULT.json">📄 کد JSON</a>
   </td>
 </tr>
 <tr>
   <td>📱 <b>INCY (مسیریابی)</b></td>
-  <td>بهینه‌سازی شده برای کریمه، SevSU به همراه AdBlock داخلی</td>
+  <td>قوانین بهینه‌شده همراه با AdBlock داخلی.</td>
   <td>
-    <a href="https://jinxpil.github.io/flclash-converter/incy.html">⚡ نصب سریع (یک کلیک)</a><br>
-    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/INCY/DEFAULT.json">📄 مشاهده کد (JSON)</a>
+    <a href="https://jinxpil.github.io/flclash-converter/incy.html">⚡ نصب سریع (۱ کلیک)</a><br>
+    <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/INCY/DEFAULT.json">📄 کد JSON</a>
   </td>
 </tr>
 <tr>
-  <td>⚙️ <b>Mihomo / Clash Meta</b><br><i>(مسیریابی VPS)</i></td>
-  <td>قوانین مسیریابی خالص (Direct / Proxy / Block) مناسب برای پیاده‌سازی روی سرورهای VPS</td>
+  <td>⚙️ <b>Mihomo / Clash Meta</b><br><i>(مسیریابی سرور)</i></td>
+  <td>مجموعه قوانین مستقیم، پروکسی و مسدودسازی برای استقرار روی سرورهای مجازی.</td>
   <td>
     <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/refs/heads/main/MIHOMO/routing.yaml">⚡ کپی RAW (routing.yaml)</a><br>
     <a href="https://github.com/JINXPIL/flclash-converter/blob/main/MIHOMO/routing.yaml">📄 مشاهده فایل</a>
   </td>
 </tr>
 <tr>
-  <td>⚙️ <b>Mihomo / Clash Meta</b><br><i>(پیکربندی کامل)</i></td>
-  <td>v79.0 Ultimate (محافظت در برابر تحلیل‌گرهای DPI، امنیت سخت‌گیرانه TLS)</td>
-  <td><a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/MIHOMO/ULTIMATE.yml">🔗 وارد کردن کانفیگ YML</a></td>
+  <td>⚙️ <b>Mihomo / Clash Meta</b><br><i>(کانفیگ کامل)</i></td>
+  <td>نسخه v79.0 Ultimate (ضد شناسایی DPI و TLS استاندارد).</td>
+  <td><a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/MIHOMO/ULTIMATE.yml">🔗 دریافت فایل YML</a></td>
 </tr>
 </tbody>
 </table>
 
 ---
 
-### 🤝 پایگاه‌های جایگزین مسیریابی
+### 🖥️ زیرساخت سرور: xui-bootstrap
 
-در صورتی که به دنبال سایر پایگاه‌های مسیریابی و تفکیک ترافیک هستید:
-* [Roscomvpn-routing](https://github.com/hydraponique/roscomvpn-routing) — پروژه‌ای کاربردی از *hydraponique* با به‌روزرسانی‌های منظم رول‌های مسیریابی برای **INCY، HAPP** و **Clash Meta**.
+قصد راه‌اندازی سرور اختصاصی برای پروفایل‌ها و کلاینت‌های ما را دارید؟ استقرار نودها را خودکار کنید:
+
+* 🚀 **[xui-bootstrap](https://github.com/JINXPIL/xui-bootstrap)** — اسکریپت استقرار کاملاً خودکار پنل **3x-ui** روی سرورهای خام (Ubuntu 22.04 / 24.04, Debian 11 / 12) ظرف ۶۰ ثانیه.
+  * **استتار Reality و Self-steal:** اعتبارسنجی خودکار سایت مقصد برای پشتیبانی از TLS 1.3 + H2 و تطبیق ASN.
+  * **شبکه پرسرعت:** تنظیمات پیشرفته `sysctl`، فعال‌سازی الگوریتم کنترل ازدحام **BBR + fq** و فعال‌سازی MTU Probing.
+  * **امنیت:** ایزوله‌سازی پنل وب (فقط از طریق تونل SSH قابل دسترسی است)، فایروال UFW و Fail2ban برای مقابله با حملات Brute-Force.
+  * **ضد نشت (Anti-Leak):** مسدودسازی دامنه‌ها و زیرشبکه‌های روسیه (`geoip:ru`) در سطح هسته Xray جهت جلوگیری از نشت ترافیک.
 
 ---
 
-### 🚦 ساختار قوانین مسیریابی (Rules)
+### 🤝 پایگاه‌های مسیریابی پیشنهادی جامعه متن‌باز
 
-تفکیک ترافیک هوشمند و دقیق، به گونه‌ای که سرویس‌های ضروری بدون افت سرعت باز شده و محتوای مسدودشده از طریق پراکسی هدایت گردند.
+* [Roscomvpn-routing](https://github.com/hydraponique/roscomvpn-routing) — مخزن باکیفیت توسعه‌داده‌شده توسط *hydraponique* با به‌روزرسانی‌های مداوم برای **INCY, HAPP** و **Clash Meta**.
+
+---
+
+### 🚦 منطق تفکیک ترافیک
 
 <table width="100%">
 <tbody>
 <tr>
-  <td>🔴 <b>BLOCK (مسدودسازی)</b></td>
-  <td>تبلیغات، ردیاب‌ها، داده‌های تله‌متری (صرفه‌جویی در ترافیک سرور و منابع سخت‌افزاری)</td>
+  <td>🔴 <b>BLOCK (مسدود)</b></td>
+  <td>تبلیغات، ترکرها و تله‌متری (صرفه‌جویی در ترافیک و باتری دستگاه).</td>
 </tr>
 <tr>
   <td>🟢 <b>DIRECT (مستقیم)</b></td>
-  <td>اپراتورهای محلی، شبکه‌های دانشگاهی، بانک‌ها و خدمات دولتی (پینگ بسیار پایین، جلوگیری از مسدودی حساب‌ها به دلیل IP ناشناس)</td>
+  <td>سرویس‌های داخلی، پورتال‌های دولتی و درگاه‌های بانکی بومی (کمترین پینگ بدون تداخل).</td>
 </tr>
 <tr>
-  <td>🔵 <b>PROXY (از طریق VPN)</b></td>
-  <td>YouTube، Instagram، ChatGPT، CDNهای بین‌المللی و تمامی ترافیک مسدودشده</td>
+  <td>🔵 <b>PROXY (پروکسی)</b></td>
+  <td>YouTube، Instagram، ChatGPT، شبکه‌های توزیع محتوای بین‌المللی و ترافیک فیلترشده.</td>
 </tr>
 </tbody>
 </table>
 
 ---
 
-### 🛡️ تنظیمات DNS
+### 🛡️ معماری DNS
 
 <table width="100%">
-<thead><tr><th align="center">هدف</th><th align="left">سرور</th><th align="left">مزیت و دلیل استفاده</th></tr></thead>
+<thead><tr><th align="center">مسیر</th><th align="left">سرور DNS</th><th align="left">هدف</th></tr></thead>
 <tbody>
 <tr>
-  <td align="center">🏠 <b>DIRECT (داخلی/محلی)</b></td>
+  <td align="center">🏠 <b>DIRECT (داخلی)</b></td>
   <td><a href="https://dns.yandex.ru/">Yandex DNS</a> <code>77.88.8.8</code></td>
-  <td>تحلیل سریع دامنه‌های محلی، پینگ پایین، عملکرد پایدار حتی بدون روشن بودن VPN.</td>
+  <td>پاسخ‌دهی سریع به منابع محلی با کمترین تأخیر، بدون نیاز به فعال بودن VPN.</td>
 </tr>
 <tr>
   <td align="center">🌍 <b>PROXY (بین‌المللی)</b></td>
   <td><a href="https://developers.cloudflare.com/1.1.1.1/">Cloudflare</a> / <a href="https://developers.google.com/speed/public-dns/">Google</a></td>
-  <td>پاسخ‌دهی مطمئن برای ترافیک پراکسی و محافظت در برابر آلودگی و جعل پاسخ‌های DNS توسط اپراتورها.</td>
+  <td>تحلیل امن دامنه‌های خارجی و مقابله با جعل و مسموم‌سازی DNS توسط ارائه‌دهندگان اینترنت.</td>
 </tr>
 </tbody>
 </table>
 
 ---
 > [!NOTE]
-> کلاینت‌های شناخته‌شده‌ای نظیر **NekoBox** و **NekoRay** در حال حاضر منسوخ تلقی می‌شوند. توصیه می‌شود از جایگزین‌های مدرن و به‌روز (نظیر کلاینت چندپلتفرمی **Throne**) بر پایه هسته‌های **sing-box** و **Xray** استفاده نمایید.
+> کلاینت‌های قدیمی مانند **NekoBox** و **NekoRay** دیگر توسعه فعال ندارند. پیشنهاد می‌شود به ابزارهای جدید بر پایه هسته‌های **sing-box** و **Xray** (نظیر **Throne**) مهاجرت کنید.
 
 <details>
-<summary><b>💻 دسکتاپ (Win/Mac/Linux)</b></summary>
+<summary><b>💻 نسخه دسکتاپ (ویندوز / مک / لینوکس)</b></summary>
 
-* [Throne](https://github.com/throneproj/Throne) — 👑 جانشین قدرتمند NekoRay با امکانات فراوان و پشتیبانی از چند پلتفرم. **(پیشنهادی)**
-* [Happ](https://www.happ.su/main) — نسخه دسکتاپ چندپلتفرمی.
-* [v2RayTun](https://v2raytun.com/) — کلاینت سریع و ایمن بر پایه هسته Xray.
-* [v2rayN](https://github.com/2dust/v2rayN) — کلاینت انعطاف‌پذیر و پیشرفته برای ویندوز.
-* [FlClash](https://github.com/chen08209/FlClash) — کلاینت مینیمال با رابط کاربری سریع.
+* [Throne](https://github.com/throneproj/Throne) — 👑 جانشین مدرن و کراس‌پلتفرم NekoRay. **(پیشنهادی)**
+* [Happ](https://www.happ.su/main) — کلاینت دسکتاپ.
+* [v2RayTun](https://v2raytun.com/) — کلاینت سریع بر پایه هسته Xray.
+* [v2rayN](https://github.com/2dust/v2rayN) — کلاینت پایدار ویندوز.
+* [FlClash](https://github.com/chen08209/FlClash) — رابط کاربری سبک.
 * [Karing](https://github.com/KaringX/karing)
 * [Clash Verge Rev](https://github.com/clash-verge-rev/clash-verge-rev)
-* ~~[NekoRay](https://github.com/MatsuriDayo/nekoray)~~ *(منسوخ شده، از Throne استفاده کنید)*
+* ~~[NekoRay](https://github.com/MatsuriDayo/nekoray)~~ *(منسوخ شده)*
 </details>
 
 <details>
-<summary><b>🤖 اندروید</b></summary>
+<summary><b>🤖 نسخه اندروید</b></summary>
 
-* [v2RayTun](https://v2raytun.com/) — کلاینت پرسرعت و ایمن بر پایه هسته Xray.
-* [FlClash](https://github.com/chen08209/FlClash) — کلاینت اصلی چندپلتفرمی.
-* [Incy](https://incy.cc/) — کلاینت مدرن و سریع با قابلیت افزودن آسان کانفیگ‌ها.
-* [Happ](https://www.happ.su/main) — ابزار کارآمد برای مدیریت لیست سرورها.
-* [Exclave](https://github.com/ExclaveNetwork/Exclave) — جایگزین به‌روز و مدرن برای NekoBox با رابط کاربری آشنا.
-* [Sing-box](https://github.com/SagerNet/sing-box) — هسته رسمی و خالص برای تنظیمات پیشرفته.
-* [Hiddify App](https://github.com/hiddify/hiddify-app) — کلاینت جامع برای انواع فرمت‌های کانفیگ.
-* [v2rayNG](https://github.com/2dust/v2rayNG) — برنامه کلاسیک و پایدار برای هسته Xray.
-* [Karing](https://github.com/KaringX/karing) — رابط گرافیکی غنی و کاربرپسند.
+* [v2RayTun](https://v2raytun.com/) — کلاینت سریع بر پایه Xray.
+* [FlClash](https://github.com/chen08209/FlClash) — کلاینت چندسکویی.
+* [Incy](https://incy.cc/) — کلاینت مدرن موبایل با واردسازی آسان.
+* [Happ](https://www.happ.su/main) — ابزار مدیریت پروکسی.
+* [Exclave](https://github.com/ExclaveNetwork/Exclave) — شاخه مدرن و فعال NekoBox.
+* [Sing-box](https://github.com/SagerNet/sing-box) — هسته رسمی و همه‌کاره.
+* [Hiddify App](https://github.com/hiddify/hiddify-app) — کلاینت چندپروتکله.
+* [v2rayNG](https://github.com/2dust/v2rayNG) — کلاینت نام‌آشنا و باسابقه.
+* [Karing](https://github.com/KaringX/karing)
 * [Clash Meta for Android](https://github.com/MetaCubeX/ClashMetaForAndroid)
 * ~~[NekoBox For Android](https://github.com/MatsuriDayo/NekoBoxForAndroid)~~ *(منسوخ شده)*
 </details>
 
 <details>
-<summary><b>🍏 آی‌او‌اس (iOS)</b></summary>
+<summary><b>🍏 نسخه iOS</b></summary>
 
-* [v2RayTun](https://v2raytun.com/) — کلاینت سریع و پایدار بر پایه هسته Xray.
-* [Incy](https://incy.cc/) — اپلیکیشن مدرن موجود در App Store.
-* [Happ](https://www.happ.su/main) — ابزاری کاربردی برای مدیریت پراکسی.
+* [v2RayTun](https://v2raytun.com/) — ابزار پایدار بر پایه Xray در iOS.
+* [Incy](https://incy.cc/) — در دسترس در App Store.
+* [Happ](https://www.happ.su/main) — ابزار اتصال به سرورها.
 * [Karing](https://apps.apple.com/us/app/karing/id6472431552)
 * [Clash.MI](https://apps.apple.com/us/app/clash-mi/id6744321968)
 * [Stash](https://apps.apple.com/us/app/stash-rule-based-proxy/id1596063349)
@@ -261,31 +270,27 @@
 
 ---
 
-### 🛡️ ابزارهای مکمل (DPI Bypass و تونل‌های ویژه)
+### 🛡️ ابزارهای دور زدن DPI
 
-*در شرایطی که پروتکل‌های استاندارد VPN توسط فیلترینگ شدید یا سامانه‌های DPI به طور کامل مسدود شده باشند، می‌توانید از ابزارهای دور زدن DPI یا تونل‌های پراکسی اختصاصی بهره ببرید:*
-
-* [Zapret](https://github.com/bol-van/zapret) — قدرتمندترین و انعطاف‌پذیرترین ابزار برای دور زدن عمیق DPI در لایه سیستم.
-* [Zapret2](https://github.com/bol-van/zapret2) — شاخه به‌روزشده و آزمایشی اسکریپت‌های دور زدن فیلترینگ توسط `bol-van`.
-* [Zapret-discord-youtube](https://github.com/Flowseal/zapret-discord-youtube) — اسکریپت‌های بهینه‌سازی‌شده برای سرویس‌های پرکاربرد.
-* [ByeByeDPI](https://github.com/romanvht/ByeByeDPI) — راه‌حل پایدار و کلاسیک جهت اجرا در ویندوز.
-* [tg-ws-proxy](https://github.com/Flowseal/tg-ws-proxy) — ابزار پراکسی تلگرام بر بستر وب‌سوکت (تضمین‌کننده اتصال پایدار پیام‌رسان در شرایط فیلترینگ شدید).
+* [Zapret](https://github.com/bol-van/zapret) — ابزار سطح سیستمی برای مقابله عمیق با بازرسی بسته‌ها (DPI).
+* [Zapret2](https://github.com/bol-van/zapret2) — شاخه آزمایشی جدید از توسعه‌دهنده `bol-van`.
+* [Zapret-discord-youtube](https://github.com/Flowseal/zapret-discord-youtube) — اسکریپت‌های تنظیم‌شده برای سرویس‌های پرکاربرد.
+* [ByeByeDPI](https://github.com/romanvht/ByeByeDPI) — راهکار محلی برای ویندوز.
+* [tg-ws-proxy](https://github.com/Flowseal/tg-ws-proxy) — پروکسی تحت وب‌سوکت برای تلگرام در شرایط اختلال شدید.
 
 ---
 
-### 🌐 دور زدن «لیست سفید» (تونل‌سازی TURN و WebRTC)
+### 🌐 ابزارهای عبور از لیست‌های سفید (تونل‌های TURN و WebRTC)
 
-*راهکارهایی برای استقرار بر روی سرور مجازی (VPS) در شرایط محدودیت‌های شدید شبکه و دسترسی اینترنت به صورت صرفاً «لیست سفید» (Whitelist). این ابزارها ترافیک دلخواه شبکه (WireGuard، Hysteria، TCP) را در قالب جریان‌های چندرسانه‌ای معتبر تماس‌های صوتی/تصویری و کنفرانس‌ها (VK Calls، Yandex Telemost، WebRTC/SFU) کپسوله‌سازی و استتار می‌کنند:*
-
-* [csqtt](https://github.com/amurcanov/csqtt) — سرور و اپلیکیشن اندروید با کارایی بالا برای ایجاد تونل امن روی TURN/RTP با استتار به عنوان ترافیک چندرسانه‌ای تماس‌های صوتی و تصویری.
-* [olcrtc](https://github.com/openlibrecommunity/olcrtc) — تونل رمزگذاری‌شده TCP-over-WebRTC که اتصال به VPS را به عنوان حضور استاندارد در کنفرانس‌های ویدیویی WebRTC/SFU پلتفرم‌های مورد اعتماد استتار می‌کند.
-* [vk-turn-proxy](https://github.com/cacggghp/vk-turn-proxy) — ابزار Good TURN: پراکسی سمت سرور و کلاینت جهت عبور ترافیک WireGuard / Hysteria از طریق سرورهای TURN پلتفرم‌های VK Calls و Yandex Telemost (پروتکل DTLS 1.2 بر روی STUN).
-* [proxy-turn-vk-android](https://github.com/amurcanov/proxy-turn-vk-android) — اپلیکیشن کلاینت اندروید (WDTT) برای تونل‌سازی ترافیک WireGuard به سرور مجازی شخصی از طریق رله‌های چندرسانه‌ای واسط VK TURN.
+* [csqtt](https://github.com/amurcanov/csqtt) — سرور و کلاینت اندروید برای ساخت تونل روی پروتکل‌های تماس صوتی و تصویری (TURN/RTP).
+* [olcrtc](https://github.com/openlibrecommunity/olcrtc) — تونل رمزگذاری‌شده TCP روی WebRTC با شبیه‌سازی نشست‌های کنفرانس آنلاین.
+* [vk-turn-proxy](https://github.com/cacggghp/vk-turn-proxy) — عبور دادن ترافیک WireGuard / Hysteria از طریق رله‌های مجاز تماس ویدیویی.
+* [proxy-turn-vk-android](https://github.com/amurcanov/proxy-turn-vk-android) — کلاینت اندرویدی (WDTT) برای تونل‌سازی وایرگارد از طریق سرورهای واسط TURN.
 
 ---
 
 ### ⭐ حمایت از پروژه
 
-**اگر Network Builder ULTRA، ابزار همراه INCY Tool یا پروفایل‌های ارائه شده برای شما مفید واقع شدند، با دادن یک ستاره به پروژه از ما حمایت کنید! این کار انگیزه بزرگی برای توسعه پیوسته پروژه است.** :star2:
+**اگر Network Builder ULTRA، ابزار INCY یا الگوهای ارائه‌شده برای شما مفید واقع شده است، با دادن ستاره در گیت‌هاب از ما حمایت کنید!** :star2:
 
 [![Star History Chart](https://api.star-history.com/svg?repos=JINXPIL/flclash-converter&type=Date)](https://star-history.com/#JINXPIL/flclash-converter&Date)
