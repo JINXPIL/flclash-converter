@@ -47,8 +47,9 @@
 </p>
 
 <p align="center">
-  🤖 <b>Также обратите внимание на мой второй проект:</b><br>
-  👉 <a href="https://github.com/JINXPIL/json-yaml-ai"><b>JSON-YAML-AI</b></a> 👈
+  🛠️ <b>Экосистема проектов автора:</b><br>
+  🚀 <a href="https://github.com/JINXPIL/xui-bootstrap"><b>xui-bootstrap</b></a> — <i>Автоматический деплой 3x-ui + VLESS Reality + BBR + Anti-Leak на чистый VPS за 1 минуту</i><br>
+  🤖 <a href="https://github.com/JINXPIL/json-yaml-ai"><b>JSON-YAML-AI</b></a> — <i>Интеллектуальный анализатор и валидатор конфигураций прокси-сетей</i>
 </p>
 
 > [!IMPORTANT]
@@ -162,6 +163,18 @@
 </tr>
 </tbody>
 </table>
+
+---
+
+### 🖥️ Серверная инфраструктура: xui-bootstrap
+
+Поднимаете собственный сервер под наши профили и клиенты? Автоматизируйте развёртывание нод:
+
+* 🚀 **[xui-bootstrap](https://github.com/JINXPIL/xui-bootstrap)** — Скрипт полного автодеплоя панели **3x-ui** на чистые VPS (Ubuntu 22.04 / 24.04, Debian 11 / 12) за 60 секунд.
+  * **Reality & Self-steal:** Автоматическая валидация доноров на TLS 1.3 + H2 и сопоставление ASN.
+  * **High-Speed Network:** Тюнинг `sysctl`, активация алгоритма **BBR + fq** и включение MTU Probing.
+  * **Безопасность:** Изоляция веб-панели (доступ через SSH-туннель), фаервол UFW и Fail2ban от брутфорса.
+  * **Anti-Leak:** Блокировка российских доменов и подсетей (`geoip:ru`) на уровне ядра Xray для защиты от утечек.
 
 ---
 
