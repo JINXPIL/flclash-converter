@@ -26,7 +26,7 @@
 
 <p align="center">
   <b>Herramienta web extremadamente potente y 100% local para la gestión de bases de datos masivas de servidores proxy.</b><br>
-  <i>Análisis, conversión y optimización profunda de configuraciones para FlClash, Exclave, Sing-box, Clash Meta, Throne, además de entorno PWA móvil para INCY / HAPP.</i>
+  <i>Análisis, conversión y optimización profunda de configuraciones para FlClash, Exclave, Sing-box, Clash Meta, Throne, además de entorno PWA móvil e instalación de perfiles en 1 clic para INCY / HAPP.</i>
 </p>
 
 <p align="center">
@@ -44,6 +44,9 @@
   <a href="https://jinxpil.github.io/flclash-converter/INCY_Tool.html">
     <img src="https://img.shields.io/badge/🔮_INCY_CONFIG_TOOL-8A2BE2?style=for-the-badge&logo=pwa&logoColor=white" alt="Open INCY Tool">
   </a>
+  <a href="https://jinxpil.github.io/flclash-converter/install.html">
+    <img src="https://img.shields.io/badge/⚡_INSTALAR_EN_1_CLIC-238636?style=for-the-badge&logo=github&logoColor=white" alt="Install profile">
+  </a>
 </p>
 
 <p align="center">
@@ -57,7 +60,33 @@
 
 ---
 
-### 🔮 Novedad: INCY Config Tool (Ultimate PWA)
+### ⚡ Novedad: instalación del perfil en 1 clic (INCY / Happ)
+
+Una sola página para **INCY** y **Happ** que reemplaza a los antiguos `incy.html` y `happ.html`: elija la aplicación y el perfil de enrutamiento se añade con un toque. *(La interfaz de la página está en ruso.)*
+
+<p align="center">
+  <img src="media/install-page.png" alt="Página de instalación del perfil" width="280">
+</p>
+
+* 🔀 **Selector INCY / Happ:** Su elección se recuerda. La aplicación puede indicarse directamente en el enlace — `install.html?app=incy` o `install.html?app=happ`.
+* 📱 **Código QR para el móvil:** En el ordenador el código se muestra de inmediato: apunte la cámara del teléfono, se abrirá la página y después la aplicación. Al tocar el código se muestra a pantalla completa. *(El enlace de configuración pesa decenas de kilobytes y no cabe en un QR, por eso el código contiene la dirección de la página.)*
+* 🚀 **Apertura automática en el móvil:** Si la aplicación viene indicada en el enlace, la página la abre sola tras cargar el perfil. Si no se abre, aparece un aviso con un enlace para instalar el cliente.
+* 🌐 **Dos fuentes:** El perfil se descarga en paralelo desde GitHub y el espejo jsDelivr, con prioridad para GitHub por ser el más actualizado.
+* 💾 **Funciona sin GitHub:** La última versión descargada se guarda en el dispositivo y se usa si GitHub no está disponible.
+* 🏷️ **Sepa lo que instala:** El nombre del perfil y la fecha de actualización se leen directamente del enlace de configuración.
+* 📋 **Para clientes de escritorio:** Botón «Copiar» y un campo con el enlace completo para importarlo manualmente.
+* 🔒 **Zero-Dependency:** Un único archivo HTML sin librerías externas (generador QR propio) y con una CSP estricta: la página solo descarga el perfil y no envía nada a ningún sitio.
+
+| Aplicación | Enlace de instalación |
+| :--- | :--- |
+| 📱 **INCY** | [jinxpil.github.io/flclash-converter/install.html?app=incy](https://jinxpil.github.io/flclash-converter/install.html?app=incy) |
+| 📱 **Happ** | [jinxpil.github.io/flclash-converter/install.html?app=happ](https://jinxpil.github.io/flclash-converter/install.html?app=happ) |
+
+👉 **[Abrir la página de instalación](https://jinxpil.github.io/flclash-converter/install.html)**
+
+---
+
+### 🔮 INCY Config Tool (Ultimate PWA)
 
 Además del conversor global, el proyecto incluye un **entorno de desarrollo (IDE) autónomo para dispositivos móviles**, diseñado para la edición quirúrgica de perfiles de enrutamiento `incy://` y `happ://` sobre la marcha.
 
@@ -135,7 +164,7 @@ Además del conversor global, el proyecto incluye un **entorno de desarrollo (ID
   <td>📱 <b>Happ (Enrutamiento)</b></td>
   <td>Reglas optimizadas con bloqueo de publicidad integrado.</td>
   <td>
-    <a href="https://jinxpil.github.io/flclash-converter/happ.html">⚡ Instalación Rápida (1 Clic)</a><br>
+    <a href="https://jinxpil.github.io/flclash-converter/install.html?app=happ">⚡ Instalación Rápida (1 Clic)</a><br>
     <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/HAPP/DEFAULT.json">📄 Ver Código JSON</a>
   </td>
 </tr>
@@ -143,7 +172,7 @@ Además del conversor global, el proyecto incluye un **entorno de desarrollo (ID
   <td>📱 <b>INCY (Enrutamiento)</b></td>
   <td>Reglas optimizadas con bloqueo de publicidad integrado.</td>
   <td>
-    <a href="https://jinxpil.github.io/flclash-converter/incy.html">⚡ Instalación Rápida (1 Clic)</a><br>
+    <a href="https://jinxpil.github.io/flclash-converter/install.html?app=incy">⚡ Instalación Rápida (1 Clic)</a><br>
     <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/INCY/DEFAULT.json">📄 Ver Código JSON</a>
   </td>
 </tr>
