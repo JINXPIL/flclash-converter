@@ -26,7 +26,7 @@
 
 <p align="center">
   <b>Extremely powerful and 100% local web tool for managing massive proxy server databases.</b><br>
-  <i>Parsing, converting, and deep optimization of configurations for FlClash, Exclave, Sing-box, Clash Meta, Throne, plus a mobile PWA environment for INCY / HAPP.</i>
+  <i>Parsing, converting, and deep optimization of configurations for FlClash, Exclave, Sing-box, Clash Meta, Throne, plus a mobile PWA environment and 1-click profile install for INCY / HAPP.</i>
 </p>
 
 <p align="center">
@@ -44,6 +44,9 @@
   <a href="https://jinxpil.github.io/flclash-converter/INCY_Tool.html">
     <img src="https://img.shields.io/badge/🔮_INCY_CONFIG_TOOL-8A2BE2?style=for-the-badge&logo=pwa&logoColor=white" alt="Open INCY Tool">
   </a>
+  <a href="https://jinxpil.github.io/flclash-converter/install.html">
+    <img src="https://img.shields.io/badge/⚡_1--CLICK_INSTALL-238636?style=for-the-badge&logo=github&logoColor=white" alt="Install profile">
+  </a>
 </p>
 
 <p align="center">
@@ -57,7 +60,33 @@
 
 ---
 
-### 🔮 New: INCY Config Tool (Ultimate PWA)
+### ⚡ New: 1-Click Profile Install (INCY / Happ)
+
+A single page for **INCY** and **Happ** that replaces the old `incy.html` and `happ.html`: pick your app and the routing profile is added with one tap. *(The page interface is in Russian.)*
+
+<p align="center">
+  <img src="media/install-page.png" alt="Profile install page" width="280">
+</p>
+
+* 🔀 **INCY / Happ Switch:** Your choice is remembered. The app can be preselected right in the link — `install.html?app=incy` or `install.html?app=happ`.
+* 📱 **QR Code for Phones:** On desktop the code is shown right away — point your phone camera at it, the page opens and then launches the app. Tap the code to show it full screen. *(The config link itself weighs tens of kilobytes and does not fit into a QR code, so the code carries the page address instead.)*
+* 🚀 **Auto-Launch on Mobile:** If the app is specified in the link, the page opens it automatically once the profile is loaded. If nothing happens, a hint with a link to install the client appears.
+* 🌐 **Two Sources:** The profile is fetched in parallel from GitHub and the jsDelivr mirror, with GitHub preferred as the freshest.
+* 💾 **Works Without GitHub:** The last downloaded version is cached on the device and used when GitHub is unreachable.
+* 🏷️ **See What You Install:** The profile name and update date are read straight from the config link.
+* 📋 **For Desktop Clients:** A “Copy” button and a field with the full link for manual import.
+* 🔒 **Zero-Dependency:** A single HTML file with no external libraries (custom QR generator) and a strict CSP — the page only downloads the profile and never sends anything anywhere.
+
+| App | Install link |
+| :--- | :--- |
+| 📱 **INCY** | [jinxpil.github.io/flclash-converter/install.html?app=incy](https://jinxpil.github.io/flclash-converter/install.html?app=incy) |
+| 📱 **Happ** | [jinxpil.github.io/flclash-converter/install.html?app=happ](https://jinxpil.github.io/flclash-converter/install.html?app=happ) |
+
+👉 **[Open the install page](https://jinxpil.github.io/flclash-converter/install.html)**
+
+---
+
+### 🔮 INCY Config Tool (Ultimate PWA)
 
 In addition to the global converter, the project includes a **dedicated offline IDE for mobile devices**, designed for precision editing of `incy://` and `happ://` routing profiles on the go.
 
@@ -137,7 +166,7 @@ All standardized starter presets are organized in dedicated repository directori
   <td>📱 <b>Happ (Routing)</b></td>
   <td>Optimized routing rules with built-in ad blocking.</td>
   <td>
-    <a href="https://jinxpil.github.io/flclash-converter/happ.html">⚡ Quick Install (1-Click)</a><br>
+    <a href="https://jinxpil.github.io/flclash-converter/install.html?app=happ">⚡ Quick Install (1-Click)</a><br>
     <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/HAPP/DEFAULT.json">📄 View JSON</a>
   </td>
 </tr>
@@ -145,7 +174,7 @@ All standardized starter presets are organized in dedicated repository directori
   <td>📱 <b>INCY (Routing)</b></td>
   <td>Optimized routing rules with built-in ad blocking.</td>
   <td>
-    <a href="https://jinxpil.github.io/flclash-converter/incy.html">⚡ Quick Install (1-Click)</a><br>
+    <a href="https://jinxpil.github.io/flclash-converter/install.html?app=incy">⚡ Quick Install (1-Click)</a><br>
     <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/INCY/DEFAULT.json">📄 View JSON</a>
   </td>
 </tr>
