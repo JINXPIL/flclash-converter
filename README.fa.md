@@ -26,7 +26,7 @@
 
 <p align="center">
   <b>ابزار تحت وب فوق‌العاده قدرتمند و ۱۰۰٪ محلی برای مدیریت پایگاه‌های داده عظیم سرورهای پروکسی.</b><br>
-  <i>تجزیه، تبدیل و بهینه‌سازی پیشرفته پیکربندی‌ها برای FlClash، Exclave، Sing-box، Clash Meta، Throne و محیط موبایل PWA برای INCY / HAPP.</i>
+  <i>تجزیه، تبدیل و بهینه‌سازی پیشرفته پیکربندی‌ها برای FlClash، Exclave، Sing-box، Clash Meta، Throne و محیط موبایل PWA و نصب پروفایل با ۱ کلیک برای INCY / HAPP.</i>
 </p>
 
 <p align="center">
@@ -44,6 +44,9 @@
   <a href="https://jinxpil.github.io/flclash-converter/INCY_Tool.html">
     <img src="https://img.shields.io/badge/🔮_INCY_CONFIG_TOOL-8A2BE2?style=for-the-badge&logo=pwa&logoColor=white" alt="Open INCY Tool">
   </a>
+  <a href="https://jinxpil.github.io/flclash-converter/install.html">
+    <img src="https://img.shields.io/badge/⚡_نصب_با_۱_کلیک-238636?style=for-the-badge&logo=github&logoColor=white" alt="Install profile">
+  </a>
 </p>
 
 <p align="center">
@@ -57,7 +60,33 @@
 
 ---
 
-### 🔮 جدید: INCY Config Tool (محیط PWA همراه)
+### ⚡ جدید: نصب پروفایل با ۱ کلیک (INCY / Happ)
+
+یک صفحه برای **INCY** و **Happ** به‌جای `incy.html` و `happ.html` قبلی: برنامه را انتخاب کنید تا پروفایل مسیریابی با یک لمس اضافه شود. *(رابط صفحه به زبان روسی است.)*
+
+<p align="center">
+  <img src="media/install-page.png" alt="صفحه نصب پروفایل" width="280">
+</p>
+
+* 🔀 **سوئیچ INCY / Happ:** انتخاب شما ذخیره می‌شود. برنامه را می‌توان مستقیماً در لینک مشخص کرد — `install.html?app=incy` یا `install.html?app=happ`.
+* 📱 **کد QR برای گوشی:** در کامپیوتر کد بلافاصله نمایش داده می‌شود — دوربین گوشی را به سمت آن بگیرید تا صفحه باز شود و سپس برنامه اجرا شود. با لمس کد، آن را تمام‌صفحه ببینید. *(خود لینک پیکربندی ده‌ها کیلوبایت حجم دارد و در کد QR جا نمی‌شود؛ به همین دلیل آدرس صفحه در کد قرار گرفته است.)*
+* 🚀 **اجرای خودکار در موبایل:** اگر برنامه در لینک مشخص شده باشد، صفحه پس از بارگذاری پروفایل آن را خودکار باز می‌کند. اگر باز نشد، راهنمایی همراه با لینک نصب کلاینت نمایش داده می‌شود.
+* 🌐 **دو منبع:** پروفایل به‌طور هم‌زمان از GitHub و آینه jsDelivr دریافت می‌شود و اولویت با GitHub به‌عنوان تازه‌ترین نسخه است.
+* 💾 **کار بدون GitHub:** آخرین نسخه دریافت‌شده روی دستگاه ذخیره می‌شود و در صورت در دسترس نبودن GitHub استفاده می‌شود.
+* 🏷️ **می‌دانید چه نصب می‌کنید:** نام پروفایل و تاریخ به‌روزرسانی مستقیماً از لینک پیکربندی خوانده می‌شود.
+* 📋 **برای کلاینت‌های دسکتاپ:** دکمه «کپی» و فیلدی با لینک کامل برای وارد کردن دستی.
+* 🔒 **بدون وابستگی:** یک فایل HTML بدون کتابخانه‌های خارجی (با تولیدکننده QR اختصاصی) و CSP سخت‌گیرانه — صفحه فقط پروفایل را دانلود می‌کند و هیچ داده‌ای به جایی ارسال نمی‌کند.
+
+| برنامه | لینک نصب |
+| :--- | :--- |
+| 📱 **INCY** | [jinxpil.github.io/flclash-converter/install.html?app=incy](https://jinxpil.github.io/flclash-converter/install.html?app=incy) |
+| 📱 **Happ** | [jinxpil.github.io/flclash-converter/install.html?app=happ](https://jinxpil.github.io/flclash-converter/install.html?app=happ) |
+
+👉 **[باز کردن صفحه نصب](https://jinxpil.github.io/flclash-converter/install.html)**
+
+---
+
+### 🔮 INCY Config Tool (محیط PWA همراه)
 
 علاوه بر مبدل کلی، این پروژه شامل یک **محیط توسعه اختصاصی و آفلاین (IDE) برای دستگاه‌های تلفن همراه** است که جهت ویرایش دقیق پروفایل‌های مسیریابی `incy://` و `happ://` توسعه یافته است.
 
@@ -135,7 +164,7 @@
   <td>📱 <b>Happ (مسیریابی)</b></td>
   <td>قوانین بهینه‌شده همراه با AdBlock داخلی.</td>
   <td>
-    <a href="https://jinxpil.github.io/flclash-converter/happ.html">⚡ نصب سریع (۱ کلیک)</a><br>
+    <a href="https://jinxpil.github.io/flclash-converter/install.html?app=happ">⚡ نصب سریع (۱ کلیک)</a><br>
     <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/HAPP/DEFAULT.json">📄 کد JSON</a>
   </td>
 </tr>
@@ -143,7 +172,7 @@
   <td>📱 <b>INCY (مسیریابی)</b></td>
   <td>قوانین بهینه‌شده همراه با AdBlock داخلی.</td>
   <td>
-    <a href="https://jinxpil.github.io/flclash-converter/incy.html">⚡ نصب سریع (۱ کلیک)</a><br>
+    <a href="https://jinxpil.github.io/flclash-converter/install.html?app=incy">⚡ نصب سریع (۱ کلیک)</a><br>
     <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/INCY/DEFAULT.json">📄 کد JSON</a>
   </td>
 </tr>
