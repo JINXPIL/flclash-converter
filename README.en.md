@@ -74,7 +74,7 @@ A single page for **INCY** and **Happ** that replaces the old `incy.html` and `h
 * 🌐 **Two Sources:** The profile is fetched in parallel from GitHub and the jsDelivr mirror, with GitHub preferred as the freshest.
 * 💾 **Works Without GitHub:** The last downloaded version is cached on the device and used when GitHub is unreachable.
 * 🏷️ **See What You Install:** The profile name and update date are read straight from the config link.
-* 📋 **For Desktop Clients:** A “Copy” button and a field with the full link for manual import.
+* 💻 **On Windows PCs — via clipboard:** The full profile link is longer than Windows can pass to an app, so the button copies the profile and the page shows where to paste it in the app. On phones it is still one tap. The full link is also available via “Copy” and a field for manual import.
 * 🔒 **Zero-Dependency:** A single HTML file with no external libraries (custom QR generator) and a strict CSP — the page only downloads the profile and never sends anything anywhere.
 
 | App | Install link |
