@@ -26,7 +26,7 @@
 
 <p align="center">
   <b>极速强悍、100% 本地运行的 Web 工具，专为管理海量代理节点数据库而生。</b><br>
-  <i>针对 FlClash、Exclave、Sing-box、Clash Meta、Throne 进行配置解析、批量转换与深度优化，并内置面向 INCY / HAPP 的移动端 PWA 环境。</i>
+  <i>针对 FlClash、Exclave、Sing-box、Clash Meta、Throne 进行配置解析、批量转换与深度优化，并内置面向 INCY / HAPP 的移动端 PWA 环境与一键配置安装页。</i>
 </p>
 
 <p align="center">
@@ -44,6 +44,9 @@
   <a href="https://jinxpil.github.io/flclash-converter/INCY_Tool.html">
     <img src="https://img.shields.io/badge/🔮_INCY_CONFIG_TOOL-8A2BE2?style=for-the-badge&logo=pwa&logoColor=white" alt="Open INCY Tool">
   </a>
+  <a href="https://jinxpil.github.io/flclash-converter/install.html">
+    <img src="https://img.shields.io/badge/⚡_一键安装配置-238636?style=for-the-badge&logo=github&logoColor=white" alt="Install profile">
+  </a>
 </p>
 
 <p align="center">
@@ -57,7 +60,33 @@
 
 ---
 
-### 🔮 新特性：INCY Config Tool (终极 PWA 环境)
+### ⚡ 新特性：一键安装配置 (INCY / Happ)
+
+一个页面同时支持 **INCY** 与 **Happ**，取代原先的 `incy.html` 和 `happ.html`：选择应用，轻点一下即可添加分流配置。*（页面界面为俄语。）*
+
+<p align="center">
+  <img src="media/install-page.png" alt="配置安装页面" width="280">
+</p>
+
+* 🔀 **INCY / Happ 切换：** 自动记住您的选择。也可以直接在链接中指定应用 —— `install.html?app=incy` 或 `install.html?app=happ`。
+* 📱 **手机扫码：** 在电脑上二维码直接显示 —— 用手机相机扫描即可打开页面，随后自动启动应用。点击二维码可全屏显示。*（配置链接本身有数十 KB，无法放入二维码，因此二维码中存放的是页面地址。）*
+* 🚀 **手机端自动启动：** 若链接中已指定应用，页面在加载配置后会自动打开它。未能打开时，会显示带有客户端下载链接的提示。
+* 🌐 **双数据源：** 同时从 GitHub 与 jsDelivr 镜像并行加载配置，优先使用最新的 GitHub 版本。
+* 💾 **无需 GitHub 也能用：** 最近一次下载的版本会缓存在设备上，GitHub 无法访问时自动使用。
+* 🏷️ **安装内容一目了然：** 直接从配置链接中读取配置名称与更新日期。
+* 📋 **适用于桌面客户端：** 提供「复制」按钮以及包含完整链接的文本框，方便手动导入。
+* 🔒 **零依赖：** 单个 HTML 文件，无外部库（自带二维码生成器），并启用严格的 CSP —— 页面只下载配置，不会向任何地方发送数据。
+
+| 应用 | 安装链接 |
+| :--- | :--- |
+| 📱 **INCY** | [jinxpil.github.io/flclash-converter/install.html?app=incy](https://jinxpil.github.io/flclash-converter/install.html?app=incy) |
+| 📱 **Happ** | [jinxpil.github.io/flclash-converter/install.html?app=happ](https://jinxpil.github.io/flclash-converter/install.html?app=happ) |
+
+👉 **[打开安装页面](https://jinxpil.github.io/flclash-converter/install.html)**
+
+---
+
+### 🔮 INCY Config Tool (终极 PWA 环境)
 
 除了全局配置转换器，本项目还提供**专为移动设备设计的独立离线开发环境 (IDE)**，用于随时随地精准修改 `incy://` 和 `happ://` 路由配置文件。
 
@@ -135,7 +164,7 @@
   <td>📱 <b>Happ (分流路由)</b></td>
   <td>优化路由规则，集成去广告。</td>
   <td>
-    <a href="https://jinxpil.github.io/flclash-converter/happ.html">⚡ 一键快速安装</a><br>
+    <a href="https://jinxpil.github.io/flclash-converter/install.html?app=happ">⚡ 一键快速安装</a><br>
     <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/HAPP/DEFAULT.json">📄 查看 JSON 源码</a>
   </td>
 </tr>
@@ -143,7 +172,7 @@
   <td>📱 <b>INCY (分流路由)</b></td>
   <td>优化路由规则，集成去广告。</td>
   <td>
-    <a href="https://jinxpil.github.io/flclash-converter/incy.html">⚡ 一键快速安装</a><br>
+    <a href="https://jinxpil.github.io/flclash-converter/install.html?app=incy">⚡ 一键快速安装</a><br>
     <a href="https://raw.githubusercontent.com/JINXPIL/flclash-converter/main/INCY/DEFAULT.json">📄 查看 JSON 源码</a>
   </td>
 </tr>
