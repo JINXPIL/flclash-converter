@@ -1056,15 +1056,24 @@
                     g('customProtoInput').value = p; saveCustomPrefs();
                 }
             } 
-            else { 
-                currentProtocol = p === 'incy-mini' ? 'incy' : p; 
-                g('customProtoContainer').classList.remove('active'); 
+            else {
+                currentProtocol = p === 'incy-mini' ? 'incy' : p;
+                g('customProtoContainer').classList.remove('active');
+                lsSet('incy_last_proto', currentProtocol);   // запоминаем INCY/HAPP между открытиями
             }
-            updateToggleLabel();
+            updateToggleLabel(); updateTargetLabels();
         };
+
+        // На кнопках видно, для какого приложения ссылка: INCY принимает только incy://, Happ — только happ://
+        function updateTargetLabels() {
+            let app = currentProtocol === 'happ' ? 'Happ' : currentProtocol === 'incy' ? 'INCY' : null;
+            els.btnDeepLink.firstElementChild.textContent = app ? `🚀 Открыть в ${app}` : '🚀 Открыть ссылку напрямую';
+            g('btnCopyResult').textContent = app ? `📋 Полная · для ${app}` : '📋 Полная';
+        }
 
         g('btnProtoIncy').onclick = () => { vibe(); setProtocol('incy'); refreshLinks(); };
         g('btnProtoHapp').onclick = () => { vibe(); setProtocol('happ'); refreshLinks(); };
+        if (localStorage.getItem('incy_last_proto') === 'happ') setProtocol('happ'); else updateTargetLabels();
         g('btnProtoCustom').onclick = () => { vibe(); setProtocol(g('customProtoInput').value || 'custom'); g('customProtoInput').focus(); refreshLinks(); };
         
         ['customProtoInput', 'customCmdManual', 'customCmdAuto'].forEach(id => {
@@ -1258,11 +1267,18 @@
         const SERVER_SCHEMES = ['vless', 'vmess', 'trojan', 'ss', 'ssr', 'hysteria', 'hysteria2', 'hy2', 'tuic', 'wireguard', 'wg', 'socks', 'socks5', 'naive+https', 'juicity'];
 
         async function handleSrc(opts = {}) {
-            let val = els.srcInput.value.trim(); if(!val) return;
+            let val = els.srcInput.value.replace(/^﻿/, '').trim(); if(!val) return;
+            // Ссылка внутри текста или кавычек: «Профиль: happ://…», "happ://…"
+            if (!val.startsWith('{') && !/^[a-z][a-z0-9+.-]*:\/\//i.test(val)) {
+                let found = val.match(/[a-z][a-z0-9+.-]*:\/\/[^\s"'«»<>]{20,}/i);
+                if (found) val = found[0];
+            }
             if(/[?&]sid=/.test(val) && val.length > 50) return decryptCloud(val);
 
             let sm = val.match(/^([a-z][a-z0-9+.-]*):\/\/(.*)$/is);
-            let scheme = sm ? sm[1].toLowerCase() : null, path = sm ? sm[2] : '';
+            // Переносы строк и пробелы внутри ссылки (мессенджеры, файлы с переносом по 76 символов) — убираем
+            let scheme = sm ? sm[1].toLowerCase() : null, path = sm ? sm[2].replace(/\s+/g, '') : '';
+            if (sm) val = sm[1] + '://' + path;
             let jsonStr = null;
 
             if (val.startsWith('{')) { try { JSON.parse(val); jsonStr = val; } catch(e) {} }
