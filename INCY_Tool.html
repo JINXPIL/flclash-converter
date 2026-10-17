@@ -185,6 +185,12 @@
         .th-btn.active { border-color: var(--accent-blue); box-shadow: 0 0 10px rgba(59,130,246,0.3);}
         .th-btn-del { font-size: 12px; color: var(--red-text); margin-left: auto; cursor: pointer; background: rgba(239,68,68,0.1); border-radius: 4px; padding: 2px 4px;}
         .th-color-dot { width: 12px; height: 12px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); }
+
+        a.btn-launch.disabled { opacity: 0.45; pointer-events: none; filter: grayscale(0.6); }
+        .link-meta { font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 8px; line-height: 1.5; }
+        .link-meta b { color: var(--text-main); }
+        .link-warn { color: var(--red-text); margin-top: 2px; }
+        .mini-note { font-size: 11px; color: var(--text-muted); text-align: center; margin: -2px 0 8px; }
     </style>
 </head>
 <body>
@@ -334,12 +340,14 @@
             </div>
 
             <textarea id="resultOutput" class="resizable-box" readonly placeholder="Здесь будет ПРЯМАЯ ссылка..."></textarea>
-            
+            <div id="linkMeta" class="link-meta" aria-live="polite"></div>
+
             <div style="font-size: 11px; color: var(--text-muted); text-align: center; margin-bottom: 8px; margin-top: 16px; font-weight: bold; text-transform: uppercase;">Скопировать:</div>
             <div style="display: flex; gap: 8px; margin-bottom: 8px;">
-                <button class="btn-primary" id="btnCopyMini" style="flex: 1; background: rgba(59,130,246,0.1); border: 1px solid var(--accent-blue); color: var(--accent-blue); font-size: 13px;" title="Только для INCY">🪄 Сжатая (MINI)</button>
+                <button class="btn-primary" id="btnCopyMini" style="flex: 1; background: rgba(59,130,246,0.1); border: 1px solid var(--accent-blue); color: var(--accent-blue); font-size: 13px;" title="Короткая ссылка для пересылки. Распаковывается только здесь, в INCY Tool — само приложение INCY её не понимает">🪄 Сжатая (MINI)</button>
                 <button class="btn-primary" id="btnCopyResult" style="flex: 1; background: var(--bg-input); border: 1px solid var(--border-gray); color: var(--text-main); font-size: 13px;">📋 Полная</button>
             </div>
+            <div class="mini-note">MINI короче, но открывается только здесь, в INCY Tool. В приложение вставляйте полную.</div>
             
             <button class="btn-primary" id="btnOpenCloudModal" style="box-shadow: 0 0 15px rgba(59,130,246,0.3); margin-bottom: 12px; margin-top: 4px;">☁️ Поделиться (Шифрование AES)</button>
 
@@ -403,7 +411,7 @@
             
             <div style="font-size:11px; color:var(--text-muted); margin:16px 0 6px; font-weight:bold;">БЭКАП РАБОЧЕГО МЕСТА:</div>
             <div style="display:flex; gap:8px;">
-                <button class="btn-action" style="flex:1; background:var(--accent-blue); color:white; border:none;" id="btnBackupDump">💾 Выгрузить (.zip)</button>
+                <button class="btn-action" style="flex:1; background:var(--accent-blue); color:white; border:none;" id="btnBackupDump">💾 Выгрузить файл</button>
                 <button class="btn-action" style="flex:1;" id="btnBackupLoad">📂 Загрузить</button>
                 <input type="file" id="backupFile" class="hidden" accept=".json,.incybackup">
             </div>
@@ -490,11 +498,12 @@
     <div class="modal-overlay" id="modalCloud">
         <div class="modal-card">
             <div class="modal-header"> 🚀 Cloud Share <button class="btn-action" onclick="toggleModal('modalCloud')">✕</button> </div>
-            <p style="font-size:12px; color:var(--text-muted); margin-bottom: 16px;">Ваш конфиг надёжно зашифруется стандартом AES-GCM-256 прямо на телефоне. Никто не сможет открыть ссылку без ключа (пароля).</p>
-            <input type="text" id="sharePassword" class="custom-proto-input" style="margin-bottom:12px;" placeholder="Пароль защиты (можно пустой)">
+            <p style="font-size:12px; color:var(--text-muted); margin-bottom: 16px; line-height:1.5;">Конфиг шифруется AES-GCM-256 прямо на устройстве.<br>• <b>Без пароля</b> — ключ встроен в ссылку: откроет любой, у кого она есть.<br>• <b>С паролем</b> — пароля в ссылке нет, передайте его отдельно (лучше другим мессенджером).</p>
+            <input type="text" id="sharePassword" class="custom-proto-input" style="margin-bottom:12px;" placeholder="Пароль (необязательно)" autocomplete="new-password">
             <button class="btn-primary" id="btnGenerateCloud">🔐 Зашифровать</button>
             <div id="shareResultBlock" class="hidden" style="margin-top:16px;">
                 <textarea id="shareUrlOut" readonly class="custom-proto-input" style="min-height:80px; text-align:center; resize:vertical; word-break:break-all;"></textarea>
+                <div id="shareMeta" class="link-meta"></div>
                 <button class="btn-action" style="width:100%; margin-top:8px;" onclick="copyToC(document.getElementById('shareUrlOut').value)">📋 Скопировать</button>
             </div>
         </div>
@@ -506,6 +515,27 @@
         const vibe = (ms=40) => { if(navigator.vibrate) navigator.vibrate(ms); };
         const g = id => document.getElementById(id);
         const toggleModal = (id, force) => { let el = g(id); if(!el)return; force !== undefined ? el.classList.toggle('active', force) : el.classList.toggle('active'); };
+
+        // --- БЕЗОПАСНОСТЬ И НАДЁЖНОСТЬ ---
+        // Всё, что попадает в innerHTML (имена профилей, тем, плагинов, значения JSON), приходит извне — экранируем
+        const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        const safeColor = c => /^#[0-9a-f]{3,8}$/i.test(c || '') ? c : '#888888';
+        // localStorage бывает переполнен или недоступен — не роняем из-за этого остальной код
+        const lsSet = (k, v) => { try { localStorage.setItem(k, v); return true; } catch (e) { return false; } };
+        const lsJSON = (k, def) => { try { let v = JSON.parse(localStorage.getItem(k)); return v ?? def; } catch (e) { return def; } };
+        // base64 для больших массивов без переполнения стека (в Safari не больше 65536 аргументов)
+        const bytesToB64 = u8 => { let s = ''; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(s); };
+        const b64ToBytes = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+        // Запускать можно только ссылки приложений, но не javascript:/data:
+        const isSafeLaunchUrl = u => /^[a-z][a-z0-9+.-]*:\/\//i.test(u || '') && !/^(javascript|data|vbscript|file):/i.test(u);
+        // Windows не передаёт приложениям ссылки длиннее ~2000 символов; Telegram режет сообщения на 4096
+        const isWindows = /Windows/i.test(navigator.userAgent) && !/Mobile|Android/i.test(navigator.userAgent);
+        const WIN_MAX_LINK = 2000, TG_MAX_MSG = 4096;
+        const isCloudLink = /[?&]sid=/.test(location.search);
+        let appReady = false;
+
+        // Модалки закрываются кликом по фону
+        document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', e => { if (e.target === m) m.classList.remove('active'); }));
 
         const els = {
             srcInput: g('srcInput'), btnPaste: g('btnPaste'), btnClear: g('btnClear'), btnParseManually: g('btnParseManually'),
@@ -526,16 +556,29 @@
         ['uiS1', 'uiS2', 'uiExp', 'uiH', 'uiAutoParse', 'uiLinter'].forEach(id => {
             let chk = g(id); let s = localStorage.getItem('incy_'+id); chk.checked = s!==null?s==='1':true;
             chk.addEventListener('change', e => {
-                localStorage.setItem('incy_'+id, e.target.checked?'1':'0');
+                lsSet('incy_'+id, e.target.checked?'1':'0');
                 if(id==='uiS1') g('step1-card').classList.toggle('hidden', !e.target.checked);
                 if(id==='uiS2') els.editorBlockWrapper.classList.toggle('hidden', !e.target.checked);
                 if(id==='uiExp') g('resultBlockWrapper').classList.toggle('hidden', !e.target.checked);
-                if(id==='uiH') { if(e.target.checked) renderHist(); else g('historyCard').classList.add('hidden'); }
-                if(id==='uiLinter') { linter(); } 
+                // До window.onload функции истории и линтера ещё не объявлены — там они вызываются сами
+                if(id==='uiH') { if(e.target.checked) { if (appReady) renderHist(); } else g('historyCard').classList.add('hidden'); }
+                if(id==='uiLinter' && appReady) { linter(); }
             }); chk.dispatchEvent(new Event('change'));
         });
 
         // --- THEME ENGINE ---
+        const THEME_VARS = ['--bg-body','--bg-card','--bg-input','--border-gray','--text-main','--text-muted','--accent-blue','--accent-green','--code-color','--line-num-bg','--line-num-color'];
+        // Тема из файла, URL или бэкапа — чужие данные: оставляем только имя и цвета вида #rrggbb
+        function sanitizeTheme(t) {
+            if (!t || typeof t !== 'object' || !t.colors || typeof t.colors !== 'object') return null;
+            let colors = {};
+            THEME_VARS.forEach(k => { if (/^#[0-9a-f]{3,8}$/i.test(t.colors[k] || '')) colors[k] = t.colors[k]; });
+            if (!Object.keys(colors).length) return null;
+            let id = /^t_\d+$/.test(t.id || '') ? t.id : 't_' + Date.now() + String(Math.floor(Math.random() * 1000));
+            return { id, name: String(t.name || 'Тема').slice(0, 40), colors };
+        }
+        const sanitizeThemes = arr => (Array.isArray(arr) ? arr : []).map(sanitizeTheme).filter(Boolean);
+
         const THEMES = {
             base: [
                 {id: 'default', name: 'Dark', c: '#0a0d14', colors: {'--bg-body': '#0a0d14', '--bg-card': '#111827', '--bg-input': '#1f2937', '--border-gray': '#374151', '--text-main': '#e5e7eb', '--text-muted': '#9ca3af', '--accent-blue': '#3b82f6', '--accent-green': '#10b981', '--code-color': '#60a5fa', '--line-num-bg': '#0d1117', '--line-num-color': '#6b7280'}},
@@ -543,8 +586,8 @@
                 {id: 'dracula', name: 'Drac', c: '#282a36', colors: {'--bg-body': '#282a36', '--bg-card': '#44475a', '--bg-input': '#282a36', '--border-gray': '#6272a4', '--text-main': '#f8f8f2', '--text-muted': '#6272a4', '--accent-blue': '#bd93f9', '--accent-green': '#50fa7b', '--code-color': '#ff79c6', '--line-num-bg': '#282a36', '--line-num-color': '#6272a4'}},
                 {id: 'cyberpunk', name: 'Cyber', c: '#fcee09', colors: {'--bg-body': '#fcee09', '--bg-card': '#111111', '--bg-input': '#222222', '--border-gray': '#0bcada', '--text-main': '#fcee09', '--text-muted': '#888888', '--accent-blue': '#0bcada', '--accent-green': '#ff003c', '--code-color': '#0bcada', '--line-num-bg': '#000000', '--line-num-color': '#0bcada'}}
             ],
-            user: JSON.parse(localStorage.getItem('incy_user_themes') || '[]'),
-            save() { localStorage.setItem('incy_user_themes', JSON.stringify(this.user)); renderThemeGrid(); },
+            user: sanitizeThemes(lsJSON('incy_user_themes', [])),
+            save() { lsSet('incy_user_themes', JSON.stringify(this.user)); renderThemeGrid(); },
             add(name, colors) { this.user.push({id: 't_'+Date.now(), name, colors}); this.save(); },
             del(id) { this.user = this.user.filter(t=>t.id!==id); this.save(); },
             get(id) { return this.user.find(t=>t.id===id); }
@@ -564,7 +607,7 @@
                 syncPickers(bTh.colors);
                 if(g('newThemeName')) g('newThemeName').value = bTh.name + ' (Copy)';
             }
-            localStorage.setItem('incy_t', th); 
+            lsSet('incy_t', th); 
             renderThemeGrid();
         };
 
@@ -575,7 +618,7 @@
             vibe(); 
             let curr = localStorage.getItem('incy_t') || 'default';
             if (curr !== 'light') {
-                localStorage.setItem('incy_last_dark', curr);
+                lsSet('incy_last_dark', curr);
                 setTheme('light');
             } else {
                 let lastDark = localStorage.getItem('incy_last_dark') || 'default';
@@ -587,21 +630,26 @@
 
         function renderThemeGrid() {
             let curr = localStorage.getItem('incy_t') || 'default';
-            let html = THEMES.base.map(t => 
-                `<button class="th-btn ${curr===t.id?'active':''}" onclick="setTheme('${t.id}')">
-                    <div class="th-color-dot" style="background:${t.c};"></div> ${t.name}
+            let html = THEMES.base.map(t =>
+                `<button class="th-btn ${curr===t.id?'active':''}" data-theme="${esc(t.id)}">
+                    <div class="th-color-dot" style="background:${safeColor(t.c)};"></div> ${esc(t.name)}
                  </button>`
             ).join('');
-            
-            html += THEMES.user.map(t => 
-                `<div class="th-btn ${curr===t.id?'active':''}">
-                    <div class="th-color-dot" style="background:${t.colors['--bg-body']};" onclick="setTheme('${t.id}')"></div> 
-                    <span onclick="setTheme('${t.id}')">${t.name}</span>
-                    <span class="th-btn-del" onclick="window.delThemeObj('${t.id}')" title="Удалить">✖</span>
+
+            html += THEMES.user.map(t =>
+                `<div class="th-btn ${curr===t.id?'active':''}" data-theme="${esc(t.id)}">
+                    <div class="th-color-dot" style="background:${safeColor(t.colors['--bg-body'])};"></div>
+                    <span>${esc(t.name)}</span>
+                    <span class="th-btn-del" data-del-theme="${esc(t.id)}" title="Удалить">✖</span>
                 </div>`
             ).join('');
             g('themesGrid').innerHTML = html;
         }
+        g('themesGrid').addEventListener('click', e => {
+            let del = e.target.closest('[data-del-theme]');
+            if (del) { e.stopPropagation(); window.delThemeObj(del.dataset.delTheme); return; }
+            let t = e.target.closest('[data-theme]'); if (t) setTheme(t.dataset.theme);
+        });
 
         window.delThemeObj = (id) => { vibe(); THEMES.del(id); if(localStorage.getItem('incy_t')===id) setTheme('default'); };
 
@@ -674,15 +722,15 @@
         g('themeFileInput').onchange = e => {
             let f = e.target.files[0]; if(!f) return; let rd = new FileReader();
             rd.onload = ev => {
-                try { let j=JSON.parse(ev.target.result); if(j.colors && j.name) { THEMES.add(j.name, j.colors); showT('Тема добавлена!'); } else throw 1; } 
+                try { let t = sanitizeTheme(JSON.parse(ev.target.result)); if(t) { THEMES.add(t.name, t.colors); showT('Тема добавлена!'); } else throw 1; }
                 catch(err){ showT('Файл поврежден', 1); }
             }; rd.readAsText(f); e.target.value='';
         };
         window.loadThemeFromURL = async () => {
             let u = g('themeUrlInput').value.trim(); if(!u) return; vibe();
             try {
-                let r = await fetch(u); let j = await r.json();
-                if(j.name && j.colors) { THEMES.add(j.name, j.colors); showT('Тема из сети загружена!'); g('themeUrlInput').value=''; } else throw 1;
+                let r = await fetch(u); let t = sanitizeTheme(await r.json());
+                if(t) { THEMES.add(t.name, t.colors); showT('Тема из сети загружена!'); g('themeUrlInput').value=''; } else throw 1;
             } catch(e) { showT('Ошибка валидации URL JSON темы', 1); }
         };
 
@@ -695,50 +743,79 @@
 
         g('btnPluginsModal').onclick = () => { vibe(); toggleModal('modalPlugins', true); renderPlugins(); };
         
-        const loadPluginsCore = () => { 
+        // Код пресетов. Старые версии: «Сжиматель» показывал тост при каждом открытии,
+        // YAML-парсер превращал любую ссылку incy:// в строку — уже установленные копии чиним при загрузке.
+        const PRESET_CODE = {
+            minify: `window.INCY_CUSTOM_FORMATTER = function(val) { return JSON.stringify(JSON.parse(val)); };`,
+            yaml: `
+                if(!window.jsyaml && !document.querySelector('script[data-jsyaml]')) {
+                    let s = document.createElement('script');
+                    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js';
+                    s.dataset.jsyaml = '1';
+                    document.head.appendChild(s);
+                }
+                window.INCY_CUSTOM_PARSER = function(val) {
+                    if (!window.jsyaml || val.trim().startsWith('{')) return null;
+                    try { let o = jsyaml.load(val); return (o && typeof o === 'object') ? JSON.stringify(o, null, 4) : null; } catch(e) { return null; }
+                };`
+        };
+        const migratePlugins = plugs => {
+            let changed = false;
+            plugs.forEach(p => {
+                if (typeof p.code !== 'string') return;
+                if (p.name === '🗜️ Сжиматель (Minifier)' && p.code.includes("toast('JSON сжат")) { p.code = PRESET_CODE.minify; changed = true; }
+                if (p.name === '📄 YAML Конвертер' && p.code.includes("if(!val.startsWith('{') && window.jsyaml)")) { p.code = PRESET_CODE.yaml; changed = true; }
+            });
+            if (changed) lsSet('incy_plugins', JSON.stringify(plugs));
+            return plugs;
+        };
+
+        const loadPluginsCore = () => {
             window.INCY_CUSTOM_LINTER = null;
             window.INCY_CUSTOM_FORMATTER = null;
             window.INCY_CUSTOM_PARSER = null;
 
-            let plugs = JSON.parse(localStorage.getItem('incy_plugins') || '[]'); 
-            plugs.forEach(p => { 
+            let plugs = migratePlugins(lsJSON('incy_plugins', []));
+            plugs.forEach(p => {
                 if (p.active !== false) {
-                    try { 
-                        let oldAlert = window.alert;
+                    let oldAlert = window.alert;
+                    try {
                         window.alert = (msg) => console.log("Заблокирован alert от плагина: ", msg);
-                        window.eval(p.code); 
-                        window.alert = oldAlert;
-                    } catch(e) { console.error("Ошибка в плагине", p.name); } 
+                        window.eval(p.code);
+                    } catch(e) { console.error("Ошибка в плагине", p.name); }
+                    finally { window.alert = oldAlert; }
                 }
-            }); 
+            });
         };
         loadPluginsCore();
-        
+
         const renderPlugins = () => {
-            let plugs = JSON.parse(localStorage.getItem('incy_plugins') || '[]');
+            let plugs = lsJSON('incy_plugins', []);
             if(plugs.length === 0) { g('pluginsList').innerHTML = '<div style="font-size:12px; color:var(--text-muted); padding: 8px; text-align:center;">Плагинов пока нет. Выберите из каталога выше!</div>'; return; }
             g('pluginsList').innerHTML = plugs.map(p => `
                 <div style="background:var(--bg-input); border:1px solid var(--border-gray); padding:8px 12px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
                     <div style="display:flex; flex-direction:column; overflow:hidden;">
-                        <span style="font-size:13px; font-weight:bold; color:var(--text-main); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.name || 'Скрипт'}</span>
+                        <span style="font-size:13px; font-weight:bold; color:var(--text-main); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${esc(p.name || 'Скрипт')}</span>
                     </div>
                     <div style="display:flex; gap:6px; align-items:center;">
                         <label class="switch" style="transform:scale(0.8);">
-                            <input type="checkbox" ${p.active !== false ? 'checked' : ''} onchange="window.togglePlugin(${p.id}, this.checked)">
+                            <input type="checkbox" ${p.active !== false ? 'checked' : ''} data-plug-toggle="${esc(p.id)}">
                             <span class="slider"></span>
                         </label>
-                        <button class="btn-action btn-action-red" style="padding:4px 8px;" onclick="window.delPlugin(${p.id})" title="Удалить">✖</button>
+                        <button class="btn-action btn-action-red" style="padding:4px 8px;" data-plug-del="${esc(p.id)}" title="Удалить">✖</button>
                     </div>
                 </div>
             `).join('');
         };
+        g('pluginsList').addEventListener('change', e => { let t = e.target.closest('[data-plug-toggle]'); if (t) window.togglePlugin(t.dataset.plugToggle, t.checked); });
+        g('pluginsList').addEventListener('click', e => { let t = e.target.closest('[data-plug-del]'); if (t) window.delPlugin(t.dataset.plugDel); });
 
         window.togglePlugin = (id, isActive) => {
-            let plugs = JSON.parse(localStorage.getItem('incy_plugins') || '[]');
-            let idx = plugs.findIndex(p => p.id === id);
+            let plugs = lsJSON('incy_plugins', []);
+            let idx = plugs.findIndex(p => String(p.id) === String(id));
             if(idx > -1) {
                 plugs[idx].active = isActive;
-                localStorage.setItem('incy_plugins', JSON.stringify(plugs));
+                lsSet('incy_plugins', JSON.stringify(plugs));
                 loadPluginsCore();
                 if(isActive) showT('Плагин включен'); else showT('Плагин выключен');
             }
@@ -746,53 +823,42 @@
 
         window.installPresetPlugin = (type) => {
             vibe();
-            let plugs = JSON.parse(localStorage.getItem('incy_plugins') || '[]');
+            let plugs = lsJSON('incy_plugins', []);
             let newPlug = null;
             if (type === 'minify') {
-                newPlug = { id: Date.now(), name: '🗜️ Сжиматель (Minifier)', active: true, code: `window.INCY_CUSTOM_FORMATTER = function(val) { return JSON.stringify(JSON.parse(val)); }; window.INCY_API.toast('JSON сжат в 1 строку!');` };
+                newPlug = { id: Date.now(), name: '🗜️ Сжиматель (Minifier)', active: true, code: PRESET_CODE.minify };
             } else if (type === 'yaml') {
-                newPlug = { 
-                    id: Date.now(), name: '📄 YAML Конвертер', active: true, 
-                    code: `
-                    if(!window.jsyaml) {
-                        let s = document.createElement('script');
-                        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js';
-                        document.head.appendChild(s);
-                        s.onload = () => window.INCY_API.toast('Движок YAML загружен!');
-                    }
-                    window.INCY_CUSTOM_PARSER = function(val) {
-                        if(!val.startsWith('{') && window.jsyaml) {
-                            try { return JSON.stringify(jsyaml.load(val), null, 4); } catch(e){}
-                        } return null;
-                    };
-                    ` 
-                };
+                newPlug = { id: Date.now(), name: '📄 YAML Конвертер', active: true, code: PRESET_CODE.yaml };
             }
-            if (newPlug) { plugs.push(newPlug); localStorage.setItem('incy_plugins', JSON.stringify(plugs)); loadPluginsCore(); renderPlugins(); showT('Плагин установлен!'); }
+            if (newPlug && plugs.some(p => p.name === newPlug.name)) { showT('Этот плагин уже установлен'); return; }
+            if (newPlug) { plugs.push(newPlug); lsSet('incy_plugins', JSON.stringify(plugs)); loadPluginsCore(); renderPlugins(); showT('Плагин установлен!'); }
         }
 
         g('btnInstallPlugin').onclick = async () => {
             let url = g('pluginUrl').value.trim(); if(!url) return;
+            if (!confirm('Плагин — это программа с полным доступом к странице и всем вашим конфигам.\nУстанавливайте только из источника, которому доверяете.\n\nПродолжить?')) return;
             try {
-                vibe(); g('btnInstallPlugin').textContent = '...'; 
+                vibe(); g('btnInstallPlugin').textContent = '...';
                 let code = "";
                 if (url.startsWith('data:')) {
-                    code = decodeURIComponent(escape(atob(url.split(',')[1])));
+                    let [meta, body] = [url.slice(0, url.indexOf(',')), url.slice(url.indexOf(',') + 1)];
+                    code = /;base64$/i.test(meta) ? decodeURIComponent(escape(atob(body))) : decodeURIComponent(body);
                 } else {
-                    let res = await fetch(url); code = await res.text();
+                    let res = await fetch(url); if (!res.ok) throw new Error('HTTP ' + res.status); code = await res.text();
                 }
-                
-                let plugs = JSON.parse(localStorage.getItem('incy_plugins') || '[]'); 
-                plugs.push({id: Date.now(), name: 'Пользовательский скрипт', active: true, url: url, code: code}); 
-                localStorage.setItem('incy_plugins', JSON.stringify(plugs));
+                let plugName = url.startsWith('data:') ? 'Скрипт (data:)' : (decodeURIComponent(url.split(/[?#]/)[0].split('/').pop() || '') || 'Пользовательский скрипт');
+
+                let plugs = lsJSON('incy_plugins', []);
+                plugs.push({id: Date.now(), name: plugName.slice(0, 60), active: true, url: url, code: code});
+                lsSet('incy_plugins', JSON.stringify(plugs));
                 
                 try { window.eval(code); showT('Плагин запущен!'); } catch(e) { showT('Ошибка кода плагина', 1); }
                 g('pluginUrl').value = ''; renderPlugins(); g('btnInstallPlugin').textContent = '📥'; linter();
             } catch(e) { showT('Ошибка (Проверьте ссылку)', 1); g('btnInstallPlugin').textContent = '📥'; }
         };
         window.delPlugin = (id) => {
-            let plugs = JSON.parse(localStorage.getItem('incy_plugins') || '[]'); plugs = plugs.filter(p => p.id !== id); localStorage.setItem('incy_plugins', JSON.stringify(plugs));
-            renderPlugins(); showT('Плагин удален. Обновите страницу!');
+            let plugs = lsJSON('incy_plugins', []).filter(p => String(p.id) !== String(id)); lsSet('incy_plugins', JSON.stringify(plugs));
+            loadPluginsCore(); renderPlugins(); linter(); showT('Плагин удалён');
         };
 
         const encodeB64 = str => btoa(unescape(encodeURIComponent(str))).replace(/=+$/, '');
@@ -805,11 +871,12 @@
                 let v = o[k]; 
                 if(typeof v==='object' && v!==null) { 
                     let p = Array.isArray(v)?`[${v.length} эл-тов]`:`{...}`; 
-                    h += `<div class="vg-node"><div class="vg-key" onclick="this.nextElementSibling.classList.toggle('hidden')">⊖ ${k} <span class="vg-obj">${p}</span></div><div>${parseNode(v)}</div></div>`; 
-                } else { h += `<div class="vg-node" style="font-size:13px"><span style="color:var(--text-main);font-weight:bold;">${k}:</span> <span class="vg-val">${v}</span></div>`; } 
-            } return h; 
+                    h += `<div class="vg-node"><div class="vg-key" data-vg-toggle>⊖ ${esc(k)} <span class="vg-obj">${p}</span></div><div>${parseNode(v)}</div></div>`;
+                } else { h += `<div class="vg-node" style="font-size:13px"><span style="color:var(--text-main);font-weight:bold;">${esc(k)}:</span> <span class="vg-val">${esc(v)}</span></div>`; }
+            } return h;
         };
-        const buildG = () => { try { els.vGraph.innerHTML = `<div style="font-weight:bold; color:var(--text-main); margin-bottom:8px;">{ Root }</div>` + parseNode(JSON.parse(els.jsonEditor.value)); } catch(e) { els.vGraph.innerHTML = `<div style="color:var(--red-text); padding:20px;">Ошибка JSON-парсера: ${e.message}</div>`; } };
+        const buildG = () => { try { els.vGraph.innerHTML = `<div style="font-weight:bold; color:var(--text-main); margin-bottom:8px;">{ Root }</div>` + parseNode(JSON.parse(els.jsonEditor.value)); } catch(e) { els.vGraph.innerHTML = `<div style="color:var(--red-text); padding:20px;">Ошибка JSON-парсера: ${esc(e.message)}</div>`; } };
+        els.vGraph.addEventListener('click', e => { let k = e.target.closest('[data-vg-toggle]'); if (k) { let open = k.nextElementSibling.classList.toggle('hidden'); k.firstChild.textContent = (open ? '⊕ ' : '⊖ ') + k.firstChild.textContent.slice(2); } });
         g('btnViewToggle').onclick = function() { vibe(); let a = els.vGraph.classList.toggle('active'); this.textContent = a ? '✏️ Редактор' : '👁 Визуал'; if(a) buildG(); };
 
         function parseAndScrollToError(e) {
@@ -902,7 +969,21 @@
         });
 
         els.jsonEditor.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') { e.preventDefault(); let start = this.selectionStart, end = this.selectionEnd, val = this.value; let lineStart = val.substring(0, start).lastIndexOf('\n') + 1; let indent = val.substring(lineStart, start).match(/^\s*/)[0]; this.setRangeText('\n' + indent, start, end, 'end'); updateLines(); saveEdState(els.jsonEditor.value); linter(); }
+            if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); let start = this.selectionStart, end = this.selectionEnd, val = this.value; let lineStart = val.substring(0, start).lastIndexOf('\n') + 1; let indent = val.substring(lineStart, start).match(/^[ \t]*/)[0]; this.setRangeText('\n' + indent, start, end, 'end'); this.dispatchEvent(new Event('input')); }
+            else if (e.key === 'Tab' && !e.shiftKey) { e.preventDefault(); this.setRangeText('    ', this.selectionStart, this.selectionEnd, 'end'); this.dispatchEvent(new Event('input')); }
+            else if (e.key === 'Escape') { this.blur(); }
+        });
+
+        // Горячие клавиши: Ctrl/⌘+S — сохранить, Ctrl/⌘+F — поиск в редакторе, Esc — закрыть окно / полноэкранный режим.
+        // e.code, а не e.key — чтобы работало и в русской раскладке
+        document.addEventListener('keydown', e => {
+            let mod = e.ctrlKey || e.metaKey;
+            if (e.key === 'Escape') {
+                let m = [...document.querySelectorAll('.modal-overlay.active')].pop();
+                if (m) { m.classList.remove('active'); return; }
+                if (isFullscreen && e.target !== els.jsonEditor) closeFullscreen();
+            } else if (mod && e.code === 'KeyS') { e.preventDefault(); els.btnSaveJson.click(); }
+            else if (mod && e.code === 'KeyF' && e.target === els.jsonEditor) { e.preventDefault(); g('searchBar').classList.remove('hidden'); g('searchInput').focus(); g('searchInput').select(); }
         });
 
         let lastSearchTerm = "";
@@ -935,10 +1016,10 @@
         }
 
         const saveCustomPrefs = () => {
-            localStorage.setItem('incy_c_proto', g('customProtoInput').value);
-            localStorage.setItem('incy_c_man', g('customCmdManual').value);
-            localStorage.setItem('incy_c_aut', g('customCmdAuto').value);
-            localStorage.setItem('incy_c_usetog', g('customUseToggle').checked ? '1' : '0');
+            lsSet('incy_c_proto', g('customProtoInput').value);
+            lsSet('incy_c_man', g('customCmdManual').value);
+            lsSet('incy_c_aut', g('customCmdAuto').value);
+            lsSet('incy_c_usetog', g('customUseToggle').checked ? '1' : '0');
         };
 
         const updateToggleLabel = () => {
@@ -1004,8 +1085,21 @@
 
         // --- УМНАЯ ГЕНЕРАЦИЯ ССЫЛКИ ---
         function refreshLinks() {
-            try {
-                let parsed = JSON.parse(els.jsonEditor.value);
+            let parsed;
+            try { parsed = JSON.parse(els.jsonEditor.value); if (parsed === null || typeof parsed !== 'object') throw 0; }
+            catch(e) { markLinksBroken(); return; }
+            updateOutputLinks(buildLink(parsed), parsed.Name);
+        }
+
+        // JSON сломан — не показываем старую ссылку как рабочую
+        function markLinksBroken() {
+            els.resOut.value = '';
+            els.resOut.placeholder = '⚠️ В JSON ошибка — ссылка не собрана. Исправьте код в редакторе.';
+            els.btnDeepLink.removeAttribute('href'); els.btnDeepLink.classList.add('disabled');
+            renderLinkMeta('');
+        }
+
+        function buildLink(parsed) {
                 let rawMinified = JSON.stringify(parsed);
                 let b64 = encodeB64(rawMinified);
                 let newUrl = "";
@@ -1027,21 +1121,57 @@
                         newUrl = prefix + b64;
                     }
                 }
-                updateOutputLinks(newUrl, parsed.Name);
-            } catch(e) {}
+                return newUrl;
         }
 
         function updateOutputLinks(urlStr, name) {
             els.resOut.style.backgroundColor = 'var(--bg-card)'; setTimeout(() => els.resOut.style.backgroundColor = '', 200);
-            els.resOut.value = urlStr; els.btnDeepLink.href = urlStr; els.pName.value = name || "Без имени";
+            els.resOut.value = urlStr; els.resOut.placeholder = 'Здесь будет ПРЯМАЯ ссылка...';
+            if (isSafeLaunchUrl(urlStr)) { els.btnDeepLink.href = urlStr; els.btnDeepLink.classList.remove('disabled'); }
+            else { els.btnDeepLink.removeAttribute('href'); els.btnDeepLink.classList.add('disabled'); }
+            els.pName.value = name || "Без имени";
+            renderLinkMeta(urlStr);
         }
+
+        // Длина ссылки и где она не пройдёт (только числа и фиксированный текст — innerHTML безопасен)
+        let linkMetaToken = 0;
+        function renderLinkMeta(url) {
+            let box = g('linkMeta'); if (!box) return;
+            let token = ++linkMetaToken;
+            if (!url) { box.innerHTML = ''; return; }
+            let n = url.length;
+            const draw = mini => {
+                if (token !== linkMetaToken) return;
+                let warn = [];
+                if (n > TG_MAX_MSG) warn.push('не влезет в одно сообщение Telegram (лимит 4096) — '
+                    + (mini && mini <= TG_MAX_MSG ? 'отправьте MINI или файлом' : 'отправьте файлом («📥 Скачать»)' + (mini ? ', MINI тоже длиннее лимита' : '')));
+                if (isWindows && n > WIN_MAX_LINK) warn.push('на Windows кнопка «Открыть» с такой длинной ссылкой не сработает — скопируйте ссылку и вставьте в приложение');
+                box.innerHTML = `Длина: <b>${n.toLocaleString('ru-RU')}</b>` + (mini ? ` · MINI: <b>${mini.toLocaleString('ru-RU')}</b>` : '')
+                    + warn.map(w => `<div class="link-warn">⚠️ ${w}</div>`).join('');
+            };
+            draw(0);
+            getMini().then(m => draw(m ? m.length : 0)).catch(() => {});
+        }
+
+        // На Windows длинная ссылка не дойдёт до приложения — копируем вместо открытия
+        const WIN_COPY_MSG = 'На Windows такая длинная ссылка не открывается — скопировал, вставьте её в приложение';
+        function openLink(url) {
+            if (!isSafeLaunchUrl(url)) { showT('Небезопасная ссылка — не открываю', 1); return; }
+            if (isWindows && url.length > WIN_MAX_LINK) { copyToC(url, WIN_COPY_MSG); return; }
+            location.href = url;
+        }
+        els.btnDeepLink.addEventListener('click', e => {
+            let url = els.resOut.value;
+            if (!url) { e.preventDefault(); showT('Сначала исправьте JSON', 1); return; }
+            if (isWindows && url.length > WIN_MAX_LINK) { e.preventDefault(); copyToC(url, WIN_COPY_MSG); }
+        });
 
         const updateLines = () => { let ls = els.jsonEditor.value.split('\n').length || 1; els.tLineH.innerHTML = Array.from({length: ls}, (_, i) => `<div>${i+1}</div>`).join(''); els.bdgLines.textContent = ls; };
         
         let liveUpdateTimer, typedDebounce;
         els.jsonEditor.addEventListener('input', () => { 
             hasUnsavedChanges = true; updateLines(); if (els.vGraph.classList.contains('active')) buildG();
-            if(els.jsonEditor.value.length > 5) localStorage.setItem('incy_draft', els.jsonEditor.value);
+            if(els.jsonEditor.value.length > 5) lsSet('incy_draft', els.jsonEditor.value);
             clearTimeout(typedDebounce); typedDebounce = setTimeout(() => { saveEdState(els.jsonEditor.value); }, 600);
             clearTimeout(liveUpdateTimer); liveUpdateTimer = setTimeout(() => { linter(); refreshLinks(); }, 300);
         });
@@ -1072,48 +1202,97 @@
         // --- ВВОД ФАЙЛА И УМНЫЙ ПАРСИНГ ---
         document.body.addEventListener('dragover', e => e.preventDefault()); document.body.addEventListener('drop', e => { e.preventDefault(); if(e.dataTransfer.files.length) { let rd = new FileReader(); rd.onload = ev => { els.srcInput.value = ev.target.result.trim(); handleSrc(); }; rd.readAsText(e.dataTransfer.files[0]); } });
         g('fileInput').onchange = e => { let file = e.target.files[0]; if(!file) return; let rd = new FileReader(); rd.onload = ev => { els.srcInput.value = ev.target.result.trim(); handleSrc(); }; rd.readAsText(file); g('fileInput').value = ''; };
-        els.btnPaste.onclick = async () => { try{ els.srcInput.value = await navigator.clipboard.readText(); handleSrc(); } catch(e){} };
+        els.btnPaste.onclick = async () => { try{ els.srcInput.value = await navigator.clipboard.readText(); handleSrc(); } catch(e){ els.srcInput.focus(); showT('Нет доступа к буферу — вставьте вручную (долгое нажатие → «Вставить»)', 1); } };
         els.btnClear.onclick = () => { vibe(); els.srcInput.value=''; loadCfg(defaultJsonTemplate, false); showT('Очищено'); edHist=[]; };
 
-        let parseTimer; els.srcInput.addEventListener('input', () => { if(g('uiAutoParse').checked) { clearTimeout(parseTimer); parseTimer = setTimeout(handleSrc, 400); } });
+        let parseTimer, srcPasted = false;
+        els.srcInput.addEventListener('paste', () => { srcPasted = true; });
+        els.srcInput.addEventListener('input', () => { let allowFetch = srcPasted; srcPasted = false; if(g('uiAutoParse').checked) { clearTimeout(parseTimer); parseTimer = setTimeout(() => handleSrc({ allowFetch }), 400); } });
         els.btnParseManually.onclick = () => { vibe(); handleSrc(); };
 
-        async function handleSrc() {
-            let val = els.srcInput.value.trim(); if(!val) return;
-            if(val.includes('#') && val.length > 50 && val.includes('sid=')) return decryptCloud(val); 
-
-            let protoMatch = val.match(/^([a-zA-Z0-9-]+):\/\//i);
-            let detectedProto = protoMatch ? protoMatch[1].toLowerCase() : 'incy';
-            if (detectedProto === 'happ') setProtocol('happ'); 
-            else if (detectedProto === 'incy' || detectedProto === 'incy-mini') setProtocol('incy'); 
-            else setProtocol(detectedProto);
-
-            if (window.INCY_CUSTOM_PARSER) { let pRes = window.INCY_CUSTOM_PARSER(val); if (pRes) { loadCfg(pRes, true); return; } }
-
-            let jsonStr = null;
-            if (val.startsWith('{')) { try { JSON.parse(val); jsonStr = val; } catch(e) {} }
-            if (!jsonStr) {
-                let b64 = val;
-                if (val.includes('://')) {
-                    let pathStr = val.substring(val.indexOf('://') + 3);
-                    if (pathStr.startsWith('routing/onadd/')) b64 = pathStr.substring(14);
-                    else if (pathStr.startsWith('routing/add/')) b64 = pathStr.substring(12);
-                    else if (pathStr.startsWith('route/')) b64 = pathStr.substring(6);
-                    else {
-                        let firstSlash = pathStr.indexOf('/');
-                        if (firstSlash > 0 && firstSlash < 30 && !pathStr.substring(0, firstSlash).includes('?')) {
-                            b64 = pathStr.substring(firstSlash + 1);
-                        } else { b64 = pathStr; }
-                    }
-                }
-
-                try {
-                    let bytes = new Uint8Array(atob(b64.padEnd(b64.length + (4 - b64.length % 4) % 4, '=')).split('').map(c=>c.charCodeAt(0)));
-                    let decomp = await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).text().catch(()=>null);
-                    jsonStr = decomp || decodeURIComponent(escape(atob(b64)));
-                } catch(e) {}
+        // base64 / base64url (обычный или сжатый deflate — MINI) → текст. requireJson: принимать только валидный JSON
+        async function decodePayload(raw, requireJson) {
+            let s = String(raw || '').trim().replace(/\s+/g, '').replace(/-/g, '+').replace(/_/g, '/');
+            try { s = decodeURIComponent(s); } catch (e) {}
+            if (!s || !/^[A-Za-z0-9+/]*={0,2}$/.test(s)) return null;
+            s += '='.repeat((4 - s.length % 4) % 4);
+            let bytes; try { bytes = b64ToBytes(s); } catch (e) { return null; }
+            const variants = [() => new TextDecoder('utf-8', { fatal: true }).decode(bytes)];
+            if (typeof DecompressionStream !== 'undefined')
+                variants.push(() => new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).text());
+            for (const v of variants) {
+                let out; try { out = await v(); } catch (e) { continue; }
+                if (!requireJson) return out;
+                try { let j = JSON.parse(out); if (j && typeof j === 'object') return out; } catch (e) {}
             }
-            if(jsonStr) { loadCfg(jsonStr, true); } else { if (val.length > 30 && !val.includes(" ")) { vibe(100); showT("ФОРМАТ НЕ РАСПОЗНАН", 1); } }
+            return null;
+        }
+
+        // Что лежит после схемы: base64 или адрес файла (incy://routing/onadd/https://…)
+        function payloadCandidates(scheme, path) {
+            if (scheme === 'incy-mini') return [path];
+            let q = path.match(/[?&]data=([^&#]+)/); if (q) return [q[1]];
+            let m = path.match(/^(?:auto)?routing\/(?:on)?add\/(.+)$/i) || path.match(/^(?:on)?add\/(.+)$/i) || path.match(/^route\/(.+)$/i);
+            if (m) return [m[1]];
+            let firstSlash = path.indexOf('/');
+            let afterCmd = (firstSlash > 0 && firstSlash < 30 && !path.slice(0, firstSlash).includes('?')) ? path.slice(firstSlash + 1) : null;
+            return afterCmd ? [afterCmd, path] : [path];
+        }
+
+        // Скачать профиль по ссылке (GitHub blob → raw). Возвращает JSON-текст или null
+        async function fetchProfile(url) {
+            url = url.replace(/^https:\/\/github\.com\/([^/]+\/[^/]+)\/blob\//i, 'https://raw.githubusercontent.com/$1/');
+            showT('⏳ Скачиваю профиль…');
+            try {
+                let ctrl = new AbortController(); let timer = setTimeout(() => ctrl.abort(), 10000);
+                let res = await fetch(url, { signal: ctrl.signal, credentials: 'omit' }); clearTimeout(timer);
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                let text = (await res.text()).trim();
+                try { let j = JSON.parse(text); if (j && typeof j === 'object') return text; } catch (e) {}
+                let sm = text.match(/^([a-z][a-z0-9+.-]*):\/\/(.*)$/is);
+                for (const c of (sm ? payloadCandidates(sm[1].toLowerCase(), sm[2]) : [text])) { let d = await decodePayload(c, true); if (d) return d; }
+                showT('По ссылке не профиль маршрутизации', 1); return null;
+            } catch (e) { showT('Не удалось скачать профиль по ссылке (нет сети или сайт не разрешает загрузку)', 1); return null; }
+        }
+
+        const SERVER_SCHEMES = ['vless', 'vmess', 'trojan', 'ss', 'ssr', 'hysteria', 'hysteria2', 'hy2', 'tuic', 'wireguard', 'wg', 'socks', 'socks5', 'naive+https', 'juicity'];
+
+        async function handleSrc(opts = {}) {
+            let val = els.srcInput.value.trim(); if(!val) return;
+            if(/[?&]sid=/.test(val) && val.length > 50) return decryptCloud(val);
+
+            let sm = val.match(/^([a-z][a-z0-9+.-]*):\/\/(.*)$/is);
+            let scheme = sm ? sm[1].toLowerCase() : null, path = sm ? sm[2] : '';
+            let jsonStr = null;
+
+            if (val.startsWith('{')) { try { JSON.parse(val); jsonStr = val; } catch(e) {} }
+
+            if (!jsonStr && scheme) {
+                if (SERVER_SCHEMES.includes(scheme)) { vibe(100); showT(`Это ссылка на сервер (${scheme}), а не профиль маршрутизации`, 1); return; }
+                if (/^crypt\d*\//i.test(path)) { vibe(100); showT('Зашифрованную ссылку INCY (crypt) открыть нельзя — её понимает только само приложение', 1); return; }
+                let cands = /^https?$/.test(scheme) ? [val] : payloadCandidates(scheme, path);
+                let urlCand = /^https?$/.test(scheme) ? val : cands.find(c => /^https?:\/\//i.test(c));
+                // Во время набора текста по сети не ходим — только после вставки или кнопки «Распознать»
+                if (urlCand && opts.allowFetch === false) { showT('Нажмите «🔄 Распознать», чтобы скачать профиль по ссылке'); return; }
+                if (urlCand) { jsonStr = await fetchProfile(urlCand); if (!jsonStr) return; }  // fetchProfile сам показал причину
+                else {
+                    for (const c of cands) { jsonStr = await decodePayload(c, true); if (jsonStr) break; }
+                    if (!jsonStr) for (const c of cands) { jsonStr = await decodePayload(c, false); if (jsonStr) break; }
+                }
+                // Протокол меняем только когда ссылку удалось разобрать; http(s) — не протокол приложения
+                if (jsonStr && scheme !== 'http' && scheme !== 'https') {
+                    if (scheme === 'happ') setProtocol('happ');
+                    else if (scheme === 'incy' || scheme === 'incy-mini') setProtocol('incy');
+                    else setProtocol(scheme);
+                }
+            } else if (!jsonStr) {
+                jsonStr = await decodePayload(val, true);
+            }
+
+            // Плагин-парсер (например YAML) — только если встроенные способы не подошли
+            if (!jsonStr && window.INCY_CUSTOM_PARSER) { try { let pRes = window.INCY_CUSTOM_PARSER(val); if (pRes) jsonStr = pRes; } catch(e) {} }
+
+            if(jsonStr) { loadCfg(jsonStr, true); } else if (val.length > 30 && !/\s/.test(val)) { vibe(100); showT("ФОРМАТ НЕ РАСПОЗНАН", 1); }
         }
 
         function loadCfg(codeStr, saveToHistoryFlag = true) {
@@ -1124,23 +1303,29 @@
                 els.jsonEditor.value = formattedStr; lastSavedJson = formattedStr; edHist = [formattedStr];
                 if (els.editorBlockWrapper.classList.contains('hidden') && saveToHistoryFlag) { g('uiS2').checked = true; g('uiS2').dispatchEvent(new Event('change')); }
                 updateLines(); linter(); refreshLinks();
-                if (saveToHistoryFlag) { pushHist(cn, formattedStr, els.resOut.value); showT("Успешно Распознано!"); els.editorBlockWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' }); els.srcInput.value = ''; }
+                if (saveToHistoryFlag) { let saved = pushHist(cn, formattedStr, els.resOut.value); if (saved) showT("Успешно Распознано!"); els.editorBlockWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' }); els.srcInput.value = ''; }
             } catch(e) { vibe(100); showT("Ошибка загрузки в редактор", 1); }
         }
 
         window.onload = () => {
             let draft = localStorage.getItem('incy_draft');
-            if(draft && draft.length > 20 && !window.location.hash) { 
+            if(draft && draft.length > 20 && !isCloudLink) { 
                 try { let p = JSON.parse(draft); els.jsonEditor.value = draft; els.pName.value = p.Name||'Черновик'; updateLines(); refreshLinks(); } catch(e) { els.jsonEditor.value = draft; els.pName.value = 'Черновик (Raw)'; updateLines(); } 
-            } else if (!window.location.hash) { els.jsonEditor.value = defaultJsonTemplate; els.pName.value = 'New Config'; updateLines(); refreshLinks(); }
-            saveEdState(els.jsonEditor.value); renderHist(); updateToggleLabel();
+            } else if (!isCloudLink) { els.jsonEditor.value = defaultJsonTemplate; els.pName.value = 'New Config'; updateLines(); refreshLinks(); }
+            appReady = true; saveEdState(els.jsonEditor.value); renderHist(); linter(); updateToggleLabel();
         };
 
         // --- СОХРАНЕНИЕ: СЖАТИЕ / КОПИРОВАНИЕ / ФАЙЛЫ ---
         els.resOut.onclick = () => { if(els.resOut.value) { els.resOut.select(); copyToC(els.resOut.value); } };
-        async function getMini() { try { return `incy-mini://${btoa(String.fromCharCode.apply(null, new Uint8Array(await new Response(new Blob([JSON.stringify(JSON.parse(els.jsonEditor.value))]).stream().pipeThrough(new CompressionStream('deflate-raw'))).arrayBuffer()))).replace(/=+$/,'')}`; } catch(e) { return `incy-mini://${encodeB64(els.jsonEditor.value)}`; } }
-        g('btnCopyMini').onclick = async () => { vibe(); try { let m = await getMini(); copyToC(m); } catch(e){ showT("Проверьте код",1); } };
-        g('btnCopyResult').onclick = () => { vibe(); copyToC(els.resOut.value); };
+        async function getMini() {
+            try {
+                let packed = await new Response(new Blob([JSON.stringify(JSON.parse(els.jsonEditor.value))]).stream().pipeThrough(new CompressionStream('deflate-raw'))).arrayBuffer();
+                return `incy-mini://${bytesToB64(new Uint8Array(packed)).replace(/=+$/,'')}`;
+            } catch(e) { return `incy-mini://${encodeB64(els.jsonEditor.value)}`; }
+        }
+        const jsonOk = () => { try { let j = JSON.parse(els.jsonEditor.value); return j !== null && typeof j === 'object'; } catch(e) { return false; } };
+        g('btnCopyMini').onclick = async () => { vibe(); if (!jsonOk()) { showT('Сначала исправьте JSON', 1); return; } copyToC(await getMini(), '✅ MINI скопирована — открывается только в INCY Tool'); };
+        g('btnCopyResult').onclick = () => { vibe(); if (!els.resOut.value) { showT('Сначала исправьте JSON', 1); return; } copyToC(els.resOut.value); };
         g('fileExtSelect').addEventListener('change', (e) => { vibe(); if(e.target.value === 'custom') { g('fileExtSelect').classList.add('hidden'); g('fileExtInput').classList.remove('hidden'); g('fileExtInput').value = '.'; g('fileExtInput').focus(); } });
         g('fileExtInput').addEventListener('blur', (e) => { let val = e.target.value.trim(); if(!val || val === '.') { g('fileExtInput').classList.add('hidden'); g('fileExtSelect').classList.remove('hidden'); g('fileExtSelect').value = '.json'; } });
         g('btnDownload').onclick = () => { 
@@ -1153,62 +1338,136 @@
         };
 
         // --- УМНАЯ ИСТОРИЯ ---
-        const getH = () => { let h = JSON.parse(localStorage.getItem('incy_history') || '[]'); let needsFix = false; h.forEach(i => { if (!i.id) { i.id = i.timestamp || Math.floor(Math.random() * 1000000000); needsFix = true; } }); if(needsFix) localStorage.setItem('incy_history', JSON.stringify(h)); return h; };
-        const setH = d => { localStorage.setItem('incy_history', JSON.stringify(d)); renderHist(); };
-        
-        const pushHist = (name, content, activeUrl) => {
-            if(!content) return; name = name || "Без имени"; let hist = getH().filter(i => i.name !== name);
-            let nUrl = activeUrl; 
-            if (!nUrl) {
-                let mode = g('autoActivateToggle').checked ? 'onadd' : 'add';
-                try { nUrl = `incy://routing/${mode}/${encodeB64(JSON.stringify(JSON.parse(content)))}`; } catch(e){ nUrl = `incy://routing/${mode}/${encodeB64(content)}`;}
+        // Запись: { id, name, content, proto, mode }. Ссылку для incy/happ собираем на лету — история весит вдвое меньше.
+        // url храним только для своих протоколов и для старых записей.
+        const getH = () => {
+            let h = lsJSON('incy_history', []); if (!Array.isArray(h)) h = [];
+            h = h.filter(i => i && typeof i === 'object');
+            let needsFix = false;
+            h.forEach(i => { if (!i.id) { i.id = i.timestamp || Math.floor(Math.random() * 1000000000); needsFix = true; } i.name = String(i.name ?? 'Без имени'); });
+            if(needsFix) lsSet('incy_history', JSON.stringify(h));
+            return h;
+        };
+        const setH = d => { let ok = lsSet('incy_history', JSON.stringify(d)); renderHist(); if (!ok) showT('Память браузера заполнена — удалите старые конфиги', 1); return ok; };
+
+        const histUrl = item => {
+            if (item.content && (item.proto === 'incy' || item.proto === 'happ')) {
+                try { return `${item.proto}://routing/${item.mode === 'add' ? 'add' : 'onadd'}/${encodeB64(JSON.stringify(JSON.parse(item.content)))}`; } catch(e) {}
             }
-            hist.unshift({ id: Date.now(), name: name, url: nUrl, content: content }); if(hist.length > 30) hist.pop(); setH(hist);
+            return item.url || '';
         };
 
+        const pushHist = (name, content, activeUrl) => {
+            if(!content) return true; name = name || "Без имени"; let hist = getH().filter(i => i.name !== name);
+            let entry = { id: Date.now(), name: name, content: content };
+            if (currentProtocol === 'incy' || currentProtocol === 'happ') { entry.proto = currentProtocol; entry.mode = g('autoActivateToggle').checked ? 'onadd' : 'add'; }
+            else if (activeUrl) entry.url = activeUrl;
+            hist.unshift(entry); if(hist.length > 30) hist.length = 30;
+            let ok = lsSet('incy_history', JSON.stringify(hist)); renderHist();
+            if (!ok) showT('Память браузера заполнена — удалите старые конфиги из истории', 1);
+            return ok;
+        };
         g('histSearch').addEventListener('input', e => renderHist(e.target.value.toLowerCase().trim()));
         g('btnClearHistory').onclick = () => { if(confirm("Сбросить всю историю?")){ vibe(); localStorage.removeItem('incy_history'); renderHist(); } };
 
-        const renderHist = (filt = "") => {
+        const renderHist = (filt = (g('histSearch').value || '').toLowerCase().trim()) => {
             if(!g('uiH').checked) return;
             let hist = getH(); if(!hist.length) { g('historyCard').classList.add('hidden'); return; }
             g('historyCard').classList.remove('hidden'); let data = filt ? hist.filter(i=>i.name.toLowerCase().includes(filt)) : hist;
-            els.historyList.innerHTML = data.map(i => {
-                let upUrl = i.url;
-                return `<div class="history-item" data-id="${i.id}"><div class="history-top"> <div class="history-title" data-act="ren">${i.name} ✏️</div><div class="history-controls"> <button class="history-btn-small" data-act="up">⬆</button> <button class="history-btn-small" data-act="dn">⬇</button> <button class="history-btn-small" data-act="dup">⧉</button> <button class="history-btn-small" style="color:var(--red-text)" data-act="del">✖</button> </div></div><div style="display:flex;gap:8px;"> <button class="btn-action" style="flex:1.5;background:var(--accent-blue);color:white;border:none;" onclick="location.href='${upUrl}'">🚀 Запуск</button> <button class="btn-action" style="flex:1;" data-act="load">✒️ Редактор</button> <button class="btn-action" style="flex:1;" onclick="copyToC('${upUrl}')">🔗 Copy</button></div></div>`;
-            }).join('');
+            els.historyList.innerHTML = data.map(i => `<div class="history-item" data-id="${esc(i.id)}"><div class="history-top"> <div class="history-title" data-act="ren" title="Переименовать">${esc(i.name)} ✏️</div><div class="history-controls"> <button class="history-btn-small" data-act="up" title="Выше">⬆</button> <button class="history-btn-small" data-act="dn" title="Ниже">⬇</button> <button class="history-btn-small" data-act="dup" title="Дублировать">⧉</button> <button class="history-btn-small" style="color:var(--red-text)" data-act="del" title="Удалить">✖</button> </div></div><div style="display:flex;gap:8px;"> <button class="btn-action" style="flex:1.5;background:var(--accent-blue);color:white;border:none;" data-act="run">🚀 Запуск</button> <button class="btn-action" style="flex:1;" data-act="load">✒️ Редактор</button> <button class="btn-action" style="flex:1;" data-act="copy">🔗 Copy</button></div></div>`).join('')
+                || '<div style="font-size:12px; color:var(--text-muted); text-align:center; padding:8px;">Ничего не найдено</div>';
         };
-
         els.historyList.addEventListener('click', async e => {
-            let t = e.target.closest('[data-act]'); if(!t) return; vibe(); 
-            let aid = Number(t.closest('.history-item').dataset.id); let h = getH(); let idx = h.findIndex(i=>i.id===aid); 
-            if(idx === -1) { let fallbackName = t.closest('.history-item').querySelector('.history-title').textContent.replace(' ✏️','').trim(); idx = h.findIndex(i=>i.name === fallbackName); }
+            let t = e.target.closest('[data-act]'); if(!t) return; vibe();
+            let item = t.closest('.history-item'); if (!item) return;
+            let h = getH(); let idx = h.findIndex(i => String(i.id) === item.dataset.id);
             if(idx === -1) return; let act = t.dataset.act;
-            if (act === 'del') { h.splice(idx,1); showT('Удалено'); } 
-            else if(act === 'up' && idx > 0) { [h[idx], h[idx-1]] = [h[idx-1], h[idx]]; } 
+            if (act === 'run') { let u = histUrl(h[idx]); if (u) openLink(u); else showT('У записи нет ссылки', 1); return; }
+            if (act === 'copy') { let u = histUrl(h[idx]); if (u) copyToC(u); else showT('У записи нет ссылки', 1); return; }
+            if (act === 'del') { h.splice(idx,1); showT('Удалено'); }
+            else if(act === 'up' && idx > 0) { [h[idx], h[idx-1]] = [h[idx-1], h[idx]]; }
             else if(act === 'dn' && idx < h.length-1) { [h[idx], h[idx+1]] = [h[idx+1], h[idx]]; }
-            else if(act === 'ren') { let nn=prompt("Имя конфига:",h[idx].name); if(nn&&nn.trim()) h[idx].name=nn.trim(); } 
-            else if(act === 'dup') { let c=JSON.parse(JSON.stringify(h[idx])); c.id=Date.now(); c.name+=' (Copy)'; h.splice(idx+1,0,c); } 
-            else if(act === 'load') { 
-                if (h[idx].content) { loadCfg(h[idx].content, false); els.editorBlockWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' }); } else if (h[idx].url) { els.srcInput.value = h[idx].url; await handleSrc(); }
-                showT('Открыто в редакторе'); return; 
+            else if(act === 'ren') { let nn=prompt("Имя конфига:",h[idx].name); if(nn&&nn.trim()) h[idx].name=nn.trim(); else return; }
+            else if(act === 'dup') { let c=JSON.parse(JSON.stringify(h[idx])); c.id=Date.now(); c.name+=' (Copy)'; h.splice(idx+1,0,c); }
+            else if(act === 'load') {
+                if (h[idx].content) { loadCfg(h[idx].content, false); if (h[idx].proto) setProtocol(h[idx].proto); refreshLinks(); els.editorBlockWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' }); } else if (h[idx].url) { els.srcInput.value = h[idx].url; await handleSrc(); }
+                showT('Открыто в редакторе'); return;
             } setH(h);
         });
-
-        g('btnBackupDump').onclick = () => { vibe(); let w = { hist: getH(), t: localStorage.getItem('incy_t'), tObj: localStorage.getItem('incy_user_themes'), ui: { s1: g('uiS1').checked?1:0, s2: g('uiS2').checked?1:0, exp: g('uiExp').checked?1:0, h: g('uiH').checked?1:0, auto: g('uiAutoParse').checked?1:0, lin: g('uiLinter').checked?1:0 }, plugs: JSON.parse(localStorage.getItem('incy_plugins')||'[]') }; let a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(w)], {type:"application/json"})); a.download = `incy_backup.incybackup`; a.click(); showT('Бэкап скачан!'); };
+        const UI_KEYS = { uiS1: 's1', uiS2: 's2', uiExp: 'exp', uiH: 'h', uiAutoParse: 'auto', uiLinter: 'lin' };
+        g('btnBackupDump').onclick = () => {
+            vibe(); let ui = {}; for (let id in UI_KEYS) ui[UI_KEYS[id]] = g(id).checked ? 1 : 0;
+            let w = { hist: getH(), t: localStorage.getItem('incy_t'), tObj: localStorage.getItem('incy_user_themes'), ui, plugs: lsJSON('incy_plugins', []) };
+            let a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(w)], {type:"application/json"}));
+            a.download = `incy_backup_${new Date().toISOString().slice(0,10)}.incybackup`; a.click(); showT('Бэкап скачан!');
+        };
         g('btnBackupLoad').onclick = () => { vibe(); g('backupFile').click(); };
-        g('backupFile').onchange = e => { let file = e.target.files[0]; if(!file)return; let rd = new FileReader(); rd.onload = ev => { try { let p = JSON.parse(ev.target.result.trim()); if(p.hist) { setH(p.hist); if(p.tObj) localStorage.setItem('incy_user_themes', p.tObj); setTheme(p.t||'default'); if(p.plugs) { localStorage.setItem('incy_plugins', JSON.stringify(p.plugs)); loadPluginsCore(); } if(p.ui) { ['uiS1', 'uiS2', 'uiExp', 'uiH', 'uiAutoParse', 'uiLinter'].forEach(id => { let key = id.replace('ui', ''); key = key==='Linter'?'lin':key.toLowerCase(); if(p.ui[key] !== undefined) { g(id).checked = p.ui[key]===1; g(id).dispatchEvent(new Event('change')); } }); } toggleModal('modSettings', false); showT('Восстановлено!'); } } catch(err){ showT('Файл поврежден', 1); } }; rd.readAsText(file); e.target.value=''; };
+        // Бэкап — чужой файл: проверяем структуру, спрашиваем перед заменой истории и отдельно — перед установкой плагинов (это код)
+        g('backupFile').onchange = e => {
+            let file = e.target.files[0]; if(!file) return; let rd = new FileReader();
+            rd.onload = ev => {
+                let p; try { p = JSON.parse(String(ev.target.result).trim()); } catch(err) { showT('Файл повреждён', 1); return; }
+                if (!p || !Array.isArray(p.hist)) { showT('Это не бэкап INCY Tool', 1); return; }
+                if (!confirm(`Восстановить бэкап?\nТекущая история (${getH().length} шт.) будет заменена на ${p.hist.length} шт. из файла.`)) return;
+                let hist = p.hist.filter(i => i && typeof i === 'object' && (typeof i.content === 'string' || typeof i.url === 'string'))
+                                 .map(i => ({ ...i, name: String(i.name ?? 'Без имени').slice(0, 200) }));
+                setH(hist);
+                if (p.tObj) { let raw = p.tObj; if (typeof raw === 'string') { try { raw = JSON.parse(raw); } catch(err) { raw = []; } } THEMES.user = sanitizeThemes(raw); THEMES.save(); }
+                setTheme(typeof p.t === 'string' && p.t ? p.t : 'default');
+                let plugs = Array.isArray(p.plugs) ? p.plugs.filter(x => x && typeof x.code === 'string') : [];
+                if (plugs.length) {
+                    let names = plugs.map(x => '• ' + String(x.name || 'Скрипт').slice(0, 60)).join('\n');
+                    if (confirm(`В бэкапе есть плагины (${plugs.length}):\n${names}\n\nПлагин — это код с полным доступом к странице и вашим конфигам. Устанавливайте, только если это ваш собственный бэкап.\n\nУстановить плагины?`)) {
+                        lsSet('incy_plugins', JSON.stringify(plugs)); loadPluginsCore(); linter();
+                    }
+                }
+                if (p.ui) { for (let id in UI_KEYS) { let v = p.ui[UI_KEYS[id]]; if (v !== undefined) { g(id).checked = v === 1; g(id).dispatchEvent(new Event('change')); } } }
+                toggleModal('modalSettings', false); showT('Восстановлено!');
+            };
+            rd.readAsText(file); e.target.value='';
+        };
 
         const deriveK = async(p,s)=>crypto.subtle.deriveKey({name:"PBKDF2",salt:s,iterations:100000,hash:"SHA-256"}, await crypto.subtle.importKey("raw",new TextEncoder().encode(p),{name:"PBKDF2"},0,["deriveKey"]),{name:"AES-GCM",length:256},0,["encrypt","decrypt"]);
         g('btnOpenCloudModal').onclick = () => { vibe(); toggleModal('modalCloud', true); g('shareResultBlock').classList.add('hidden'); };
         
-        g('btnGenerateCloud').onclick = async () => { vibe(); if(g('uiLinter').checked && !linter()) {showT('Исправьте код',1); return;} try { let p = g('sharePassword').value || Math.random().toString(36).slice(-8); let salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12)); let enc = await crypto.subtle.encrypt({name: "AES-GCM", iv}, await deriveK(p,salt), new TextEncoder().encode(els.jsonEditor.value)); let su = `${window.location.origin}${window.location.pathname}?sid=${encodeURIComponent(btoa(String.fromCharCode(...new Uint8Array(enc))))}&s=${encodeURIComponent(btoa(String.fromCharCode(...salt)))}&i=${encodeURIComponent(btoa(String.fromCharCode(...iv)))}#${p}`; g('shareUrlOut').value = su; g('shareResultBlock').classList.remove('hidden'); showT('Зашифровано AES256!'); } catch(e) { showT('Ошибка шифрования', 1); } };
+        const deflateBytes = async u8 => new Uint8Array(await new Response(new Blob([u8]).stream().pipeThrough(new CompressionStream('deflate-raw'))).arrayBuffer());
+        const inflateBytes = async u8 => new Uint8Array(await new Response(new Blob([u8]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).arrayBuffer());
+        // Без пароля — случайный ключ в части ссылки после «#» (она не уходит на сервер). С паролем — пароля в ссылке нет.
+        // Перед шифрованием конфиг сжимается (&z=1) — ссылка короче в несколько раз.
+        g('btnGenerateCloud').onclick = async () => {
+            vibe(); if(g('uiLinter').checked && !linter()) {showT('Исправьте код',1); return;}
+            try {
+                let pass = g('sharePassword').value;
+                let key = pass || bytesToB64(crypto.getRandomValues(new Uint8Array(12))).replace(/\+/g, '-').replace(/\//g, '_');
+                let data = new TextEncoder().encode(els.jsonEditor.value), z = 0;
+                if (typeof CompressionStream !== 'undefined') { data = await deflateBytes(data); z = 1; }
+                let salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12));
+                let enc = new Uint8Array(await crypto.subtle.encrypt({name: "AES-GCM", iv}, await deriveK(key, salt), data));
+                let su = `${location.origin}${location.pathname}?sid=${encodeURIComponent(bytesToB64(enc))}&s=${encodeURIComponent(bytesToB64(salt))}&i=${encodeURIComponent(bytesToB64(iv))}${z ? '&z=1' : ''}${pass ? '' : '#' + key}`;
+                g('shareUrlOut').value = su; g('shareResultBlock').classList.remove('hidden');
+                g('shareMeta').innerHTML = `Длина: <b>${su.length.toLocaleString('ru-RU')}</b>`
+                    + (pass ? '<div>🔑 Пароля в ссылке нет — передайте его отдельно</div>' : '<div>🔓 Ключ встроен в ссылку — откроет любой, у кого она есть</div>')
+                    + (su.length > TG_MAX_MSG ? '<div class="link-warn">⚠️ Длиннее 4096 символов — в одно сообщение Telegram не влезет, отправьте файлом</div>' : '');
+                showT(pass ? '🔐 Зашифровано. Пароль передайте отдельно!' : '🔐 Зашифровано');
+            } catch(e) { showT('Ошибка шифрования', 1); }
+        };
         
-        async function decryptCloud(u) { try { let url=new URL(u), p=url.hash.substring(1), sid=url.searchParams.get('sid'), s=url.searchParams.get('s'), i=url.searchParams.get('i'); if(!p||!sid||!s||!i)return; let dec = await crypto.subtle.decrypt({name:"AES-GCM", iv:Uint8Array.from(atob(i),c=>c.charCodeAt(0))}, await deriveK(p, Uint8Array.from(atob(s),c=>c.charCodeAt(0))), Uint8Array.from(atob(sid),c=>c.charCodeAt(0))); els.srcInput.value = new TextDecoder().decode(dec); handleSrc(); showT('🔓 Облако расшифровано'); } catch(e) { showT('Ссылка или ключ поврежден', 1); els.srcInput.value=''; } }
-        if(window.location.hash && window.location.search.includes('sid=')) decryptCloud(window.location.href);
+        async function decryptCloud(u) {
+            try {
+                let url = new URL(u), sid = url.searchParams.get('sid'), s = url.searchParams.get('s'), i = url.searchParams.get('i'), z = url.searchParams.get('z') === '1';
+                if (!sid || !s || !i) { showT('Ссылка повреждена', 1); return; }
+                let key = url.hash.slice(1); try { key = decodeURIComponent(key); } catch(e) {}
+                if (!key) { key = prompt('Конфиг защищён паролем. Введите пароль:'); if (!key) { showT('Без пароля не открыть', 1); return; } }
+                let dec = new Uint8Array(await crypto.subtle.decrypt({name:"AES-GCM", iv: b64ToBytes(i)}, await deriveK(key, b64ToBytes(s)), b64ToBytes(sid)));
+                if (z) dec = await inflateBytes(dec);
+                els.srcInput.value = new TextDecoder().decode(dec); await handleSrc(); showT('🔓 Облако расшифровано');
+                if (u === location.href) history.replaceState(null, '', location.pathname);   // убираем ключ из адресной строки и истории браузера
+            } catch(e) { showT('Неверный пароль или ссылка повреждена', 1); els.srcInput.value=''; }
+        }
+        if (isCloudLink) decryptCloud(location.href);
 
         let toastTimerT; function showT(msg, err=false) { els.toast.textContent=msg; els.toast.className=`toast show ${err?'error':''}`; clearTimeout(toastTimerT); toastTimerT=setTimeout(()=>els.toast.className='toast', 2500); }
-        function copyToC(txt) { navigator.clipboard.writeText(txt).then(()=>showT('✅ Скопировано')).catch(()=>{let t=document.createElement("textarea");t.value=txt;document.body.appendChild(t);t.select();try{document.execCommand("copy");showT('✅ Скопировано');}catch(e){showT('Ошибка',1);}document.body.removeChild(t);});}
+        function copyToC(txt, okMsg = '✅ Скопировано') { navigator.clipboard.writeText(txt).then(()=>showT(okMsg)).catch(()=>{let t=document.createElement("textarea");t.value=txt;t.setAttribute('readonly','');t.style.cssText='position:fixed;top:0;left:0;opacity:0';document.body.appendChild(t);t.select();try{document.execCommand("copy");showT(okMsg);}catch(e){showT('Не удалось скопировать',1);}document.body.removeChild(t);});}
     </script>
 </body>
 </html>
