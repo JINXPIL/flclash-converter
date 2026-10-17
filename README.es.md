@@ -74,7 +74,7 @@ Una sola página para **INCY** y **Happ** que reemplaza a los antiguos `incy.htm
 * 🌐 **Dos fuentes:** El perfil se descarga en paralelo desde GitHub y el espejo jsDelivr, con prioridad para GitHub por ser el más actualizado.
 * 💾 **Funciona sin GitHub:** La última versión descargada se guarda en el dispositivo y se usa si GitHub no está disponible.
 * 🏷️ **Sepa lo que instala:** El nombre del perfil y la fecha de actualización se leen directamente del enlace de configuración.
-* 📋 **Para clientes de escritorio:** Botón «Copiar» y un campo con el enlace completo para importarlo manualmente.
+* 💻 **En PC con Windows, por el portapapeles:** El enlace completo del perfil es más largo de lo que Windows puede pasar a una aplicación, así que el botón copia el perfil y la página indica dónde pegarlo en la aplicación. En el móvil sigue siendo un solo toque. El enlace completo también está disponible con «Copiar» y en un campo para importarlo manualmente.
 * 🔒 **Zero-Dependency:** Un único archivo HTML sin librerías externas (generador QR propio) y con una CSP estricta: la página solo descarga el perfil y no envía nada a ningún sitio.
 
 | Aplicación | Enlace de instalación |
