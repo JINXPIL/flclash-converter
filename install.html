@@ -75,10 +75,13 @@
         .btn.secondary { background: var(--card); border-color: var(--border); color: var(--text); }
         .btn.secondary:hover { background: #1f242c; border-color: var(--muted); }
         .btn.ok { border-color: var(--accent-hover); color: var(--ok); }
+        .btn.primary.ok { background: var(--accent-hover); color: #fff; }
         .btn[aria-disabled="true"] { opacity: .45; pointer-events: none; }
         .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
         .notice { padding: 12px 14px; border-radius: 10px; background: rgba(56,139,253,.1); border: 1px solid rgba(56,139,253,.35); font-size: 14px; color: var(--text); }
+        .notice p { margin: 0; }
+        .notice ol { margin: 8px 0 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
 
         /* --- РАСКРЫВАЮЩИЕСЯ БЛОКИ --- */
         details.card { padding: 0; }
@@ -144,16 +147,16 @@
             <div class="profile-meta" id="profile-meta"></div>
         </section>
 
-        <a class="btn primary" id="btn-open" aria-disabled="true">🚀 <span id="open-label">Открыть в INCY</span></a>
+        <a class="btn primary" id="btn-open" aria-disabled="true"><span class="label" id="open-label">🚀 Открыть в INCY</span></a>
 
         <div class="row">
             <button type="button" class="btn secondary" id="btn-copy" aria-disabled="true" title="Скопировать ссылку-конфиг, чтобы вставить её в приложение вручную"><span class="label">📋 Копировать</span></button>
             <button type="button" class="btn secondary" id="btn-share" title="Поделиться ссылкой на эту страницу"><span class="label">📤 Поделиться</span></button>
         </div>
 
-        <div class="notice fade" id="no-app" hidden>
-            Приложение не открылось? <a id="store-link" href="#" target="_blank" rel="noopener noreferrer">Установите INCY</a> и нажмите кнопку ещё раз.
-        </div>
+        <div class="notice" id="pc-hint" hidden></div>
+
+        <div class="notice fade" id="no-app" hidden></div>
 
         <details class="card" id="qr-box">
             <summary>📱 QR-код для телефона</summary>
@@ -185,6 +188,7 @@
                     <li>Нажмите зелёную кнопку «Открыть в <span class="app-name">INCY</span>».</li>
                     <li>Подтвердите добавление профиля в приложении.</li>
                 </ol>
+                <p class="muted">На компьютере с Windows приложение не получает профиль по кнопке: полная ссылка длиннее, чем Windows может передать программе. Поэтому там кнопка копирует профиль, а вы вставляете его в приложение из буфера обмена.</p>
                 <p class="muted">Профиль кэшируется на устройстве: если GitHub недоступен, страница возьмёт последнюю сохранённую версию.</p>
             </div>
         </details>
@@ -458,14 +462,27 @@
                 file: 'INCY/INCY_INSTALL.DEEPLINK',
                 backupKey: 'incy_deeplink_backup',   // те же ключи, что в старых страницах — кэш не потеряется
                 site: 'https://incy.cc',
+                // INCY для Windows (версия на 18.10.2026) падает с «Failed to launch JVM» на любой ссылке incy://,
+                // даже на incy://status. Когда починят — поставьте true: на Windows кнопка будет открывать INCY
+                // короткой ссылкой ниже, и INCY сам скачает профиль по адресу (docs.incy.cc/en/deep-links).
+                windowsLinks: false,
+                // 'incy://autorouting/onadd/' — то же, но INCY будет сам обновлять профиль (включать осознанно)
+                shortLink: url => 'incy://routing/onadd/' + url,
+                profileFile: 'INCY/DEFAULT.json',
             },
             happ: {
                 name: 'Happ', scheme: 'happ://',
                 file: 'HAPP/HAPP_INSTALL.DEEPLINK',
                 backupKey: 'happ_deeplink_backup',
                 site: 'https://www.happ.su/main/ru',
+                windowsLinks: true,
+                shortLink: null,      // в документации Happ есть только happ://routing/onadd/{base64}
+                profileFile: null,
             },
         };
+        // Windows не передаёт программам длинные ссылки: Chromium режет всё длиннее 2048 символов,
+        // сама система — длиннее 32 767. Полная ссылка-профиль — около 34 500 символов.
+        const WIN_MAX_LINK = 2000;
         const LAST_APP_KEY = 'install_last_app';
         const QR_SCALE_KEY = 'install_qr_scale';
         // =============================================
@@ -477,7 +494,7 @@
             name: $('profile-name'), meta: $('profile-meta'),
             open: $('btn-open'), openLabel: $('open-label'),
             copy: $('btn-copy'), share: $('btn-share'),
-            noApp: $('no-app'), storeLink: $('store-link'), helpStore: $('help-store'),
+            noApp: $('no-app'), pcHint: $('pc-hint'), helpStore: $('help-store'),
             qrBox: $('qr-box'), qrCard: $('qr-card'), qrSize: $('qr-size'),
             overlay: $('qr-overlay'), qrBig: $('qr-big'),
             rawBox: $('raw-box'), raw: $('raw-link'),
@@ -491,6 +508,7 @@
 
         const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)
             || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        const isWindows = !isMobile && /Windows/i.test(navigator.userAgent);
 
         // Приложение из адреса: ?app=happ или #happ (старые ссылки тоже можно перенаправить сюда)
         const params = new URLSearchParams(location.search);
@@ -501,10 +519,11 @@
         let autoOpenPending = !!urlApp && isMobile;
 
         // ---------- Загрузка ----------
-        const sourcesFor = file => [
-            `https://raw.githubusercontent.com/${REPO}/${BRANCH}/${file}?t=${Date.now()}`,   // свежий
-            `https://cdn.jsdelivr.net/gh/${REPO}@${BRANCH}/${file}`,                        // зеркало (может отставать)
-        ];
+        const fileUrl = (file, source) => source === 'cdn'
+            ? `https://cdn.jsdelivr.net/gh/${REPO}@${BRANCH}/${file}`        // зеркало (может отставать)
+            : `https://raw.githubusercontent.com/${REPO}/${BRANCH}/${file}`; // свежий
+        const SOURCE_NAMES = ['raw', 'cdn'];
+        const sourcesFor = file => [fileUrl(file, 'raw') + `?t=${Date.now()}`, fileUrl(file, 'cdn')];
 
         async function fetchText(url) {
             const ctrl = new AbortController();
@@ -524,7 +543,9 @@
                 return text;
             }));
             attempts.forEach(p => p.catch(() => {}));
-            for (const p of attempts) { try { return await p; } catch { /* следующий источник */ } }
+            for (let i = 0; i < attempts.length; i++) {
+                try { return { text: await attempts[i], source: SOURCE_NAMES[i] }; } catch { /* следующий источник */ }
+            }
             return null;
         }
 
@@ -533,15 +554,15 @@
             const cached = store.get(cfg.backupKey);
             const backup = cached && cached.startsWith(cfg.scheme) ? cached : null;
             // Пока грузим — кнопка уже работает с сохранённой копией
-            const s = state[app] = { status: 'loading', link: backup, info: backup ? parseProfile(backup) : null };
+            const s = state[app] = { status: 'loading', link: backup, source: backup ? 'cache' : null, info: backup ? parseProfile(backup) : null };
             if (app === current) render();
 
             const fresh = await fetchLink(app);
             if (state[app] !== s) return; // был запущен повтор
 
             if (fresh) {
-                store.set(cfg.backupKey, fresh);
-                Object.assign(s, { status: 'ready', link: fresh, info: parseProfile(fresh) });
+                store.set(cfg.backupKey, fresh.text);
+                Object.assign(s, { status: 'ready', link: fresh.text, source: fresh.source, info: parseProfile(fresh.text) });
             } else {
                 s.status = backup ? 'offline' : 'error';
             }
@@ -578,11 +599,12 @@
 
             ui.tabs.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.app === current)));
             document.title = `Установка профиля — ${cfg.name}`;
-            ui.openLabel.textContent = `Открыть в ${cfg.name}`;
+            const plan = currentPlan = launchPlan(current, s);
+            if (!ui.open.classList.contains('ok'))
+                ui.openLabel.textContent = plan.mode === 'copy' ? `📋 Скопировать для ${cfg.name}` : `🚀 Открыть в ${cfg.name}`;
             document.querySelectorAll('.app-name').forEach(el => { el.textContent = cfg.name; });
-            ui.storeLink.textContent = `Установите ${cfg.name}`;
             ui.helpStore.textContent = cfg.name;
-            ui.storeLink.href = ui.helpStore.href = cfg.site;
+            ui.helpStore.href = cfg.site;
 
             ui.profile.dataset.status = s.status;
             ui.statusText.textContent = STATUS_TEXT[s.status](s);
@@ -602,13 +624,68 @@
                 ui.meta.textContent = '';
             }
 
-            const enabled = !!s.link;
-            if (enabled) ui.open.href = s.link; else ui.open.removeAttribute('href');
-            ui.open.setAttribute('aria-disabled', String(!enabled));
-            ui.copy.setAttribute('aria-disabled', String(!enabled));
+            if (plan.mode === 'open') { ui.open.href = plan.href; ui.open.removeAttribute('role'); }
+            else if (plan.mode === 'copy') { ui.open.href = '#'; ui.open.setAttribute('role', 'button'); }
+            else { ui.open.removeAttribute('href'); ui.open.removeAttribute('role'); }
+            ui.open.setAttribute('aria-disabled', String(plan.mode === 'none'));
+            ui.copy.setAttribute('aria-disabled', String(!s.link));
             ui.raw.value = s.link || '';
 
+            renderPcHint(cfg, s, plan);
+            renderNoApp(cfg);
             renderQr();
+        }
+
+        // Как отдать профиль приложению на этом устройстве:
+        // open — кнопка-ссылка, copy — кнопка копирует профиль для вставки вручную, none — профиля нет
+        function launchPlan(app, s) {
+            const cfg = APPS[app];
+            if (!s.link) return { mode: 'none' };
+            if (!isWindows) return { mode: 'open', href: s.link };   // телефоны, macOS, Linux — полная ссылка, как раньше
+            if (!cfg.windowsLinks) return { mode: 'copy' };
+            if (s.link.length <= WIN_MAX_LINK) return { mode: 'open', href: s.link };
+            if (cfg.shortLink) {
+                // Хост берём тот, что открылся у пользователя: значит, и приложение его, скорее всего, достанет
+                const url = fileUrl(cfg.profileFile, s.source === 'cdn' ? 'cdn' : 'raw');
+                return { mode: 'open', short: true, href: cfg.shortLink(url) };
+            }
+            return { mode: 'copy' };
+        }
+
+        // Подсказка для ПК (имена приложений — из констант APPS, поэтому innerHTML безопасен)
+        function renderPcHint(cfg, s, plan) {
+            const box = ui.pcHint;
+            if (plan.mode === 'copy') {
+                const why = cfg.windowsLinks
+                    ? 'ссылка-профиль слишком длинная, Windows не может передать её программе'
+                    : `${cfg.name} для Windows пока не принимает ссылки из браузера`;
+                box.innerHTML = `<p><b>💻 На компьютере — через буфер обмена</b> (${why}):</p>`
+                    + '<ol><li>Нажмите зелёную кнопку — профиль скопируется.</li>'
+                    + `<li>Откройте ${cfg.name}.</li>`
+                    + '<li>Нажмите «+» и выберите добавление из буфера обмена.</li></ol>';
+                box.hidden = false;
+            } else if (plan.short) {
+                box.innerHTML = s.status === 'offline'
+                    ? `<p>💻 ${cfg.name} скачивает профиль с GitHub сам, а GitHub сейчас недоступен. Надёжнее нажать «Копировать» и вставить ссылку в ${cfg.name} из буфера обмена.</p>`
+                    : `<p>💻 На компьютере ${cfg.name} скачает профиль сам — с GitHub. Если после открытия профиль не появился, нажмите «Копировать» и вставьте ссылку в ${cfg.name} из буфера обмена.</p>`;
+                box.hidden = false;
+            } else {
+                box.hidden = true;
+            }
+        }
+
+        // Текст подсказки «не открылось?»
+        function renderNoApp(cfg) {
+            const a = document.createElement('a');
+            a.href = cfg.site; a.target = '_blank'; a.rel = 'noopener noreferrer';
+            if (isMobile) {
+                a.textContent = `Установите ${cfg.name}`;
+                ui.noApp.replaceChildren('Приложение не открылось? ', a, ' и нажмите кнопку ещё раз.');
+            } else {
+                a.textContent = 'скачать';
+                ui.noApp.replaceChildren(`${cfg.name} не открылся? Проверьте, что он установлен (`, a,
+                    `), или нажмите «Копировать» и вставьте ссылку в ${cfg.name} из буфера обмена.`);
+            }
         }
 
         // ---------- QR: кодируем адрес страницы, а не саму ссылку ----------
@@ -661,8 +738,16 @@
             ctrl.signal.addEventListener('abort', () => clearTimeout(timer));
         }
 
-        ui.open.addEventListener('click', e => {
-            if (!state[current]?.link) { e.preventDefault(); return; }
+        let currentPlan = { mode: 'none' };
+        ui.open.addEventListener('click', async e => {
+            const s = state[current];
+            if (!s?.link || currentPlan.mode === 'none') { e.preventDefault(); return; }
+            if (currentPlan.mode === 'copy') {
+                e.preventDefault();
+                if (await copyText(s.link)) flash(ui.open, `✅ Скопировано — вставьте в ${APPS[current].name}`);
+                else showManualCopy(s.link);
+                return;
+            }
             watchForApp();
         });
 
@@ -683,6 +768,7 @@
             autoOpenPending = false;
             appWatch?.abort();
             ui.noApp.hidden = true;
+            stopFlash(ui.open);
             store.set(LAST_APP_KEY, app);
             try {
                 const u = new URL(location.href);
@@ -712,22 +798,32 @@
 
         function flash(btn, text) {
             const label = btn.querySelector('.label');
-            btn.dataset.label ||= label.textContent;
+            if (!btn.classList.contains('ok')) btn.dataset.label = label.textContent;
             label.textContent = text;
             btn.classList.add('ok');
             clearTimeout(btn._flashTimer);
-            btn._flashTimer = setTimeout(() => { label.textContent = btn.dataset.label; btn.classList.remove('ok'); }, 2000);
+            btn._flashTimer = setTimeout(() => stopFlash(btn), 2500);
+        }
+        function stopFlash(btn) {
+            if (!btn.classList.contains('ok')) return;
+            clearTimeout(btn._flashTimer);
+            btn.querySelector('.label').textContent = btn.dataset.label;
+            btn.classList.remove('ok');
+        }
+
+        // Буфер недоступен — показываем текст для ручного копирования
+        function showManualCopy(link) {
+            ui.rawBox.open = true;
+            ui.raw.value = link;
+            ui.raw.focus(); ui.raw.select();
+            ui.rawBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
         ui.copy.addEventListener('click', async () => {
             const link = state[current]?.link;
             if (!link) return;
-            if (await copyText(link)) { flash(ui.copy, '✅ Скопировано'); return; }
-            // Буфер недоступен — показываем текст для ручного копирования
-            ui.rawBox.open = true;
-            ui.raw.value = link;
-            ui.raw.focus(); ui.raw.select();
-            ui.rawBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            if (await copyText(link)) flash(ui.copy, '✅ Скопировано');
+            else showManualCopy(link);
         });
 
         ui.raw.addEventListener('focus', () => ui.raw.select());
